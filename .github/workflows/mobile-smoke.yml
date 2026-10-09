@@ -1,0 +1,91 @@
+name: Native uygulama açılışı
+
+on:
+  workflow_run:
+    workflows: ['Native mobil paketler']
+    types: [completed]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  android:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: oggaq-android-local-preview
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          path: native-artifacts
+      - name: KVM erişimi
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: APK gerçek Android emülatöründe açılır
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: |
+            mkdir -p smoke
+            adb install native-artifacts/app-release.apk
+            adb shell am start -n net.harunaltay.oggaq/.MainActivity
+            sleep 5
+            adb shell uiautomator dump /sdcard/oggaq-login.xml
+            adb pull /sdcard/oggaq-login.xml smoke/android-login.xml
+            rg 'Hoş geldin' smoke/android-login.xml
+            adb exec-out screencap -p > smoke/android-login.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oggaq-android-startup
+          path: smoke/
+          if-no-files-found: error
+          retention-days: 14
+
+  ios:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: oggaq-ios-simulator
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          path: native-artifacts
+      - name: Simulator seçimi
+        run: |
+          xcrun simctl list devices available --json > devices.json
+          python3 - <<'PY'
+          import json, os
+          devices = json.load(open('devices.json'))['devices']
+          device = next(d for group in devices.values() for d in group if d['name'].startswith('iPhone') and d['state'] == 'Shutdown')
+          with open(os.environ['GITHUB_ENV'], 'a') as f:
+              f.write('OGGAQ_SIMULATOR_ID=' + device['udid'] + '\n')
+          PY
+      - name: Derlenmiş iOS uygulaması Simulator üzerinde açılır
+        run: |
+          mkdir -p smoke
+          ditto -x -k native-artifacts/oggaq-ios-simulator.zip native-artifacts/unpacked
+          xcrun simctl boot "$OGGAQ_SIMULATOR_ID"
+          xcrun simctl bootstatus "$OGGAQ_SIMULATOR_ID" -b
+          xcrun simctl install "$OGGAQ_SIMULATOR_ID" native-artifacts/unpacked/oggaqnizleme.app
+          xcrun simctl launch "$OGGAQ_SIMULATOR_ID" net.harunaltay.oggaq > smoke/ios-launch.txt
+          sleep 5
+          OGGAQ_APP_PID=$(awk '{print $NF}' smoke/ios-launch.txt)
+          ps -p "$OGGAQ_APP_PID" -o comm=
+          xcrun simctl io "$OGGAQ_SIMULATOR_ID" screenshot smoke/ios-login.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oggaq-ios-startup
+          path: smoke/
+          if-no-files-found: error
+          retention-days: 14
