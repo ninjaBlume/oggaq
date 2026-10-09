@@ -89,7 +89,14 @@ jobs:
           OGGAQ_APP_PID=$(awk '{print $NF}' smoke/ios-launch.txt)
           ps -p "$OGGAQ_APP_PID" -o comm=
           xcrun simctl io "$OGGAQ_SIMULATOR_ID" screenshot smoke/ios-login.png
+      - name: Başarısız Simulator açılışının tanısı
+        if: failure() && env.OGGAQ_SIMULATOR_ID != ''
+        run: |
+          mkdir -p smoke
+          xcrun simctl spawn "$OGGAQ_SIMULATOR_ID" log show --style compact --last 3m --predicate 'process == "oggaqnizleme" OR eventMessage CONTAINS "net.harunaltay.oggaq"' > smoke/ios-system.log || true
+          xcrun simctl io "$OGGAQ_SIMULATOR_ID" screenshot smoke/ios-failure.png || true
       - uses: actions/upload-artifact@v4
+        if: always() && env.OGGAQ_SIMULATOR_ID != ''
         with:
           name: oggaq-ios-startup
           path: smoke/
