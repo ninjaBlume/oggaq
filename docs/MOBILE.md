@@ -6,9 +6,38 @@
 
 Node 24 ve yerel API/servisleri hazırlayın. Kökte `npm ci --ignore-scripts`; `npm run dev:mobile` Expo'yu loopback'te açar. Xcode bulunan Mac'te `npm run ios --workspace @oggaq/mobile`; Android SDK/JDK ile `npm run android --workspace @oggaq/mobile`. [Expo yerel geliştirme](https://docs.expo.dev/guides/local-app-development/) gerekli araçları açıklar. [SDK matrisi](https://docs.expo.dev/versions/latest/) SDK 57 için Xcode 26.4+, iOS 16.4+, Android 7+ ve compile/target SDK 36 belirtir.
 
-`apps/mobile/.env.example` kopyalanabilir; gerçek `.env` git dışındadır. iOS Simulator API `http://127.0.0.1:8000`, Android emülatörü `http://10.0.2.2:8000` kullanır. Fiziksel cihaz için erişilebilir HTTPS API ve `EXPO_PUBLIC_WEB_URL` gerekir. Bu adreste backend ayrıca çalışmalı; sunucu LAN'a otomatik açılmaz. `EXPO_PUBLIC_*` ayarları paketin içinde herkes tarafından okunabilir; token/parola içermez.
+`apps/mobile/.env.example` kopyalanabilir; gerçek `.env` git dışındadır. iOS Simulator API `http://127.0.0.1:8000`, Android emülatörü `http://10.0.2.2:8000` kullanır. Fiziksel cihazdaki bağımsız release paketi için erişilebilir HTTPS API ve `EXPO_PUBLIC_WEB_URL` gerekir. Expo Go geliştirme testi aynı yerel ağda HTTP API kullanabilir; aşağıdaki kurulum bu geliştirme yoludur. Bu adreste backend ayrıca çalışmalı; sunucu LAN'a otomatik açılmaz. `EXPO_PUBLIC_*` ayarları paketin içinde herkes tarafından okunabilir; token/parola içermez.
 
 Normal release paketi HTTPS gerektirir. CI yerel önizlemesi `EXPO_PUBLIC_LOCAL_PREVIEW=1` ile yalnız localhost/127.0.0.1/10.0.2.2 hedeflerine izin verir; Android manifestinde HTTP erişimi, iOS'ta local networking açılır. Bu APK mağaza/üretim paketi değildir. Native klasörler `expo prebuild` ile kilitli bağımlılıklardan üretilir; git dışındadır.
+
+## iPhone'da aynı Wi-Fi üzerinden geliştirme testi
+
+iPhone'a [Expo Go](https://apps.apple.com/app/expo-go/id982107779) kurun. Mac ve iPhone aynı yerel ağda olmalı. Fiziksel iOS cihazında [Expo CLI ve Expo Go aynı Expo hesabına giriş ister](https://docs.expo.dev/troubleshooting/expo-go-sign-in-required/). Mac'te `apps/mobile` içinde Node 24 ile `npx expo login`; telefonda Expo Go'nun hesap ekranında aynı Expo hesabına giriş yapın. Expo oturumu geliştirme aracına aittir; uygulamadaki kullanıcı oturumu OGGAQ API'si tarafından doğrulanır. Expo CLI oturumu sunucu açıkken açılabilir; telefonda yeniden deneyin.
+
+Mac'in Wi-Fi IPv4 adresini `ipconfig getifaddr en1` ile bulun; aktif Wi-Fi arayüzü farklıysa onu kullanın. Aşağıdaki `192.168.1.20` yalnız örnektir; kendi Mac adresinizle değiştirin. `apps/mobile/.env.local` git dışındadır:
+
+```dotenv
+EXPO_PUBLIC_API_URL=http://192.168.1.20:8002
+EXPO_PUBLIC_WEB_URL=http://192.168.1.20:5175
+EXPO_PUBLIC_LOCAL_PREVIEW=0
+```
+
+Yerel PostgreSQL/Redis açıkken ayrı terminallerde, PHP 8.4 ve Node 24 PATH'e seçilerek:
+
+```sh
+# backend/ içinde; yalnız özel ağ arayüzüne bağlanır.
+APP_DEBUG=false APP_URL=http://192.168.1.20:8002 FRONTEND_URL=http://192.168.1.20:5175 SANCTUM_STATEFUL_DOMAINS=192.168.1.20:5175 php artisan serve --host=192.168.1.20 --port=8002 --tries=1 --no-reload
+
+# apps/web/ içinde; telefon tarayıcısı ve mobilde web bağlantıları için.
+VITE_API_URL=http://192.168.1.20:8002 npx vite --host 192.168.1.20 --port 5175 --strictPort
+
+# apps/mobile/ içinde.
+REACT_NATIVE_PACKAGER_HOSTNAME=192.168.1.20 npx expo start --go --lan --port 8081
+```
+
+Kamerayla Expo QR kodunu tarayıp Expo Go'da açın; iOS yerel ağ iznini istiyorsa verin. API bağlantısını iPhone Safari'de `http://192.168.1.20:8002/up` ile kontrol edebilirsiniz. Uygulamada mevcut doğrulanmış hesabınızla giriş yapın. Mac açık ve bu üç terminal çalışır durumda kalmalıdır; durdurmak için her terminalde Ctrl+C. Wi-Fi/IP değişirse yerel adresleri güncelleyip Expo'yu yeniden başlatın. Bu geliştirme erişimi TestFlight/App Store dağıtımı değildir. Bildirim e-postaları yerel Mailpit'e gider; mevcut loopback Horizon worker'ının e-posta bağlantıları Mac tarayıcısında açılır.
+
+9 Ekim 2026 yerel hazırlığında özel ağ üzerinden API/web erişimi, mobil login endpoint validation, web origin CORS, iOS Expo manifesti, LAN adresleri gömülü native geliştirme bundle'ı ve QR çözümleme kontrol edildi. Fiziksel iPhone'da açma, giriş ve yeniden açılış kontrolü kullanıcının Expo oturumu ve cihaz erişimiyle ayrıca doğrulanmalıdır.
 
 ## Oturum ve e-posta
 
@@ -35,6 +64,6 @@ Bu kontrol gerçek hesapla native API E2E, tokenın uygulama yeniden açılış�
 
 ## Açık bağımlılık sorunları
 
-9 Ekim 2026 npm audit: Expo derleme zincirinde **15 etkilenen paket**, iki kök high advisory: [braces recursive pattern DoS](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) (3.0.3) ve [node-forge signature verification](https://github.com/advisories/GHSA-86w9-cpqp-85rv) (1.4.0). İncelenen advisory'lerde düzeltilmiş sürüm yayımlanmamış. Bunlar Metro dosya eşleme ve Expo CLI sertifika araçlarında; native uygulamanın auth/HTTPS uygulamasında kullanılmaz. Derleme sunucusu loopback'te; dışarıdan glob/kod imzası girdisi kabul edilmez, OTA kod imzalama yapılandırılmadı. Bu değerlendirme upstream açığın düzeltildiği anlamına gelmez.
+9 Ekim 2026 npm audit: Expo derleme zincirinde **15 etkilenen paket**, iki kök high advisory: [braces recursive pattern DoS](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) (3.0.3) ve [node-forge signature verification](https://github.com/advisories/GHSA-86w9-cpqp-85rv) (1.4.0). İncelenen advisory'lerde düzeltilmiş sürüm yayımlanmamış. Bunlar Metro dosya eşleme ve Expo CLI sertifika araçlarında; native uygulamanın auth/HTTPS uygulamasında kullanılmaz. Varsayılan geliştirme sunucusu loopback'tedir; yukarıdaki iPhone testi Metro'yu yerel Wi-Fi ağına açar ve güvenilen geliştirme ağı içindir. OTA kod imzalama yapılandırılmadı. Bu değerlendirme upstream açığın düzeltildiği anlamına gelmez.
 
 `xcode` altındaki UUID 7, desteklenen CJS UUID 11.1.1 override'ıyla düzeltildi ve prebuild tekrar doğrulandı. `npm run audit` bütün audit raporunu okur, sadece belirtilen iki build advisory'sini açık uyarıyla raporlar; yeni advisory veya mobil dışına çıkan bağımlılık exception'ı CI'ı durdurur. Ham `npm audit` şu anda temiz değildir. Düzeltme yayımlandığında override/exception yeniden incelenmeli; üretim öncesi bu iki risk kapatılmalı.
