@@ -30,3 +30,18 @@ export async function deviceId(): Promise<string> {
   await SecureStore.setItemAsync("oggaq.device", id);
   return id;
 }
+
+// Preview-only native probe: verifies real encrypted storage on the simulator.
+export async function verifyPreviewStorage(): Promise<void> {
+  if (Platform.OS === "web" || process.env.EXPO_PUBLIC_LOCAL_PREVIEW !== "1")
+    return;
+  const key = "oggaq.preview-probe";
+  const value = Crypto.randomUUID();
+  try {
+    await SecureStore.setItemAsync(key, value);
+    if ((await SecureStore.getItemAsync(key)) !== value)
+      throw new Error("Secure storage probe failed.");
+  } finally {
+    await SecureStore.deleteItemAsync(key);
+  }
+}

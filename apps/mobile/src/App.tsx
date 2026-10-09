@@ -13,7 +13,7 @@ import type { User } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
 import brand from "../brand.json";
 import { api, sessionExpiredHandler } from "./api";
-import { session } from "./storage";
+import { session, verifyPreviewStorage } from "./storage";
 import { Login, Verify } from "./auth";
 import { useResource, useResume, useTask } from "./hooks";
 import { Button, Card, ErrorNotice, Heading, Loading, styles } from "./ui";
@@ -215,6 +215,7 @@ function Application() {
     setRestoring(true);
     setError(null);
     try {
+      await verifyPreviewStorage();
       if (await session.restore()) await refresh();
     } catch (e) {
       setError(e);

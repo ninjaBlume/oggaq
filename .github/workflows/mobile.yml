@@ -8,6 +8,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/mobile.yml'
+      - 'scripts/simulator-entitlements.plist'
   pull_request:
     paths:
       - 'apps/mobile/**'
@@ -15,6 +16,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/mobile.yml'
+      - 'scripts/simulator-entitlements.plist'
 
 permissions:
   contents: read
@@ -77,11 +79,14 @@ jobs:
           npx expo prebuild --platform ios --no-install
           cd ios
           pod install
-      - name: İmza gerektirmeyen iOS Simulator derlemesi
+      - name: iOS Simulator derlemesi
         working-directory: apps/mobile/ios
         run: |
           xcodebuild -workspace oggaqnizleme.xcworkspace -scheme oggaqnizleme -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build CODE_SIGNING_ALLOWED=NO | tee build.log
         shell: bash -eo pipefail {0}
+      - name: Simulator Keychain için ad hoc imza
+        working-directory: apps/mobile/ios
+        run: codesign --force --sign - --entitlements ../../../scripts/simulator-entitlements.plist build/Build/Products/Release-iphonesimulator/oggaqnizleme.app
       - name: Simulator uygulamasını paketle
         working-directory: apps/mobile/ios
         run: ditto -c -k --sequesterRsrc --keepParent build/Build/Products/Release-iphonesimulator/oggaqnizleme.app oggaq-ios-simulator.zip
