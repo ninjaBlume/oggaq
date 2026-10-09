@@ -1,6 +1,6 @@
 # Teknoloji ve uyumluluk
 
-Kontrol tarihi: 9 Ekim 2026. Backend hedefleri artık PHP 8.4 üzerinde çözümlenmiş ve composer.lock ile kilitlenmiştir; platform gereksinimleri, audit ve testler doğrulandı. Web/mobil tablosundaki değerler hâlâ registry/şablon adaylarıdır; bu istemciler kurulmadı, tip kontrolü veya native build yapılmadı.
+Kontrol tarihi: 9 Ekim 2026. Backend hedefleri artık PHP 8.4 üzerinde çözümlenmiş ve composer.lock ile kilitlenmiştir; platform gereksinimleri, audit ve testler doğrulandı. Yönetim panelinin aşağıdaki bağımlılıkları kuruldu ve package-lock.json ile kilitlendi; strict tip kontrolü, üretim derlemesi, Vitest ve Chromium E2E geçti. Öğrenci web ve mobil uygulamalarının değerleri adaydır; native build yapılmadı.
 
 ## Backend
 
@@ -20,7 +20,23 @@ Paket bildirimleri doğrudan [Laravel](https://repo.packagist.org/p2/laravel/fra
 
 [PostgreSQL destek tablosuna](https://www.postgresql.org/support/versioning/) göre 18 desteklenen bir seridir. Global `psql 14.18` korunmuştur; projeye ait PostgreSQL 18.6 sunucusu ayrı cluster ve port ile kuruldu ve migration/test bağlantıları doğrulandı.
 
-## JavaScript ve mobil
+## Kurulu yönetim paneli
+
+| Bileşen | Kilitli sürüm |
+| --- | --- |
+| React / React DOM | `19.3.0` |
+| React Router DOM | `7.18.4` |
+| Vite / React plugin | `8.3.4` / `6.1.2` |
+| TypeScript | `6.0.3` |
+| Tailwind CSS / Vite plugin | `4.3.3` |
+| TanStack Query | `5.104.1` |
+| Vitest | `5.0.3` |
+| Playwright | `1.64.0` |
+| openapi-typescript | `7.13.0` |
+
+Router 7 yönetim panelinde `createBrowserRouter` ve kaydedilmemiş değişiklik engeli için kullanılıyor. Paylaşılan istemci, OpenAPI'den üretilen tiplerle kontrol edilir. Bağımlılık kurulumu ve npm audit başarılı; 11 Vitest ve 8 Chromium testi geçti. React Testing Library, Zustand veya mobil paketleri kurulmadı.
+
+## JavaScript ve mobil adayları
 
 Node 24 LTS ortak çalışma ortamı olarak seçildi; `.nvmrc` bu ana sürümü gösterir. [Node sürüm tablosu](https://nodejs.org/en/about/previous-releases) LTS durumunu, [Vite gereksinimleri](https://vite.dev/guide/) desteklenen Node aralığını belirtir. Tam patch sürümü kurulum/CI sırasında sabitlenecek.
 
@@ -31,7 +47,7 @@ Node 24 LTS ortak çalışma ortamı olarak seçildi; `.nvmrc` bu ana sürümü 
 | Mobil React | Şablonda `19.2.3` | Expo'nun sürümünü koru |
 | Expo Router | Şablonda `~57.0.25` | Expo ile birlikte çözümle |
 | Web/admin React | Registry `19.3.0` | React 19; mobil sürümünden ayrı çözümle |
-| React Router | `8.4.0` | React/React DOM `>=19.2.7`, Node `>=22.22.0` gerekiyor |
+| React Router | Admin `7.18.4` | Kurulu admin sürümü; diğer uygulamalar kurulumda ayrıca doğrulanacak |
 | Vite | `8.3.4` | Web/admin için; Metro'nun yerine geçmez |
 | Vite React plugin | `6.1.2` | Vite 8 peer aralığı destekleniyor |
 | TypeScript | Registry `7.0.2`; Expo şablonu `~6.0.3` | İlk ortak derleyici adayı 6.0.3; TS 7 yükseltmesi ayrıca doğrulanacak |
@@ -58,4 +74,4 @@ Ortak paketler React bileşeni barındırmayacak; veri sözleşmeleri, saf kural
 | Mailpit | 1.31.4 | Gerçek SMTP bildirimleri yerel kutuda doğrulandı |
 | Docker | Kurulmadı | Yerel Homebrew servisleri kullanılıyor; Docker doğrulanmadı |
 
-Gerekli Homebrew sürümleri yan yana kuruldu; global PHP/Node/PostgreSQL linkleri değiştirilmedi. Root npm manifesti/workspace düzeni ve Redocly CLI 2.60.0 kilit dosyası vardır; web/mobil paketleri henüz kurulmadı. GitHub Actions yapılandırması vardır; uzak sonuç Actions üzerinden izlenir. QuestionBank mevcut bağımlılıklarla geliştirilmiştir; yeni paket eklenmedi. Kurulum [DEVELOPMENT](DEVELOPMENT.md) içindedir. Yeni sürümlere geçiş changelog/peer incelemesi ve ilgili testlerle yapılır.
+Gerekli Homebrew sürümleri yan yana kuruldu; global PHP/Node/PostgreSQL linkleri değiştirilmedi. Root npm manifesti/workspace düzeni ve Redocly CLI 2.60.0 kilit dosyası vardır; yönetim paneli ve ortak API paketleri kuruldu; öğrenci web/mobil henüz kurulmadı. GitHub Actions yapılandırması vardır; uzak sonuç Actions üzerinden izlenir. QuestionBank mevcut bağımlılıklarla geliştirilmiştir; yeni paket eklenmedi. Kurulum [DEVELOPMENT](DEVELOPMENT.md) içindedir. Yeni sürümlere geçiş changelog/peer incelemesi ve ilgili testlerle yapılır.

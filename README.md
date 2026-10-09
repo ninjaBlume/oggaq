@@ -10,7 +10,9 @@ Kayıt, cookie giriş/çıkış, cihaz bazlı süreli mobil token, e-posta doğr
 
 Merkezi ders, konu/alt konu, sınav türü ve kaynak katalogları; tek doğru seçenekli metin sorusu oluşturma, yeni sürümle düzenleme, ayrı yayımlama ve yönetici sürüm geçmişi uygulanmıştır. Öğrenci yalnız yayımlanmış sürümü filtreleyip okuyabilir; cevap anahtarı ve açıklama dönmez. PostgreSQL trigger'ları yayımlanmış soru/seçenek değişikliklerini engeller. 75 backend testi ve 329 assertion geçti.
 
-Web/admin/mobil arayüzler, soru çözme/değerlendirme ve sınav motoru, import, raporlar ve hesap silme/veri export akışları henüz geliştirilmedi. Çevrimdışı çalışma güncel [prompt.md](prompt.md) kapsamında ayrıca kararlaştırılacak; mevcut sync belgeleri tasarım önerisidir. Kuruma özel soru gelecekte merkezi içerikten ayrı yetkilendirilecek. Uygulama klasörlerindeki `.gitkeep` dosyaları ekran veya özellik değildir.
+React 19/TypeScript yönetim paneli gerçek API'ye bağlıdır: cookie giriş/çıkış, katalog oluşturma, soru listesi/filtre, taslak düzenleme, önizleme, yayımlama ve sürüm geçmişi. 11 istemci testi, 8 Chromium E2E ve strict tip kontrolü/production build geçti. [Panel kurulumu](apps/admin/README.md) ayrı belgelenmiştir.
+
+Öğrenci web/mobil arayüzleri, soru çözme/değerlendirme ve sınav motoru, import, raporlar ve hesap silme/veri export akışları henüz geliştirilmedi. Çevrimdışı çalışma güncel [prompt.md](prompt.md) kapsamında ayrıca kararlaştırılacak; mevcut sync belgeleri tasarım önerisidir. Kuruma özel soru gelecekte merkezi içerikten ayrı yetkilendirilecek. Boş uygulama klasörlerindeki `.gitkeep` dosyaları ekran veya özellik değildir.
 
 PostgreSQL/Redis otomatik testleri ve gerçek HTTP kimlik akışı doğrulandı. GitHub Actions yapılandırması hazır; uzak CI sonucu GitHub Actions üzerinden izlenir.
 
@@ -20,11 +22,11 @@ PostgreSQL/Redis otomatik testleri ve gerçek HTTP kimlik akışı doğrulandı.
 apps/
   mobile/                 React Native + Expo
   web/                    React + Vite kullanıcı uygulaması
-  admin/                  React + Vite yönetim paneli
+  admin/                  Çalışan React + Vite içerik yönetimi
 backend/                  Laravel 13 modüler monolit
 packages/
-  api-client/             OpenAPI'den üretilen istemci ve platform adaptörleri
-  shared-types/           Ortak veri sözleşmeleri
+  api-client/             OpenAPI tipleriyle cookie/CSRF HTTP istemcisi
+  shared-types/           OpenAPI'den üretilen veri ve operasyon tipleri
   validation/             İstemci doğrulaması; sunucu doğrulaması ayrıca zorunlu
   shared-utils/           Yalnızca gerçekten ortak yardımcılar
 infrastructure/           Geliştirme ve dağıtım yapılandırmaları
@@ -64,4 +66,6 @@ php artisan serve --host=127.0.0.1 --port=8000 --no-reload
 
 Bu komutlar PATH'te PHP 8.4 seçili olmasını gerektirir. Horizon'u ayrı terminalde `php artisan horizon` ile çalıştırın. Yerel API `http://127.0.0.1:8000`, posta kutusu `http://127.0.0.1:58025`; bunlar geliştirme servisleridir. Üretime dağıtım yapılmadı.
 
-Gerçek MySQL/MariaDB SQL ve PDF kaynakları henüz sağlanmadı; aktarım başlamadı. Yönetim panelinin gerçek API'ye bağlanması ve sürümlü sınav/cevap değerlendirme sonraki işlerdir.
+Paneli kökte `npm run dev:admin` ile `http://127.0.0.1:5174` adresinde çalıştırın. Yönetici hesabı için panel kurulum belgesindeki `app:create-admin` komutunu kullanın; hazır/parolası sabit bir hesap oluşturulmaz.
+
+Gerçek MySQL/MariaDB SQL ve PDF kaynakları henüz sağlanmadı; aktarım başlamadı. Sürümlü sınav/cevap değerlendirme ve öğrenci uygulamalarını bağlamak sonraki işlerdir.

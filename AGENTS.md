@@ -33,6 +33,10 @@ Her özellik için iş kuralını ve kritik başarısızlık senaryolarını do�
 
 API değişikliğiyle birlikte sözleşmeyi, veritabanı değişikliğiyle birlikte veri modelini güncelle. Gerçek durum ile planı açıkça ayır; geçici çözümleri kalıcı mimari gibi sunma. Büyük işleri küçük ve doğrulanabilir parçalara böl. Tamamlanan işleri ve kalan eksikleri açıkça belirt.
 
+Kullanıcının "Bağla" talimatı içerik yönetim panelini mevcut API'ye bağlamayı yetkilendirir. `apps/admin` yerel React uygulamasıdır; Sites hosting veya yeni kimlik sağlayıcısına taşınmaz. İçerik ekranlarının yetkisi backend policy ile korunur. OpenAPI ortak tipleri üretildikten sonra strict tip, build ve ilgili UI testlerini çalıştır.
+
 ## Mevcut doğrulama komutları
 
 Yerel servisleri `python3 scripts/dev-services.py start` ile başlat. Backend komutlarını PHP 8.4 ile `backend/` içinde çalıştır: `composer test`, `composer lint`, `composer validate --strict`, `composer audit`. API sözleşmesini kökte Node 24 ile `npm run lint:api` üzerinden doğrula. Kurulumun ayrıntıları [DEVELOPMENT](docs/DEVELOPMENT.md) içindedir. PHPUnit yalnız `oggaq_test` PostgreSQL veritabanını kabul eder; testleri geliştirme veya üretim veritabanına yönlendirme.
+
+Admin için kökte `npm run generate:api`, `npm run typecheck`, `npm run test:admin`, `npm run build:admin` kullan. `npm run test:e2e` yalnız `oggaq_test` veritabanını yeniden oluşturur; PHPUnit/E2E aynı DB'yi kullandığından sırayla çalıştırılır. E2E `8001`/`5174` portlarını kendi açar ve kapatır; bu portlarda normal sunucu açıkken çalıştırılmaz.

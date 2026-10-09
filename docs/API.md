@@ -1,6 +1,6 @@
 # API standartları ve planlanan uç noktalar
 
-Durum: Identity/Tenancy/QuestionBank için [OpenAPI sözleşmesi](openapi.json), [OpenAPI 3.1.2](https://spec.openapis.org/oas/v3.1.2.html) biçiminde oluşturuldu ve lint edildi. Sözleşme–route eşitliği otomatik testtedir. Aşağıdaki sınav/değerlendirme/export/silme/import/offline yolları ileri tasarım olarak korunur; OpenAPI'de yer almayan yollar henüz uygulanmadı. Üretilmiş ortak istemci henüz yoktur.
+Durum: Identity/Tenancy/QuestionBank için [OpenAPI sözleşmesi](openapi.json), [OpenAPI 3.1.2](https://spec.openapis.org/oas/v3.1.2.html) biçiminde oluşturuldu ve lint edildi. Sözleşme–route eşitliği otomatik testtedir. Aşağıdaki sınav/değerlendirme/export/silme/import/offline yolları ileri tasarım olarak korunur; OpenAPI'de yer almayan yollar henüz uygulanmadı. `packages/shared-types` içindeki operasyon/veri tipleri `npm run generate:api` ile üretilir; `packages/api-client` bu tiplerle cookie/CSRF taşımasını uygular. Admin bunları gerçek API'de kullanır. Mobil taşıma adaptörü henüz yoktur.
 
 ## Bu teslimde uygulanan yollar
 
@@ -91,4 +91,4 @@ Import yolları: `POST /admin/imports` upload/staging; `GET /admin/imports/{id}`
 
 Şirket yolları `/tenants/{tenant}/profile`, `/memberships`, `/invitations`, `/reports` şeklinde olacak; yalnız ilgili aktif admin erişebilir. Merkezi soru yönetimi şirket yollarından açılmaz. Rapor alanları, hukuki kapsam ve veri minimizasyonu doğrulanınca somut response şeması belirlenir.
 
-Endpoint uygulanmadan path/DTO/validation/response sözleşmesi, 401/403/404/422/409 davranışı ve ilgili testleri birlikte yazılır. Üretilmiş istemcinin kaynak sözleşmesiyle tutarlılığı CI'da denetlenecek; makineye uygun OpenAPI dosyası mevcuttur; üretilmiş ortak SDK henüz yoktur.
+Endpoint uygulanmadan path/DTO/validation/response sözleşmesi, 401/403/404/422/409 davranışı ve ilgili testleri birlikte yazılır. CI, OpenAPI tiplerini yeniden üretip Git farkı olmamasını ve admin strict tip kontrolünü denetler. Cursor `links`/`meta` nesneleri sözleşmede açık alanlarla tanımlanmıştır. İstemci sunucunun döndürdüğü URL'yi doğrudan çağırmaz; yalnız cursor değerini kendi yapılandırılmış API origin'ine taşır.

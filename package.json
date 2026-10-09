@@ -4,6 +4,18 @@
   "private": true,
   "engines": { "node": ">=24 <25", "npm": ">=10" },
   "workspaces": ["apps/*", "packages/*"],
-  "scripts": { "lint:api": "redocly lint docs/openapi.json" },
-  "devDependencies": { "@redocly/cli": "2.60.0" }
+  "scripts": {
+    "lint:api": "redocly lint docs/openapi.json",
+    "generate:api": "openapi-typescript docs/openapi.json -o packages/shared-types/src/api.d.ts",
+    "dev:admin": "npm run dev --workspace @oggaq/admin",
+    "build:admin": "npm run build --workspace @oggaq/admin",
+    "typecheck": "npm run typecheck --workspace @oggaq/admin",
+    "test:admin": "npm run test --workspace @oggaq/admin",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@redocly/cli": "2.60.0",
+    "@playwright/test": "1.64.0",
+    "openapi-typescript": "7.13.0"
+  }
 }

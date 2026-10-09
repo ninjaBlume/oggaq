@@ -49,4 +49,4 @@ GET `/api/v1/questions` ve `/questions/{question}` yalnız güncel yayımlanmı�
 
 PostgreSQL [constraint](https://www.postgresql.org/docs/18/ddl-constraints.html) ve [trigger](https://www.postgresql.org/docs/18/trigger-definition.html) mekanizmaları ilişkileri ve yayımlanmış içerik korumasını uygular. Migration fonksiyonları `CREATE OR REPLACE` kullanır; test `migrate:fresh` işlemi tabloları silerken kalan fonksiyonlar yeniden kurulabilir. Migration rollback merkezi audit geçmişini silmez ve audit `tenant_id` alanını nullable bırakır.
 
-Sözleşme [OpenAPI](openapi.json) içinde; route eşitliği otomatik testte ve Redocly lint temizdir. Web/admin/mobil arayüz ve native/E2E testleri bu backend teslimine dahil değildir.
+Sözleşme [OpenAPI](openapi.json) içinde; route eşitliği otomatik testte ve Redocly lint temizdir. Sonraki panel tesliminde [React yönetim arayüzü](../apps/admin/README.md) bu API'ye bağlandı; 8 Chromium E2E ile doğrulandı. Öğrenci web/mobil, native test ve sınav/değerlendirme bu içerik paneline dahil değildir.

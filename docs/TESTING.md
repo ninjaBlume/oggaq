@@ -1,14 +1,27 @@
 # Test ve doğrulama stratejisi
 
-Mevcut durum: PHP 8.4, gerçek PostgreSQL 18 ve Redis üzerinde **75 backend testi, 329 assertion geçti**. Identity, Tenancy, QuestionBank, database constraints ve infrastructure testleri uygulanmıştır. QuestionBank için 23 test; yetki, sürüm/yayın, taslak/cevap gizliliği, stale revision, rollback, filtre/pagination ve composite FK/trigger korumasını doğrular. Gerçek HTTP kimlik akışları daha önce doğrulandı; ayrıca ayrı yerel süreçte soru oluşturma/yayımlama/düzenleme/sürüm koruma/409 ve öğrenci/admin erişimi `oggaq_test` üzerinde doğrulandı, sentetik veriler temizlendi. Web/admin/mobil arayüz, soru çözme/değerlendirme, sınav/import ve offline akışları henüz yoktur; aşağıdaki ilgili senaryolar gelecekteki plandır. Uzak CI sonucu bu yerel doğrulama raporuna dahil değildir.
+Mevcut durum: PHP 8.4, gerçek PostgreSQL 18 ve Redis üzerinde **75 backend testi, 329 assertion geçti**. Identity, Tenancy, QuestionBank, database constraints ve infrastructure testleri uygulanmıştır. QuestionBank için 23 test; yetki, sürüm/yayın, taslak/cevap gizliliği, stale revision, rollback, filtre/pagination ve composite FK/trigger korumasını doğrular. Gerçek HTTP kimlik akışları daha önce doğrulandı; ayrıca ayrı yerel süreçte soru oluşturma/yayımlama/düzenleme/sürüm koruma/409 ve öğrenci/admin erişimi `oggaq_test` üzerinde doğrulandı, sentetik veriler temizlendi. Yönetim panelinde ayrıca **11 Vitest ve 8 Chromium E2E testi geçti**; strict TypeScript ve üretim build başarılı. Öğrenci web/mobil arayüzü, soru çözme/değerlendirme, sınav/import ve offline akışları henüz yoktur; aşağıdaki ilgili senaryolar gelecekteki plandır. Uzak CI sonucu bu yerel doğrulama raporuna dahil değildir.
 
 ## Araçlar ve ortamlar
 
 Backend standardı PHPUnit 12.5.38; Composer lock dosyasıyla kilitli. Gerçek PostgreSQL servisinde feature/database/authorization testleri; gerektiğinde Redis queue integration. Merkezi PostgreSQL testleri SQLite ile ikame edilmez.
 
-Web/admin: Vitest + React Testing Library; Playwright ile gerçek API/veritabanına bağlı kritik akışlar. Mobil: Expo'nun uyumlu Jest preset'i ve React Native Testing Library; SQLite integration ve gerçek iOS/Android buildinde cihaz/emülatör doğrulaması. Native E2E aracı mobil temel kurulunca uyumluluk/CI maliyetine göre seçilir.
+Admin: Vitest ile saf editör kuralları ve API taşıma hata davranışı; Playwright ile gerçek Laravel/PostgreSQL ve cookie/CSRF kritik akışları. React Testing Library henüz kurulmadı. Mobil: Expo'nun uyumlu Jest preset'i ve React Native Testing Library; SQLite integration ve gerçek iOS/Android buildinde cihaz/emülatör doğrulaması. Native E2E aracı mobil temel kurulunca uyumluluk/CI maliyetine göre seçilir.
 
 Saat, ağ ve dış e-posta/depolama sınırları kontrollü olabilir; domain/tenant/idempotency davranışı gerçek veritabanında doğrulanır. Testlerde sentetik sorular ve kullanıcılar kullanılır; resmî soru veya gerçek kişisel veri kullanılmaz.
+
+## Uygulanan admin tarayıcı kontrolleri
+
+1. Giriş, gerçek katalog oluşturma, taslak/önizleme/kayıt, kalıcı veri, yayın, yeni sürüm, eski yayın ve geçmiş koruması, öğrenci cevap gizliliği, çıkış.
+2. Öğrenci ve doğrulanmamış yönetici erişiminin engellenmesi.
+3. Yanlış parola ve gerçek duplicate kod 422 alan hatası.
+4. Kaydedilmemiş değişiklikleri koruma veya bırakma.
+5. İki gerçek sekmenin aynı soruyu düzenlemesinde 409 ve yerel girdilerin korunması.
+6. Telefon/tablet ölçülerinde yatay taşma kontrolü.
+7. Kontrollü ağ hatasında hata/retry görünümü ve gerçek API'ye tekrar bağlanma.
+8. Kontrollü 401 yanıtında session temizleme ve girişe dönüş.
+
+E2E `APP_ENV=local` ile gerçek CSRF middleware'ini kullanır; sentetik fixture'lar yalnız `oggaq_test` içinde hazırlanır/temizlenir. Guard farklı veritabanını reddeder. Backend testleri ile E2E aynı veritabanını yenilediğinden **eşzamanlı çalıştırılmaz**. Test session/cache'i database driver ile izole edilir; geliştirme Redis cache'i temizlenmez. Chromium doğrulandı; Firefox/WebKit, ekran okuyucu veya native cihaz testi tamamlandı sayılmaz. Komutlar ve portlar [panel README](../apps/admin/README.md) içindedir.
 
 ## Kritik kabul matrisi
 
@@ -41,6 +54,6 @@ Veritabanında composite FK/CHECK/NULL unique, rollback, yarış ve concurrent f
 
 ## CI ve raporlama
 
-Yerelde hazır GitHub Actions yapılandırması PHP 8.4, Node 24, PostgreSQL ve Redis içerir; şu anda manifest/audit/biçim, backend testleri ve API lint kapıları bulunur. Frontend uygulandığında Composer/npm kilitli kurulum, format/lint, `tsc --noEmit`, build, OpenAPI doğrulama ve ilgili testler kurulacak. Native build/test ortamı ayrı hazırlanır; web test başarısı mobil başarı sayılmaz.
+Yerelde hazır GitHub Actions yapılandırması PHP 8.4, Node 24, PostgreSQL ve Redis içerir; manifest/audit/biçim, backend testleri, API lint ve üretilen tiplerin güncelliği, strict tip kontrolü, Vitest, admin build, npm audit ve gerçek API Chromium E2E kapıları bulunur. Kilitli Composer/npm kurulumu kullanılır. Native build/test ortamı ayrı hazırlanır; web test başarısı mobil başarı sayılmaz.
 
 Bir özellikte yalnız ilgili testler çalıştırılıp sonuçları raporlanır; değişen shared contract etkilenen uygulamalarda doğrulanır. Test raporu komut, ortam, başarı/başarısızlık ve çalıştırılmayan kontrolleri belirtir. Üretim kapısında güvenlik/performance, backup restore ve hesap silme akışı ayrıca doğrulanır.

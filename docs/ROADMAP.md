@@ -17,7 +17,7 @@ Güncelleme: 9 Ekim 2026. Güncel [prompt.md](../prompt.md) ilk analiz sonrasın
 - [x] OpenAPI 3.1.2, route eşitliği testi, API lint, Composer kontrolleri.
 - [x] Kurulum belgeleri ve yerelde hazır GitHub Actions yapılandırması.
 
-Bu teslim backend/API temelidir. Kullanıcı arayüzleri olmadığı için kayıt/giriş gibi uçtan uca ürün özellikleri tüm platformlarda tamamlandı sayılmaz. Web/mobil E2E ve üretim deploy çalıştırılmadı. Uzak CI sonucu GitHub Actions üzerinden izlenir.
+İlk teslim backend/API temeliydi. Üçüncü teslimde yönetim paneli eklendi; öğrenci web/mobil kayıt ve sınav akışları hâlâ tamamlanmadı. Üretim deploy çalıştırılmadı. Uzak CI sonucu GitHub Actions üzerinden izlenir.
 
 ## Tamamlanan ikinci backend teslimi — merkezi soru bankası
 
@@ -28,9 +28,22 @@ Bu teslim backend/API temelidir. Kullanıcı arayüzleri olmadığı için kayı
 - [x] Composite FK, yayın pointer'ı, PostgreSQL yayımlanmış sürüm/seçenek değişmezliği ve merkezi audit.
 - [x] 23 yeni test; toplam 75 test/329 assertion, gerçek HTTP soru bankası akışı ve 39 operasyonlu OpenAPI.
 
-Kapsam ve sınırlar [QUESTION_BANK](QUESTION_BANK.md) içindedir. Gerçek soru/import, yönetim paneli ve cevap değerlendirme henüz yoktur. Yeni bağımlılık eklenmedi.
+Kapsam ve sınırlar [QUESTION_BANK](QUESTION_BANK.md) içindedir. Gerçek soru/import ve cevap değerlendirme henüz yoktur. Yönetim paneli üçüncü teslimde eklendi. Yeni bağımlılık eklenmedi.
 
-## Sıradaki işler — yönetim paneli ve sürümlü sınav motoru
+## Tamamlanan üçüncü teslim — gerçek API ile yönetim paneli
+
+- [x] Türkçe, telefon/tablet/masaüstü React 19/TypeScript paneli.
+- [x] Cookie/CSRF giriş, çıkış, rol/doğrulama kapısı ve session hata yönetimi.
+- [x] Ders/konu/alt konu, sınav türü ve kaynak oluşturma/listeleme.
+- [x] Soru listesi/filtre/sayfalama, taslak oluşturma, yeni sürümle düzenleme, önizleme, yayın onayı ve geçmiş sürümler.
+- [x] Kaydedilmemiş değişiklik koruması ve iki gerçek sekmeyle 409 çakışma akışı.
+- [x] OpenAPI'den üretilen ortak tipler ve cookie/CSRF API istemcisi.
+- [x] Strict tip kontrolü, üretim build'i, 11 Vitest ve 8 gerçek API Chromium E2E testi.
+- [x] CI'da admin kontrolleri ve tarayıcı testleri; önceki eksik Unit dizini hatasının giderilmesi.
+
+Panel kapsamı ve kurulum [apps/admin/README](../apps/admin/README.md) içindedir. Kurum yönetimi, import ve öğrenci sınav motoru sonraki işlerdir.
+
+## Sıradaki işler — sürümlü sınav motoru ve öğrenci uygulaması
 
 Ders, konu ve gerekirse alt konu; soru/seçenek/görsel/kaynak sürümleri; sınav türü/numarası/yıl/dönem; resmî sınavın özgün soru sırası ve cevap anahtarı. Bir soru birden çok sınavda kullanılabilir. Alıştırma ile süreli sınavın kuralları ayrılır; doğrulanmamış resmî sayı/süre/başarı koşulu sabitlenmez.
 
@@ -46,7 +59,7 @@ Kaynak örnekleri ve telif/yeniden kullanım bilgisi olmadan kesin adapter doğr
 
 ## Yönetim paneli, web ve mobil
 
-React 19/TypeScript yönetim paneli gerçek API ile içerik ve kurum yönetimini sunacak. Kurum daveti, üyelik yönetimi, izinli raporlar ve kaynak aktarım önizlemesi sırayla tamamlanacak. Raporda kişisel/diğer kurum geçmişi gösterilmez.
+React 19/TypeScript yönetim paneli merkezi içerik API'sine bağlandı; kurum yönetimi sonraki geliştirmedir. Kurum daveti, üyelik yönetimi, izinli raporlar ve kaynak aktarım önizlemesi sırayla tamamlanacak. Raporda kişisel/diğer kurum geçmişi gösterilmez.
 
 Web ve Expo mobil kullanıcı uygulamalarında Türkçe kayıt/giriş, ders/konu/çıkmış sınav/karma deneme, sonuç, yanlış/boş/favori ve başarı akışları; yükleniyor/boş/hata, erişilebilirlik ve tablet/masaüstü düzeni geliştirilir. Platform sürümleri, native build ve gerçek API akışları ayrı doğrulanır.
 

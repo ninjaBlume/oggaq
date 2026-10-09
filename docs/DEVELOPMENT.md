@@ -82,6 +82,14 @@ PHPUnit PostgreSQL ve Redis'in açık olmasını ister. `APP_ENV=testing`, Postg
 
 GitHub Actions aynı PHP/Node ana sürümleri ve PostgreSQL 18/Redis 8 servisleriyle manifest, audit, biçim, test ve API lint kapılarını içerir. Workflow push ve pull request ile tetiklenir; uzak CI sonucu GitHub Actions üzerinden izlenir.
 
+## Yönetim paneli
+
+Backend API açıkken kökte Node 24 ile `npm ci --ignore-scripts` ve `npm run dev:admin` çalıştırın. Panel `http://127.0.0.1:5174` adresinde cookie/CSRF ile API'ye bağlanır. `.env.example` içindeki `ADMIN_URL` ve `SANCTUM_STATEFUL_DOMAINS` bu origin'i içerir. Yönetici hesabı için yukarıdaki `app:create-admin` komutu kullanılır; otomatik hesap yoktur. Akışlar ve sınırlar [panel README](../apps/admin/README.md) içindedir.
+
+`npm run typecheck`, `npm run test:admin`, `npm run build:admin` ile istemci kontrol edilir. `npx playwright install chromium` ardından `npm run test:e2e`, yalnız `oggaq_test` PostgreSQL üzerinde sentetik veriyle çalışır; test DB'sini önce/sonra yeniden oluşturur. PHPUnit ve E2E aynı anda çalıştırılmaz. Normal panel sunucusunu E2E öncesi kapatın: E2E `8001`/`5174` portlarını kendi açıp kapatır. Test session/cache'i izole PostgreSQL'de tutulur; gerçek geliştirme Redis verisi temizlenmez.
+
+CI, OpenAPI tip üretimi/fark kontrolü, admin strict tip/Vitest/build/npm audit ve gerçek API Chromium E2E kapılarını da içerir. İlk uzak çalışma, Git'te bulunmayan boş `tests/Unit` dizinine PHPUnit referansı nedeniyle başarısız oldu; bu referans kaldırıldı. Yeni uzak sonuç GitHub Actions'tan izlenir.
+
 ## Durdurma ve üretim sınırı
 
 Önce API, Horizon ve scheduler terminallerini Ctrl+C ile kapatın; sonra kökte:

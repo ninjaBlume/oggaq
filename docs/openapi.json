@@ -2719,10 +2719,10 @@
             }
           },
           "links": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorLinks"
           },
           "meta": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorMeta"
           }
         },
         "required": [
@@ -2741,10 +2741,10 @@
             }
           },
           "links": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorLinks"
           },
           "meta": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorMeta"
           }
         },
         "required": [
@@ -3151,10 +3151,10 @@
             }
           },
           "links": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorLinks"
           },
           "meta": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorMeta"
           }
         },
         "required": [
@@ -3184,10 +3184,10 @@
             }
           },
           "links": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorLinks"
           },
           "meta": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorMeta"
           }
         },
         "required": [
@@ -3217,10 +3217,10 @@
             }
           },
           "links": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorLinks"
           },
           "meta": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorMeta"
           }
         },
         "required": [
@@ -3250,10 +3250,10 @@
             }
           },
           "links": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorLinks"
           },
           "meta": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorMeta"
           }
         },
         "required": [
@@ -3283,10 +3283,10 @@
             }
           },
           "links": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorLinks"
           },
           "meta": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorMeta"
           }
         },
         "required": [
@@ -3316,10 +3316,10 @@
             }
           },
           "links": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorLinks"
           },
           "meta": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorMeta"
           }
         },
         "required": [
@@ -3338,10 +3338,10 @@
             }
           },
           "links": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorLinks"
           },
           "meta": {
-            "type": "object"
+            "$ref": "#/components/schemas/CursorMeta"
           }
         },
         "required": [
@@ -3589,6 +3589,77 @@
           "base_version"
         ],
         "additionalProperties": false
+      },
+      "CursorLinks": {
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri"
+          },
+          "last": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri"
+          },
+          "prev": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri"
+          },
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri"
+          }
+        },
+        "required": [
+          "first",
+          "last",
+          "prev",
+          "next"
+        ]
+      },
+      "CursorMeta": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "format": "uri"
+          },
+          "per_page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "next_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "prev_cursor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "path",
+          "per_page",
+          "next_cursor",
+          "prev_cursor"
+        ]
       }
     },
     "responses": {

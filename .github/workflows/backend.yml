@@ -1,4 +1,4 @@
-name: Backend kalite ve API
+name: Backend, yönetim paneli ve API
 
 on:
   push:
@@ -54,7 +54,8 @@ jobs:
       - name: Test ortamı ve geçici anahtar
         run: |
           cp backend/.env.example backend/.env.testing
-          php -r 'echo "APP_KEY=base64:".base64_encode(random_bytes(32)).PHP_EOL;' >> "$GITHUB_ENV"
+          cp backend/.env.example backend/.env
+          php -r '$key = "base64:".base64_encode(random_bytes(32)); echo "::add-mask::".$key.PHP_EOL; file_put_contents(getenv("GITHUB_ENV"), "APP_KEY=".$key.PHP_EOL, FILE_APPEND);'
       - name: Kilitli PHP bağımlılıkları
         working-directory: backend
         run: composer install --no-interaction --prefer-dist
@@ -72,3 +73,15 @@ jobs:
         run: |
           npm ci --ignore-scripts
           npm run lint:api
+          npm run generate:api
+          git diff --exit-code -- packages/shared-types/src/api.d.ts
+      - name: Yönetim paneli tip, test ve derleme
+        run: |
+          npm run typecheck
+          npm run test:admin
+          npm run build:admin
+          npm audit
+      - name: Gerçek API ile Chromium akışları
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:e2e
