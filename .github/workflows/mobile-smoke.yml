@@ -1,6 +1,12 @@
 name: Native uygulama açılışı
 
 on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Bu depodaki başarılı native paket işinin run ID değeri'
+        required: true
+        type: string
   workflow_run:
     workflows: ['Native mobil paketler']
     types: [completed]
@@ -11,14 +17,14 @@ permissions:
 
 jobs:
   android:
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: oggaq-android-local-preview
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ github.event.workflow_run.id || inputs.run_id }}
           github-token: ${{ github.token }}
           path: native-artifacts
       - name: KVM erişimi
@@ -41,7 +47,7 @@ jobs:
             sleep 5
             adb shell uiautomator dump /sdcard/oggaq-login.xml
             adb pull /sdcard/oggaq-login.xml smoke/android-login.xml
-            rg 'Hoş geldin' smoke/android-login.xml
+            python3 -c "import xml.etree.ElementTree as ET; assert any(n.get('text') == 'Hoş geldin' or n.get('content-desc') == 'Hoş geldin' for n in ET.parse('smoke/android-login.xml').iter()), 'Native login screen missing'"
             adb exec-out screencap -p > smoke/android-login.png
       - uses: actions/upload-artifact@v4
         with:
@@ -51,14 +57,14 @@ jobs:
           retention-days: 14
 
   ios:
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: macos-26
     timeout-minutes: 20
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: oggaq-ios-simulator
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ github.event.workflow_run.id || inputs.run_id }}
           github-token: ${{ github.token }}
           path: native-artifacts
       - name: Simulator seçimi
