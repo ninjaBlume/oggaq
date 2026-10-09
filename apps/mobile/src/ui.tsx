@@ -154,7 +154,7 @@ export function ErrorNotice({
   retry?: () => void;
 }) {
   if (!error) return null;
-  let message = error instanceof Error ? error.message : "İşlem tamamlanamadı.";
+  let message = error instanceof ApiError ? error.message : "İşlem tamamlanamadı. Yeniden deneyin.";
   if (error instanceof ApiError && error.status === 422)
     message = Object.values(error.problem.errors ?? {}).flat()[0] ?? message;
   return (
