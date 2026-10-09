@@ -4,7 +4,7 @@
 
 Bu dosya deponun tamamı için geçerlidir. Önce mevcut kodu, [prompt.md](prompt.md), README ve ilgili `docs/` belgelerini oku. Kullanıcının açık talimatları önceliklidir. İstenen kapsamı onaysız genişletme. Depo adı `oggaq`, geçici teknik ad `security-exam-platform`; kalıcı marka üretme.
 
-Güncel `prompt.md` ilk inceleme sonrasında yenilendi. Çevrimdışı çalışma zorunlu MVP kapsamı değildir; kurumlara özel içerik geleceğe yönelik tasarlanır, merkezi havuza otomatik katılmaz. Eski planı güncel yönerge yerine kullanma. Kullanıcının "Hadi devam et" talimatı backend altyapısı, kimlik doğrulama ve kurum izolasyonu geliştirmesini yetkilendirmiştir; bu işler için yeniden onay isteme. Gerçek kaynak veri aktarımı ayrıca kullanıcı onayı gerektirir.
+Güncel `prompt.md` ilk inceleme sonrasında yenilendi. Çevrimdışı çalışma zorunlu MVP kapsamı değildir; kurumlara özel içerik geleceğe yönelik tasarlanır, merkezi havuza otomatik katılmaz. Eski planı güncel yönerge yerine kullanma. Kullanıcının "Hadi devam et" talimatı backend altyapısı, kimlik doğrulama ve kurum izolasyonu geliştirmesini; sonraki "ee geliştiriyor musun" talimatı açıklanan merkezi soru bankası veri modeli/API/test geliştirmesini yetkilendirmiştir. Bu işler için yeniden onay isteme. Gerçek kaynak veri aktarımı ayrıca kullanıcı onayı gerektirir.
 
 ## Uygulama ilkeleri
 

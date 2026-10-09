@@ -1,6 +1,6 @@
 # Sistem mimarisi
 
-Durum: Laravel Identity/Tenancy modülleri, PostgreSQL/Redis, Horizon ve şifreli bildirim kuyruğu uygulanmıştır. Web/admin/mobil, içerik/sınav/import ve offline modüller tasarım aşamasındadır. Çevrimdışı öneriler güncel yönergeye göre ayrıca kapsamlandırılacaktır. Kurulum [DEVELOPMENT](DEVELOPMENT.md), sürümler [TECH_STACK](TECH_STACK.md) içindedir.
+Durum: Laravel Identity/Tenancy/QuestionBank modülleri, PostgreSQL/Redis, Horizon ve şifreli bildirim kuyruğu uygulanmıştır. QuestionBank merkezi katalog, taslak/sürüm/yayın ve yayımlanmış soru okuma API'sini içerir; ayrıntıları [QUESTION_BANK](QUESTION_BANK.md) belgesindedir. Web/admin/mobil, sınav/import ve offline modüller tasarım aşamasındadır. Çevrimdışı öneriler güncel yönergeye göre ayrıca kapsamlandırılacaktır. Kurulum [DEVELOPMENT](DEVELOPMENT.md), sürümler [TECH_STACK](TECH_STACK.md) içindedir.
 
 ## Topoloji
 

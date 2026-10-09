@@ -1,10 +1,12 @@
 # API standartları ve planlanan uç noktalar
 
-Durum: Identity/Tenancy için [OpenAPI sözleşmesi](openapi.json), [OpenAPI 3.1.2](https://spec.openapis.org/oas/v3.1.2.html) biçiminde oluşturuldu ve lint edildi. Sözleşme–route eşitliği otomatik testtedir. Aşağıdaki soru/sınav/export/silme/import/offline yolları ileri tasarım olarak korunur; OpenAPI'de yer almayan yollar henüz uygulanmadı. Üretilmiş ortak istemci henüz yoktur.
+Durum: Identity/Tenancy/QuestionBank için [OpenAPI sözleşmesi](openapi.json), [OpenAPI 3.1.2](https://spec.openapis.org/oas/v3.1.2.html) biçiminde oluşturuldu ve lint edildi. Sözleşme–route eşitliği otomatik testtedir. Aşağıdaki sınav/değerlendirme/export/silme/import/offline yolları ileri tasarım olarak korunur; OpenAPI'de yer almayan yollar henüz uygulanmadı. Üretilmiş ortak istemci henüz yoktur.
 
 ## Bu teslimde uygulanan yollar
 
-Kayıt, web giriş, mobil token, logout, forgot/reset, verification/resend, profil GET/PATCH; `/me/contexts`, `/contexts/{context}`; `/admin/tenants` GET/POST; kurum profili/üye listesi/detail; `/admin/tenants/{tenant}/memberships` POST ve `/admin/tenants/{tenant}/memberships/{membership}` DELETE. `/sanctum/csrf-cookie` ile toplam 20 operasyon vardır.
+Kayıt, web giriş, mobil token, logout, forgot/reset, verification/resend, profil GET/PATCH; `/me/contexts`, `/contexts/{context}`; `/admin/tenants` GET/POST; kurum profili/üye listesi/detail; `/admin/tenants/{tenant}/memberships` POST ve `/admin/tenants/{tenant}/memberships/{membership}` DELETE.
+
+QuestionBank: `/subjects`, `/exam-types`, `/subjects/{subject}/topics` GET; `/admin/subjects`, `/admin/topics`, `/admin/exam-types`, `/admin/question-sources` GET/POST; `/admin/questions` GET/POST; `/admin/questions/{question}` GET/PATCH; `/admin/questions/{question}/publish` POST; `/admin/questions/{question}/versions` GET; `/questions`, `/questions/{question}` GET. `/sanctum/csrf-cookie` ile toplam 39 operasyon vardır. Yollar `/api/v1` öneki taşır; ayrıntı ve örnekler [QUESTION_BANK](QUESTION_BANK.md) içindedir.
 
 Üyelik oluşturma/iptal şimdilik platform yöneticisine açıktır; kurum yöneticisi üyeleri okuyabilir. Öğrenciye ait context endpoint'i yalnız o öğrencinindir. İmzalı verification GET web session middleware'iyle doğrudan e-posta bağlantısından açılabilir; aynı kullanıcı girişi gerekir. Mobilde Bearer kimliği de desteklenir.
 
@@ -15,7 +17,7 @@ Kayıt, web giriş, mobil token, logout, forgot/reset, verification/resend, prof
 - Filtre/sıralama allowlist; tüm girişler backend'de doğrulanır. Cevap anahtarı ve açıklama exam modunda bitişten önce online payload'a eklenmez.
 - Sahip kullanıcı, tenant, platform rolü ve nihai puan sunucuda belirlenir. İstemcinin bu alanları göndermesi yetki yaratmaz.
 - Cookie authentication için CSRF; mobil için sonlu Bearer token. Token abilities ek kısıttır, Policy yerine geçmez.
-- Create/finish gibi tekrar riski olan online mutation'larda `Idempotency-Key` UUID. Kimlik, bağlam ve payload hash'iyle scoped kalıcı kayıt; aynı anahtar/farklı payload 409.
+- Deneme create/finish gibi gelecekteki tekrar riski olan online mutation'larda `Idempotency-Key` UUID planlanır. Kimlik, bağlam ve payload hash'iyle scoped kalıcı kayıt; aynı anahtar/farklı payload 409. Mevcut katalog/soru POST oluşturma uçları kalıcı idempotency kaydı sunmaz; başarılı POST yanıtı kaybolduğunda kör tekrar yeni kayıt üretebilir.
 - Güncellemelerde `base_version`; yarışta 409. Mutasyon aynı bağlamda kalır; hazır sonucu güncelleme yok.
 - Upload/download limitleri ve batch boyutu uygulamada yapılandırılıp OpenAPI'de belirtilir. Başlangıç sync batch üst sınır adayı 100 işlemdir; yük testinde doğrulanır.
 - `Cache-Control: private, no-store` kimlik/rapor/deneme/sync yanıtlarında; service worker API oturum yanıtlarını genel cache'e koymaz.
@@ -61,8 +63,8 @@ Kayıt, web giriş, mobil token, logout, forgot/reset, verification/resend, prof
 
 | Yöntem / yol | Davranış |
 | --- | --- |
-| `GET /subjects`, `GET /subjects/{id}/topics` | Yayınlanmış ders/konular |
-| `GET /questions` | Yayınlanmış çalışma soruları, izinli filtreler |
+| `GET /subjects`, `GET /subjects/{subject}/topics`, `GET /exam-types` | Uygulandı: merkezi sınıflandırmalar; taslak soru içermez |
+| `GET /questions`, `GET /questions/{question}` | Uygulandı: yayımlanmış sürüm, izinli filtreler; cevap/açıklama içermez |
 | `GET /exams`, `GET /exam-templates` | Yayınlanmış geçmiş sınav ve şablonlar |
 | `POST /contexts/{context}/attempts` | Mod/şablon doğrulaması; pinned soru listesi |
 | `GET /contexts/{context}/attempts/{attempt}` | Sahiplik/bağlam doğrulanmış mevcut deneme |
@@ -83,7 +85,7 @@ Tablodaki yollar `/api/v1` önekiyle kullanılır. Answer endpoint'i `user_id`, 
 
 ## Yönetim ve içe aktarma
 
-Platform yönetimi `/admin/users`, `/admin/tenants`, `/admin/subjects`, `/admin/topics`, `/admin/questions`, `/admin/exams`, `/admin/exam-templates`, `/admin/question-packages` altında policy korumalı list/create/update eylemleri sunacak. Soru güncellemesi yeni sürüm üretir; yayınlama ayrı yetkili eylemdir.
+Platform yönetiminde kurum, katalog ve soru uçları yukarıdaki kapsamda uygulanmıştır. Soru güncellemesi yeni sürüm üretir; yayımlama ayrı yetkili eylemdir. `/admin/users`, `/admin/exams`, `/admin/exam-templates`, `/admin/question-packages` ve katalog güncelleme/silme ileriki kapsamdadır.
 
 Import yolları: `POST /admin/imports` upload/staging; `GET /admin/imports/{id}` durum/rapor; `PUT /admin/imports/{id}/mapping` eşleme; `POST /admin/imports/{id}/validate`; `GET /admin/imports/{id}/preview`; `POST /admin/imports/{id}/approve`; `POST /admin/imports/{id}/commit`. Onay sonrasında içerik/eşleme değişirse onay geçersizleşir. Ağ tekrarları ikinci aktarım üretmez.
 

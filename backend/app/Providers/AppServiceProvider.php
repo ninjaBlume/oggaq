@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Modules\QuestionBank\Models\Question;
+use App\Modules\QuestionBank\Policies\QuestionPolicy;
 use App\Modules\Tenancy\Models\StudyContext;
 use App\Modules\Tenancy\Models\Tenant;
 use App\Modules\Tenancy\Policies\StudyContextPolicy;
@@ -30,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(Tenant::class, TenantPolicy::class);
         Gate::policy(StudyContext::class, StudyContextPolicy::class);
+        Gate::policy(Question::class, QuestionPolicy::class);
         URL::forceRootUrl(config('app.url'));
         if ($this->app->environment('production')) {
             config(['session.secure' => true]);

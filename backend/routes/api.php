@@ -2,6 +2,9 @@
 
 use App\Modules\Identity\Http\Controllers\AuthController;
 use App\Modules\Identity\Http\Controllers\ProfileController;
+use App\Modules\QuestionBank\Http\Controllers\AdminQuestionController;
+use App\Modules\QuestionBank\Http\Controllers\CatalogController;
+use App\Modules\QuestionBank\Http\Controllers\QuestionController;
 use App\Modules\Tenancy\Http\Controllers\MembershipController;
 use App\Modules\Tenancy\Http\Controllers\StudyContextController;
 use App\Modules\Tenancy\Http\Controllers\TenantController;
@@ -20,6 +23,22 @@ Route::prefix('v1')->group(function () {
         Route::patch('me', [ProfileController::class, 'update']);
 
         Route::middleware('email.verified')->group(function () {
+            foreach (['subjects', 'exam-types'] as $catalog) {
+                Route::get($catalog, [CatalogController::class, 'index'])->defaults('catalog', $catalog);
+            }
+            Route::get('subjects/{subject}/topics', [CatalogController::class, 'index'])->whereUuid('subject')->defaults('catalog', 'topics');
+            foreach (['subjects', 'topics', 'exam-types', 'question-sources'] as $catalog) {
+                Route::get('admin/'.$catalog, [CatalogController::class, 'index'])->defaults('catalog', $catalog);
+                Route::post('admin/'.$catalog, [CatalogController::class, 'store'])->defaults('catalog', $catalog);
+            }
+            Route::get('admin/questions', [AdminQuestionController::class, 'index']);
+            Route::post('admin/questions', [AdminQuestionController::class, 'store']);
+            Route::get('admin/questions/{question}', [AdminQuestionController::class, 'show'])->whereUuid('question');
+            Route::patch('admin/questions/{question}', [AdminQuestionController::class, 'update'])->whereUuid('question');
+            Route::post('admin/questions/{question}/publish', [AdminQuestionController::class, 'publish'])->whereUuid('question');
+            Route::get('admin/questions/{question}/versions', [AdminQuestionController::class, 'versions'])->whereUuid('question');
+            Route::get('questions', [QuestionController::class, 'index']);
+            Route::get('questions/{question}', [QuestionController::class, 'show'])->whereUuid('question');
             Route::get('me/contexts', [StudyContextController::class, 'index']);
             Route::get('contexts/{context}', [StudyContextController::class, 'show'])->whereUuid('context');
             Route::get('admin/tenants', [TenantController::class, 'index']);

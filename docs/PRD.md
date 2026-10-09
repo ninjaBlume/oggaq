@@ -1,6 +1,6 @@
 # Ürün gereksinimleri
 
-Durum: Identity/Tenancy backend temeli uygulanmıştır; diğer ürün özellikleri tasarım aşamasındadır. Güncel kaynak [proje yönergesi](../prompt.md); ilk analizden sonra bu dosya yenilenmiştir. Teknik ad `security-exam-platform`, depo adı OGGAQ olarak korunur.
+Durum: Identity/Tenancy ve merkezi QuestionBank backend uygulanmıştır. Soru bankası teknik API kapsamı [QUESTION_BANK](QUESTION_BANK.md) içindedir; arayüz, soru çözme/değerlendirme ve diğer ürün akışları tasarım aşamasındadır. Güncel kaynak [proje yönergesi](../prompt.md); ilk analizden sonra bu dosya yenilenmiştir. Teknik ad `security-exam-platform`, depo adı OGGAQ olarak korunur.
 
 ## Hedef ve kullanıcılar
 

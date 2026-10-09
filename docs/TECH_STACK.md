@@ -58,4 +58,4 @@ Ortak paketler React bileşeni barındırmayacak; veri sözleşmeleri, saf kural
 | Mailpit | 1.31.4 | Gerçek SMTP bildirimleri yerel kutuda doğrulandı |
 | Docker | Kurulmadı | Yerel Homebrew servisleri kullanılıyor; Docker doğrulanmadı |
 
-Gerekli Homebrew sürümleri yan yana kuruldu; global PHP/Node/PostgreSQL linkleri değiştirilmedi. Root npm manifesti/workspace düzeni ve Redocly CLI 2.60.0 kilit dosyası vardır; web/mobil paketleri henüz kurulmadı. GitHub Actions dosyası hazır fakat uzak CI çalıştırılmadı. Kurulum [DEVELOPMENT](DEVELOPMENT.md) içindedir. Yeni sürümlere geçiş changelog/peer incelemesi ve ilgili testlerle yapılır.
+Gerekli Homebrew sürümleri yan yana kuruldu; global PHP/Node/PostgreSQL linkleri değiştirilmedi. Root npm manifesti/workspace düzeni ve Redocly CLI 2.60.0 kilit dosyası vardır; web/mobil paketleri henüz kurulmadı. GitHub Actions yapılandırması vardır; uzak sonuç Actions üzerinden izlenir. QuestionBank mevcut bağımlılıklarla geliştirilmiştir; yeni paket eklenmedi. Kurulum [DEVELOPMENT](DEVELOPMENT.md) içindedir. Yeni sürümlere geçiş changelog/peer incelemesi ve ilgili testlerle yapılır.

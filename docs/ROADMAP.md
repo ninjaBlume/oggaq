@@ -19,13 +19,24 @@ Güncelleme: 9 Ekim 2026. Güncel [prompt.md](../prompt.md) ilk analiz sonrasın
 
 Bu teslim backend/API temelidir. Kullanıcı arayüzleri olmadığı için kayıt/giriş gibi uçtan uca ürün özellikleri tüm platformlarda tamamlandı sayılmaz. Web/mobil E2E ve üretim deploy çalıştırılmadı. Uzak CI sonucu GitHub Actions üzerinden izlenir.
 
-## Sıradaki backend işi — merkezi soru bankası ve sınav motoru
+## Tamamlanan ikinci backend teslimi — merkezi soru bankası
+
+- [x] Merkezi ders/konu/alt konu, sınav türü ve kaynak katalogları.
+- [x] Tek doğru seçenekli metin sorusu taslağı ve yeni sürümle düzenleme.
+- [x] Ayrı yayımlama, yönetici sürüm geçmişi ve `base_version` çakışma kontrolü.
+- [x] Öğrenciye yalnız yayımlanmış sürüm; cevap/açıklama gizliliği ve filtreli cursor listeleri.
+- [x] Composite FK, yayın pointer'ı, PostgreSQL yayımlanmış sürüm/seçenek değişmezliği ve merkezi audit.
+- [x] 23 yeni test; toplam 75 test/329 assertion, gerçek HTTP soru bankası akışı ve 39 operasyonlu OpenAPI.
+
+Kapsam ve sınırlar [QUESTION_BANK](QUESTION_BANK.md) içindedir. Gerçek soru/import, yönetim paneli ve cevap değerlendirme henüz yoktur. Yeni bağımlılık eklenmedi.
+
+## Sıradaki işler — yönetim paneli ve sürümlü sınav motoru
 
 Ders, konu ve gerekirse alt konu; soru/seçenek/görsel/kaynak sürümleri; sınav türü/numarası/yıl/dönem; resmî sınavın özgün soru sırası ve cevap anahtarı. Bir soru birden çok sınavda kullanılabilir. Alıştırma ile süreli sınavın kuralları ayrılır; doğrulanmamış resmî sayı/süre/başarı koşulu sabitlenmez.
 
 Deneme, cevap ve merkezi değerlendirme; geçmiş sonucun soru/kural değişikliklerinden korunması. Yanlışlar, boş bırakılanlar, favoriler ve başarı projeksiyonları. Kabul kapısı gerçek PostgreSQL işlemleri, context/tenant policies, sürümleme ve puanlama testleri, gerçek API/OpenAPI tutarlılığıdır.
 
-Kurumlara özel sorular/sınavlar gelecekte ayrı sahiplik/yayın kapsamı taşıyacak; merkezi havuza otomatik katılmayacak. Bu genişleme ilk içerik migration'ları öncesinde tasarımda netleştirilecek; ilk teslimde kurum içerik modeli veya yetkisi eklenmedi.
+Kurumlara özel sorular/sınavlar gelecekte ayrı sahiplik/yayın kapsamı taşıyacak; merkezi havuza otomatik katılmayacak. İlk QuestionBank migration'ları yalnız merkezi tabloları oluşturur; kurum içerik modeli veya yetkisi eklenmedi. Kurum içeriği merkezi endpoint'lere tenant alanı ekleyerek açılmayacak.
 
 ## SQL/PDF kaynak incelemesi ve import
 

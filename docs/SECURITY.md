@@ -1,6 +1,6 @@
 # Güvenlik, kişisel veri ve mevzuat
 
-Durum: cookie/CSRF, süreli ve cihaz bazlı Sanctum token, Argon2id, rate limit, aktif hesap/e-posta denetimi, rol/tenant policies, hassas bilgiyi açığa çıkarmayan API hatası, şifreli bildirim payload ve kurum yönetimi audit kayıtları uygulanıp test edildi. Diğer modüller ve KVKK yönetişim süreçleri aşağıda gereksinim olarak yer alır; hukuki uygunluk sağlandığı iddia edilmiyor. Kaynak inceleme tarihi 9 Ekim 2026; üretim öncesinde güncel metinler ve hizmetin fiilî kapsamı ayrıca incelenir.
+Durum: cookie/CSRF, süreli ve cihaz bazlı Sanctum token, Argon2id, rate limit, aktif hesap/e-posta denetimi, rol/tenant policies, hassas bilgiyi açığa çıkarmayan API hatası, şifreli bildirim payload ve kurum/merkezi içerik audit kayıtları uygulanıp test edildi. QuestionBank merkezi yazmaları yalnız doğrulanmış aktif platform yöneticisine açar; öğrenciden taslak/cevap anahtarını saklar ve yayımlanmış sürüm/seçenekleri PostgreSQL trigger'larıyla korur. Diğer modüller ve KVKK yönetişim süreçleri aşağıda gereksinim olarak yer alır; hukuki uygunluk sağlandığı iddia edilmiyor. Kaynak inceleme tarihi 9 Ekim 2026; üretim öncesinde güncel metinler ve hizmetin fiilî kapsamı ayrıca incelenir.
 
 ## Kimlik ve oturum
 

@@ -2,8 +2,8 @@
   "openapi": "3.1.2",
   "info": {
     "title": "OGGAQ Backend API",
-    "version": "0.1.0",
-    "description": "Uygulanmış Identity/Tenancy uçları. Soru bankası, sınav, import ve offline uçları henüz yoktur."
+    "version": "0.2.0",
+    "description": "Uygulanmış Identity, Tenancy ve merkezi QuestionBank API uçları. Arayüz, sınav/cevap değerlendirme, import ve offline uçları henüz yoktur."
   },
   "servers": [
     {
@@ -19,6 +19,10 @@
     {
       "name": "Tenancy",
       "description": "Kurum, üyelik ve çalışma bağlamı"
+    },
+    {
+      "name": "QuestionBank",
+      "description": "Merkezi ders/konu/kaynak ve sürümlü soru yayımlama"
     }
   ],
   "security": [
@@ -1078,6 +1082,1118 @@
           }
         ]
       }
+    },
+    "/api/v1/admin/subjects": {
+      "get": {
+        "operationId": "adminListSubjects",
+        "summary": "Platform yöneticisi ders listesi",
+        "description": "Platform yöneticisi ders listesi",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "per_page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createSubject",
+        "summary": "Merkezi ders kaydı oluşturma",
+        "description": "Merkezi ders kaydı oluşturma",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "201": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubjectInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/topics": {
+      "get": {
+        "operationId": "adminListTopics",
+        "summary": "Platform yöneticisi konu listesi",
+        "description": "Platform yöneticisi konu listesi",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "per_page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "subject_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createTopic",
+        "summary": "Merkezi konu kaydı oluşturma",
+        "description": "Merkezi konu kaydı oluşturma",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "201": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TopicInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/exam-types": {
+      "get": {
+        "operationId": "adminListExamTypes",
+        "summary": "Platform yöneticisi sınav türü listesi",
+        "description": "Platform yöneticisi sınav türü listesi",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamTypeList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "per_page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createExamType",
+        "summary": "Merkezi sınav türü kaydı oluşturma",
+        "description": "Merkezi sınav türü kaydı oluşturma",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "201": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamTypeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExamTypeInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/question-sources": {
+      "get": {
+        "operationId": "adminListQuestionSources",
+        "summary": "Platform yöneticisi kaynak listesi",
+        "description": "Platform yöneticisi kaynak listesi",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionSourceList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "per_page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createQuestionSource",
+        "summary": "Merkezi kaynak kaydı oluşturma",
+        "description": "Merkezi kaynak kaydı oluşturma",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "201": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionSourceResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionSourceInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/subjects": {
+      "get": {
+        "operationId": "listSubjects",
+        "summary": "Merkezi sınıflandırma listesi",
+        "description": "Doğrulanmış aktif kullanıcılara açık sınıflandırmalar. Taslak soru içerikleri içermez. Ders/konu etiketleri henüz soru yayımlanmadan da listelenebilir.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "per_page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/exam-types": {
+      "get": {
+        "operationId": "listExamTypes",
+        "summary": "Merkezi sınıflandırma listesi",
+        "description": "Doğrulanmış aktif kullanıcılara açık sınıflandırmalar. Taslak soru içerikleri içermez. Ders/konu etiketleri henüz soru yayımlanmadan da listelenebilir.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamTypeList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "per_page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/subjects/{subject}/topics": {
+      "get": {
+        "operationId": "listTopics",
+        "summary": "Merkezi sınıflandırma listesi",
+        "description": "Doğrulanmış aktif kullanıcılara açık sınıflandırmalar. Taslak soru içerikleri içermez. Ders/konu etiketleri henüz soru yayımlanmadan da listelenebilir.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "subject",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "per_page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/questions": {
+      "get": {
+        "operationId": "adminListQuestions",
+        "summary": "Merkezi soruları son taslaklarına göre listeleme",
+        "description": "Merkezi soruları son taslaklarına göre listeleme",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuestionList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "per_page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "subject_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "topic_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "exam_type_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "source_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "published"
+              ]
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createQuestion",
+        "summary": "Soru kimliği ve ilk taslak sürümü oluşturma",
+        "description": "Tek doğru seçenekli metin sorusu. Seçenek sırası dizi sırasıdır; doğru cevap konumu 1 tabanlıdır. Kaynak ve cevap taslakta eksik olabilir. tenant/sahip/yayın alanları kabul edilmez.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "201": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuestionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/questions/{question}": {
+      "get": {
+        "operationId": "adminShowQuestion",
+        "summary": "Sorunun son taslağı ve yayın durumunu görüntüleme",
+        "description": "Sorunun son taslağı ve yayın durumunu görüntüleme",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuestionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "question",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "reviseQuestion",
+        "summary": "Yeni taslak soru sürümü oluşturma",
+        "description": "İçerik tam snapshot olarak gönderilir; atlanan nullable alanlar yeni sürümde null olur. base_version soru revision değeridir. Satır kilidi altında farklı revision 409 üretir. Mevcut yayındaki içerik değiştirilmez.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuestionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "question",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionUpdateInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/questions/{question}/publish": {
+      "post": {
+        "operationId": "publishQuestion",
+        "summary": "Son taslak soru sürümünü yayımlama",
+        "description": "En az iki seçenek, kaynak ve bir doğru cevap zorunludur. base_version güncel revision olmalıdır. Güncel yayın tekrar gönderildiğinde revision/audit çoğalmaz; eski revision ile tekrar 409 verir.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuestionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "question",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionPublishInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/questions/{question}/versions": {
+      "get": {
+        "operationId": "listQuestionVersions",
+        "summary": "Soru sürümlerinin yönetici geçmişi",
+        "description": "Soru sürümlerinin yönetici geçmişi",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuestionVersionList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "question",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "per_page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/questions": {
+      "get": {
+        "operationId": "listPublishedQuestions",
+        "summary": "Yayımlanmış soruları filtreleyip listeleme",
+        "description": "Filtreler yayımlanmış sürüme uygulanır; taslaklar, cevap anahtarı ve açıklama dönmez. topic_id yalnız tam konu eşleşmesidir.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "per_page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "subject_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "topic_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "exam_type_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "source_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/questions/{question}": {
+      "get": {
+        "operationId": "showPublishedQuestion",
+        "summary": "Güncel yayımlanmış soruyu görüntüleme",
+        "description": "Taslak veya mevcut olmayan soru 404 döner. Cevap anahtarı ve açıklama dönmez; deneme/cevap değerlendirme ayrı sonraki teslimdir.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "question",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -1650,6 +2766,829 @@
         "required": [
           "data"
         ]
+      },
+      "Subject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 80
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code"
+        ]
+      },
+      "Topic": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "subject_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "parent_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code",
+          "subject_id",
+          "parent_id"
+        ]
+      },
+      "ExamType": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 80
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code"
+        ]
+      },
+      "QuestionSource": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2048
+          },
+          "citation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "url",
+          "citation"
+        ]
+      },
+      "QuestionOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "position": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "id",
+          "position",
+          "text"
+        ]
+      },
+      "QuestionVersion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "subject_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "topic_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "exam_type_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "stem": {
+            "type": "string",
+            "maxLength": 20000
+          },
+          "published_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuestionSource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "options": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "$ref": "#/components/schemas/QuestionOption"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "subject_id",
+          "topic_id",
+          "exam_type_id",
+          "stem",
+          "published_at",
+          "source",
+          "options"
+        ]
+      },
+      "AdminQuestionVersion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "subject_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "topic_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "exam_type_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "stem": {
+            "type": "string",
+            "maxLength": 20000
+          },
+          "published_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuestionSource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "options": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "$ref": "#/components/schemas/QuestionOption"
+            }
+          },
+          "correct_option_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "explanation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 20000
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "subject_id",
+          "topic_id",
+          "exam_type_id",
+          "stem",
+          "published_at",
+          "source",
+          "options",
+          "correct_option_id",
+          "explanation",
+          "created_at"
+        ]
+      },
+      "Question": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "$ref": "#/components/schemas/QuestionVersion"
+          }
+        },
+        "required": [
+          "id",
+          "version"
+        ]
+      },
+      "AdminQuestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published"
+            ]
+          },
+          "published_version_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "has_pending_changes": {
+            "type": "boolean"
+          },
+          "latest_version": {
+            "$ref": "#/components/schemas/AdminQuestionVersion"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "revision",
+          "status",
+          "published_version_id",
+          "has_pending_changes",
+          "latest_version",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "SubjectResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Subject"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "SubjectList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Subject"
+            }
+          },
+          "links": {
+            "type": "object"
+          },
+          "meta": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "TopicResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Topic"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "TopicList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Topic"
+            }
+          },
+          "links": {
+            "type": "object"
+          },
+          "meta": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "ExamTypeResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ExamType"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "ExamTypeList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamType"
+            }
+          },
+          "links": {
+            "type": "object"
+          },
+          "meta": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "QuestionSourceResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/QuestionSource"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "QuestionSourceList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionSource"
+            }
+          },
+          "links": {
+            "type": "object"
+          },
+          "meta": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "QuestionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Question"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "QuestionList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Question"
+            }
+          },
+          "links": {
+            "type": "object"
+          },
+          "meta": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "AdminQuestionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AdminQuestion"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "AdminQuestionList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminQuestion"
+            }
+          },
+          "links": {
+            "type": "object"
+          },
+          "meta": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "AdminQuestionVersionList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminQuestionVersion"
+            }
+          },
+          "links": {
+            "type": "object"
+          },
+          "meta": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "SubjectInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          }
+        },
+        "required": [
+          "name",
+          "code"
+        ],
+        "additionalProperties": false
+      },
+      "ExamTypeInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          }
+        },
+        "required": [
+          "name",
+          "code"
+        ],
+        "additionalProperties": false
+      },
+      "TopicInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "subject_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "parent_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "name",
+          "code",
+          "subject_id"
+        ],
+        "additionalProperties": false
+      },
+      "QuestionSourceInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2048
+          },
+          "citation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4000
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "additionalProperties": false
+      },
+      "QuestionInput": {
+        "type": "object",
+        "properties": {
+          "subject_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "topic_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "exam_type_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "source_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "stem": {
+            "type": "string",
+            "maxLength": 20000
+          },
+          "explanation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 20000
+          },
+          "options": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "string",
+              "maxLength": 4000
+            }
+          },
+          "correct_option_position": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10
+          }
+        },
+        "required": [
+          "subject_id",
+          "stem",
+          "options"
+        ],
+        "additionalProperties": false
+      },
+      "QuestionUpdateInput": {
+        "type": "object",
+        "properties": {
+          "subject_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "topic_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "exam_type_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "source_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "stem": {
+            "type": "string",
+            "maxLength": 20000
+          },
+          "explanation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 20000
+          },
+          "options": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "string",
+              "maxLength": 4000
+            }
+          },
+          "correct_option_position": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10
+          },
+          "base_version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "subject_id",
+          "stem",
+          "options",
+          "base_version"
+        ],
+        "additionalProperties": false
+      },
+      "QuestionPublishInput": {
+        "type": "object",
+        "properties": {
+          "base_version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "base_version"
+        ],
+        "additionalProperties": false
       }
     },
     "responses": {

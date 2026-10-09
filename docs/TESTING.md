@@ -1,6 +1,6 @@
 # Test ve doğrulama stratejisi
 
-Mevcut durum: PHP 8.4, gerçek PostgreSQL 18 ve Redis üzerinde **52 backend testi, 191 assertion geçti**. Identity, Tenancy, database constraints ve infrastructure testleri uygulanmıştır. Gerçek HTTP ile cookie/CSRF, kayıt, Horizon→Mailpit doğrulama/reset e-postası, imzalı doğrulama, parola sıfırlama, session/token iptali ve logout ayrıca doğrulandı; sentetik test hesabı temizlendi. Web/admin/mobil arayüz, soru/sınav/import ve offline akışları henüz yoktur; aşağıdaki ilgili senaryolar gelecekteki plandır. Uzak GitHub Actions çalıştırılmadı.
+Mevcut durum: PHP 8.4, gerçek PostgreSQL 18 ve Redis üzerinde **75 backend testi, 329 assertion geçti**. Identity, Tenancy, QuestionBank, database constraints ve infrastructure testleri uygulanmıştır. QuestionBank için 23 test; yetki, sürüm/yayın, taslak/cevap gizliliği, stale revision, rollback, filtre/pagination ve composite FK/trigger korumasını doğrular. Gerçek HTTP kimlik akışları daha önce doğrulandı; ayrıca ayrı yerel süreçte soru oluşturma/yayımlama/düzenleme/sürüm koruma/409 ve öğrenci/admin erişimi `oggaq_test` üzerinde doğrulandı, sentetik veriler temizlendi. Web/admin/mobil arayüz, soru çözme/değerlendirme, sınav/import ve offline akışları henüz yoktur; aşağıdaki ilgili senaryolar gelecekteki plandır. Uzak CI sonucu bu yerel doğrulama raporuna dahil değildir.
 
 ## Araçlar ve ortamlar
 
