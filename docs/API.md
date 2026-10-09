@@ -1,14 +1,16 @@
 # API standartları ve planlanan uç noktalar
 
-Durum: Identity/Tenancy/QuestionBank için [OpenAPI sözleşmesi](openapi.json), [OpenAPI 3.1.2](https://spec.openapis.org/oas/v3.1.2.html) biçiminde oluşturuldu ve lint edildi. Sözleşme–route eşitliği otomatik testtedir. Aşağıdaki sınav/değerlendirme/export/silme/import/offline yolları ileri tasarım olarak korunur; OpenAPI'de yer almayan yollar henüz uygulanmadı. `packages/shared-types` içindeki operasyon/veri tipleri `npm run generate:api` ile üretilir; `packages/api-client` bu tiplerle cookie/CSRF taşımasını uygular. Admin bunları gerçek API'de kullanır. Mobil taşıma adaptörü henüz yoktur.
+Durum: Identity/Tenancy/QuestionBank/Study için [OpenAPI sözleşmesi](openapi.json), [OpenAPI 3.1.2](https://spec.openapis.org/oas/v3.1.2.html) biçiminde oluşturuldu ve lint edildi. Sözleşme–route eşitliği otomatik testtedir. Aşağıdaki çok sorulu sınav/export/silme/import/offline yolları ileri tasarım olarak korunur; OpenAPI'de yer almayan yollar henüz uygulanmadı. `packages/shared-types` içindeki operasyon/veri tipleri `npm run generate:api` ile üretilir; `packages/api-client` bu tiplerle cookie/CSRF taşımasını uygular. Admin ve öğrenci web bunları gerçek API'de kullanır. Mobil taşıma adaptörü henüz yoktur.
 
 ## Bu teslimde uygulanan yollar
 
 Kayıt, web giriş, mobil token, logout, forgot/reset, verification/resend, profil GET/PATCH; `/me/contexts`, `/contexts/{context}`; `/admin/tenants` GET/POST; kurum profili/üye listesi/detail; `/admin/tenants/{tenant}/memberships` POST ve `/admin/tenants/{tenant}/memberships/{membership}` DELETE.
 
-QuestionBank: `/subjects`, `/exam-types`, `/subjects/{subject}/topics` GET; `/admin/subjects`, `/admin/topics`, `/admin/exam-types`, `/admin/question-sources` GET/POST; `/admin/questions` GET/POST; `/admin/questions/{question}` GET/PATCH; `/admin/questions/{question}/publish` POST; `/admin/questions/{question}/versions` GET; `/questions`, `/questions/{question}` GET. `/sanctum/csrf-cookie` ile toplam 39 operasyon vardır. Yollar `/api/v1` öneki taşır; ayrıntı ve örnekler [QUESTION_BANK](QUESTION_BANK.md) içindedir.
+QuestionBank: `/subjects`, `/exam-types`, `/subjects/{subject}/topics` GET; `/admin/subjects`, `/admin/topics`, `/admin/exam-types`, `/admin/question-sources` GET/POST; `/admin/questions` GET/POST; `/admin/questions/{question}` GET/PATCH; `/admin/questions/{question}/publish` POST; `/admin/questions/{question}/versions` GET; `/questions`, `/questions/{question}` GET. `/sanctum/csrf-cookie` ve dört Study işlemiyle toplam 43 operasyon vardır. Yollar `/api/v1` öneki taşır; ayrıntı ve örnekler [QUESTION_BANK](QUESTION_BANK.md) içindedir.
 
-Üyelik oluşturma/iptal şimdilik platform yöneticisine açıktır; kurum yöneticisi üyeleri okuyabilir. Öğrenciye ait context endpoint'i yalnız o öğrencinindir. İmzalı verification GET web session middleware'iyle doğrudan e-posta bağlantısından açılabilir; aynı kullanıcı girişi gerekir. Mobilde Bearer kimliği de desteklenir.
+Üyelik oluşturma/iptal şimdilik platform yöneticisine açıktır; kurum yöneticisi üyeleri okuyabilir. Öğrenciye ait context endpoint'i yalnız o öğrencinindir. Doğrulama e-postası web `/verify-email` formuna gider; form imzalı verification GET çağırır; aynı kullanıcı girişi gerekir. Mobilde Bearer kimliği de desteklenir.
+
+Study: `/contexts/{context}/practice-attempts` GET/POST; `/contexts/{context}/practice-attempts/{attempt}` GET; `/contexts/{context}/practice-attempts/{attempt}/answer` POST. Tek soru alıştırması, tekrar semantiği ve gizlilik [STUDY](STUDY.md) içindedir.
 
 ## Genel kurallar
 
@@ -91,4 +93,4 @@ Import yolları: `POST /admin/imports` upload/staging; `GET /admin/imports/{id}`
 
 Şirket yolları `/tenants/{tenant}/profile`, `/memberships`, `/invitations`, `/reports` şeklinde olacak; yalnız ilgili aktif admin erişebilir. Merkezi soru yönetimi şirket yollarından açılmaz. Rapor alanları, hukuki kapsam ve veri minimizasyonu doğrulanınca somut response şeması belirlenir.
 
-Endpoint uygulanmadan path/DTO/validation/response sözleşmesi, 401/403/404/422/409 davranışı ve ilgili testleri birlikte yazılır. CI, OpenAPI tiplerini yeniden üretip Git farkı olmamasını ve admin strict tip kontrolünü denetler. Cursor `links`/`meta` nesneleri sözleşmede açık alanlarla tanımlanmıştır. İstemci sunucunun döndürdüğü URL'yi doğrudan çağırmaz; yalnız cursor değerini kendi yapılandırılmış API origin'ine taşır.
+Endpoint uygulanmadan path/DTO/validation/response sözleşmesi, 401/403/404/422/409 davranışı ve ilgili testleri birlikte yazılır. CI, OpenAPI tiplerini yeniden üretip Git farkı olmamasını ve admin/öğrenci web strict tip kontrolünü denetler. Cursor `links`/`meta` nesneleri sözleşmede açık alanlarla tanımlanmıştır. İstemci sunucunun döndürdüğü URL'yi doğrudan çağırmaz; yalnız cursor değerini kendi yapılandırılmış API origin'ine taşır.

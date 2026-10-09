@@ -1,13 +1,8 @@
-import { ApiClient, cursorFromLink } from '@oggaq/api-client';
+import { ApiClient, cursorFromLink, xsrfCookie } from '@oggaq/api-client';
 import type { Catalogs, Page } from '@oggaq/shared-types';
 import { apiUrl } from './config';
 
-export function xsrfCookie(cookie: string): string | null {
-  const entry = cookie.split(';').map((part) => part.trim()).find((part) => part.startsWith('XSRF-TOKEN='));
-  if (!entry) return null;
-  try { return decodeURIComponent(entry.slice('XSRF-TOKEN='.length)); }
-  catch { return null; }
-}
+export { xsrfCookie } from '@oggaq/api-client';
 
 export const api = new ApiClient(apiUrl, {
   csrfToken: () => xsrfCookie(document.cookie),

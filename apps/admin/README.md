@@ -31,7 +31,7 @@ Parola gizli istemde belirlenir. Komut güvenilir operasyon yöneticisinin hesab
 - Soru editöründe gezinme/sekme kapatma uyarısı; 409 hatasında yerel değişikliklerin korunması ve kullanıcı onayıyla sunucudaki son sürümü yükleme.
 - Türkçe alan hatası, loading/empty/error/retry, bildirimler, klavye etiketleri, dialog focus dönüşü, telefon/tablet/masaüstü düzeni.
 
-Katalog düzenleme/silme backend'de bulunmadığından panelde yoktur. Dosya/görsel/import, kurum yönetimi, öğrenci soru çözme/sınav/sonuç akışları bu panelin kapsamına eklenmedi. Kaynak kaydı kullanım hakkı/resmîlik incelemesinin yerine geçmez. POST yanıtının kaybolması kalıcı idempotency ile çözülmedi; otomatik mutation retry yapılmaz.
+Katalog düzenleme/silme backend'de bulunmadığından panelde yoktur. Dosya/görsel/import, kurum yönetimi, öğrenci soru çözme akışı ayrı [web uygulamasında](../web/README.md) sunulur; sınav akışları bu panelin kapsamına eklenmedi. Kaynak kaydı kullanım hakkı/resmîlik incelemesinin yerine geçmez. POST yanıtının kaybolması kalıcı idempotency ile çözülmedi; otomatik mutation retry yapılmaz.
 
 ## Kontroller
 
@@ -49,6 +49,6 @@ npm run test:e2e
 
 11 Vitest testi ve 8 Chromium E2E testi geçti. E2E ana akışları gerçek Laravel, PostgreSQL ve cookie/CSRF ile çalışır; 409 testi iki gerçek tarayıcı sekmesinden düzenleme yapar. Ağ kesintisi ve oturum hatası görünümü kontrollü yanıtlarla test edilir. Uygulama içi Browser kontrol aracı bu oturumda yoktu; proje Playwright kontrolleri ve ekran görüntüleri kullanıldı.
 
-E2E yalnız `oggaq_test` veritabanını yeniden oluşturur ve sonunda temizler; mevcut test verileri korunmaz. PHP fixture guard'ı diğer veritabanlarını reddeder. Backend PHPUnit ve E2E'yi aynı anda çalıştırmayın. E2E, `8001` API ve `5174` panel portlarını kendi açıp kapatır; bu portlarda başka süreç varken mevcut sunucuyu yeniden kullanmaz. Test öncesi normal panel dev sunucusunu durdurun. Test cache/session'ı izole PostgreSQL'dedir; geliştirme Redis cache'i temizlenmez.
+E2E yalnız `oggaq_test` veritabanını yeniden oluşturur ve sonunda temizler; mevcut test verileri korunmaz. PHP fixture guard'ı diğer veritabanlarını reddeder. Backend PHPUnit ve E2E'yi aynı anda çalıştırmayın. E2E, `8001` API, `5183` öğrenci ve `5184` panel portlarını kendi açıp kapatır; bu portlarda başka süreç varken mevcut sunucuyu yeniden kullanmaz. Normal `5174` panel sunucusu testlerce kullanılmaz. Test cache/session'ı izole PostgreSQL'dedir; geliştirme Redis cache'i temizlenmez.
 
 E2E ekran görüntüleri ve raporları Git dışında `artifacts/` altında tutulur. Sentetik hesap/soru verileri resmî içerik değildir. Firefox/WebKit/native iOS/Android build/test ve üretim dağıtımı yapılmadı.

@@ -8,7 +8,7 @@ Platform yöneticisi `/api/v1/admin/subjects`, `/admin/topics`, `/admin/exam-typ
 
 Doğrulanmış aktif kullanıcılar `/api/v1/subjects`, `/exam-types`, `/subjects/{subject}/topics` üzerinden sınıflandırmaları okuyabilir. Bu etiketler henüz soru yayımlanmadan da görünür; soru taslaklarını içermez. Sınav türleri veriyle tanımlanır; resmî sınav sayısı/süresi/puanlama kuralı kodda sabitlenmedi.
 
-Şimdilik tek doğru seçenekli metin sorusu desteklenir. Medya, geçmiş sınavın yılı/numarası/sırası, çoklu sınav eşleştirmesi ve değerlendirme motoru henüz yoktur. Kaynak `title`, nullable HTTP(S) `url` ve `citation` taşır. Kaynak kaydının varlığı resmîlik veya kullanım hakkı onayı anlamına gelmez; gerçek içerik yayını için kaynak/hak incelemesi üretim kapısıdır.
+Şimdilik tek doğru seçenekli metin sorusu desteklenir. Medya, geçmiş sınavın yılı/numarası/sırası, çoklu sınav eşleştirmesi ve çok sorulu sınav motoru henüz yoktur; tek soru değerlendirmesi [STUDY](STUDY.md) içinde uygulanmıştır. Kaynak `title`, nullable HTTP(S) `url` ve `citation` taşır. Kaynak kaydının varlığı resmîlik veya kullanım hakkı onayı anlamına gelmez; gerçek içerik yayını için kaynak/hak incelemesi üretim kapısıdır.
 
 ## Taslak ve sürüm
 
@@ -37,9 +37,9 @@ Seçenek sırası dizinin sırasıdır; doğru cevap konumu 1 tabanlıdır. Tasl
 
 POST `/api/v1/admin/questions/{question}/publish`, `{"base_version": <revision>}` alır. En az iki seçenek, bir doğru seçenek ve kaynak zorunludur. İşlem son taslağı yayımlar, soru revision'ını artırır ve audit kaydı ekler. Yeni taslak oluşturmak mevcut yayını değiştirmez; yeni taslak yayımlandığında public pointer değişir. Güncel revision ile zaten yayında olan sürümü tekrar yayımlamak revision/audit üretmez. Eski revision ile tekrar 409 döner.
 
-GET `/api/v1/admin/questions/{question}/versions` sürümleri azalan numara sırasıyla cursor pagination ile döndürür. Yönetici yanıtı doğru seçeneği ve açıklamayı içerir. Gelecekteki denemeler soru kimliğinin güncel pointer'ını değil kullandıkları sürüm kimliğini saklamalıdır; deneme tabloları henüz uygulanmadı.
+GET `/api/v1/admin/questions/{question}/versions` sürümleri azalan numara sırasıyla cursor pagination ile döndürür. Yönetici yanıtı doğru seçeneği ve açıklamayı içerir. Gelecekteki denemeler soru kimliğinin güncel pointer'ını değil kullandıkları sürüm kimliğini saklamalıdır; tek soru çalışması `practice_attempts` bu sürüm kimliğini saklar; çok sorulu deneme henüz uygulanmadı.
 
-GET `/api/v1/questions` ve `/questions/{question}` yalnız güncel yayımlanmış sürümü döndürür. Cevap anahtarı ve açıklama ayrı öğrenci Resource üzerinden çıkarılır; yönetici hesabı da öğrenci route'unu kullanırsa bu alanları alamaz. Taslak veya olmayan soru 404 döner. `include_answers` ve öğrenci `status` parametreleri reddedilir. Cevap gönderme ve doğru/yanlış değerlendirme henüz yoktur.
+GET `/api/v1/questions` ve `/questions/{question}` yalnız güncel yayımlanmış sürümü döndürür. Cevap anahtarı ve açıklama ayrı öğrenci Resource üzerinden çıkarılır; yönetici hesabı da öğrenci route'unu kullanırsa bu alanları alamaz. Taslak veya olmayan soru 404 döner. `include_answers` ve öğrenci `status` parametreleri reddedilir. Cevap gönderme ve doğru/yanlış/boş değerlendirme ayrı Study route'ları üzerinden uygulanır.
 
 Öğrenci filtreleri `subject_id`, `topic_id`, `exam_type_id`, `source_id` yayımlanmış sürüme uygulanır. `topic_id` tam eşleşmedir; alt konuları otomatik kapsamaz. Yönetici listesi aynı filtreleri son taslağa uygular, ek `status=draft|published` kabul eder. `draft` hiç yayımlanmamış soru demektir; yayımlanmış sorunun bekleyen taslağı `has_pending_changes` alanıyla belirtilir. Listeler varsayılan 20, en fazla 100 kayıt döndürür; cursor ve filtreler sonraki sayfa bağlantısında korunur.
 
@@ -49,4 +49,4 @@ GET `/api/v1/questions` ve `/questions/{question}` yalnız güncel yayımlanmı�
 
 PostgreSQL [constraint](https://www.postgresql.org/docs/18/ddl-constraints.html) ve [trigger](https://www.postgresql.org/docs/18/trigger-definition.html) mekanizmaları ilişkileri ve yayımlanmış içerik korumasını uygular. Migration fonksiyonları `CREATE OR REPLACE` kullanır; test `migrate:fresh` işlemi tabloları silerken kalan fonksiyonlar yeniden kurulabilir. Migration rollback merkezi audit geçmişini silmez ve audit `tenant_id` alanını nullable bırakır.
 
-Sözleşme [OpenAPI](openapi.json) içinde; route eşitliği otomatik testte ve Redocly lint temizdir. Sonraki panel tesliminde [React yönetim arayüzü](../apps/admin/README.md) bu API'ye bağlandı; 8 Chromium E2E ile doğrulandı. Öğrenci web/mobil, native test ve sınav/değerlendirme bu içerik paneline dahil değildir.
+Sözleşme [OpenAPI](openapi.json) içinde; route eşitliği otomatik testte ve Redocly lint temizdir. Sonraki panel tesliminde [React yönetim arayüzü](../apps/admin/README.md) bu API'ye bağlandı; 8 Chromium E2E ile doğrulandı. Öğrenci web alıştırması ayrı uygulamada geliştirilmiştir. Native mobil ve süreli sınav henüz yoktur.

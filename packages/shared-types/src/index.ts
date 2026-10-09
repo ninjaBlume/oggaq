@@ -25,3 +25,8 @@ export interface Catalogs {
   'question-sources': QuestionSource[];
 }
 export type CatalogName = keyof Catalogs;
+
+export type Question = components['schemas']['Question'];
+export type QuestionVersion = components['schemas']['QuestionVersion'];
+export type PracticeAttempt = components['schemas']['PracticeAttempt'];
+export type StudyContext = components['schemas']['Context'];

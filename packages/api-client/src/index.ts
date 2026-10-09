@@ -97,3 +97,10 @@ export function cursorFromLink(link: string | null | undefined): string | undefi
   // Only copy the cursor; never send cookies to a server-supplied URL.
   return new URL(link, 'http://pagination.invalid').searchParams.get('cursor') ?? undefined;
 }
+
+export function xsrfCookie(cookie: string): string | null {
+  const entry = cookie.split(';').map((part) => part.trim()).find((part) => part.startsWith('XSRF-TOKEN='));
+  if (!entry) return null;
+  try { return decodeURIComponent(entry.slice('XSRF-TOKEN='.length)); }
+  catch { return null; }
+}

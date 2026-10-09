@@ -23,6 +23,10 @@
     {
       "name": "QuestionBank",
       "description": "Merkezi ders/konu/kaynak ve sürümlü soru yayımlama"
+    },
+    {
+      "name": "Study",
+      "description": "Bağlama özel, sürüme sabitlenmiş tek soru alıştırması"
     }
   ],
   "security": [
@@ -2151,7 +2155,7 @@
       "get": {
         "operationId": "showPublishedQuestion",
         "summary": "Güncel yayımlanmış soruyu görüntüleme",
-        "description": "Taslak veya mevcut olmayan soru 404 döner. Cevap anahtarı ve açıklama dönmez; deneme/cevap değerlendirme ayrı sonraki teslimdir.",
+        "description": "Taslak veya mevcut olmayan soru 404 döner. Cevap anahtarı ve açıklama bu route üzerinde dönmez; tek soru alıştırması Study uçlarıyla değerlendirilir.",
         "tags": [
           "QuestionBank"
         ],
@@ -2193,6 +2197,296 @@
             }
           }
         ]
+      }
+    },
+    "/api/v1/contexts/{context}/practice-attempts": {
+      "get": {
+        "operationId": "listPracticeAttempts",
+        "summary": "Kendi bağlamında çözüm geçmişi",
+        "description": "Yalnız bağlam sahibi ve aktif üyelik erişebilir; kurum yöneticisi başka öğrencinin geçmişini okuyamaz. Başlanmış çalışmalar da listelenir; created_at/id ile cursor sırası.",
+        "tags": [
+          "Study"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PracticeAttemptList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "startPracticeAttempt",
+        "summary": "Yayımlanmış soru sürümüne sabit alıştırma açma",
+        "description": "İstemci UUID id aynı içerikle tekrar kullanılınca aynı çözüm döner (200). Farklı içerik veya bağlam 409. question_version_id güncel yayımlanmış sürümle uyuşmalıdır; değiştiyse question_changed 409. Başlanmış çalışmada cevap anahtarı/açıklama gizlidir.",
+        "tags": [
+          "Study"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PracticeAttemptResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartPracticeInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/contexts/{context}/practice-attempts/{attempt}": {
+      "get": {
+        "operationId": "showPracticeAttempt",
+        "summary": "Sabit sürümü ve varsa çözüm sonucunu okuma",
+        "description": "Soru sonradan yayımlansa bile bu çalışmanın sürümü değişmez. Başka bağlamın çalışması 404 döner.",
+        "tags": [
+          "Study"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PracticeAttemptResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "attempt",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/contexts/{context}/practice-attempts/{attempt}/answer": {
+      "post": {
+        "operationId": "answerPracticeAttempt",
+        "summary": "Tek soruyu sunucuda değerlendirme",
+        "description": "selected_option_id bu sürümün seçeneği veya açıkça null (boş bırakma) olmalıdır. Aynı cevap tekrarında aynı sonuç; tamamlandıktan sonra farklı cevap answer_locked 409. Nihai cevap/açıklama yalnız cevaplandıktan sonra bu kayıtta görünür. Resmî sınav puanlama veya süre kuralı değildir.",
+        "tags": [
+          "Study"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PracticeAttemptResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "attempt",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerPracticeInput"
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -3659,6 +3953,163 @@
           "per_page",
           "next_cursor",
           "prev_cursor"
+        ]
+      },
+      "StartPracticeInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "question_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "question_version_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "id",
+          "question_id",
+          "question_version_id"
+        ]
+      },
+      "AnswerPracticeInput": {
+        "type": "object",
+        "properties": {
+          "selected_option_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "selected_option_id"
+        ]
+      },
+      "PracticeFeedback": {
+        "type": "object",
+        "properties": {
+          "correct_option_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "explanation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "correct_option_id",
+          "explanation"
+        ]
+      },
+      "PracticeAttempt": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "context_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "question_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "question": {
+            "$ref": "#/components/schemas/QuestionVersion"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "answered_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "selected_option_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "correct",
+              "incorrect",
+              "skipped"
+            ]
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PracticeFeedback"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "context_id",
+          "question_id",
+          "question",
+          "created_at",
+          "answered_at",
+          "selected_option_id",
+          "outcome",
+          "feedback"
+        ]
+      },
+      "PracticeAttemptResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/PracticeAttempt"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "PracticeAttemptList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PracticeAttempt"
+            }
+          },
+          "links": {
+            "$ref": "#/components/schemas/CursorLinks"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/CursorMeta"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
         ]
       }
     },

@@ -1,6 +1,6 @@
 # Teknoloji ve uyumluluk
 
-Kontrol tarihi: 9 Ekim 2026. Backend hedefleri artık PHP 8.4 üzerinde çözümlenmiş ve composer.lock ile kilitlenmiştir; platform gereksinimleri, audit ve testler doğrulandı. Yönetim panelinin aşağıdaki bağımlılıkları kuruldu ve package-lock.json ile kilitlendi; strict tip kontrolü, üretim derlemesi, Vitest ve Chromium E2E geçti. Öğrenci web ve mobil uygulamalarının değerleri adaydır; native build yapılmadı.
+Kontrol tarihi: 9 Ekim 2026. Backend hedefleri artık PHP 8.4 üzerinde çözümlenmiş ve composer.lock ile kilitlenmiştir; platform gereksinimleri, audit ve testler doğrulandı. Yönetim paneli ve öğrenci webin aşağıdaki bağımlılıkları kuruldu ve package-lock.json ile kilitlendi; strict tip kontrolü, üretim derlemesi, Vitest ve Chromium E2E geçti. Mobil uygulamanın değerleri adaydır; native build yapılmadı.
 
 ## Backend
 
@@ -20,7 +20,7 @@ Paket bildirimleri doğrudan [Laravel](https://repo.packagist.org/p2/laravel/fra
 
 [PostgreSQL destek tablosuna](https://www.postgresql.org/support/versioning/) göre 18 desteklenen bir seridir. Global `psql 14.18` korunmuştur; projeye ait PostgreSQL 18.6 sunucusu ayrı cluster ve port ile kuruldu ve migration/test bağlantıları doğrulandı.
 
-## Kurulu yönetim paneli
+## Kurulu web uygulamaları
 
 | Bileşen | Kilitli sürüm |
 | --- | --- |
@@ -34,7 +34,7 @@ Paket bildirimleri doğrudan [Laravel](https://repo.packagist.org/p2/laravel/fra
 | Playwright | `1.64.0` |
 | openapi-typescript | `7.13.0` |
 
-Router 7 yönetim panelinde `createBrowserRouter` ve kaydedilmemiş değişiklik engeli için kullanılıyor. Paylaşılan istemci, OpenAPI'den üretilen tiplerle kontrol edilir. Bağımlılık kurulumu ve npm audit başarılı; 11 Vitest ve 8 Chromium testi geçti. React Testing Library, Zustand veya mobil paketleri kurulmadı.
+Router 7 yönetim panelinde `createBrowserRouter` ve kaydedilmemiş değişiklik engeli için kullanılıyor. Paylaşılan istemci, OpenAPI'den üretilen tiplerle kontrol edilir. Bağımlılık kurulumu ve npm audit başarılı; 15 Vitest ve 17 Chromium testi geçti. React Testing Library, Zustand veya mobil paketleri kurulmadı.
 
 ## JavaScript ve mobil adayları
 
@@ -74,4 +74,4 @@ Ortak paketler React bileşeni barındırmayacak; veri sözleşmeleri, saf kural
 | Mailpit | 1.31.4 | Gerçek SMTP bildirimleri yerel kutuda doğrulandı |
 | Docker | Kurulmadı | Yerel Homebrew servisleri kullanılıyor; Docker doğrulanmadı |
 
-Gerekli Homebrew sürümleri yan yana kuruldu; global PHP/Node/PostgreSQL linkleri değiştirilmedi. Root npm manifesti/workspace düzeni ve Redocly CLI 2.60.0 kilit dosyası vardır; yönetim paneli ve ortak API paketleri kuruldu; öğrenci web/mobil henüz kurulmadı. GitHub Actions yapılandırması vardır; uzak sonuç Actions üzerinden izlenir. QuestionBank mevcut bağımlılıklarla geliştirilmiştir; yeni paket eklenmedi. Kurulum [DEVELOPMENT](DEVELOPMENT.md) içindedir. Yeni sürümlere geçiş changelog/peer incelemesi ve ilgili testlerle yapılır.
+Gerekli Homebrew sürümleri yan yana kuruldu; global PHP/Node/PostgreSQL linkleri değiştirilmedi. Root npm manifesti/workspace düzeni ve Redocly CLI 2.60.0 kilit dosyası vardır; yönetim paneli ve ortak API paketleri kuruldu; öğrenci web de kuruldu; mobil henüz kurulmadı. GitHub Actions yapılandırması vardır; uzak sonuç Actions üzerinden izlenir. QuestionBank mevcut bağımlılıklarla geliştirilmiştir; yeni paket eklenmedi. Kurulum [DEVELOPMENT](DEVELOPMENT.md) içindedir. Yeni sürümlere geçiş changelog/peer incelemesi ve ilgili testlerle yapılır.

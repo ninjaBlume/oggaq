@@ -1,6 +1,6 @@
 # Ürün gereksinimleri
 
-Durum: Identity/Tenancy/QuestionBank backend ve gerçek API'ye bağlı merkezi içerik yönetim paneli uygulanmıştır. Teknik kapsam [QUESTION_BANK](QUESTION_BANK.md) ve [panel kurulumunda](../apps/admin/README.md) anlatılır; öğrenci web/mobil, soru çözme/değerlendirme ve diğer ürün akışları tasarım aşamasındadır. Güncel kaynak [proje yönergesi](../prompt.md); ilk analizden sonra bu dosya yenilenmiştir. Teknik ad `security-exam-platform`, depo adı OGGAQ olarak korunur.
+Durum: Identity/Tenancy/QuestionBank/Study backend ve gerçek API'ye bağlı merkezi içerik yönetim paneli uygulanmıştır. Teknik kapsam [QUESTION_BANK](QUESTION_BANK.md) ve [panel kurulumunda](../apps/admin/README.md) anlatılır; Öğrenci web kayıt/giriş/doğrulama/reset, tek soru çözme/değerlendirme ve çalışma geçmişi de uygulanmıştır; [STUDY](STUDY.md) kapsamı belirtir. Native mobil, süreli sınav ve diğer ürün akışları tasarım aşamasındadır. Güncel kaynak [proje yönergesi](../prompt.md); ilk analizden sonra bu dosya yenilenmiştir. Teknik ad `security-exam-platform`, depo adı OGGAQ olarak korunur.
 
 ## Hedef ve kullanıcılar
 

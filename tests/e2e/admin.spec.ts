@@ -71,14 +71,14 @@ test('cookie giriş, katalog, taslak, sürüm, yayın, geçmiş ve logout gerçe
   await page.getByRole('button', { name: 'Yayımla', exact: true }).click();
   await page.getByRole('button', { name: 'Son sürümü yayımla', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Soru yayımlandı.' })).toBeVisible();
-  const publicBefore = await page.request.get(`http://127.0.0.1:8001/api/v1/questions/${questionId}`, { headers: { Origin: 'http://127.0.0.1:5174', Accept: 'application/json' } });
+  const publicBefore = await page.request.get(`http://127.0.0.1:8001/api/v1/questions/${questionId}`, { headers: { Origin: 'http://127.0.0.1:5184', Accept: 'application/json' } });
   expect(publicBefore.status()).toBe(200);
   expect((await publicBefore.json()).data.version).not.toHaveProperty('correct_option_id');
   await page.getByLabel('Soru metni', { exact: true }).fill('İkinci sentetik E2E sürümü');
   await page.getByRole('radio', { name: 'B seçeneği doğru cevap', exact: true }).check();
   await page.getByRole('button', { name: 'Taslağı kaydet', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Yeni taslak sürümü kaydedildi.' })).toBeVisible();
-  const stillOld = await page.request.get(`http://127.0.0.1:8001/api/v1/questions/${questionId}`, { headers: { Origin: 'http://127.0.0.1:5174', Accept: 'application/json' } });
+  const stillOld = await page.request.get(`http://127.0.0.1:8001/api/v1/questions/${questionId}`, { headers: { Origin: 'http://127.0.0.1:5184', Accept: 'application/json' } });
   expect((await stillOld.json()).data.version.stem).toBe('Sentetik E2E soru — resmî değildir');
   await page.getByRole('button', { name: 'Yayımla', exact: true }).click();
   await page.getByRole('button', { name: 'Son sürümü yayımla', exact: true }).click();
@@ -96,7 +96,7 @@ test('cookie giriş, katalog, taslak, sürüm, yayın, geçmiş ve logout gerçe
   await page.screenshot({ path: 'artifacts/admin-preview/questions.png', fullPage: true });
   await page.getByRole('button', { name: 'Çıkış yap', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Tekrar hoş geldiniz' })).toBeVisible();
-  const afterLogout = await page.request.get('http://127.0.0.1:8001/api/v1/me', { headers: { Origin: 'http://127.0.0.1:5174', Accept: 'application/json' } });
+  const afterLogout = await page.request.get('http://127.0.0.1:8001/api/v1/me', { headers: { Origin: 'http://127.0.0.1:5184', Accept: 'application/json' } });
   expect(afterLogout.status()).toBe(401);
   expect(consoleErrors).toEqual([]);
 });
@@ -104,7 +104,7 @@ test('cookie giriş, katalog, taslak, sürüm, yayın, geçmiş ve logout gerçe
 test('öğrenci ve doğrulanmamış yönetici paneli kullanamaz', async ({ page }) => {
   await login(page, 'student');
   await expect(page.getByRole('heading', { name: 'Bu panel için yetkiniz yok' })).toBeVisible();
-  const response = await page.request.get('http://127.0.0.1:8001/api/v1/admin/questions', { headers: { Origin: 'http://127.0.0.1:5174', Accept: 'application/json' } });
+  const response = await page.request.get('http://127.0.0.1:8001/api/v1/admin/questions', { headers: { Origin: 'http://127.0.0.1:5184', Accept: 'application/json' } });
   expect(response.status()).toBe(403);
   await page.getByRole('button', { name: 'Çıkış yap', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Tekrar hoş geldiniz' })).toBeVisible();

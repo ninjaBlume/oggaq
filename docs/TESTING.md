@@ -1,6 +1,6 @@
 # Test ve doğrulama stratejisi
 
-Mevcut durum: PHP 8.4, gerçek PostgreSQL 18 ve Redis üzerinde **75 backend testi, 329 assertion geçti**. Identity, Tenancy, QuestionBank, database constraints ve infrastructure testleri uygulanmıştır. QuestionBank için 23 test; yetki, sürüm/yayın, taslak/cevap gizliliği, stale revision, rollback, filtre/pagination ve composite FK/trigger korumasını doğrular. Gerçek HTTP kimlik akışları daha önce doğrulandı; ayrıca ayrı yerel süreçte soru oluşturma/yayımlama/düzenleme/sürüm koruma/409 ve öğrenci/admin erişimi `oggaq_test` üzerinde doğrulandı, sentetik veriler temizlendi. Yönetim panelinde ayrıca **11 Vitest ve 8 Chromium E2E testi geçti**; strict TypeScript ve üretim build başarılı. Öğrenci web/mobil arayüzü, soru çözme/değerlendirme, sınav/import ve offline akışları henüz yoktur; aşağıdaki ilgili senaryolar gelecekteki plandır. Uzak CI sonucu bu yerel doğrulama raporuna dahil değildir.
+Mevcut durum: PHP 8.4, gerçek PostgreSQL 18 ve Redis üzerinde **93 backend testi, 450 assertion geçti**. Identity, Tenancy, QuestionBank, database constraints ve infrastructure testleri uygulanmıştır. QuestionBank için 23 test; yetki, sürüm/yayın, taslak/cevap gizliliği, stale revision, rollback, filtre/pagination ve composite FK/trigger korumasını doğrular. Gerçek HTTP kimlik akışları daha önce doğrulandı; ayrıca ayrı yerel süreçte soru oluşturma/yayımlama/düzenleme/sürüm koruma/409 ve öğrenci/admin erişimi `oggaq_test` üzerinde doğrulandı, sentetik veriler temizlendi. Admin için 11, öğrenci web için 4 Vitest testi; iki uygulama için toplam 17 Chromium E2E testi geçti. Strict TypeScript ve iki üretim build başarılı. Öğrenci web tek soru alıştırması ve kalıcı geçmişi [STUDY](STUDY.md) kapsamında uygulanmıştır. Native mobil, çok sorulu sınav/import ve offline akışları henüz yoktur; aşağıdaki ilgili senaryolar gelecekteki plandır. Uzak CI sonucu bu yerel doğrulama raporuna dahil değildir.
 
 ## Araçlar ve ortamlar
 
@@ -22,6 +22,10 @@ Saat, ağ ve dış e-posta/depolama sınırları kontrollü olabilir; domain/ten
 8. Kontrollü 401 yanıtında session temizleme ve girişe dönüş.
 
 E2E `APP_ENV=local` ile gerçek CSRF middleware'ini kullanır; sentetik fixture'lar yalnız `oggaq_test` içinde hazırlanır/temizlenir. Guard farklı veritabanını reddeder. Backend testleri ile E2E aynı veritabanını yenilediğinden **eşzamanlı çalıştırılmaz**. Test session/cache'i database driver ile izole edilir; geliştirme Redis cache'i temizlenmez. Chromium doğrulandı; Firefox/WebKit, ekran okuyucu veya native cihaz testi tamamlandı sayılmaz. Komutlar ve portlar [panel README](../apps/admin/README.md) içindedir.
+
+## Uygulanan öğrenci kontrolleri
+
+18 Study PostgreSQL testi ve 9 öğrenci Chromium E2E: doğru/yanlış/boş, sabit sürüm, kişisel/kurum ayrımı, stale actor/üyelik/kurum aktifliği, kalıcı geçmiş, yanıt kaybında aynı kayıt, iki sekmede farklı cevap çakışması, gerçek broker/notification bağlantısıyla kayıt/doğrulama/reset. Test SMTP teslimi web E2E'ye dahil değildir. Senaryolar ve test portları [web README](../apps/web/README.md) içindedir.
 
 ## Kritik kabul matrisi
 

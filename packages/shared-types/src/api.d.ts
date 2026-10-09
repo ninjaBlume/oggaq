@@ -645,11 +645,75 @@ export interface paths {
         };
         /**
          * Güncel yayımlanmış soruyu görüntüleme
-         * @description Taslak veya mevcut olmayan soru 404 döner. Cevap anahtarı ve açıklama dönmez; deneme/cevap değerlendirme ayrı sonraki teslimdir.
+         * @description Taslak veya mevcut olmayan soru 404 döner. Cevap anahtarı ve açıklama bu route üzerinde dönmez; tek soru alıştırması Study uçlarıyla değerlendirilir.
          */
         get: operations["showPublishedQuestion"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contexts/{context}/practice-attempts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Kendi bağlamında çözüm geçmişi
+         * @description Yalnız bağlam sahibi ve aktif üyelik erişebilir; kurum yöneticisi başka öğrencinin geçmişini okuyamaz. Başlanmış çalışmalar da listelenir; created_at/id ile cursor sırası.
+         */
+        get: operations["listPracticeAttempts"];
+        put?: never;
+        /**
+         * Yayımlanmış soru sürümüne sabit alıştırma açma
+         * @description İstemci UUID id aynı içerikle tekrar kullanılınca aynı çözüm döner (200). Farklı içerik veya bağlam 409. question_version_id güncel yayımlanmış sürümle uyuşmalıdır; değiştiyse question_changed 409. Başlanmış çalışmada cevap anahtarı/açıklama gizlidir.
+         */
+        post: operations["startPracticeAttempt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contexts/{context}/practice-attempts/{attempt}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sabit sürümü ve varsa çözüm sonucunu okuma
+         * @description Soru sonradan yayımlansa bile bu çalışmanın sürümü değişmez. Başka bağlamın çalışması 404 döner.
+         */
+        get: operations["showPracticeAttempt"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contexts/{context}/practice-attempts/{attempt}/answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Tek soruyu sunucuda değerlendirme
+         * @description selected_option_id bu sürümün seçeneği veya açıkça null (boş bırakma) olmalıdır. Aynı cevap tekrarında aynı sonuç; tamamlandıktan sonra farklı cevap answer_locked 409. Nihai cevap/açıklama yalnız cevaplandıktan sonra bu kayıtta görünür. Resmî sınav puanlama veya süre kuralı değildir.
+         */
+        post: operations["answerPracticeAttempt"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1028,6 +1092,49 @@ export interface components {
             per_page: number;
             next_cursor: string | null;
             prev_cursor: string | null;
+        };
+        StartPracticeInput: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            question_id: string;
+            /** Format: uuid */
+            question_version_id: string;
+        };
+        AnswerPracticeInput: {
+            /** Format: uuid */
+            selected_option_id: string | null;
+        };
+        PracticeFeedback: {
+            /** Format: uuid */
+            correct_option_id: string;
+            explanation: string | null;
+        };
+        PracticeAttempt: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            context_id: string;
+            /** Format: uuid */
+            question_id: string;
+            question: components["schemas"]["QuestionVersion"];
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            answered_at: string | null;
+            /** Format: uuid */
+            selected_option_id: string | null;
+            /** @enum {string} */
+            outcome: "pending" | "correct" | "incorrect" | "skipped";
+            feedback: components["schemas"]["PracticeFeedback"] | null;
+        };
+        PracticeAttemptResponse: {
+            data: components["schemas"]["PracticeAttempt"];
+        };
+        PracticeAttemptList: {
+            data: components["schemas"]["PracticeAttempt"][];
+            links: components["schemas"]["CursorLinks"];
+            meta: components["schemas"]["CursorMeta"];
         };
     };
     responses: {
@@ -2145,6 +2252,131 @@ export interface operations {
             401: components["responses"]["Problem"];
             403: components["responses"]["Problem"];
             404: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    listPracticeAttempts: {
+        parameters: {
+            query?: {
+                per_page?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                context: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PracticeAttemptList"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    startPracticeAttempt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartPracticeInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PracticeAttemptResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    showPracticeAttempt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+                attempt: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PracticeAttemptResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    answerPracticeAttempt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+                attempt: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnswerPracticeInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PracticeAttemptResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
             422: components["responses"]["Problem"];
             429: components["responses"]["Problem"];
         };

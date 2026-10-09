@@ -41,7 +41,7 @@ php artisan schedule:work
 | Mailpit posta kutusu | `http://127.0.0.1:58025` |
 | Yerel SMTP | `127.0.0.1:51025` |
 
-Mailpit e-postaları yerelde yakalar; dışarıya göndermez. Bildirimler Horizon çalışırken işlenir. Parola sıfırlama e-postası henüz geliştirilmemiş web formuna bağlantı taşır; backend reset endpoint'i ve token akışı test edilmiştir. Doğrulama bağlantısı giriş yapmış aynı kullanıcı için geçerlidir; webde cookie, mobil API'de Bearer kimliği kullanılır.
+Mailpit e-postaları yerelde yakalar; dışarıya göndermez. Bildirimler Horizon çalışırken işlenir. Doğrulama ve parola sıfırlama e-postaları öğrenci web formlarını açar; backend reset endpoint'i ve token akışı test edilmiştir. Doğrulama bağlantısı giriş yapmış aynı kullanıcı için geçerlidir; webde cookie, mobil API'de Bearer kimliği kullanılır.
 
 Horizon paneli yerelde de yalnız doğrulanmış aktif platform yöneticisine açıktır. Örnek yönetici hesabı/parolası otomatik oluşturulmaz:
 
@@ -86,9 +86,13 @@ GitHub Actions aynı PHP/Node ana sürümleri ve PostgreSQL 18/Redis 8 servisler
 
 Backend API açıkken kökte Node 24 ile `npm ci --ignore-scripts` ve `npm run dev:admin` çalıştırın. Panel `http://127.0.0.1:5174` adresinde cookie/CSRF ile API'ye bağlanır. `.env.example` içindeki `ADMIN_URL` ve `SANCTUM_STATEFUL_DOMAINS` bu origin'i içerir. Yönetici hesabı için yukarıdaki `app:create-admin` komutu kullanılır; otomatik hesap yoktur. Akışlar ve sınırlar [panel README](../apps/admin/README.md) içindedir.
 
-`npm run typecheck`, `npm run test:admin`, `npm run build:admin` ile istemci kontrol edilir. `npx playwright install chromium` ardından `npm run test:e2e`, yalnız `oggaq_test` PostgreSQL üzerinde sentetik veriyle çalışır; test DB'sini önce/sonra yeniden oluşturur. PHPUnit ve E2E aynı anda çalıştırılmaz. Normal panel sunucusunu E2E öncesi kapatın: E2E `8001`/`5174` portlarını kendi açıp kapatır. Test session/cache'i izole PostgreSQL'de tutulur; gerçek geliştirme Redis verisi temizlenmez.
+`npm run typecheck`, `npm run test:admin`, `npm run build:admin` ile istemci kontrol edilir. `npx playwright install chromium` ardından `npm run test:e2e`, yalnız `oggaq_test` PostgreSQL üzerinde sentetik veriyle çalışır; test DB'sini önce/sonra yeniden oluşturur. PHPUnit ve E2E aynı anda çalıştırılmaz. E2E `8001`/`5183`/`5184` portlarını kendi açıp kapatır; normal `8000`/`5173`/`5174` sunucularını kullanmaz. Test session/cache'i izole PostgreSQL'de tutulur; gerçek geliştirme Redis verisi temizlenmez.
 
-CI, OpenAPI tip üretimi/fark kontrolü, admin strict tip/Vitest/build/npm audit ve gerçek API Chromium E2E kapılarını da içerir. İlk uzak çalışma, Git'te bulunmayan boş `tests/Unit` dizinine PHPUnit referansı nedeniyle başarısız oldu; bu referans kaldırıldı. Yeni uzak sonuç GitHub Actions'tan izlenir.
+CI, OpenAPI tip üretimi/fark kontrolü, admin/öğrenci web strict tip/Vitest/build/npm audit ve gerçek API Chromium E2E kapılarını da içerir. İlk uzak çalışma, Git'te bulunmayan boş `tests/Unit` dizinine PHPUnit referansı nedeniyle başarısız oldu; bu referans kaldırıldı. Yeni uzak sonuç GitHub Actions'tan izlenir.
+
+## Öğrenci uygulaması
+
+Backend migration'ını `php artisan migrate` ile uygulayıp kökte `npm run dev:web` çalıştırın. Uygulama `http://127.0.0.1:5173` adresindedir. Kayıt/doğrulama/reset, ders/konu çalışması ve kalıcı çözüm geçmişi [web README](../apps/web/README.md) ve [STUDY](STUDY.md) içinde açıklanır. `npm run test:web`, `npm run build:web` ve ortak `npm run typecheck` webi de kontrol eder. Bildirim bağlantısı değiştiğinden açık Horizon worker'ını yeni kodla yeniden başlatın.
 
 ## Durdurma ve üretim sınırı
 

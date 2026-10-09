@@ -8,11 +8,13 @@ Türkiye'deki özel güvenlik görevlisi adayları için ücretsiz sınav hazır
 
 Kayıt, cookie giriş/çıkış, cihaz bazlı süreli mobil token, e-posta doğrulama, parola sıfırlama, ad güncelleme, platform yöneticisi kurum/üyelik oluşturma ve iptali çalışır. Kullanıcı kişisel/aktif kurum bağlamlarını görebilir; kurum yöneticisi sadece kendi kurumunun üye dizinine erişebilir.
 
-Merkezi ders, konu/alt konu, sınav türü ve kaynak katalogları; tek doğru seçenekli metin sorusu oluşturma, yeni sürümle düzenleme, ayrı yayımlama ve yönetici sürüm geçmişi uygulanmıştır. Öğrenci yalnız yayımlanmış sürümü filtreleyip okuyabilir; cevap anahtarı ve açıklama dönmez. PostgreSQL trigger'ları yayımlanmış soru/seçenek değişikliklerini engeller. 75 backend testi ve 329 assertion geçti.
+Merkezi ders, konu/alt konu, sınav türü ve kaynak katalogları; tek doğru seçenekli metin sorusu oluşturma, yeni sürümle düzenleme, ayrı yayımlama ve yönetici sürüm geçmişi uygulanmıştır. Öğrenci yalnız yayımlanmış sürümü filtreleyip okuyabilir; cevap anahtarı ve açıklama dönmez. PostgreSQL trigger'ları yayımlanmış soru/seçenek değişikliklerini engeller. Soru bankasının ikinci tesliminde 75 backend testi ve 329 assertion geçti.
 
 React 19/TypeScript yönetim paneli gerçek API'ye bağlıdır: cookie giriş/çıkış, katalog oluşturma, soru listesi/filtre, taslak düzenleme, önizleme, yayımlama ve sürüm geçmişi. 11 istemci testi, 8 Chromium E2E ve strict tip kontrolü/production build geçti. [Panel kurulumu](apps/admin/README.md) ayrı belgelenmiştir.
 
-Öğrenci web/mobil arayüzleri, soru çözme/değerlendirme ve sınav motoru, import, raporlar ve hesap silme/veri export akışları henüz geliştirilmedi. Çevrimdışı çalışma güncel [prompt.md](prompt.md) kapsamında ayrıca kararlaştırılacak; mevcut sync belgeleri tasarım önerisidir. Kuruma özel soru gelecekte merkezi içerikten ayrı yetkilendirilecek. Boş uygulama klasörlerindeki `.gitkeep` dosyaları ekran veya özellik değildir.
+Öğrenci web uygulaması eklendi: kayıt/giriş, e-posta doğrulama, parola sıfırlama, ders/konu seçimi, yayımlanmış soruyu çözme, sunucuda doğru/yanlış/boş değerlendirme ve kalıcı çalışma geçmişi. Soru sürümü sonuçla sabitlenir; kişisel/kurum geçmişi ayrıdır. Güncel sonuç: **93 backend testi/450 assertion, 15 Vitest ve 17 Chromium E2E testi**; strict tip ve iki uygulamanın production build'i başarılı. [Öğrenci kurulumu](apps/web/README.md), [Study API/veri modeli](docs/STUDY.md).
+
+Native mobil, süreli çok sorulu sınav motoru, import, raporlar ve hesap silme/veri export akışları henüz geliştirilmedi. Çevrimdışı çalışma güncel [prompt.md](prompt.md) kapsamında ayrıca kararlaştırılacak; mevcut sync belgeleri tasarım önerisidir. Kuruma özel soru gelecekte merkezi içerikten ayrı yetkilendirilecek. Boş uygulama klasörlerindeki `.gitkeep` dosyaları ekran veya özellik değildir.
 
 PostgreSQL/Redis otomatik testleri ve gerçek HTTP kimlik akışı doğrulandı. GitHub Actions yapılandırması hazır; uzak CI sonucu GitHub Actions üzerinden izlenir.
 
@@ -21,7 +23,7 @@ PostgreSQL/Redis otomatik testleri ve gerçek HTTP kimlik akışı doğrulandı.
 ```text
 apps/
   mobile/                 React Native + Expo
-  web/                    React + Vite kullanıcı uygulaması
+  web/                    Çalışan React + Vite öğrenci uygulaması
   admin/                  Çalışan React + Vite içerik yönetimi
 backend/                  Laravel 13 modüler monolit
 packages/
@@ -50,7 +52,7 @@ docs/                     Türkçe teknik belgeler
 | [Testler](docs/TESTING.md) | Kritik senaryolar ve doğrulama yöntemi |
 | [Yol haritası](docs/ROADMAP.md) | Aşamalar, bağımlılıklar ve tamamlanma kapıları |
 | [Geliştirme ortamı](docs/DEVELOPMENT.md) | Kurulum, servisler, API, test ve yönetici hesabı |
-| [OpenAPI 3.1.2](docs/openapi.json) | Uygulanmış 39 HTTP operasyonunun makineyle doğrulanabilir sözleşmesi |
+| [OpenAPI 3.1.2](docs/openapi.json) | Uygulanmış 43 HTTP operasyonunun makineyle doğrulanabilir sözleşmesi |
 
 ## Geliştirme ortamı
 
@@ -68,4 +70,6 @@ Bu komutlar PATH'te PHP 8.4 seçili olmasını gerektirir. Horizon'u ayrı termi
 
 Paneli kökte `npm run dev:admin` ile `http://127.0.0.1:5174` adresinde çalıştırın. Yönetici hesabı için panel kurulum belgesindeki `app:create-admin` komutunu kullanın; hazır/parolası sabit bir hesap oluşturulmaz.
 
-Gerçek MySQL/MariaDB SQL ve PDF kaynakları henüz sağlanmadı; aktarım başlamadı. Sürümlü sınav/cevap değerlendirme ve öğrenci uygulamalarını bağlamak sonraki işlerdir.
+Gerçek MySQL/MariaDB SQL ve PDF kaynakları henüz sağlanmadı; aktarım başlamadı. Süreli çok sorulu sınav ve native mobil sonraki işlerdir.
+
+Öğrenci uygulamasını kökte `npm run dev:web` ile `http://127.0.0.1:5173` adresinde açın. Normal veritabanı boşsa yönetim panelinde yayımlanan sorular listelenene kadar boş durum gösterilir.

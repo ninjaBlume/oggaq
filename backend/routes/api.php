@@ -5,6 +5,7 @@ use App\Modules\Identity\Http\Controllers\ProfileController;
 use App\Modules\QuestionBank\Http\Controllers\AdminQuestionController;
 use App\Modules\QuestionBank\Http\Controllers\CatalogController;
 use App\Modules\QuestionBank\Http\Controllers\QuestionController;
+use App\Modules\Study\Http\Controllers\PracticeAttemptController;
 use App\Modules\Tenancy\Http\Controllers\MembershipController;
 use App\Modules\Tenancy\Http\Controllers\StudyContextController;
 use App\Modules\Tenancy\Http\Controllers\TenantController;
@@ -39,6 +40,10 @@ Route::prefix('v1')->group(function () {
             Route::get('admin/questions/{question}/versions', [AdminQuestionController::class, 'versions'])->whereUuid('question');
             Route::get('questions', [QuestionController::class, 'index']);
             Route::get('questions/{question}', [QuestionController::class, 'show'])->whereUuid('question');
+            Route::get('contexts/{context}/practice-attempts', [PracticeAttemptController::class, 'index'])->whereUuid('context');
+            Route::post('contexts/{context}/practice-attempts', [PracticeAttemptController::class, 'store'])->whereUuid('context');
+            Route::get('contexts/{context}/practice-attempts/{attempt}', [PracticeAttemptController::class, 'show'])->whereUuid(['context', 'attempt']);
+            Route::post('contexts/{context}/practice-attempts/{attempt}/answer', [PracticeAttemptController::class, 'answer'])->whereUuid(['context', 'attempt']);
             Route::get('me/contexts', [StudyContextController::class, 'index']);
             Route::get('contexts/{context}', [StudyContextController::class, 'show'])->whereUuid('context');
             Route::get('admin/tenants', [TenantController::class, 'index']);

@@ -17,7 +17,7 @@ Güncelleme: 9 Ekim 2026. Güncel [prompt.md](../prompt.md) ilk analiz sonrasın
 - [x] OpenAPI 3.1.2, route eşitliği testi, API lint, Composer kontrolleri.
 - [x] Kurulum belgeleri ve yerelde hazır GitHub Actions yapılandırması.
 
-İlk teslim backend/API temeliydi. Üçüncü teslimde yönetim paneli eklendi; öğrenci web/mobil kayıt ve sınav akışları hâlâ tamamlanmadı. Üretim deploy çalıştırılmadı. Uzak CI sonucu GitHub Actions üzerinden izlenir.
+İlk teslim backend/API temeliydi. Üçüncü teslimde yönetim paneli eklendi; öğrenci web kayıt/tek soru çalışması dördüncü teslimde eklendi; native mobil ve çok sorulu sınav henüz yoktur. Üretim deploy çalıştırılmadı. Uzak CI sonucu GitHub Actions üzerinden izlenir.
 
 ## Tamamlanan ikinci backend teslimi — merkezi soru bankası
 
@@ -43,7 +43,17 @@ Kapsam ve sınırlar [QUESTION_BANK](QUESTION_BANK.md) içindedir. Gerçek soru/
 
 Panel kapsamı ve kurulum [apps/admin/README](../apps/admin/README.md) içindedir. Kurum yönetimi, import ve öğrenci sınav motoru sonraki işlerdir.
 
-## Sıradaki işler — sürümlü sınav motoru ve öğrenci uygulaması
+## Tamamlanan dördüncü teslim — öğrenci web ve tek soru alıştırması
+
+- [x] Kayıt, giriş/çıkış, web formunda imzalı doğrulama ve parola sıfırlama.
+- [x] Ders/konu filtresi, kişisel/aktif kurum çalışma seçimi.
+- [x] Sabit yayımlanmış sürüm, doğru/yanlış/boş sunucu değerlendirmesi, kalıcı ve yarım çalışma geçmişi.
+- [x] Tekrar güvenli açma/cevap; ikinci farklı cevabın 409 ile reddi.
+- [x] 18 yeni backend testi; toplam 93 test/450 assertion. 15 istemci birim testi ve 17 Chromium E2E, iki web build'i/strict tip kontrolü.
+
+Kapsam [STUDY](STUDY.md), kurulum [öğrenci README](../apps/web/README.md) içindedir. Tek soru çalışması tamamlandı; resmî/süreli çok sorulu sınav değildir.
+
+## Sıradaki işler — sürümlü sınav motoru ve native mobil
 
 Ders, konu ve gerekirse alt konu; soru/seçenek/görsel/kaynak sürümleri; sınav türü/numarası/yıl/dönem; resmî sınavın özgün soru sırası ve cevap anahtarı. Bir soru birden çok sınavda kullanılabilir. Alıştırma ile süreli sınavın kuralları ayrılır; doğrulanmamış resmî sayı/süre/başarı koşulu sabitlenmez.
 

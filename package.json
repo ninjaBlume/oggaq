@@ -2,16 +2,25 @@
   "name": "security-exam-platform",
   "version": "0.1.0",
   "private": true,
-  "engines": { "node": ">=24 <25", "npm": ">=10" },
-  "workspaces": ["apps/*", "packages/*"],
+  "engines": {
+    "node": ">=24 <25",
+    "npm": ">=10"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "lint:api": "redocly lint docs/openapi.json",
     "generate:api": "openapi-typescript docs/openapi.json -o packages/shared-types/src/api.d.ts",
     "dev:admin": "npm run dev --workspace @oggaq/admin",
     "build:admin": "npm run build --workspace @oggaq/admin",
-    "typecheck": "npm run typecheck --workspace @oggaq/admin",
+    "typecheck": "npm run typecheck --workspaces --if-present",
     "test:admin": "npm run test --workspace @oggaq/admin",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "dev:web": "npm run dev --workspace @oggaq/web",
+    "build:web": "npm run build --workspace @oggaq/web",
+    "test:web": "npm run test --workspace @oggaq/web"
   },
   "devDependencies": {
     "@redocly/cli": "2.60.0",

@@ -1,4 +1,4 @@
-name: Backend, yönetim paneli ve API
+name: Backend, web uygulamaları ve API
 
 on:
   push:
@@ -75,11 +75,13 @@ jobs:
           npm run lint:api
           npm run generate:api
           git diff --exit-code -- packages/shared-types/src/api.d.ts
-      - name: Yönetim paneli tip, test ve derleme
+      - name: Web uygulamaları tip, test ve derleme
         run: |
           npm run typecheck
           npm run test:admin
           npm run build:admin
+          npm run test:web
+          npm run build:web
           npm audit
       - name: Gerçek API ile Chromium akışları
         run: |
