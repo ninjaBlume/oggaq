@@ -1,6 +1,6 @@
 # Teknoloji ve uyumluluk
 
-Kontrol tarihi: 9 Ekim 2026. Backend hedefleri artık PHP 8.4 üzerinde çözümlenmiş ve composer.lock ile kilitlenmiştir; platform gereksinimleri, audit ve testler doğrulandı. Yönetim paneli ve öğrenci webin aşağıdaki bağımlılıkları kuruldu ve package-lock.json ile kilitlendi; strict tip kontrolü, üretim derlemesi, Vitest ve Chromium E2E geçti. Mobil uygulamanın değerleri adaydır; native build yapılmadı.
+Kontrol tarihi: 9 Ekim 2026. Backend hedefleri artık PHP 8.4 üzerinde çözümlenmiş ve composer.lock ile kilitlenmiştir; platform gereksinimleri, audit ve testler doğrulandı. Yönetim paneli ve öğrenci webin aşağıdaki bağımlılıkları kuruldu ve package-lock.json ile kilitlendi; strict tip kontrolü, üretim derlemesi, Vitest ve Chromium E2E geçti. Mobil sürümleri de kilitlidir; Metro/prebuild/Doctor doğrulandı, native derleme sonuçları [MOBILE](MOBILE.md) içinde ayrı raporlanır.
 
 ## Backend
 
@@ -45,8 +45,8 @@ Node 24 LTS ortak çalışma ortamı olarak seçildi; `.nvmrc` bu ana sürümü 
 | Expo | `57.0.27` | SDK 57'nin eşlediği paketleri kullan |
 | Mobil React Native | Şablonda `0.86.3` | Registry'deki bağımsız `0.87.1` sürümüne zorla yükseltme |
 | Mobil React | Şablonda `19.2.3` | Expo'nun sürümünü koru |
-| Expo Router | Şablonda `~57.0.25` | Expo ile birlikte çözümle |
-| Web/admin React | Registry `19.2.3` | React 19; mobil sürümünden ayrı çözümle |
+| Expo Router | Şablonda `~57.0.25` | Bu uygulamada kurulmadı; native ekranlar ayrı React Native bileşenleridir |
+| Web/admin React | Kurulu `19.2.3` | SDK renderer ile tek sürüm; duplicate native dependency yok |
 | React Router | Admin `7.18.4` | Kurulu admin sürümü; diğer uygulamalar kurulumda ayrıca doğrulanacak |
 | Vite | `8.3.4` | Web/admin için; Metro'nun yerine geçmez |
 | Vite React plugin | `6.1.2` | Vite 8 peer aralığı destekleniyor |
