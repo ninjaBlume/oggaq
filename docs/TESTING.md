@@ -1,12 +1,12 @@
 # Test ve doğrulama stratejisi
 
-Mevcut durum: PHP 8.4, gerçek PostgreSQL 18 ve Redis üzerinde **93 backend testi, 450 assertion geçti**. Identity, Tenancy, QuestionBank, database constraints ve infrastructure testleri uygulanmıştır. QuestionBank için 23 test; yetki, sürüm/yayın, taslak/cevap gizliliği, stale revision, rollback, filtre/pagination ve composite FK/trigger korumasını doğrular. Gerçek HTTP kimlik akışları daha önce doğrulandı; ayrıca ayrı yerel süreçte soru oluşturma/yayımlama/düzenleme/sürüm koruma/409 ve öğrenci/admin erişimi `oggaq_test` üzerinde doğrulandı, sentetik veriler temizlendi. Admin için 11, öğrenci web için 4 Vitest testi; iki uygulama için toplam 17 Chromium E2E testi geçti. Strict TypeScript ve iki üretim build başarılı. Öğrenci web tek soru alıştırması ve kalıcı geçmişi [STUDY](STUDY.md) kapsamında uygulanmıştır. Native mobil, çok sorulu sınav/import ve offline akışları henüz yoktur; aşağıdaki ilgili senaryolar gelecekteki plandır. Uzak CI sonucu bu yerel doğrulama raporuna dahil değildir.
+Mevcut yerel sonuç: PHP 8.4 / gerçek PostgreSQL 18 / Redis ile **109 backend testi, 584 assertion**; admin 11, web 4, mobil 7 ve ortak saat 3 olmak üzere **25 Vitest**. **24 Chromium E2E** admin, öğrenci, deneme ve Expo ekran/Bearer akışlarını kapsar. Strict TypeScript, iki web production build, üç platform Metro export, native prebuild ve Expo Doctor (21/21) doğrulandı. Native derleme sonuçları [MOBILE](MOBILE.md) içinde ayrı tutulur; Chromium kontrolü cihaz testi yerine geçmez. İki upstream Expo build advisory'si açıktır; ham npm audit temiz değildir.
 
 ## Araçlar ve ortamlar
 
 Backend standardı PHPUnit 12.5.38; Composer lock dosyasıyla kilitli. Gerçek PostgreSQL servisinde feature/database/authorization testleri; gerektiğinde Redis queue integration. Merkezi PostgreSQL testleri SQLite ile ikame edilmez.
 
-Admin: Vitest ile saf editör kuralları ve API taşıma hata davranışı; Playwright ile gerçek Laravel/PostgreSQL ve cookie/CSRF kritik akışları. React Testing Library henüz kurulmadı. Mobil: Expo'nun uyumlu Jest preset'i ve React Native Testing Library; SQLite integration ve gerçek iOS/Android buildinde cihaz/emülatör doğrulaması. Native E2E aracı mobil temel kurulunca uyumluluk/CI maliyetine göre seçilir.
+Admin: Vitest ile saf editör kuralları ve API taşıma hata davranışı; Playwright ile gerçek Laravel/PostgreSQL ve cookie/CSRF kritik akışları. React Testing Library henüz kurulmadı. Mobil: saf oturum/taşıma kuralları Vitest; Expo web export ekranları gerçek Bearer API ile Playwright. Jest/RNTL, SQLite ve cihaz E2E henüz yoktur. Native E2E aracı mobil temel kurulunca uyumluluk/CI maliyetine göre seçilir.
 
 Saat, ağ ve dış e-posta/depolama sınırları kontrollü olabilir; domain/tenant/idempotency davranışı gerçek veritabanında doğrulanır. Testlerde sentetik sorular ve kullanıcılar kullanılır; resmî soru veya gerçek kişisel veri kullanılmaz.
 
@@ -58,6 +58,8 @@ Veritabanında composite FK/CHECK/NULL unique, rollback, yarış ve concurrent f
 
 ## CI ve raporlama
 
-Yerelde hazır GitHub Actions yapılandırması PHP 8.4, Node 24, PostgreSQL ve Redis içerir; manifest/audit/biçim, backend testleri, API lint ve üretilen tiplerin güncelliği, strict tip kontrolü, Vitest, admin build, npm audit ve gerçek API Chromium E2E kapıları bulunur. Kilitli Composer/npm kurulumu kullanılır. Native build/test ortamı ayrı hazırlanır; web test başarısı mobil başarı sayılmaz.
+Yerelde hazır GitHub Actions yapılandırması PHP 8.4, Node 24, PostgreSQL ve Redis içerir; manifest/audit/biçim, backend testleri, API lint ve üretilen tiplerin güncelliği, strict tip kontrolü, Vitest, admin build, npm audit ve gerçek API Chromium E2E kapıları bulunur. Kilitli Composer/npm kurulumu kullanılır. Android APK ve macOS 26 iOS Simulator derleme işleri eklendi; web test başarısı mobil başarı sayılmaz.
 
 Bir özellikte yalnız ilgili testler çalıştırılıp sonuçları raporlanır; değişen shared contract etkilenen uygulamalarda doğrulanır. Test raporu komut, ortam, başarı/başarısızlık ve çalıştırılmayan kontrolleri belirtir. Üretim kapısında güvenlik/performance, backup restore ve hesap silme akışı ayrıca doğrulanır.
+
+Deneme testleri, yarış worker guardı ve süre sonu fixture davranışı [EXAMS](EXAMS.md) içinde. Tam E2E öncesi `npm run export:mobile:preview` çalıştırın; test sunucuları 8001/5183/5184/5185 portlarını açıp kapatır. PHPUnit ile sırayla çalıştırın.

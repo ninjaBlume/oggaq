@@ -1,6 +1,6 @@
 import type { paths, Problem } from '@oggaq/shared-types';
 
-type Method = 'get' | 'post' | 'patch' | 'delete';
+type Method = 'get' | 'post' | 'put' | 'patch' | 'delete';
 type AvailableMethod<P extends keyof paths> = { [M in Method]: NonNullable<paths[P][M]> extends never ? never : M }[Method];
 type Operation<P extends keyof paths, M extends Method> = M extends keyof paths[P] ? NonNullable<paths[P][M]> : never;
 type ResponseOf<O> = O extends { responses: infer R }
@@ -24,22 +24,23 @@ export class ApiError extends Error {
   field(name: string): string | undefined { return this.problem.errors?.[name]?.[0]; }
 }
 
-interface ClientOptions {
-  csrfToken: () => string | null;
+type Fetcher = (url: string, init?: RequestInit) => Promise<Response>;
+
+type ClientOptions = ({ auth?: 'cookie'; csrfToken: () => string | null } | { auth: 'bearer'; accessToken: () => Promise<string | null> | string | null }) & {
   onSessionExpired?: () => void;
-  fetch?: typeof fetch;
+  fetch?: Fetcher;
 }
 
 export class ApiClient {
   private readonly base: string;
-  private readonly fetcher: typeof fetch;
+  private readonly fetcher: Fetcher;
   constructor(baseUrl: string, private readonly options: ClientOptions) {
     this.base = baseUrl.replace(/\/$/, '');
     this.fetcher = options.fetch ?? globalThis.fetch.bind(globalThis);
   }
 
   async csrf(): Promise<void> {
-    await this.send('GET', '/sanctum/csrf-cookie');
+    if (this.options.auth !== 'bearer') await this.send('GET', '/sanctum/csrf-cookie');
   }
 
   async request<P extends keyof paths, M extends Method & AvailableMethod<P>>(
@@ -62,14 +63,19 @@ export class ApiClient {
   private async send(method: string, path: string, body?: unknown, signal?: AbortSignal): Promise<unknown> {
     const headers: Record<string, string> = { Accept: 'application/json' };
     if (body !== undefined) headers['Content-Type'] = 'application/json';
-    if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+    let sentToken: string | null = null;
+    if (this.options.auth === 'bearer') {
+      const token = await this.options.accessToken();
+      sentToken = token;
+      if (token) headers.Authorization = `Bearer ${token}`;
+    } else if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
       const token = this.options.csrfToken();
       if (token) headers['X-XSRF-TOKEN'] = token;
     }
     let response: Response;
     try {
       response = await this.fetcher(this.base + path, {
-        method, credentials: 'include', cache: 'no-store', headers,
+        method, credentials: this.options.auth === 'bearer' ? 'omit' : 'include', cache: 'no-store', headers,
         ...(body === undefined ? {} : { body: JSON.stringify(body) }), ...(signal ? { signal } : {}),
       });
     } catch (error) {
@@ -81,7 +87,9 @@ export class ApiClient {
     try { payload = await response.json(); }
     catch { throw new ApiError(response.status, { code: 'invalid_response', detail: 'Sunucudan geçerli bir yanıt alınamadı.' }); }
     if (!response.ok) {
-      if (response.status === 401 && path !== '/api/v1/me' && !path.startsWith('/api/v1/auth/')) this.options.onSessionExpired?.();
+      if (response.status === 401 && path !== '/api/v1/me' && !path.startsWith('/api/v1/auth/')) {
+        if (this.options.auth !== 'bearer' || await this.options.accessToken() === sentToken) this.options.onSessionExpired?.();
+      }
       throw new ApiError(response.status, isProblem(payload) ? payload : {});
     }
     return payload;

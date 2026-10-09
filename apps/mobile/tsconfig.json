@@ -1,0 +1,5 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {"strict": true, "noEmit": true, "noUnusedLocals": true, "noUnusedParameters": true},
+  "include": ["**/*.ts", "**/*.tsx", "../../packages/api-client/src", "../../packages/shared-types/src", "../../packages/study-core/src/index.ts"]
+}

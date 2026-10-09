@@ -20,11 +20,22 @@
     "test:e2e": "playwright test",
     "dev:web": "npm run dev --workspace @oggaq/web",
     "build:web": "npm run build --workspace @oggaq/web",
-    "test:web": "npm run test --workspace @oggaq/web"
+    "test:web": "npm run test --workspace @oggaq/web",
+    "dev:mobile": "npm run dev --workspace @oggaq/mobile",
+    "test:mobile": "npm run test --workspace @oggaq/mobile",
+    "export:mobile": "npm run export --workspace @oggaq/mobile",
+    "test:core": "npm run test --workspace @oggaq/study-core",
+    "audit": "node scripts/audit-node.mjs",
+    "export:mobile:preview": "EXPO_PUBLIC_LOCAL_PREVIEW=1 EXPO_PUBLIC_API_URL=http://127.0.0.1:8001 npm run export:mobile"
   },
   "devDependencies": {
     "@redocly/cli": "2.60.0",
     "@playwright/test": "1.64.0",
     "openapi-typescript": "7.13.0"
+  },
+  "overrides": {
+    "xcode": {
+      "uuid": "11.1.1"
+    }
   }
 }

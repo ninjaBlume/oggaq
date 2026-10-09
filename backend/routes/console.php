@@ -10,3 +10,5 @@ Artisan::command('inspire', function () {
 
 Schedule::command('sanctum:prune-expired --hours=24')->daily();
 Schedule::command('horizon:snapshot')->everyFiveMinutes();
+
+Schedule::command('exams:expire')->everyMinute()->withoutOverlapping();

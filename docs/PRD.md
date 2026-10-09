@@ -1,6 +1,6 @@
 # Ürün gereksinimleri
 
-Durum: Identity/Tenancy/QuestionBank/Study backend ve gerçek API'ye bağlı merkezi içerik yönetim paneli uygulanmıştır. Teknik kapsam [QUESTION_BANK](QUESTION_BANK.md) ve [panel kurulumunda](../apps/admin/README.md) anlatılır; Öğrenci web kayıt/giriş/doğrulama/reset, tek soru çözme/değerlendirme ve çalışma geçmişi de uygulanmıştır; [STUDY](STUDY.md) kapsamı belirtir. Native mobil, süreli sınav ve diğer ürün akışları tasarım aşamasındadır. Güncel kaynak [proje yönergesi](../prompt.md); ilk analizden sonra bu dosya yenilenmiştir. Teknik ad `security-exam-platform`, depo adı OGGAQ olarak korunur.
+Durum: Identity/Tenancy/QuestionBank/Study/Exams backend ve gerçek API'ye bağlı merkezi içerik yönetim paneli uygulanmıştır. Teknik kapsam [QUESTION_BANK](QUESTION_BANK.md) ve [panel kurulumunda](../apps/admin/README.md) anlatılır; Öğrenci web kayıt/giriş/doğrulama/reset, tek soru çözme/değerlendirme ve çalışma geçmişi de uygulanmıştır; [STUDY](STUDY.md) kapsamı belirtir. Süreli deneme ve Expo mobil uygulanmıştır; kapsam [EXAMS](EXAMS.md) ve native doğrulama durumu [MOBILE](MOBILE.md) içindedir. Diğer ürün akışları tasarım aşamasındadır. Güncel kaynak [proje yönergesi](../prompt.md); ilk analizden sonra bu dosya yenilenmiştir. Teknik ad `security-exam-platform`, depo adı OGGAQ olarak korunur.
 
 ## Hedef ve kullanıcılar
 
@@ -50,3 +50,7 @@ Kurum sınavları ve kurumlara özel içerik gelecekte ayrı erişim kapsamıyla
 | Hesap silme | Oturumlar iptal edilir, senkronizasyonla silinen veri geri oluşmaz, yerel veri temizlenir |
 
 Gerçek soru dosyaları, doğrulanmış sınav kuralları, kalıcı marka, barındırma/veri konumu ve hukuki metinler henüz yoktur. Bunlar ilgili yayın kapılarını etkiler; mimari ve altyapı çalışmasına engel değildir.
+
+## Uygulanan süreli deneme ve mobil
+
+[EXAMS](EXAMS.md) gerçek `exam_attempts`/`exam_answers` şemasını, yetki, sabit sürüm, revision, sunucu süresi ve değişmez sonucu anlatır. Önceki genel `attempts`/şablon/rapor tabloları gelecekteki tasarımdır. Expo istemcisinin native paket/test sınırları [MOBILE](MOBILE.md) içinde ayrıca raporlanır.

@@ -104,3 +104,7 @@ python3 scripts/dev-services.py stop
 ```
 
 Veriler silinmez. `.env`, uygulama anahtarı ve veri dizini kaybolursa mevcut şifreli oturum/kuyruk verisi açılamayabilir; geliştirme verisini silmeden önce bunun etkisini değerlendirin. Üretimde HTTPS, `APP_DEBUG=false`, özel secret yönetimi, bağımsız servis yaşam döngüsü, SMTP sağlayıcısı ve veri konumu değerlendirmesi gerekir. Bu yerel script üretimde kullanılmaz.
+
+## Deneme ve mobil
+
+Yeni tablolar için yalnız forward `php artisan migrate`; normal DB üzerinde `migrate:fresh` çalıştırmayın. Terk edilen süreli denemeler için `php artisan schedule:work` veya üretim cron scheduler gerekir. Mobil kurulum ve toolchain [MOBILE](MOBILE.md) içinde. E2E öncesi `npm run export:mobile:preview`; native/web QA ayrı. `npm run audit` yeni advisory’leri reddeder, belgelenmiş iki Expo build uyarısı açık kalır.

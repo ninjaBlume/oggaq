@@ -720,6 +720,90 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/contexts/{context}/exam-attempts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Bağlama ait süreli deneme geçmişi
+         * @description Süresi dolan kayıtları tamamlar. started_at/id ile cursor sırası; yalnız sahibi ve aktif üyelik.
+         */
+        get: operations["listExams"];
+        put?: never;
+        /**
+         * Rastgele yayımlanmış sorularla süreli çalışma başlatma
+         * @description UUID id ve aynı ayarlar tekrarında aynı deneme. Farklı ayarlar/bağlam 409; yetersiz havuz 422. Sorular başlangıç sürümüne sabitlenir. Kullanıcının seçtiği süre ve doğru yüzdesi çalışma amaçlıdır; resmî sınav şablonu değildir.
+         */
+        post: operations["startExam"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contexts/{context}/exam-attempts/{exam}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Denemeyi sürdürme veya sonucu okuma
+         * @description Sunucu zamanı ve son süre döner. Süre dolduysa atomik olarak tamamlanır. Cevap anahtarı yalnız tamamlanınca görünür.
+         */
+        get: operations["showExam"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contexts/{context}/exam-attempts/{exam}/answers/{answer}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Süre içinde deneme cevabını kaydetme veya değiştirme
+         * @description base_version güncel revision olmalıdır; aynı kaydedilmiş cevap tekrarı eski revision ile de güvenlidir. Farklı eski cevap 409 version_conflict. null cevabı temizler. Biten/süresi dolan denemeye geç gelen yazı değiştirilmez; tamamlanmış kayıt 200 döner.
+         */
+        put: operations["saveExamAnswer"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contexts/{context}/exam-attempts/{exam}/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Tüm cevapları tek işlemde değerlendirme
+         * @description Güncel base_version gerekir; eski revision 409. Boşlar dahil sabit sürümlerden doğru/yanlış/boş ve doğru yüzdesi hesaplanır. Bitirme tekrarı aynı değişmez sonucu döndürür. Süreyi sunucu belirler.
+         */
+        post: operations["finishExam"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1135,6 +1219,114 @@ export interface components {
             data: components["schemas"]["PracticeAttempt"][];
             links: components["schemas"]["CursorLinks"];
             meta: components["schemas"]["CursorMeta"];
+        };
+        ExamResult: {
+            correct: number;
+            incorrect: number;
+            blank: number;
+            score_percent: number;
+            elapsed_seconds: number;
+        };
+        ExamSummary: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            context_id: string;
+            revision: number;
+            /** @enum {string} */
+            status: "active" | "completed";
+            question_count: number;
+            duration_seconds: number;
+            /** Format: uuid */
+            subject_id: string | null;
+            /** Format: uuid */
+            topic_id: string | null;
+            /** @enum {string} */
+            scoring_rule: "correct_ratio_v1";
+            /** Format: date-time */
+            started_at: string;
+            /** Format: date-time */
+            deadline_at: string;
+            /** Format: date-time */
+            server_time: string;
+            /** Format: date-time */
+            finished_at: string | null;
+            /** @enum {string|null} */
+            finish_reason: "manual" | "expired" | null;
+            result: components["schemas"]["ExamResult"] | null;
+        };
+        ExamQuestion: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            question_id: string;
+            position: number;
+            question: components["schemas"]["QuestionVersion"];
+            /** Format: uuid */
+            selected_option_id: string | null;
+            feedback: components["schemas"]["ExamFeedback"] | null;
+        };
+        ExamAttempt: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            context_id: string;
+            revision: number;
+            /** @enum {string} */
+            status: "active" | "completed";
+            question_count: number;
+            duration_seconds: number;
+            /** Format: uuid */
+            subject_id: string | null;
+            /** Format: uuid */
+            topic_id: string | null;
+            /** @enum {string} */
+            scoring_rule: "correct_ratio_v1";
+            /** Format: date-time */
+            started_at: string;
+            /** Format: date-time */
+            deadline_at: string;
+            /** Format: date-time */
+            server_time: string;
+            /** Format: date-time */
+            finished_at: string | null;
+            /** @enum {string|null} */
+            finish_reason: "manual" | "expired" | null;
+            result: components["schemas"]["ExamResult"] | null;
+            questions: components["schemas"]["ExamQuestion"][];
+        };
+        ExamAttemptResponse: {
+            data: components["schemas"]["ExamAttempt"];
+        };
+        ExamAttemptList: {
+            data: components["schemas"]["ExamSummary"][];
+            links: components["schemas"]["CursorLinks"];
+            meta: components["schemas"]["CursorMeta"];
+        };
+        StartExamInput: {
+            /** Format: uuid */
+            id: string;
+            question_count: number;
+            duration_seconds: number;
+            /** Format: uuid */
+            subject_id?: string | null;
+            /** Format: uuid */
+            topic_id?: string | null;
+        };
+        SaveExamAnswerInput: {
+            /** Format: uuid */
+            selected_option_id: string | null;
+            base_version: number;
+        };
+        FinishExamInput: {
+            base_version: number;
+        };
+        ExamFeedback: {
+            /** Format: uuid */
+            correct_option_id: string;
+            explanation: string | null;
+            /** @enum {string} */
+            outcome: "correct" | "incorrect" | "skipped";
         };
     };
     responses: {
@@ -2371,6 +2563,165 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PracticeAttemptResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    listExams: {
+        parameters: {
+            query?: {
+                per_page?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                context: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamAttemptList"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    startExam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartExamInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamAttemptResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    showExam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+                exam: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamAttemptResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    saveExamAnswer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+                exam: string;
+                answer: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveExamAnswerInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamAttemptResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    finishExam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+                exam: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FinishExamInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamAttemptResponse"];
                 };
             };
             401: components["responses"]["Problem"];

@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Exams\Http\Controllers\ExamAttemptController;
 use App\Modules\Identity\Http\Controllers\AuthController;
 use App\Modules\Identity\Http\Controllers\ProfileController;
 use App\Modules\QuestionBank\Http\Controllers\AdminQuestionController;
@@ -44,6 +45,11 @@ Route::prefix('v1')->group(function () {
             Route::post('contexts/{context}/practice-attempts', [PracticeAttemptController::class, 'store'])->whereUuid('context');
             Route::get('contexts/{context}/practice-attempts/{attempt}', [PracticeAttemptController::class, 'show'])->whereUuid(['context', 'attempt']);
             Route::post('contexts/{context}/practice-attempts/{attempt}/answer', [PracticeAttemptController::class, 'answer'])->whereUuid(['context', 'attempt']);
+            Route::get('contexts/{context}/exam-attempts', [ExamAttemptController::class, 'index'])->whereUuid('context');
+            Route::post('contexts/{context}/exam-attempts', [ExamAttemptController::class, 'store'])->whereUuid('context');
+            Route::get('contexts/{context}/exam-attempts/{exam}', [ExamAttemptController::class, 'show'])->whereUuid(['context', 'exam']);
+            Route::put('contexts/{context}/exam-attempts/{exam}/answers/{answer}', [ExamAttemptController::class, 'answer'])->whereUuid(['context', 'exam', 'answer']);
+            Route::post('contexts/{context}/exam-attempts/{exam}/finish', [ExamAttemptController::class, 'finish'])->whereUuid(['context', 'exam']);
             Route::get('me/contexts', [StudyContextController::class, 'index']);
             Route::get('contexts/{context}', [StudyContextController::class, 'show'])->whereUuid('context');
             Route::get('admin/tenants', [TenantController::class, 'index']);

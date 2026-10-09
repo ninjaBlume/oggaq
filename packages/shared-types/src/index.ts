@@ -30,3 +30,7 @@ export type Question = components['schemas']['Question'];
 export type QuestionVersion = components['schemas']['QuestionVersion'];
 export type PracticeAttempt = components['schemas']['PracticeAttempt'];
 export type StudyContext = components['schemas']['Context'];
+
+export type ExamAttempt = components['schemas']['ExamAttempt'];
+export type ExamSummary = components['schemas']['ExamSummary'];
+export type ExamQuestion = components['schemas']['ExamQuestion'];

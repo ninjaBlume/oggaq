@@ -31,4 +31,4 @@ Yazmada tenant, kullanıcı, membership ve çözüm kilitleri transaction içind
 
 ## Kanıt ve sınır
 
-18 yeni PostgreSQL testi: grading, empty answer, idempotency/conflict, eski sürüm, yetki/bağlam ayrımı/üyelik iptali, stale actor, cursor ve constraint/trigger koruması. Toplam 93 backend testi/450 assertion. Web için 9 Chromium E2E; gerçek API/CSRF, notification/broker linkleri, iki sekmede conflict ve gerçek yazmadan sonra kontrollü yanıt kaybını kapsar. Offline cevap kalıcılığı yoktur; gönderilmemiş seçim yenilemede kaybolabilir. Native iOS/Android geliştirilmedi.
+18 yeni PostgreSQL testi: grading, empty answer, idempotency/conflict, eski sürüm, yetki/bağlam ayrımı/üyelik iptali, stale actor, cursor ve constraint/trigger koruması. Toplam 93 backend testi/450 assertion. Web için 9 Chromium E2E; gerçek API/CSRF, notification/broker linkleri, iki sekmede conflict ve gerçek yazmadan sonra kontrollü yanıt kaybını kapsar. Offline cevap kalıcılığı yoktur; gönderilmemiş seçim yenilemede kaybolabilir. Native istemci [MOBILE](MOBILE.md), ayrı süreli deneme [EXAMS](EXAMS.md) içinde raporlanır.

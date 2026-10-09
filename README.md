@@ -12,9 +12,9 @@ Merkezi ders, konu/alt konu, sınav türü ve kaynak katalogları; tek doğru se
 
 React 19/TypeScript yönetim paneli gerçek API'ye bağlıdır: cookie giriş/çıkış, katalog oluşturma, soru listesi/filtre, taslak düzenleme, önizleme, yayımlama ve sürüm geçmişi. 11 istemci testi, 8 Chromium E2E ve strict tip kontrolü/production build geçti. [Panel kurulumu](apps/admin/README.md) ayrı belgelenmiştir.
 
-Öğrenci web uygulaması eklendi: kayıt/giriş, e-posta doğrulama, parola sıfırlama, ders/konu seçimi, yayımlanmış soruyu çözme, sunucuda doğru/yanlış/boş değerlendirme ve kalıcı çalışma geçmişi. Soru sürümü sonuçla sabitlenir; kişisel/kurum geçmişi ayrıdır. Güncel sonuç: **93 backend testi/450 assertion, 15 Vitest ve 17 Chromium E2E testi**; strict tip ve iki uygulamanın production build'i başarılı. [Öğrenci kurulumu](apps/web/README.md), [Study API/veri modeli](docs/STUDY.md).
+Öğrenci web uygulaması eklendi: kayıt/giriş, e-posta doğrulama, parola sıfırlama, ders/konu seçimi, yayımlanmış soruyu çözme, sunucuda doğru/yanlış/boş değerlendirme ve kalıcı çalışma geçmişi. Soru sürümü sonuçla sabitlenir; kişisel/kurum geçmişi ayrıdır. Güncel sonuç: **109 backend testi/584 assertion, 25 Vitest ve 24 Chromium E2E testi**; strict tip ve iki uygulamanın production build'i başarılı. [Öğrenci kurulumu](apps/web/README.md), [Study API/veri modeli](docs/STUDY.md).
 
-Native mobil, süreli çok sorulu sınav motoru, import, raporlar ve hesap silme/veri export akışları henüz geliştirilmedi. Çevrimdışı çalışma güncel [prompt.md](prompt.md) kapsamında ayrıca kararlaştırılacak; mevcut sync belgeleri tasarım önerisidir. Kuruma özel soru gelecekte merkezi içerikten ayrı yetkilendirilecek. Boş uygulama klasörlerindeki `.gitkeep` dosyaları ekran veya özellik değildir.
+Süreli çok sorulu deneme, otomatik süre sonu, sabit soru sürümleri, atomik doğru/yanlış/boş/puan ve web ekranı eklendi. Expo iOS/Android istemcisi gerçek Bearer API ve SecureStore ile giriş, çalışma/geçmiş ve deneme akışlarını uygular. [Deneme motoru](docs/EXAMS.md), [mobil kurulum ve native doğrulama durumu](docs/MOBILE.md). Import, raporlar ve hesap silme/veri export akışları henüz geliştirilmedi. Çevrimdışı çalışma güncel [prompt.md](prompt.md) kapsamında ayrıca kararlaştırılacak; mevcut sync belgeleri tasarım önerisidir. Kuruma özel soru gelecekte merkezi içerikten ayrı yetkilendirilecek. Boş uygulama klasörlerindeki `.gitkeep` dosyaları ekran veya özellik değildir.
 
 PostgreSQL/Redis otomatik testleri ve gerçek HTTP kimlik akışı doğrulandı. GitHub Actions yapılandırması hazır; uzak CI sonucu GitHub Actions üzerinden izlenir.
 
@@ -52,7 +52,7 @@ docs/                     Türkçe teknik belgeler
 | [Testler](docs/TESTING.md) | Kritik senaryolar ve doğrulama yöntemi |
 | [Yol haritası](docs/ROADMAP.md) | Aşamalar, bağımlılıklar ve tamamlanma kapıları |
 | [Geliştirme ortamı](docs/DEVELOPMENT.md) | Kurulum, servisler, API, test ve yönetici hesabı |
-| [OpenAPI 3.1.2](docs/openapi.json) | Uygulanmış 43 HTTP operasyonunun makineyle doğrulanabilir sözleşmesi |
+| [OpenAPI 3.1.2](docs/openapi.json) | Uygulanmış 48 HTTP operasyonunun makineyle doğrulanabilir sözleşmesi |
 
 ## Geliştirme ortamı
 
@@ -70,6 +70,8 @@ Bu komutlar PATH'te PHP 8.4 seçili olmasını gerektirir. Horizon'u ayrı termi
 
 Paneli kökte `npm run dev:admin` ile `http://127.0.0.1:5174` adresinde çalıştırın. Yönetici hesabı için panel kurulum belgesindeki `app:create-admin` komutunu kullanın; hazır/parolası sabit bir hesap oluşturulmaz.
 
-Gerçek MySQL/MariaDB SQL ve PDF kaynakları henüz sağlanmadı; aktarım başlamadı. Süreli çok sorulu sınav ve native mobil sonraki işlerdir.
+Gerçek MySQL/MariaDB SQL ve PDF kaynakları henüz sağlanmadı; aktarım başlamadı. Deneme ve mobil için gerçek soru havuzu yönetim panelinden yayımlanmalıdır; geliştirme DB’sine sentetik içerik eklenmez.
 
 Öğrenci uygulamasını kökte `npm run dev:web` ile `http://127.0.0.1:5173` adresinde açın. Normal veritabanı boşsa yönetim panelinde yayımlanan sorular listelenene kadar boş durum gösterilir.
+
+Mobil için `npm run dev:mobile`. Yerel native araçlar bu Mac’te eksik; GitHub Actions Android APK ve iOS Simulator paket işleri ayrıca doğrulanır. Expo build zincirindeki iki düzeltilmemiş advisory [MOBILE](docs/MOBILE.md) içinde açıkça raporlanır.

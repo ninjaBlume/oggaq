@@ -937,3 +937,15 @@ small {
     transition:none!important
   }
 }
+
+.exam-setup fieldset { border: 0; padding: 0; margin: 0; }
+.exam-setup legend { font-weight: 700; font-size: 1.25rem; margin-bottom: 1.2rem; }
+.exam-settings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.section-title { margin: 2rem 0 1rem; }
+.exam-result { margin-bottom: 1.5rem; display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+.exam-result strong { display: block; font-size: 2.8rem; color: var(--green); }
+.exam-question-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .5rem; margin: 1.2rem 0; }
+.exam-question-grid .button { padding: .6rem .2rem; min-width: 0; }
+.exam-question-grid .answered { background: #dcece2; }
+.exam-question-grid [aria-current=step] { outline: 2px solid #286549; outline-offset: 2px; }
+@media (max-width: 600px) { .exam-settings { grid-template-columns: 1fr; } .exam-result { gap: .8rem; } }

@@ -24,7 +24,7 @@ Paket bildirimleri doğrudan [Laravel](https://repo.packagist.org/p2/laravel/fra
 
 | Bileşen | Kilitli sürüm |
 | --- | --- |
-| React / React DOM | `19.3.0` |
+| React / React DOM | `19.2.3` |
 | React Router DOM | `7.18.4` |
 | Vite / React plugin | `8.3.4` / `6.1.2` |
 | TypeScript | `6.0.3` |
@@ -34,9 +34,9 @@ Paket bildirimleri doğrudan [Laravel](https://repo.packagist.org/p2/laravel/fra
 | Playwright | `1.64.0` |
 | openapi-typescript | `7.13.0` |
 
-Router 7 yönetim panelinde `createBrowserRouter` ve kaydedilmemiş değişiklik engeli için kullanılıyor. Paylaşılan istemci, OpenAPI'den üretilen tiplerle kontrol edilir. Bağımlılık kurulumu ve npm audit başarılı; 15 Vitest ve 17 Chromium testi geçti. React Testing Library, Zustand veya mobil paketleri kurulmadı.
+Router 7 yönetim panelinde `createBrowserRouter` ve kaydedilmemiş değişiklik engeli için kullanılıyor. Paylaşılan istemci, OpenAPI'den üretilen tiplerle kontrol edilir. Bağımlılık kurulumu başarılı; Expo build zincirinde iki açık advisory [MOBILE](MOBILE.md) içinde raporlanır; 25 Vitest ve 24 Chromium testi geçti. React Testing Library, Zustand kurulmadı; Expo/RN/crypto/SecureStore/safe-area paketleri kuruldu.
 
-## JavaScript ve mobil adayları
+## JavaScript ve mobil sürümleri
 
 Node 24 LTS ortak çalışma ortamı olarak seçildi; `.nvmrc` bu ana sürümü gösterir. [Node sürüm tablosu](https://nodejs.org/en/about/previous-releases) LTS durumunu, [Vite gereksinimleri](https://vite.dev/guide/) desteklenen Node aralığını belirtir. Tam patch sürümü kurulum/CI sırasında sabitlenecek.
 
@@ -46,7 +46,7 @@ Node 24 LTS ortak çalışma ortamı olarak seçildi; `.nvmrc` bu ana sürümü 
 | Mobil React Native | Şablonda `0.86.3` | Registry'deki bağımsız `0.87.1` sürümüne zorla yükseltme |
 | Mobil React | Şablonda `19.2.3` | Expo'nun sürümünü koru |
 | Expo Router | Şablonda `~57.0.25` | Expo ile birlikte çözümle |
-| Web/admin React | Registry `19.3.0` | React 19; mobil sürümünden ayrı çözümle |
+| Web/admin React | Registry `19.2.3` | React 19; mobil sürümünden ayrı çözümle |
 | React Router | Admin `7.18.4` | Kurulu admin sürümü; diğer uygulamalar kurulumda ayrıca doğrulanacak |
 | Vite | `8.3.4` | Web/admin için; Metro'nun yerine geçmez |
 | Vite React plugin | `6.1.2` | Vite 8 peer aralığı destekleniyor |
@@ -59,7 +59,7 @@ Expo'nun [SDK matrisi](https://docs.expo.dev/versions/latest/) React Native/Reac
 
 Diğer değerler doğrudan paketlerin npm registry `latest` bildirimlerinden okundu: [React](https://registry.npmjs.org/react/latest), [React Native](https://registry.npmjs.org/react-native/latest), [React Router](https://registry.npmjs.org/react-router/latest), [Vite](https://registry.npmjs.org/vite/latest), [React plugin](https://registry.npmjs.org/@vitejs%2fplugin-react/latest), [TypeScript](https://registry.npmjs.org/typescript/latest), [Tailwind](https://registry.npmjs.org/tailwindcss/latest), [TanStack Query](https://registry.npmjs.org/@tanstack%2freact-query/latest), [Zustand](https://registry.npmjs.org/zustand/latest).
 
-Ortak paketler React bileşeni barındırmayacak; veri sözleşmeleri, saf kurallar ve platform bağımsız istemci paylaşılır. npm workspace çözümlemesinde her uygulamanın React bağımlılığı ayrı tutulur. Mobilde `expo install` ve `expo-doctor`, webde peer kontrolleri ve build sonuçları doğrulanmadan sürüm uyumluluğu tamamlandı sayılmaz.
+Ortak paketler React bileşeni barındırmayacak; veri sözleşmeleri, saf kurallar ve platform bağımsız istemci paylaşılır. npm workspace çözümlemesinde React 19.2.3 tüm uygulamalarda aynıdır; Expo Doctor duplicate kontrolü geçer. Mobilde `expo install` ve `expo-doctor`, webde peer kontrolleri ve build sonuçları doğrulanmadan sürüm uyumluluğu tamamlandı sayılmaz.
 
 ## Yerel ortam
 
@@ -74,4 +74,4 @@ Ortak paketler React bileşeni barındırmayacak; veri sözleşmeleri, saf kural
 | Mailpit | 1.31.4 | Gerçek SMTP bildirimleri yerel kutuda doğrulandı |
 | Docker | Kurulmadı | Yerel Homebrew servisleri kullanılıyor; Docker doğrulanmadı |
 
-Gerekli Homebrew sürümleri yan yana kuruldu; global PHP/Node/PostgreSQL linkleri değiştirilmedi. Root npm manifesti/workspace düzeni ve Redocly CLI 2.60.0 kilit dosyası vardır; yönetim paneli ve ortak API paketleri kuruldu; öğrenci web de kuruldu; mobil henüz kurulmadı. GitHub Actions yapılandırması vardır; uzak sonuç Actions üzerinden izlenir. QuestionBank mevcut bağımlılıklarla geliştirilmiştir; yeni paket eklenmedi. Kurulum [DEVELOPMENT](DEVELOPMENT.md) içindedir. Yeni sürümlere geçiş changelog/peer incelemesi ve ilgili testlerle yapılır.
+Gerekli Homebrew sürümleri yan yana kuruldu; global PHP/Node/PostgreSQL linkleri değiştirilmedi. Root npm manifesti/workspace düzeni ve Redocly CLI 2.60.0 kilit dosyası vardır; yönetim paneli ve ortak API paketleri kuruldu; öğrenci web de kuruldu; Expo mobil de kuruldu. GitHub Actions yapılandırması vardır; uzak sonuç Actions üzerinden izlenir. QuestionBank mevcut bağımlılıklarla geliştirilmiştir; yeni paket eklenmedi. Kurulum [DEVELOPMENT](DEVELOPMENT.md) içindedir. Yeni sürümlere geçiş changelog/peer incelemesi ve ilgili testlerle yapılır.

@@ -17,7 +17,7 @@ Güncelleme: 9 Ekim 2026. Güncel [prompt.md](../prompt.md) ilk analiz sonrasın
 - [x] OpenAPI 3.1.2, route eşitliği testi, API lint, Composer kontrolleri.
 - [x] Kurulum belgeleri ve yerelde hazır GitHub Actions yapılandırması.
 
-İlk teslim backend/API temeliydi. Üçüncü teslimde yönetim paneli eklendi; öğrenci web kayıt/tek soru çalışması dördüncü teslimde eklendi; native mobil ve çok sorulu sınav henüz yoktur. Üretim deploy çalıştırılmadı. Uzak CI sonucu GitHub Actions üzerinden izlenir.
+İlk teslim backend/API temeliydi. Üçüncü teslimde yönetim paneli eklendi; öğrenci web kayıt/tek soru çalışması dördüncü teslimde eklendi; süreli deneme ve Expo istemcisi beşinci teslimde eklendi; native derleme sonuçları ayrıca izlenir. Üretim deploy çalıştırılmadı. Uzak CI sonucu GitHub Actions üzerinden izlenir.
 
 ## Tamamlanan ikinci backend teslimi — merkezi soru bankası
 
@@ -28,7 +28,7 @@ Güncelleme: 9 Ekim 2026. Güncel [prompt.md](../prompt.md) ilk analiz sonrasın
 - [x] Composite FK, yayın pointer'ı, PostgreSQL yayımlanmış sürüm/seçenek değişmezliği ve merkezi audit.
 - [x] 23 yeni test; toplam 75 test/329 assertion, gerçek HTTP soru bankası akışı ve 39 operasyonlu OpenAPI.
 
-Kapsam ve sınırlar [QUESTION_BANK](QUESTION_BANK.md) içindedir. Gerçek soru/import ve cevap değerlendirme henüz yoktur. Yönetim paneli üçüncü teslimde eklendi. Yeni bağımlılık eklenmedi.
+Kapsam ve sınırlar [QUESTION_BANK](QUESTION_BANK.md) içindedir. Gerçek kaynak import henüz yoktur; Study/Exams sunucu değerlendirmesi sonraki teslimlerde eklendi. Yönetim paneli üçüncü teslimde eklendi. Yeni bağımlılık eklenmedi.
 
 ## Tamamlanan üçüncü teslim — gerçek API ile yönetim paneli
 
@@ -53,7 +53,18 @@ Panel kapsamı ve kurulum [apps/admin/README](../apps/admin/README.md) içindedi
 
 Kapsam [STUDY](STUDY.md), kurulum [öğrenci README](../apps/web/README.md) içindedir. Tek soru çalışması tamamlandı; resmî/süreli çok sorulu sınav değildir.
 
-## Sıradaki işler — sürümlü sınav motoru ve native mobil
+## Beşinci teslim — süreli deneme ve Expo istemcisi
+
+- [x] Sunucu süresi, sabit rastgele soru/sürüm listesi, doğru/yanlış/boş/puan, atomik bitirme ve scheduler.
+- [x] Revision çakışması/tekrar güvenliği, sahip/kurum yetkisi, 16 PostgreSQL testi (gerçek paralel finish dahil).
+- [x] Web deneme/sonuç/geçmiş, süre sonunda API sonucu ve telefon/tablet düzeni.
+- [x] Expo native giriş, SecureStore, kişisel/kurum seçimi, ders/konu çalışması, geçmiş ve deneme.
+- [x] Yerel strict tip, unit, Expo Doctor, iOS/Android Metro export ve prebuild; gerçek Bearer API ekran QA.
+- [ ] GitHub Actions native derleme artifact sonuçları; fiziksel cihaz/mağaza yayını ayrıca doğrulanır.
+
+[EXAMS](EXAMS.md), [MOBILE](MOBILE.md); iki upstream Expo build advisory'si açık.
+
+## Sıradaki işler — resmî sınav şablonları ve ilerleme
 
 Ders, konu ve gerekirse alt konu; soru/seçenek/görsel/kaynak sürümleri; sınav türü/numarası/yıl/dönem; resmî sınavın özgün soru sırası ve cevap anahtarı. Bir soru birden çok sınavda kullanılabilir. Alıştırma ile süreli sınavın kuralları ayrılır; doğrulanmamış resmî sayı/süre/başarı koşulu sabitlenmez.
 

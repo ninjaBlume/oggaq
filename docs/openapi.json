@@ -27,6 +27,10 @@
     {
       "name": "Study",
       "description": "Bağlama özel, sürüme sabitlenmiş tek soru alıştırması"
+    },
+    {
+      "name": "Exams",
+      "description": "Sunucu süreli, sürümü sabit kişisel veya kurum denemeleri."
     }
   ],
   "security": [
@@ -2488,6 +2492,383 @@
           }
         }
       }
+    },
+    "/api/v1/contexts/{context}/exam-attempts": {
+      "get": {
+        "operationId": "listExams",
+        "summary": "Bağlama ait süreli deneme geçmişi",
+        "description": "Süresi dolan kayıtları tamamlar. started_at/id ile cursor sırası; yalnız sahibi ve aktif üyelik.",
+        "tags": [
+          "Exams"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamAttemptList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "startExam",
+        "summary": "Rastgele yayımlanmış sorularla süreli çalışma başlatma",
+        "description": "UUID id ve aynı ayarlar tekrarında aynı deneme. Farklı ayarlar/bağlam 409; yetersiz havuz 422. Sorular başlangıç sürümüne sabitlenir. Kullanıcının seçtiği süre ve doğru yüzdesi çalışma amaçlıdır; resmî sınav şablonu değildir.",
+        "tags": [
+          "Exams"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamAttemptResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartExamInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/contexts/{context}/exam-attempts/{exam}": {
+      "get": {
+        "operationId": "showExam",
+        "summary": "Denemeyi sürdürme veya sonucu okuma",
+        "description": "Sunucu zamanı ve son süre döner. Süre dolduysa atomik olarak tamamlanır. Cevap anahtarı yalnız tamamlanınca görünür.",
+        "tags": [
+          "Exams"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamAttemptResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "exam",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/contexts/{context}/exam-attempts/{exam}/answers/{answer}": {
+      "put": {
+        "operationId": "saveExamAnswer",
+        "summary": "Süre içinde deneme cevabını kaydetme veya değiştirme",
+        "description": "base_version güncel revision olmalıdır; aynı kaydedilmiş cevap tekrarı eski revision ile de güvenlidir. Farklı eski cevap 409 version_conflict. null cevabı temizler. Biten/süresi dolan denemeye geç gelen yazı değiştirilmez; tamamlanmış kayıt 200 döner.",
+        "tags": [
+          "Exams"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamAttemptResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "exam",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "answer",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveExamAnswerInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/contexts/{context}/exam-attempts/{exam}/finish": {
+      "post": {
+        "operationId": "finishExam",
+        "summary": "Tüm cevapları tek işlemde değerlendirme",
+        "description": "Güncel base_version gerekir; eski revision 409. Boşlar dahil sabit sürümlerden doğru/yanlış/boş ve doğru yüzdesi hesaplanır. Bitirme tekrarı aynı değişmez sonucu döndürür. Süreyi sunucu belirler.",
+        "tags": [
+          "Exams"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamAttemptResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "exam",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinishExamInput"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4110,6 +4491,427 @@
           "data",
           "links",
           "meta"
+        ]
+      },
+      "ExamResult": {
+        "type": "object",
+        "properties": {
+          "correct": {
+            "type": "integer"
+          },
+          "incorrect": {
+            "type": "integer"
+          },
+          "blank": {
+            "type": "integer"
+          },
+          "score_percent": {
+            "type": "number"
+          },
+          "elapsed_seconds": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "correct",
+          "incorrect",
+          "blank",
+          "score_percent",
+          "elapsed_seconds"
+        ]
+      },
+      "ExamSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "context_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "completed"
+            ]
+          },
+          "question_count": {
+            "type": "integer"
+          },
+          "duration_seconds": {
+            "type": "integer"
+          },
+          "subject_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "topic_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "scoring_rule": {
+            "type": "string",
+            "enum": [
+              "correct_ratio_v1"
+            ]
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deadline_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "server_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finished_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "finish_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "manual",
+              "expired",
+              null
+            ]
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExamResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "context_id",
+          "revision",
+          "status",
+          "question_count",
+          "duration_seconds",
+          "subject_id",
+          "topic_id",
+          "scoring_rule",
+          "started_at",
+          "deadline_at",
+          "server_time",
+          "finished_at",
+          "finish_reason",
+          "result"
+        ]
+      },
+      "ExamQuestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "question_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "position": {
+            "type": "integer"
+          },
+          "question": {
+            "$ref": "#/components/schemas/QuestionVersion"
+          },
+          "selected_option_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExamFeedback"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "question_id",
+          "position",
+          "question",
+          "selected_option_id",
+          "feedback"
+        ]
+      },
+      "ExamAttempt": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "context_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "completed"
+            ]
+          },
+          "question_count": {
+            "type": "integer"
+          },
+          "duration_seconds": {
+            "type": "integer"
+          },
+          "subject_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "topic_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "scoring_rule": {
+            "type": "string",
+            "enum": [
+              "correct_ratio_v1"
+            ]
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deadline_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "server_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finished_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "finish_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "manual",
+              "expired",
+              null
+            ]
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExamResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamQuestion"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "context_id",
+          "revision",
+          "status",
+          "question_count",
+          "duration_seconds",
+          "subject_id",
+          "topic_id",
+          "scoring_rule",
+          "started_at",
+          "deadline_at",
+          "server_time",
+          "finished_at",
+          "finish_reason",
+          "result",
+          "questions"
+        ]
+      },
+      "ExamAttemptResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ExamAttempt"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "ExamAttemptList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamSummary"
+            }
+          },
+          "links": {
+            "$ref": "#/components/schemas/CursorLinks"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/CursorMeta"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "StartExamInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "question_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "duration_seconds": {
+            "type": "integer",
+            "minimum": 60,
+            "maximum": 7200
+          },
+          "subject_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "topic_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "id",
+          "question_count",
+          "duration_seconds"
+        ]
+      },
+      "SaveExamAnswerInput": {
+        "type": "object",
+        "properties": {
+          "selected_option_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "base_version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "selected_option_id",
+          "base_version"
+        ]
+      },
+      "FinishExamInput": {
+        "type": "object",
+        "properties": {
+          "base_version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "base_version"
+        ]
+      },
+      "ExamFeedback": {
+        "type": "object",
+        "properties": {
+          "correct_option_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "explanation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "correct",
+              "incorrect",
+              "skipped"
+            ]
+          }
+        },
+        "required": [
+          "correct_option_id",
+          "explanation",
+          "outcome"
         ]
       }
     },

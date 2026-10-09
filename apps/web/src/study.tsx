@@ -21,7 +21,7 @@ export function QuestionList() {
     {questions.isPending ? <Loading /> : questions.isError ? <ErrorNotice error={questions.error} retry={() => { void questions.refetch(); }} /> : questions.data.data.length === 0 ? <section className="empty card"><span className="empty-symbol">◇</span><h2>Henüz yayımlanmış soru yok</h2><p>Bu seçimde soru bulunamadı. Başka bir ders seçebilir veya içerik yayımlandığında tekrar gelebilirsin.</p><button className="button secondary" onClick={() => { void questions.refetch(); }}>Listeyi yenile</button></section> : <><div className="section-heading"><h2>Çalışmaya hazır sorular</h2><span>Bu sayfada {questions.data.data.length} soru</span></div><div className="question-grid">{questions.data.data.map((question) => <QuestionCard key={`${context.id}-${question.id}-${question.version.id}`} question={question} refresh={() => { void questions.refetch(); }} subjectName={subjects.data?.data.find((item) => item.id === question.version.subject_id)?.name} />)}</div><Pagination links={questions.data.links} change={setCursor} /></>}
   </>;
 }
-function CatalogPages({ label, links, change }: { label: string; links: { prev: string | null; next: string | null }; change: (cursor?: string) => void }) {
+export function CatalogPages({ label, links, change }: { label: string; links: { prev: string | null; next: string | null }; change: (cursor?: string) => void }) {
   if (!links.prev && !links.next) return null;
   return <div className="catalog-pages"><span>{label}</span><button disabled={!links.prev} onClick={() => change(cursorFromLink(links.prev))}>Önceki kayıtlar</button><button disabled={!links.next} onClick={() => change(cursorFromLink(links.next))}>Sonraki kayıtlar</button></div>;
 }

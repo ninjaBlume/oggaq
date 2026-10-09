@@ -1,6 +1,6 @@
 # Sistem mimarisi
 
-Durum: Laravel Identity/Tenancy/QuestionBank/Study modülleri, PostgreSQL/Redis, Horizon ve şifreli bildirim kuyruğu uygulanmıştır. QuestionBank merkezi katalog, taslak/sürüm/yayın ve yayımlanmış soru okuma API'sini içerir; ayrıntıları [QUESTION_BANK](QUESTION_BANK.md) belgesindedir. React yönetim paneli cookie/CSRF ile bu API'ye bağlanır; OpenAPI'den üretilen ortak tipler ve React bağımsız HTTP istemcisi workspace paketlerindedir. Öğrenci web Study API ile tek soru alıştırması ve kalıcı geçmişi sunar; native mobil, çok sorulu sınav/import ve offline tasarım aşamasındadır. [Study kapsamı](STUDY.md) ayrı belgelenmiştir. Çevrimdışı öneriler güncel yönergeye göre ayrıca kapsamlandırılacaktır. Kurulum [DEVELOPMENT](DEVELOPMENT.md), sürümler [TECH_STACK](TECH_STACK.md) içindedir.
+Durum: Laravel Identity/Tenancy/QuestionBank/Study/Exams modülleri, PostgreSQL/Redis, Horizon ve şifreli bildirim kuyruğu uygulanmıştır. QuestionBank merkezi katalog, taslak/sürüm/yayın ve yayımlanmış soru okuma API'sini içerir; ayrıntıları [QUESTION_BANK](QUESTION_BANK.md) belgesindedir. React yönetim paneli cookie/CSRF ile bu API'ye bağlanır; OpenAPI'den üretilen ortak tipler ve React bağımsız HTTP istemcisi workspace paketlerindedir. Öğrenci web Study API ile tek soru alıştırması ve kalıcı geçmişi sunar; süreli deneme ve Expo mobil gerçek API istemcisi de eklendi; import ve offline tasarım aşamasındadır. [Study kapsamı](STUDY.md) ayrı belgelenmiştir. Çevrimdışı öneriler güncel yönergeye göre ayrıca kapsamlandırılacaktır. Kurulum [DEVELOPMENT](DEVELOPMENT.md), sürümler [TECH_STACK](TECH_STACK.md) içindedir.
 
 ## Topoloji
 
@@ -8,7 +8,7 @@ Durum: Laravel Identity/Tenancy/QuestionBank/Study modülleri, PostgreSQL/Redis,
 flowchart LR
     Web[React web / IndexedDB / PWA] --> API[Laravel REST API]
     Admin[React yönetim paneli] --> API
-    Mobile[Expo mobil / SQLite / SecureStore] --> API
+    Mobile[Expo mobil / SecureStore] --> API
     API --> DB[(PostgreSQL)]
     API --> Redis[(Redis)]
     Worker[Horizon worker] --> Redis
@@ -61,3 +61,7 @@ PostgreSQL sorguları sayfalı, gerekli ilişkiler eager-loaded ve indeksli olur
 Başlangıç dağıtım hedefi: HTTPS reverse proxy, PHP 8.4 API, ayrı Horizon worker, scheduler, PostgreSQL, Redis ve özel dosya deposu. Web/admin statik dağıtımı API ile aynı site alanı altında yapılandırılır. Sağlayıcı ve ülke seçilmedi; kişisel veri/aktarımı değerlendirmesi öncesinde üçüncü taraf servise veri gönderilmez.
 
 Dağıtım aşamasında health/readiness, migrations, queue drain, cache yenileme, geriye uyumlu API, şifreli yedek ve geri yükleme tatbikatı hazırlanır. Üretim anahtarları secret store'da tutulur. İzleme kullanıcı/token verisini maskeleyecek; RPO/RTO ve saklama süreleri operasyon kararları olarak belirlenir. Yerel API ve worker çalışmaktadır; üretim deploy yapılmadı. Kurumlara özel gelecekteki soru/sınav içeriği ayrı tenant sahipliğiyle tasarlanacak; merkezi soru yayın yetkisi kurum yöneticisine verilmez.
+
+## Uygulanan süreli deneme ve mobil
+
+[EXAMS](EXAMS.md) gerçek `exam_attempts`/`exam_answers` şemasını, yetki, sabit sürüm, revision, sunucu süresi ve değişmez sonucu anlatır. Önceki genel `attempts`/şablon/rapor tabloları gelecekteki tasarımdır. Expo istemcisinin native paket/test sınırları [MOBILE](MOBILE.md) içinde ayrıca raporlanır.

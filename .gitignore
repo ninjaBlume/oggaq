@@ -29,3 +29,6 @@ infrastructure/data/
 artifacts/
 __pycache__/
 .venv/
+/apps/mobile/.expo/
+/apps/mobile/android/
+/apps/mobile/ios/
