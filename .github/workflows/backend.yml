@@ -1,0 +1,74 @@
+name: Backend kalite ve API
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: oggaq_test
+          POSTGRES_USER: oggaq
+          POSTGRES_PASSWORD: ci-only-synthetic-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U oggaq -d oggaq_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:8
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: oggaq_test
+      DB_USERNAME: oggaq
+      DB_PASSWORD: ci-only-synthetic-password
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      APP_ENV: testing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: pdo_pgsql, mbstring, pcntl, posix
+          coverage: none
+          tools: composer:v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Test ortamı ve geçici anahtar
+        run: |
+          cp backend/.env.example backend/.env.testing
+          php -r 'echo "APP_KEY=base64:".base64_encode(random_bytes(32)).PHP_EOL;' >> "$GITHUB_ENV"
+      - name: Kilitli PHP bağımlılıkları
+        working-directory: backend
+        run: composer install --no-interaction --prefer-dist
+      - name: PHP manifest ve güvenlik kontrolü
+        working-directory: backend
+        run: |
+          composer validate --strict
+          composer check-platform-reqs
+          composer audit
+          composer lint
+      - name: PostgreSQL ve Redis testleri
+        working-directory: backend
+        run: composer test
+      - name: API sözleşmesi
+        run: |
+          npm ci --ignore-scripts
+          npm run lint:api

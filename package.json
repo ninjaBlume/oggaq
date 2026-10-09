@@ -1,0 +1,9 @@
+{
+  "name": "security-exam-platform",
+  "version": "0.1.0",
+  "private": true,
+  "engines": { "node": ">=24 <25", "npm": ">=10" },
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": { "lint:api": "redocly lint docs/openapi.json" },
+  "devDependencies": { "@redocly/cli": "2.60.0" }
+}
