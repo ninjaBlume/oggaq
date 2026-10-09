@@ -74,4 +74,4 @@ Gerçek MySQL/MariaDB SQL ve PDF kaynakları henüz sağlanmadı; aktarım başl
 
 Öğrenci uygulamasını kökte `npm run dev:web` ile `http://127.0.0.1:5173` adresinde açın. Normal veritabanı boşsa yönetim panelinde yayımlanan sorular listelenene kadar boş durum gösterilir.
 
-Mobil için `npm run dev:mobile`. Yerel native araçlar bu Mac’te eksik; GitHub Actions Android APK ve iOS Simulator paket işleri ayrıca doğrulanır. Expo build zincirindeki iki düzeltilmemiş advisory [MOBILE](docs/MOBILE.md) içinde açıkça raporlanır.
+Mobil için `npm run dev:mobile`. GitHub Actions üzerinde Android APK ve iOS Simulator paketi derlendi ve indirildi; önizleme paketleri yerel API ile çalışır. Kurulum, native doğrulama kanıtı ve Expo build zincirindeki iki düzeltilmemiş advisory [MOBILE](docs/MOBILE.md) içinde açıklanır.

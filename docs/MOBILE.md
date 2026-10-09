@@ -22,7 +22,16 @@ Expo web export yalnız ekran/API QA önizlemesidir; oturum bellekte tutulur, lo
 
 Yerelde strict TypeScript, 7 mobil saf oturum/HTTP testi, 3 ortak saat testi, iOS/Android Hermes ve web Metro export, native Android/iOS prebuild ve Expo Doctor doğrulandı. Expo ekranları 390px Chromium üzerinde gerçek PostgreSQL/API ile Bearer giriş, tek soru, geçmiş, deneme bitişi, logout ve önizleme yenilemesiyle kontrol edildi. Web ve native davranış kanıtları ayrıdır.
 
-Bu Mac'te tam Xcode, Android SDK ve Java yoktur. GitHub Actions `android` işi Metro paketi gömülü, debug keystore ile imzalı yerel önizleme APK'sı; `ios` işi Simulator Keychain yetkileriyle ad hoc imzalı iOS Simulator `.app` ZIP'i üretmek üzere yapılandırıldı. Uzak sonuç ve artifact varlığı Actions üzerinden doğrulanır; yapılandırmanın bulunması derlemenin geçtiği anlamına gelmez. Başarılı main/push native paket işi sonrasında ayrı açılış işi APK’yı Android emülatörüne ve `.app` paketini iOS Simulator’a yükleyip açar, ekran görüntüsü üretir. Android accessibility ağacında giriş başlığını doğrular; iOS süreç çalışmasını kontrol eder; ekran görüntüsü ayrıca incelenir. Yerel önizleme açılışı native SecureStore’a sentetik bir probe değeri yazıp okur ve siler. Bu açılış kontrolü native SecureStore/gerçek API E2E testi değildir. Fiziksel cihaz/SecureStore arka plan-kapanma testi ve App Store/Play Store yayını tamamlanmadı. Üretim imzası, canlı HTTPS API, mağaza metinleri ve gizlilik/hesap silme kapıları ayrıdır.
+Bu Mac'te tam Xcode, Android SDK ve Java yoktur. `e9148d792ad0fccad0dba352241c0cce628a102f` için [GitHub Actions native derlemesi](https://github.com/ninjaBlume/oggaq/actions/runs/37895000973) Android ve iOS işlerinde başarılıdır; iki artifact indirildi. Android paketi Metro/Hermes kodu gömülü, debug keystore ile imzalı yerel önizleme APK'sıdır. iOS paketi Xcode'un ad hoc imzaladığı `.app` ZIP'idir; iPhone'a yüklenen IPA değildir. Xcode Simulator yetkilerini derleme sırasında yürütülebilir dosyaya gömer; sonradan `codesign --entitlements` uygulamak bunun yerine geçmez. Simulator kimliği/imzası Apple üretim sertifikası yerine geçmez.
+
+| Paket | Boyut (byte) | SHA-256 |
+| --- | ---: | --- |
+| `app-release.apk` | 42262862 | `bd615c5e76187330cab4bdc39e226dc2e30937232b1fc2afc630c1e8c10b71b2` |
+| `oggaq-ios-simulator.zip` | 14464425 | `6d907a0816a47feda2a3118ec8dd23c92930315213bbe39e63f3a81c90cb82d4` |
+
+[Native açılış kontrolü](https://github.com/ninjaBlume/oggaq/actions/runs/37895502143) Android ve iOS işlerinde başarılıdır. APK Android emülatörüne, `.app` iPhone Simulator'a yüklenip açıldı; iki platformun son ekran görüntüleri indirildi ve hatasız giriş ekranı görüldü. Android accessibility ağacında giriş başlığı, iOS'ta uygulama süreci ayrıca doğrulandı. Yerel önizleme açılışında native SecureStore’a sentetik bir probe değeri yazma, okuma ve silme tamamlandı. Aynı kodun [API/uygulama CI sonucu](https://github.com/ninjaBlume/oggaq/actions/runs/37895000957) da başarılıdır.
+
+Bu kontrol gerçek hesapla native API E2E, tokenın uygulama yeniden açılışında korunması veya fiziksel cihaz/arka plan testi yerine geçmez. App Store/Play Store yayını tamamlanmadı. Üretim imzası, canlı HTTPS API, mağaza metinleri ve gizlilik/hesap silme kapıları ayrıdır.
 
 ## Açık bağımlılık sorunları
 

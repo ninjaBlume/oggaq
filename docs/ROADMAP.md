@@ -60,7 +60,9 @@ Kapsam [STUDY](STUDY.md), kurulum [öğrenci README](../apps/web/README.md) içi
 - [x] Web deneme/sonuç/geçmiş, süre sonunda API sonucu ve telefon/tablet düzeni.
 - [x] Expo native giriş, SecureStore, kişisel/kurum seçimi, ders/konu çalışması, geçmiş ve deneme.
 - [x] Yerel strict tip, unit, Expo Doctor, iOS/Android Metro export ve prebuild; gerçek Bearer API ekran QA.
-- [ ] GitHub Actions native derleme artifact sonuçları; fiziksel cihaz/mağaza yayını ayrıca doğrulanır.
+- [x] GitHub Actions Android APK ve iOS Simulator derlemesi; iki artifact indirildi ve hash'leri kaydedildi.
+- [x] Son paketleri Android/iPhone emülatöründe açma, giriş ekranı görüntülerini inceleme, native SecureStore yazma/okuma/silme kontrolü.
+- [ ] Fiziksel cihazda oturum/arka plan testleri, canlı HTTPS API ve mağaza yayını.
 
 [EXAMS](EXAMS.md), [MOBILE](MOBILE.md); iki upstream Expo build advisory'si açık.
 
