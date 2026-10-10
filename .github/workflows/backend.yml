@@ -41,6 +41,8 @@ jobs:
       APP_ENV: testing
     steps:
       - uses: actions/checkout@v4
+      - name: Mobil önizleme HTTP gövde testleri
+        run: python3 -m unittest discover -s scripts -p test_preview_http_body.py -v
       - uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
