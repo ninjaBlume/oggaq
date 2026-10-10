@@ -56,15 +56,9 @@ function validSession(value: unknown): value is Session {
 }
 export function validateApiUrl(value: string, development: boolean): string {
   const url = new URL(value);
-  if (
-    url.username ||
-    url.password ||
-    url.search ||
-    url.hash ||
-    url.pathname !== "/"
-  )
-    throw new Error("API adresi yalnız sunucu adresini içermelidir.");
+  if (url.username || url.password || url.search || url.hash)
+    throw new Error("API adresi kullanıcı bilgisi, sorgu veya fragment içeremez.");
   if (url.protocol !== "https:" && !(development && url.protocol === "http:"))
     throw new Error("Uygulama için HTTPS API adresi gerekli.");
-  return url.origin;
+  return url.origin + url.pathname.replace(/\/+$/, "");
 }

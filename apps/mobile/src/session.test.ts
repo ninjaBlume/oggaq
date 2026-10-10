@@ -1,4 +1,5 @@
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
+import { ApiClient } from "@oggaq/api-client";
 import { SessionStore, validateApiUrl } from "./session";
 function storage() {
   let value: string | null = null;
@@ -59,4 +60,36 @@ it("requires HTTPS outside development and rejects credentials in configuration"
   expect(() =>
     validateApiUrl("https://name:secret@example.test", false),
   ).toThrow();
+});
+it.each([
+  ["https://example.test", "https://example.test"],
+  ["https://example.test/", "https://example.test"],
+  ["https://example.test/preview/backend", "https://example.test/preview/backend"],
+  ["https://example.test/preview/backend///", "https://example.test/preview/backend"],
+])("preserves the API base path for %s", (input, expected) => {
+  expect(validateApiUrl(input, false)).toBe(expected);
+});
+it.each([
+  "https://name:secret@example.test/preview/backend",
+  "https://example.test/preview/backend?token=synthetic",
+  "https://example.test/preview/backend#fragment",
+  "http://example.test/preview/backend",
+  "ftp://example.test/preview/backend",
+])("rejects unsafe API configuration %s", (input) => {
+  expect(() => validateApiUrl(input, false)).toThrow();
+});
+it("routes a Bearer API request through the validated proxy prefix", async () => {
+  const fetcher = vi.fn(async () => new Response("{}", { status: 200 }));
+  const api = new ApiClient(
+    validateApiUrl("https://example.test/preview/backend/", false),
+    { auth: "bearer", accessToken: () => "synthetic-token", fetch: fetcher },
+  );
+  await api.request("get", "/api/v1/me", {});
+  expect(fetcher).toHaveBeenCalledWith(
+    "https://example.test/preview/backend/api/v1/me",
+    expect.objectContaining({
+      credentials: "omit",
+      headers: expect.objectContaining({ Authorization: "Bearer synthetic-token" }),
+    }),
+  );
 });
