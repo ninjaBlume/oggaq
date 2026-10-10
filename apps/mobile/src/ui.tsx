@@ -54,7 +54,7 @@ export const styles = StyleSheet.create({
     backgroundColor: palette.white,
     borderWidth: 1,
     borderColor: palette.line,
-    borderRadius: 24,
+    borderRadius: 20,
     padding: 20,
     gap: 16,
   },
@@ -72,7 +72,7 @@ export const styles = StyleSheet.create({
     letterSpacing: -0.4,
     lineHeight: 27,
   },
-  text: { fontSize: 16, color: palette.ink, lineHeight: 25 },
+  text: { fontSize: 17, color: palette.ink, lineHeight: 27 },
   muted: { fontSize: 13, color: palette.muted, lineHeight: 20 },
   eyebrow: {
     fontSize: 11,
@@ -97,7 +97,7 @@ export const styles = StyleSheet.create({
     color: palette.white,
     lineHeight: 22,
   },
-  secondary: { backgroundColor: palette.softBlue },
+  secondary: { backgroundColor: palette.softPrimary },
   secondaryText: { color: palette.primary },
   disabled: { opacity: 0.45 },
   input: {
@@ -125,8 +125,14 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: palette.white,
   },
-  selected: { backgroundColor: palette.softBlue, borderColor: palette.primary },
-  correct: { backgroundColor: palette.softMint, borderColor: palette.success },
+  selected: {
+    backgroundColor: palette.softPrimary,
+    borderColor: palette.primary,
+  },
+  correct: {
+    backgroundColor: palette.softSuccess,
+    borderColor: palette.success,
+  },
   header: {
     paddingHorizontal: 24,
     paddingVertical: 14,
@@ -277,21 +283,21 @@ export function SectionTitle({
 }
 export function Badge({
   children,
-  tone = "blue",
+  tone = "primary",
 }: {
   children: string;
-  tone?: "blue" | "green" | "red" | "neutral";
+  tone?: "primary" | "success" | "red" | "neutral";
 }) {
   const backgroundColor =
-    tone === "green"
-      ? palette.softMint
+    tone === "success"
+      ? palette.softSuccess
       : tone === "red"
         ? palette.softRed
         : tone === "neutral"
           ? palette.paper
-          : palette.softBlue;
+          : palette.softPrimary;
   const color =
-    tone === "green"
+    tone === "success"
       ? palette.success
       : tone === "red"
         ? palette.red
@@ -332,7 +338,7 @@ export function EmptyState({
         gap: 12,
         paddingHorizontal: 22,
         paddingVertical: 32,
-        borderRadius: 24,
+        borderRadius: 20,
         backgroundColor: palette.white,
         borderWidth: 1,
         borderColor: palette.line,
@@ -343,7 +349,7 @@ export function EmptyState({
           width: 66,
           height: 66,
           borderRadius: 22,
-          backgroundColor: palette.softBlue,
+          backgroundColor: palette.softPrimary,
           alignItems: "center",
           justifyContent: "center",
           marginBottom: 4,
@@ -499,7 +505,7 @@ export function Sheet({
       <View
         style={{
           flex: 1,
-          backgroundColor: "#17243E66",
+          backgroundColor: palette.scrim,
           justifyContent: "flex-end",
         }}
       >
@@ -513,8 +519,8 @@ export function Sheet({
           accessibilityViewIsModal
           style={{
             backgroundColor: palette.white,
-            borderTopLeftRadius: 30,
-            borderTopRightRadius: 30,
+            borderTopLeftRadius: 24,
+            borderTopRightRadius: 24,
             maxHeight: "80%",
             paddingBottom: Math.max(insets.bottom, 20),
           }}
@@ -691,7 +697,7 @@ export function ListRow({
           borderWidth: 1,
           borderColor: palette.line,
         },
-        pressed && { backgroundColor: palette.softBlue },
+        pressed && { backgroundColor: palette.softPrimary },
       ]}
     >
       <View
@@ -699,7 +705,7 @@ export function ListRow({
           width: 44,
           height: 44,
           borderRadius: 14,
-          backgroundColor: palette.softBlue,
+          backgroundColor: palette.softPrimary,
           alignItems: "center",
           justifyContent: "center",
         }}
@@ -744,7 +750,7 @@ export function StudyHero({ compact = false }: { compact?: boolean }) {
           height: "100%",
           borderRadius: 100,
           borderWidth: 1,
-          borderColor: "#FFFFFF26",
+          borderColor: palette.decorativeLine,
         }}
       />
       <View
@@ -754,12 +760,12 @@ export function StudyHero({ compact = false }: { compact?: boolean }) {
           height: "76%",
           borderRadius: 100,
           borderWidth: 1,
-          borderColor: "#FFFFFF33",
+          borderColor: palette.decorativeLine,
         }}
       />
       <View
         style={{
-          backgroundColor: palette.mint,
+          backgroundColor: palette.accent,
           width: compact ? 62 : 88,
           height: compact ? 68 : 96,
           borderRadius: 23,

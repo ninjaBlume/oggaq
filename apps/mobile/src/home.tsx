@@ -8,10 +8,8 @@ import {
   History,
   Layers3,
   Play,
-  ShieldCheck,
 } from "./icons";
 import type { StudyContext, User } from "@oggaq/shared-types";
-import brand from "../brand.json";
 import { api } from "./api";
 import { useResource, useOnReturn } from "./hooks";
 import {
@@ -22,7 +20,6 @@ import {
   Loading,
   ScreenTitle,
   SectionTitle,
-  StudyHero,
   palette,
   styles,
 } from "./ui";
@@ -32,7 +29,6 @@ export function Home({
   questions,
   exams,
   history,
-  profile,
   practice,
   exam,
 }: {
@@ -41,7 +37,6 @@ export function Home({
   questions: (subject?: string) => void;
   exams: () => void;
   history: () => void;
-  profile: () => void;
   practice: (id: string) => void;
   exam: (id: string) => void;
 }) {
@@ -78,67 +73,22 @@ export function Home({
   const activeExam = recentExams.data?.data.find((e) => e.status === "active");
   return (
     <>
-      <View style={styles.between}>
-        <View style={styles.row}>
-          <View
-            style={{
-              width: 32,
-              height: 32,
-              backgroundColor: palette.primary,
-              borderRadius: 11,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <ShieldCheck size={20} color={palette.white} />
-          </View>
-          <Text
-            style={{
-              fontSize: 17,
-              fontWeight: "800",
-              letterSpacing: 2,
-              color: palette.ink,
-            }}
-          >
-            {brand.displayName}
-          </Text>
-        </View>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Profilimi aç"
-          onPress={profile}
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: 16,
-            backgroundColor: palette.softBlue,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text
-            style={{ color: palette.primary, fontWeight: "800", fontSize: 16 }}
-          >
-            {user.name.trim().slice(0, 1).toLocaleUpperCase("tr-TR")}
-          </Text>
-        </Pressable>
-      </View>
       <ScreenTitle
         title={`Merhaba, ${user.name.trim().split(/\s+/)[0]}.`}
         subtitle="Bugün kendine bir adım daha yaklaş."
       />
       <View
         style={{
-          backgroundColor: palette.primary,
-          padding: 24,
-          borderRadius: 26,
+          backgroundColor: palette.navy,
+          padding: 22,
+          borderRadius: 20,
           overflow: "hidden",
           gap: 16,
         }}
       >
         <Text
           style={{
-            color: "#D7E1FF",
+            color: palette.accent,
             fontSize: 10,
             fontWeight: "800",
             letterSpacing: 1.5,
@@ -146,27 +96,22 @@ export function Home({
         >
           BUGÜNÜN İLK ADIMI
         </Text>
-        <View style={{ position: "absolute", right: -10, top: 32 }}>
-          <StudyHero compact />
-        </View>
         <Text
           style={{
             color: palette.white,
-            fontSize: 28,
-            lineHeight: 34,
+            fontSize: 25,
+            lineHeight: 32,
             fontWeight: "800",
             letterSpacing: -0.7,
-            maxWidth: "74%",
           }}
         >
-          Bir soru çöz.{"\n"}Bir şey öğren.
+          Sınava adım adım hazırlan.
         </Text>
         <Text
           style={{
-            color: "#DFE7FF",
+            color: palette.onNavyMuted,
             fontSize: 12,
             lineHeight: 19,
-            maxWidth: "72%",
           }}
         >
           Küçük adımlar, daha güçlü bir hazırlık.
@@ -181,20 +126,20 @@ export function Home({
               alignSelf: "flex-start",
               alignItems: "center",
               gap: 12,
-              backgroundColor: palette.mint,
-              borderRadius: 13,
+              backgroundColor: palette.primary,
+              borderRadius: 14,
               paddingHorizontal: 16,
-              minHeight: 46,
+              minHeight: 50,
             },
             pressed && { opacity: 0.85 },
           ]}
         >
           <Text
-            style={{ fontSize: 13, fontWeight: "800", color: palette.navy }}
+            style={{ fontSize: 13, fontWeight: "700", color: palette.white }}
           >
             Çalışmaya başla
           </Text>
-          <ArrowRight size={17} color={palette.navy} />
+          <ArrowRight size={17} color={palette.white} />
         </Pressable>
       </View>
       <View style={{ flexDirection: "row", gap: 12 }}>
@@ -204,7 +149,7 @@ export function Home({
             text: "Konunu seç, öğren",
             icon: BookOpen,
             press: () => questions(),
-            bg: palette.softBlue,
+            bg: palette.softPrimary,
             color: palette.primary,
           },
           {
@@ -212,7 +157,7 @@ export function Home({
             text: "Kendini sınamak için",
             icon: Clock3,
             press: exams,
-            bg: palette.softMint,
+            bg: palette.softSuccess,
             color: palette.success,
           },
         ].map(({ title, text, icon: Icon, press, bg, color }) => (
@@ -225,7 +170,7 @@ export function Home({
               {
                 flex: 1,
                 backgroundColor: palette.white,
-                borderRadius: 22,
+                borderRadius: 18,
                 padding: 18,
                 gap: 8,
                 borderWidth: 1,
@@ -314,7 +259,7 @@ export function Home({
                   borderWidth: 1,
                   borderColor: palette.line,
                 },
-                pressed && { backgroundColor: palette.softBlue },
+                pressed && { backgroundColor: palette.softPrimary },
               ]}
             >
               <View style={styles.between}>
@@ -371,7 +316,7 @@ export function Home({
               <Badge
                 tone={
                   a.outcome === "correct"
-                    ? "green"
+                    ? "success"
                     : a.outcome === "incorrect"
                       ? "red"
                       : "neutral"

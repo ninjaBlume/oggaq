@@ -25,6 +25,10 @@ async function login(page: Page) {
 }
 async function screenshot(page: Page, name: string) {
   mkdirSync("artifacts/mobile-preview/redesign", { recursive: true });
+  const panel = page.getByLabel("Uygulama menüsü", { exact: true });
+  if (await panel.isVisible()) {
+    await expect.poll(async () => (await panel.boundingBox())?.x).toBe(0);
+  }
   await page.screenshot({
     path: `artifacts/mobile-preview/redesign/${name}.png`,
   });
@@ -215,4 +219,191 @@ test("boş içerik gerçek API ile açıklanır ve örnek soru gösterilmez", as
     page.getByRole("button", { name: "Soruyu çöz", exact: true }),
   ).not.toBeVisible();
   await screenshot(page, "empty-questions");
+});
+
+test("yan menü gerçek ekranlara gider, seçimi gösterir ve odağı içinde tutar", async ({
+  page,
+}) => {
+  await login(page);
+  const destinations = [
+    { menu: "Soru bankası", title: "Soru bankası", tab: "Soru çöz" },
+    { menu: "Deneme sınavı", title: "Deneme sınavı", tab: "Deneme" },
+    { menu: "Çalışma geçmişi", title: "Geçmişim", tab: "Geçmiş" },
+    { menu: "Profilim", title: "Profilim", tab: "Profil" },
+    { menu: "Ana sayfa", title: "Merhaba, E2E.", tab: "Ana sayfa" },
+  ];
+  for (const target of destinations) {
+    await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
+    const menu = page.getByRole("dialog");
+    await expect(menu).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Ana sayfa" })).toHaveCount(0);
+    await menu.getByRole("button", { name: target.menu, exact: true }).click();
+    await expect(menu).not.toBeVisible();
+    await expect(page.getByText(target.title, { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("tab", { name: target.tab, exact: true }),
+    ).toHaveAttribute("aria-selected", "true");
+  }
+  await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
+  const menu = page.getByRole("dialog");
+  await expect(
+    menu.getByRole("button", { name: "Ana sayfa", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+  await screenshot(page, "sidebar");
+  for (let i = 0; i < 16; i++) {
+    await page.keyboard.press("Tab");
+    expect(
+      await menu.evaluate((element) =>
+        element.contains(document.activeElement),
+      ),
+    ).toBe(true);
+  }
+  await page.keyboard.press("Escape");
+  await expect(menu).not.toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Menüyü aç", exact: true }),
+  ).toBeFocused();
+  await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
+  await menu.getByRole("button", { name: "Menüyü kapat", exact: true }).click();
+  await expect(menu).not.toBeVisible();
+});
+
+test("yan menü çalışma alanını ayırır ve gerçek tokenı iptal ederek çıkış yapar", async ({
+  page,
+}) => {
+  await login(page);
+  await page.getByRole("tab", { name: "Soru çöz", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Soruyu çöz", exact: true })
+    .first()
+    .click();
+  await page.getByRole("radio", { name: "Sentetik A", exact: true }).click();
+  await page.getByRole("button", { name: "Cevabımı kontrol et" }).click();
+  await expect(page.getByText("Doğru", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Geri dön" }).click();
+  await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
+  const menu = page.getByRole("dialog");
+  await menu
+    .getByRole("button", { name: "Sentetik eğitim kurumu çalışma alanını seç" })
+    .click();
+  await expect(menu).not.toBeVisible();
+  await expect(page.getByText("Merhaba, E2E.", { exact: true })).toBeVisible();
+  await page.getByRole("tab", { name: "Geçmiş", exact: true }).click();
+  await expect(
+    page.getByText("Yeni bir başlangıç", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Sonucu incele" })).toHaveCount(
+    0,
+  );
+  await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
+  await expect(
+    menu.getByRole("button", {
+      name: "Sentetik eğitim kurumu çalışma alanını seç",
+    }),
+  ).toHaveAttribute("aria-selected", "true");
+  const revoked = page.waitForResponse(
+    (r) =>
+      r.url().endsWith("/api/v1/auth/logout") &&
+      r.request().method() === "POST",
+  );
+  await menu.getByRole("button", { name: "Çıkış yap", exact: true }).click();
+  const response = await revoked;
+  expect(response.ok()).toBe(true);
+  const authorization = response.request().headers()["authorization"];
+  expect(authorization?.startsWith("Bearer ")).toBe(true);
+  const me = await page.request.get("http://127.0.0.1:8001/api/v1/me", {
+    headers: { Authorization: authorization!, Accept: "application/json" },
+  });
+  expect(me.status()).toBe(401);
+  await expect(page.getByText("Hoş geldin", { exact: true })).toBeVisible();
+});
+
+test("yan menüden çıkış başarısızsa oturum korunur ve tekrar denenebilir", async ({
+  page,
+}) => {
+  await login(page);
+  let fail = true;
+  await page.route("**/api/v1/auth/logout", async (route) => {
+    if (fail) {
+      fail = false;
+      await route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        body: JSON.stringify({
+          detail: "Geçici bağlantı sorunu",
+          status: 503,
+          code: "service_unavailable",
+        }),
+      });
+    } else await route.continue();
+  });
+  await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Çıkış yap", exact: true })
+    .click();
+  await expect(
+    page.getByText("Geçici bağlantı sorunu", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Merhaba, E2E.", { exact: true })).toBeVisible();
+  await expect(page.getByText("Hoş geldin", { exact: true })).not.toBeVisible();
+  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await expect(page.getByText("Hoş geldin", { exact: true })).toBeVisible();
+});
+
+test("yan menü küçük telefon, tablet ve yatay ekranda kapanır ve sola sürüklenir", async ({
+  page,
+}) => {
+  await login(page);
+  for (const viewport of [
+    { width: 320, height: 844 },
+    { width: 390, height: 844 },
+    { width: 834, height: 844 },
+    { width: 844, height: 390 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
+    const menu = page.getByRole("dialog");
+    await expect(
+      menu.getByRole("button", { name: "Menüyü kapat", exact: true }),
+    ).toBeInViewport();
+    await expect(
+      menu.getByRole("button", { name: "Çıkış yap", exact: true }),
+    ).toBeInViewport();
+    await menu
+      .getByRole("button", {
+        name: "Sentetik eğitim kurumu çalışma alanını seç",
+      })
+      .scrollIntoViewIfNeeded();
+    await expect(menu).toBeVisible();
+    await expect(
+      menu.getByRole("button", {
+        name: "Sentetik eğitim kurumu çalışma alanını seç",
+      }),
+    ).toBeInViewport();
+    await screenshot(page, `sidebar-${viewport.width}x${viewport.height}`);
+    await page.mouse.click(viewport.width - 12, viewport.height / 2);
+    await expect(menu).not.toBeVisible();
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
+  const menu = page.getByRole("dialog");
+  await expect(
+    menu.getByRole("button", { name: "Ana sayfa", exact: true }),
+  ).toBeInViewport();
+  await expect
+    .poll(
+      async () =>
+        (
+          await page
+            .getByLabel("Uygulama menüsü", { exact: true })
+            .boundingBox()
+        )?.x,
+    )
+    .toBe(0);
+  await page.mouse.move(240, 100);
+  await page.mouse.down();
+  await page.mouse.move(80, 100, { steps: 12 });
+  await page.mouse.up();
+  await expect(menu).not.toBeVisible();
 });

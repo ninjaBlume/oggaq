@@ -20,15 +20,7 @@ import {
   useIsFocused,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import {
-  ArrowLeft,
-  BookOpen,
-  Clock3,
-  History as HistoryIcon,
-  House,
-  ShieldCheck,
-  UserRound,
-} from "./icons";
+import { ArrowLeft, ShieldCheck } from "./icons";
 import { StatusBar } from "expo-status-bar";
 import type { StudyContext, User } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
@@ -51,6 +43,12 @@ import { History, Practice, QuestionList } from "./study";
 import { Exam, Exams } from "./exams";
 import { Home } from "./home";
 import { Profile } from "./profile";
+import {
+  destinations as tabs,
+  MainHeader,
+  SideMenu,
+  type MainTab,
+} from "./navigation";
 
 type Routes = {
   Main: undefined;
@@ -69,14 +67,6 @@ const navigationTheme = {
     border: palette.line,
   },
 };
-const tabs = [
-  { id: "home", label: "Ana sayfa", icon: House },
-  { id: "questions", label: "Soru çöz", icon: BookOpen },
-  { id: "exams", label: "Deneme", icon: Clock3 },
-  { id: "history", label: "Geçmiş", icon: HistoryIcon },
-  { id: "profile", label: "Profil", icon: UserRound },
-] as const;
-type Tab = (typeof tabs)[number]["id"];
 function MainTabs({
   user,
   context,
@@ -97,7 +87,8 @@ function MainTabs({
   exam: (id: string) => void;
 }) {
   const insets = useSafeAreaInsets();
-  const [tab, setTab] = useState<Tab>("home");
+  const [tab, setTab] = useState<MainTab>("home");
+  const [menuOpen, setMenuOpen] = useState(false);
   const [subject, setSubject] = useState<string>();
   const content = useRef<ScrollView>(null);
   const focused = useIsFocused();
@@ -126,108 +117,137 @@ function MainTabs({
     setSubject(subjectId);
     setTab("questions");
   }
+  function selectTab(id: MainTab) {
+    if (id === "questions") setSubject(undefined);
+    if (tab === id) content.current?.scrollTo({ y: 0, animated: true });
+    else setTab(id);
+  }
   return (
-    <SafeAreaView style={styles.shell} edges={["top"]}>
-      <ScrollView
-        ref={content}
-        key={tab}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.body}
+    <>
+      <SafeAreaView
+        style={styles.shell}
+        edges={["top"]}
+        accessibilityElementsHidden={menuOpen}
+        aria-hidden={menuOpen}
+        importantForAccessibility={menuOpen ? "no-hide-descendants" : "auto"}
       >
-        {tab === "home" ? (
-          <Home
-            user={user}
-            context={context}
-            questions={questions}
-            exams={() => setTab("exams")}
-            history={() => setTab("history")}
-            profile={() => setTab("profile")}
-            practice={practice}
-            exam={exam}
-          />
-        ) : tab === "questions" ? (
-          <QuestionList
-            context={context}
-            open={practice}
-            initialSubject={subject}
-          />
-        ) : tab === "exams" ? (
-          <Exams context={context} open={exam} />
-        ) : tab === "history" ? (
-          <History context={context} open={practice} openExam={exam} />
-        ) : (
-          <Profile
-            user={user}
-            context={context}
-            contexts={contexts}
-            choose={choose}
-            logout={logout}
-            pending={pending}
-          />
-        )}
-      </ScrollView>
-      {!keyboardOpen && (
-        <View
-          accessibilityLabel="Ana gezinme"
-          style={{
-            flexDirection: "row",
-            paddingTop: 10,
-            paddingBottom: Math.max(insets.bottom, 12),
-            paddingHorizontal: 8,
-            backgroundColor: palette.white,
-            borderTopWidth: 1,
-            borderColor: palette.line,
-          }}
+        <MainHeader
+          user={user}
+          context={context}
+          expanded={menuOpen}
+          menu={() => setMenuOpen(true)}
+          profile={() => selectTab("profile")}
+        />
+        <ScrollView
+          ref={content}
+          key={tab}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.body}
         >
-          {tabs.map(({ id, label, icon: Icon }) => (
-            <Pressable
-              key={id}
-              accessibilityRole="tab"
-              accessibilityLabel={label}
-              accessibilityState={{ selected: tab === id }}
-              onPress={() => {
-                if (tab === id)
-                  content.current?.scrollTo({ y: 0, animated: true });
-                else setTab(id);
-              }}
-              style={{
-                flex: 1,
-                minHeight: 52,
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 5,
-              }}
-            >
-              <View
+          {tab === "home" ? (
+            <Home
+              user={user}
+              context={context}
+              questions={questions}
+              exams={() => setTab("exams")}
+              history={() => setTab("history")}
+              practice={practice}
+              exam={exam}
+            />
+          ) : tab === "questions" ? (
+            <QuestionList
+              context={context}
+              open={practice}
+              initialSubject={subject}
+            />
+          ) : tab === "exams" ? (
+            <Exams context={context} open={exam} />
+          ) : tab === "history" ? (
+            <History context={context} open={practice} openExam={exam} />
+          ) : (
+            <Profile
+              user={user}
+              context={context}
+              contexts={contexts}
+              choose={choose}
+              logout={logout}
+              pending={pending}
+            />
+          )}
+        </ScrollView>
+        {!keyboardOpen && (
+          <View
+            accessibilityLabel="Ana gezinme"
+            style={{
+              flexDirection: "row",
+              paddingTop: 10,
+              paddingBottom: Math.max(insets.bottom, 12),
+              paddingHorizontal: 8,
+              backgroundColor: palette.white,
+              borderTopWidth: 1,
+              borderColor: palette.line,
+            }}
+          >
+            {tabs.map(({ id, label, icon: Icon }) => (
+              <Pressable
+                key={id}
+                accessibilityRole="tab"
+                accessibilityLabel={label}
+                accessibilityState={{ selected: tab === id }}
+                aria-selected={tab === id}
+                onPress={() => selectTab(id)}
                 style={{
-                  paddingHorizontal: 14,
-                  paddingVertical: 4,
-                  borderRadius: 12,
-                  backgroundColor:
-                    tab === id ? palette.softBlue : "transparent",
+                  flex: 1,
+                  minHeight: 52,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 5,
                 }}
               >
-                <Icon
-                  size={22}
-                  strokeWidth={tab === id ? 2.3 : 1.7}
-                  color={tab === id ? palette.primary : palette.muted}
-                />
-              </View>
-              <Text
-                style={{
-                  fontSize: 10,
-                  fontWeight: tab === id ? "800" : "500",
-                  color: tab === id ? palette.primary : palette.muted,
-                }}
-              >
-                {label}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+                <View
+                  style={{
+                    paddingHorizontal: 14,
+                    paddingVertical: 4,
+                    borderRadius: 12,
+                    backgroundColor:
+                      tab === id ? palette.softPrimary : "transparent",
+                  }}
+                >
+                  <Icon
+                    size={22}
+                    strokeWidth={tab === id ? 2.3 : 1.7}
+                    color={tab === id ? palette.primary : palette.muted}
+                  />
+                </View>
+                <Text
+                  style={{
+                    fontSize: 11,
+                    fontWeight: tab === id ? "700" : "500",
+                    color: tab === id ? palette.primary : palette.muted,
+                  }}
+                >
+                  {label}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
+      </SafeAreaView>
+      {menuOpen && (
+        <SideMenu
+          user={user}
+          context={context}
+          contexts={contexts}
+          selected={tab}
+          select={selectTab}
+          choose={choose}
+          logout={logout}
+          pending={pending}
+          close={() => setMenuOpen(false)}
+        />
       )}
-    </SafeAreaView>
+    </>
   );
 }
 function Workspace({

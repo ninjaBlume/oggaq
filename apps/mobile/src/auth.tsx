@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { Linking, Pressable, Text, View } from "react-native";
-import {
-  ArrowLeft,
-  ArrowRight,
-  ShieldCheck,
-  CheckCircle2,
-} from "./icons";
+import { ArrowLeft, ArrowRight, ShieldCheck, CheckCircle2 } from "./icons";
 import brand from "../brand.json";
 import type { User } from "@oggaq/shared-types";
 import { api, frontendUrl } from "./api";
@@ -99,14 +94,14 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
       <View
         style={{
           backgroundColor: palette.navy,
-          borderRadius: 28,
+          borderRadius: 20,
           padding: 26,
           minHeight: 235,
           overflow: "hidden",
         }}
       >
         <View style={[styles.row, { marginBottom: 22 }]}>
-          <ShieldCheck size={23} color={palette.mint} />
+          <ShieldCheck size={23} color={palette.accent} />
           <Text
             style={{
               color: palette.white,
@@ -120,7 +115,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
         </View>
         <Text
           style={{
-            color: "#B8C6E4",
+            color: palette.onNavyMuted,
             fontSize: 10,
             fontWeight: "700",
             letterSpacing: 1.5,
@@ -144,7 +139,9 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
         <View style={{ position: "absolute", right: -12, bottom: 12 }}>
           <StudyHero compact />
         </View>
-        <Text style={{ color: "#B8C6E4", fontSize: 12, marginTop: 14 }}>
+        <Text
+          style={{ color: palette.onNavyMuted, fontSize: 12, marginTop: 14 }}
+        >
           Öğren. Pratik yap. Kendine güven.
         </Text>
       </View>
@@ -152,7 +149,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
         <View
           style={{
             flexDirection: "row",
-            backgroundColor: "#E9EDF5",
+            backgroundColor: palette.neutralSurface,
             borderRadius: 16,
             padding: 4,
           }}
@@ -262,7 +259,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
           <View
             accessibilityRole="alert"
             style={{
-              backgroundColor: palette.softMint,
+              backgroundColor: palette.softSuccess,
               padding: 14,
               borderRadius: 14,
             }}

@@ -320,7 +320,7 @@ function QuestionCard({
             padding: 20,
             gap: 14,
           },
-          pressed && { backgroundColor: palette.softBlue },
+          pressed && { backgroundColor: palette.softPrimary },
         ]}
       >
         <View style={styles.between}>
@@ -483,7 +483,7 @@ export function Practice({
                   borderRadius: 18,
                   backgroundColor:
                     attempt.outcome === "correct"
-                      ? palette.softMint
+                      ? palette.softSuccess
                       : palette.softRed,
                   gap: 10,
                 }}
@@ -612,7 +612,7 @@ export function History({
       />
       <View
         style={{
-          backgroundColor: "#E9EDF5",
+          backgroundColor: palette.neutralSurface,
           borderRadius: 16,
           padding: 4,
           flexDirection: "row",
@@ -682,7 +682,7 @@ export function History({
               <Badge
                 tone={
                   a.outcome === "correct"
-                    ? "green"
+                    ? "success"
                     : a.outcome === "incorrect"
                       ? "red"
                       : "neutral"
@@ -709,7 +709,7 @@ export function History({
             label={e.status === "active" ? "Denemeye dön" : "Sonucu incele"}
             onPress={() => openExam(e.id)}
             badge={
-              <Badge tone={e.status === "completed" ? "green" : "blue"}>
+              <Badge tone={e.status === "completed" ? "success" : "primary"}>
                 {e.status === "active"
                   ? "Devam ediyor"
                   : e.result

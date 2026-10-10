@@ -42,7 +42,7 @@ export function Profile({
             width: 84,
             height: 84,
             borderRadius: 30,
-            backgroundColor: palette.softBlue,
+            backgroundColor: palette.softPrimary,
             alignItems: "center",
             justifyContent: "center",
             borderWidth: 6,
@@ -62,7 +62,7 @@ export function Profile({
           </Text>
         </View>
         <Text style={[styles.heading, { fontSize: 22 }]}>{user.name}</Text>
-        <Badge tone="green">E-posta doğrulandı</Badge>
+        <Badge tone="success">E-posta doğrulandı</Badge>
       </View>
       <SectionTitle>Hesap bilgilerin</SectionTitle>
       <Card>
@@ -95,7 +95,7 @@ export function Profile({
               borderWidth: 1.5,
               borderColor: c.id === context.id ? palette.primary : palette.line,
               backgroundColor:
-                c.id === context.id ? palette.softBlue : palette.white,
+                c.id === context.id ? palette.softPrimary : palette.white,
               padding: 18,
               flexDirection: "row",
               alignItems: "center",

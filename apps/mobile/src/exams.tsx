@@ -105,13 +105,13 @@ export function Exams({
         style={{
           backgroundColor: palette.navy,
           padding: 24,
-          borderRadius: 26,
+          borderRadius: 20,
           gap: 12,
         }}
       >
         <View style={styles.between}>
           <Badge>PROVA ZAMANI</Badge>
-          <Clock3 size={35} color={palette.mint} strokeWidth={1.5} />
+          <Clock3 size={35} color={palette.accent} strokeWidth={1.5} />
         </View>
         <Text
           style={{
@@ -124,7 +124,9 @@ export function Exams({
         >
           Bilgini zamana karşı sına.
         </Text>
-        <Text style={{ fontSize: 12, lineHeight: 19, color: "#B8C6E4" }}>
+        <Text
+          style={{ fontSize: 12, lineHeight: 19, color: palette.onNavyMuted }}
+        >
           Sorularını ve süreni seç. Sonucunu birlikte görelim.
         </Text>
       </View>
@@ -164,7 +166,7 @@ export function Exams({
               onPress={() => setCount(String(n))}
               style={{
                 backgroundColor:
-                  count === String(n) ? palette.softBlue : palette.paper,
+                  count === String(n) ? palette.softPrimary : palette.paper,
                 paddingHorizontal: 16,
                 minHeight: 44,
                 alignItems: "center",
@@ -223,7 +225,7 @@ export function Exams({
             label={e.status === "active" ? "Denemeye dön" : "Sonucu incele"}
             onPress={() => open(e.id)}
             badge={
-              <Badge tone={e.status === "active" ? "blue" : "green"}>
+              <Badge tone={e.status === "active" ? "primary" : "success"}>
                 {e.status === "active"
                   ? "Devam ediyor"
                   : e.result
@@ -403,7 +405,7 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
               style={[
                 styles.smallButton,
                 q.selected_option_id !== null && {
-                  backgroundColor: palette.softBlue,
+                  backgroundColor: palette.softPrimary,
                 },
                 i === index && { borderWidth: 2, borderColor: palette.primary },
               ]}
@@ -456,7 +458,7 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
                 alignItems: "center",
                 gap: 6,
                 backgroundColor:
-                  seconds < 60 ? palette.softRed : palette.softBlue,
+                  seconds < 60 ? palette.softRed : palette.softPrimary,
                 padding: 10,
                 borderRadius: 12,
               }}
@@ -522,7 +524,7 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
                     height: 140,
                     borderRadius: 70,
                     borderWidth: 7,
-                    borderColor: palette.softBlue,
+                    borderColor: palette.softPrimary,
                     alignItems: "center",
                     justifyContent: "center",
                   }}
@@ -547,7 +549,7 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
                     value: exam.result.correct,
                     label: "Doğru",
                     color: palette.success,
-                    bg: palette.softMint,
+                    bg: palette.softSuccess,
                   },
                   {
                     value: exam.result.incorrect,
@@ -664,7 +666,7 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
               style={{
                 backgroundColor:
                   row.feedback.outcome === "correct"
-                    ? palette.softMint
+                    ? palette.softSuccess
                     : palette.softRed,
                 padding: 16,
                 borderRadius: 16,
@@ -768,7 +770,7 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
                   justifyContent: "center",
                   alignItems: "center",
                   gap: 10,
-                  backgroundColor: palette.softBlue,
+                  backgroundColor: palette.softPrimary,
                 },
                 disabled && styles.disabled,
                 pressed && { opacity: 0.7 },

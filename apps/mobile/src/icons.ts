@@ -19,6 +19,7 @@ export { default as ListChecks } from "lucide-react-native/icons/list-checks";
 export { default as LockKeyhole } from "lucide-react-native/icons/lock-keyhole";
 export { default as LogOut } from "lucide-react-native/icons/log-out";
 export { default as Mail } from "lucide-react-native/icons/mail";
+export { default as Menu } from "lucide-react-native/icons/menu";
 export { default as Play } from "lucide-react-native/icons/play";
 export { default as ShieldCheck } from "lucide-react-native/icons/shield-check";
 export { default as SlidersHorizontal } from "lucide-react-native/icons/sliders-horizontal";
