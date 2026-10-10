@@ -1,10 +1,27 @@
 import { useState } from "react";
-import { Linking, Text } from "react-native";
+import { Linking, Pressable, Text, View } from "react-native";
+import {
+  ArrowLeft,
+  ArrowRight,
+  ShieldCheck,
+  CheckCircle2,
+} from "./icons";
+import brand from "../brand.json";
 import type { User } from "@oggaq/shared-types";
 import { api, frontendUrl } from "./api";
 import { deviceId, session } from "./storage";
 import { useTask } from "./hooks";
-import { Button, Card, ErrorNotice, Field, Heading, styles } from "./ui";
+import {
+  Button,
+  Card,
+  ErrorNotice,
+  Field,
+  Heading,
+  StudyHero,
+  TextLink,
+  palette,
+  styles,
+} from "./ui";
 export function Login({ signedIn }: { signedIn: (user: User) => void }) {
   const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
   const [email, setEmail] = useState("");
@@ -79,16 +96,118 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
   }
   return (
     <>
-      <Heading>
-        {mode === "login"
-          ? "Hoş geldin"
-          : mode === "register"
-            ? "Hesap oluştur"
-            : "Parolanı yenile"}
-      </Heading>
-      <Text style={styles.muted}>
-        Ders çalış, süreli deneme çöz ve geçmişine her cihazından ulaş.
-      </Text>
+      <View
+        style={{
+          backgroundColor: palette.navy,
+          borderRadius: 28,
+          padding: 26,
+          minHeight: 235,
+          overflow: "hidden",
+        }}
+      >
+        <View style={[styles.row, { marginBottom: 22 }]}>
+          <ShieldCheck size={23} color={palette.mint} />
+          <Text
+            style={{
+              color: palette.white,
+              fontSize: 19,
+              fontWeight: "800",
+              letterSpacing: 2,
+            }}
+          >
+            {brand.displayName}
+          </Text>
+        </View>
+        <Text
+          style={{
+            color: "#B8C6E4",
+            fontSize: 10,
+            fontWeight: "700",
+            letterSpacing: 1.5,
+          }}
+        >
+          ÖGG SINAVINA HAZIRLIK
+        </Text>
+        <Text
+          style={{
+            color: palette.white,
+            fontSize: 31,
+            lineHeight: 37,
+            fontWeight: "800",
+            letterSpacing: -1,
+            marginTop: 10,
+            width: "72%",
+          }}
+        >
+          Bir adım daha{"\n"}hazır.
+        </Text>
+        <View style={{ position: "absolute", right: -12, bottom: 12 }}>
+          <StudyHero compact />
+        </View>
+        <Text style={{ color: "#B8C6E4", fontSize: 12, marginTop: 14 }}>
+          Öğren. Pratik yap. Kendine güven.
+        </Text>
+      </View>
+      {mode !== "forgot" && (
+        <View
+          style={{
+            flexDirection: "row",
+            backgroundColor: "#E9EDF5",
+            borderRadius: 16,
+            padding: 4,
+          }}
+        >
+          {(["login", "register"] as const).map((value) => (
+            <Pressable
+              key={value}
+              accessibilityRole="button"
+              accessibilityLabel={
+                value === "login" ? "Giriş sekmesi" : "Kayıt sekmesi"
+              }
+              accessibilityState={{
+                selected: mode === value,
+                disabled: task.pending,
+              }}
+              disabled={task.pending}
+              onPress={() => change(value)}
+              style={{
+                flex: 1,
+                minHeight: 44,
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 12,
+                backgroundColor: mode === value ? palette.white : "transparent",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontWeight: "700",
+                  color: mode === value ? palette.ink : palette.muted,
+                }}
+              >
+                {value === "login" ? "Giriş yap" : "Hesap oluştur"}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      )}
+      <View style={{ gap: 7 }}>
+        <Heading>
+          {mode === "login"
+            ? "Hoş geldin"
+            : mode === "register"
+              ? "Aramıza katıl"
+              : "Parolanı yenile"}
+        </Heading>
+        <Text style={styles.muted}>
+          {mode === "login"
+            ? "Kaldığın yerden devam etmeye hazır mısın?"
+            : mode === "register"
+              ? "Ücretsiz hesabını oluştur, ilk adımını at."
+              : "E-postana bir yenileme bağlantısı gönderelim."}
+        </Text>
+      </View>
       <Card>
         {mode === "register" && (
           <Field
@@ -114,6 +233,17 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
             editable={!task.pending}
           />
         )}
+        {mode === "login" && (
+          <View style={{ alignSelf: "flex-end", marginTop: -8 }}>
+            <TextLink
+              onPress={() => {
+                if (!task.pending) change("forgot");
+              }}
+            >
+              Parolamı unuttum
+            </TextLink>
+          </View>
+        )}
         {mode === "register" && (
           <>
             <Field
@@ -129,14 +259,26 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
           </>
         )}
         {notice && (
-          <Text accessibilityRole="alert" style={styles.text}>
-            {notice}
-          </Text>
+          <View
+            accessibilityRole="alert"
+            style={{
+              backgroundColor: palette.softMint,
+              padding: 14,
+              borderRadius: 14,
+            }}
+          >
+            <Text
+              style={[styles.text, { fontSize: 14, color: palette.success }]}
+            >
+              {notice}
+            </Text>
+          </View>
         )}
         <ErrorNotice error={task.error} />
         <Button
           disabled={task.pending || !email || (mode !== "forgot" && !password)}
           onPress={submit}
+          icon={ArrowRight}
         >
           {task.pending
             ? "İşleniyor…"
@@ -146,36 +288,29 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
                 ? "Hesap oluştur"
                 : "Bağlantı gönder"}
         </Button>
-        {mode === "login" ? (
-          <>
-            <Button
-              secondary
-              disabled={task.pending}
-              onPress={() => change("register")}
-            >
-              Hesap oluştur
-            </Button>
-            <Button
-              secondary
-              disabled={task.pending}
-              onPress={() => change("forgot")}
-            >
-              Parolamı unuttum
-            </Button>
-          </>
-        ) : (
+        {mode === "forgot" && (
           <Button
             secondary
             disabled={task.pending}
             onPress={() => change("login")}
+            icon={ArrowLeft}
           >
             Girişe dön
           </Button>
         )}
       </Card>
+      <View
+        style={[styles.row, { justifyContent: "center", paddingBottom: 12 }]}
+      >
+        <CheckCircle2 size={15} color={palette.muted} />
+        <Text style={{ color: palette.muted, fontSize: 11 }}>
+          Her gün, kendi hızında bir adım.
+        </Text>
+      </View>
     </>
   );
 }
+
 export function Verify({
   refresh,
   logout,

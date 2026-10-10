@@ -2,6 +2,19 @@
 
 `apps/mobile`, React Native 0.86.3 / Expo SDK 57.0.27 ile iOS/Android native bileşenleri kullanır. Kayıt/giriş, doğrulama e-postasını yeniden gönderme ve kontrol etme, parola yenileme e-postası, kişisel/aktif kurum seçimi, ders/konu ve yayımlanmış soru çalışması, geçmiş, süreli deneme/sonuç uygulanmıştır. HTML/web ekranı native içine gömülmez. Ortak API sözleşmesi ve saf sayaç kodu web ile paylaşılır. Uygulamaların React sürümü SDK'nın renderer sürümü 19.2.3'e eşitlendi; Expo Doctor 21/21 geçti.
 
+## Mobil tasarım ve gezinme
+
+10 Ekim 2026 mobil arayüzü telefon uygulaması olarak yenilendi. `apps/web` ve `apps/admin` masaüstü arayüzlerinden bağımsızdır; ortak API istemcisi ve iş kuralları korunur. Renkler `src/theme.ts`, bileşenler `src/ui.tsx`, marka başlığı `brand.json` içindedir.
+
+- Alt gezinme: Ana sayfa, Soru çöz, Deneme, Geçmiş ve Profil. Seçili sekme, tekrar dokunarak başa kaydırma, güvenli alan ve klavye açıkken sekmeleri gizleme uygulanır.
+- Ana sayfa: kişisel karşılama, çalışmaya başlama, gerçek ders kataloğu, son sorular ve son üç denemedeki devam eden deneme. Toplam başarı/günlük seri gibi API’de olmayan sayılar gösterilmez.
+- Ders/konu filtreleri, soru dizini ve bitirme onayı alttan açılan panellerdir. Katalog ve geçmiş sayfalaması korunur. Soru/deneme ayrıntılarında alt sekmeler gizlenir; cevaplama/soru geçişi kontrolleri ekranın altında sabit kalır.
+- Ayrıntılar [React Navigation native stack](https://reactnavigation.org/docs/native-stack-navigator/) ile açılır; iOS kenardan geri hareketi ve Android geri düğmesi desteklenir. Android’de ana sekmelerin geri hareketi Ana sayfa’ya döner. Güvenli alan, soru/cevap durumları ve sunucuya dayalı süre/değerlendirme korunur.
+- Geçmişte sorular ve denemeler ayrı seçilir. Profilde hesap bilgileri, kişisel/kurum alanı ve çıkış bulunur. Alan değişimi gezinmeyi sıfırlar; diğer alandaki geçmiş gösterilmez.
+- İkonlar [Lucide React Native](https://lucide.dev/guide/react-native) / SVG bileşenleridir; tek tek import edilir. Soru listesine döndükten sonra aynı soruyu yeniden çözmek yeni çalışma UUID’si oluşturur. Denemeden dönünce yeni deneme başlatma kilidi kaldırılır; başarısız isteğin tekrarında UUID korunur.
+
+Bu değişiklik için 17 mobil birim testi, tüm istemcilerin strict TypeScript kontrolü, 5 gerçek PostgreSQL/API mobil Chromium E2E testi ve Expo Doctor 21/21 geçti. iOS/Android Hermes ve web export ile iki platformun prebuild yapılandırması doğrulandı. Android prebuild `super.onCreate(null)` ve `enableOnBackInvokedCallback=false` üretir. E2E; tekrar soru çözme, cevap/deneme sonucu, filtre panelleri, soru dizini, geçmiş, alan ayrımı, çıkış, boş içerik ve 320/390/834px gezinmeyi kapsar. Ekran görüntüleri `artifacts/mobile-preview/redesign/` içinde git dışındadır. Chromium görüntüleri yeni tasarımın fiziksel cihazdaki jest/klavye/arka plan davranışının kanıtı değildir; bu tasarımın fiziksel iPhone kontrolü ayrıca yapılır.
+
 ## Çalıştırma
 
 Node 24 ve yerel API/servisleri hazırlayın. Kökte `npm ci --ignore-scripts`; `npm run dev:mobile` Expo'yu loopback'te açar. Xcode bulunan Mac'te `npm run ios --workspace @oggaq/mobile`; Android SDK/JDK ile `npm run android --workspace @oggaq/mobile`. [Expo yerel geliştirme](https://docs.expo.dev/guides/local-app-development/) gerekli araçları açıklar. [SDK matrisi](https://docs.expo.dev/versions/latest/) SDK 57 için Xcode 26.4+, iOS 16.4+, Android 7+ ve compile/target SDK 36 belirtir.

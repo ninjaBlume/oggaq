@@ -1,5 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronDown,
+  Clock3,
+  ListChecks,
+  Play,
+  Trophy,
+} from "./icons";
 import * as Crypto from "expo-crypto";
 import type {
   ExamAttempt,
@@ -9,7 +19,7 @@ import type {
 import { ApiError } from "@oggaq/api-client";
 import { anchorClock, remainingSeconds, timeLabel } from "@oggaq/study-core";
 import { api } from "./api";
-import { useResource, useResume, useTask } from "./hooks";
+import { useResource, useResume, useTask, useOnReturn } from "./hooks";
 import {
   Button,
   Card,
@@ -19,6 +29,14 @@ import {
   Heading,
   Loading,
   styles,
+  Badge,
+  EmptyState,
+  ListRow,
+  Option,
+  ScreenTitle,
+  SectionTitle,
+  Sheet,
+  palette,
 } from "./ui";
 import { Pagination } from "./study";
 type StartInput = components["schemas"]["StartExamInput"];
@@ -55,7 +73,10 @@ export function Exams({
           params: { context: context.id },
           body: submission.current!,
         }),
-      (r) => open(r.data.id),
+      (r) => {
+        submission.current = null;
+        open(r.data.id);
+      },
     );
   }
   useEffect(() => {
@@ -71,34 +92,112 @@ export function Exams({
       !(
         task.error instanceof ApiError && [409, 422].includes(task.error.status)
       ));
+  useOnReturn(() => {
+    void query.reload();
+  });
   return (
     <>
-      <Heading>Deneme sınavı</Heading>
-      <Card>
-        <Field
-          label="Soru sayısı"
-          numeric
-          value={count}
-          onChange={setCount}
-          editable={!locked}
-        />
-        <Field
-          label="Süre (dakika)"
-          numeric
-          value={minutes}
-          onChange={setMinutes}
-          editable={!locked}
-        />
-        <Text style={styles.muted}>
-          1–100 soru, 1–120 dakika. Süre uygulamadan ayrılsan da işler. Puanın
-          doğru yüzdesidir; resmî sınav şablonu değildir.
+      <ScreenTitle
+        title="Deneme sınavı"
+        subtitle="Kendi temponu bul. Hazırlığını bir adım ileri taşı."
+      />
+      <View
+        style={{
+          backgroundColor: palette.navy,
+          padding: 24,
+          borderRadius: 26,
+          gap: 12,
+        }}
+      >
+        <View style={styles.between}>
+          <Badge>PROVA ZAMANI</Badge>
+          <Clock3 size={35} color={palette.mint} strokeWidth={1.5} />
+        </View>
+        <Text
+          style={{
+            fontSize: 25,
+            lineHeight: 32,
+            color: palette.white,
+            fontWeight: "800",
+            letterSpacing: -0.6,
+          }}
+        >
+          Bilgini zamana karşı sına.
         </Text>
-        <Button disabled={locked || !count || !minutes} onPress={begin}>
+        <Text style={{ fontSize: 12, lineHeight: 19, color: "#B8C6E4" }}>
+          Sorularını ve süreni seç. Sonucunu birlikte görelim.
+        </Text>
+      </View>
+      <Card>
+        <Text style={styles.heading}>Denemeni hazırla</Text>
+        <View style={{ flexDirection: "row", gap: 14 }}>
+          <View style={{ flex: 1 }}>
+            <Field
+              label="Soru sayısı"
+              numeric
+              value={count}
+              onChange={setCount}
+              editable={!locked}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Field
+              label="Süre (dakika)"
+              numeric
+              value={minutes}
+              onChange={setMinutes}
+              editable={!locked}
+            />
+          </View>
+        </View>
+        <View style={styles.row}>
+          {[5, 10, 20].map((n) => (
+            <Pressable
+              key={n}
+              accessibilityRole="button"
+              accessibilityLabel={`${n} soru seç`}
+              accessibilityState={{
+                selected: count === String(n),
+                disabled: locked,
+              }}
+              disabled={locked}
+              onPress={() => setCount(String(n))}
+              style={{
+                backgroundColor:
+                  count === String(n) ? palette.softBlue : palette.paper,
+                paddingHorizontal: 16,
+                minHeight: 44,
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 13,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontWeight: "700",
+                  color: count === String(n) ? palette.primary : palette.muted,
+                }}
+              >
+                {n} soru
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+        <Text style={styles.muted}>
+          1–100 soru, 1–120 dakika. Uygulamadan ayrılsan da süren devam eder.
+          Kendi hazırlık denemen; resmî sınav şablonu değildir.
+        </Text>
+        <Button
+          disabled={locked || !count || !minutes}
+          onPress={begin}
+          icon={Play}
+        >
           {task.pending ? "Hazırlanıyor…" : "Denemeyi başlat"}
         </Button>
         <ErrorNotice error={task.error} retry={begin} />
       </Card>
-      <Text style={styles.heading}>Deneme geçmişim</Text>
+      <SectionTitle>Son denemelerin</SectionTitle>
       {query.loading ? (
         <Loading />
       ) : query.error ? (
@@ -109,42 +208,43 @@ export function Exams({
           }}
         />
       ) : query.data?.data.length === 0 ? (
-        <Card>
-          <Text style={styles.text}>Henüz denemen yok.</Text>
-        </Card>
+        <EmptyState
+          icon={Trophy}
+          title="İlk denemene hazır mısın?"
+          message="Başlattığın denemeler ve sonuçların burada görünür."
+        />
       ) : (
         query.data?.data.map((e) => (
-          <Card key={e.id}>
-            <Text style={styles.heading}>
-              {e.question_count} soruluk deneme
-            </Text>
-            <Text style={styles.muted}>
-              {e.status === "active"
-                ? "Devam ediyor"
-                : `Doğru yüzdesi: %${e.result?.score_percent}`}{" "}
-              · {new Date(e.started_at).toLocaleDateString("tr-TR")}
-            </Text>
-            <Button secondary onPress={() => open(e.id)}>
-              {e.status === "active" ? "Denemeye dön" : "Sonucu incele"}
-            </Button>
-          </Card>
+          <ListRow
+            key={e.id}
+            icon={Clock3}
+            title={`${e.question_count} soruluk deneme`}
+            subtitle={new Date(e.started_at).toLocaleDateString("tr-TR")}
+            label={e.status === "active" ? "Denemeye dön" : "Sonucu incele"}
+            onPress={() => open(e.id)}
+            badge={
+              <Badge tone={e.status === "active" ? "blue" : "green"}>
+                {e.status === "active"
+                  ? "Devam ediyor"
+                  : e.result
+                    ? `%${e.result.score_percent} doğru`
+                    : "Sonuç bekleniyor"}
+              </Badge>
+            }
+          />
         ))
       )}
       {query.data && <Pagination page={query.data} change={setCursor} />}
     </>
   );
 }
+
 type Save = { row: string; option: string | null; revision: number };
-export function Exam({
-  context,
-  id,
-  onComplete,
-}: {
-  context: StudyContext;
-  id: string;
-  onComplete: () => void;
-}) {
+export function Exam({ context, id }: { context: StudyContext; id: string }) {
   const latest = useRef<ExamAttempt | null>(null);
+  const scroll = useRef<ScrollView>(null);
+  const insets = useSafeAreaInsets();
+  const [overview, setOverview] = useState(false);
   const query = useResource(
     async (signal) => {
       const response = await api.request(
@@ -169,7 +269,7 @@ export function Exam({
   const done = exam?.status === "completed";
   useEffect(() => {
     if (done) {
-      onComplete();
+      scroll.current?.scrollTo({ y: 0, animated: false });
       setSubmission(null);
       setFinishing(null);
       task.reset();
@@ -268,8 +368,13 @@ export function Exam({
   const answered = exam.questions.filter(
     (q) => q.selected_option_id !== null,
   ).length;
+  function choose(index: number) {
+    setIndex(index);
+    setOverview(false);
+    scroll.current?.scrollTo({ y: 0, animated: false });
+  }
   return (
-    <>
+    <View style={styles.shell}>
       <ConfirmDialog
         visible={confirm && !done}
         title="Denemeyi bitir"
@@ -278,161 +383,12 @@ export function Exam({
         cancel={() => setConfirm(false)}
         disabled={blocked}
       />
-      <Heading>{done ? "Deneme sonucun" : "Denemen devam ediyor"}</Heading>
-      {done && exam.result && (
-        <Card>
-          <Text style={[styles.title, { fontSize: 38 }]}>
-            %{exam.result.score_percent}
-          </Text>
-          <Text style={styles.text}>
-            {exam.result.correct} doğru · {exam.result.incorrect} yanlış ·{" "}
-            {exam.result.blank} boş
-          </Text>
-          <Text style={styles.muted}>
-            {exam.finish_reason === "expired"
-              ? "Süre dolduğunda tamamlandı."
-              : "Denemeyi sen bitirdin."}{" "}
-            Çalışma puanı; geçme / kalma kararı değildir.
-          </Text>
-        </Card>
-      )}
-      <Card>
-        <View style={styles.row}>
-          <Text style={styles.heading}>
-            Soru {index + 1} / {exam.question_count}
-          </Text>
-          {!done && (
-            <Text accessibilityLabel="Kalan süre" style={styles.heading}>
-              {timeLabel(seconds)}
-            </Text>
-          )}
-        </View>
-        <Text style={styles.heading}>{row.question.stem}</Text>
-        <View accessibilityRole="radiogroup">
-          {row.question.options.map((o) => {
-            const selected =
-              submission?.row === row.id
-                ? submission.option === o.id
-                : row.selected_option_id === o.id;
-            const correct = done && row.feedback?.correct_option_id === o.id;
-            return (
-              <Pressable
-                key={o.id}
-                accessibilityRole="radio"
-                accessibilityLabel={o.text}
-                accessibilityState={{ checked: selected, disabled: locked }}
-                disabled={locked}
-                onPress={() =>
-                  save({ row: row.id, option: o.id, revision: exam.revision })
-                }
-                style={[
-                  styles.option,
-                  selected && styles.selected,
-                  correct && styles.correct,
-                  { marginVertical: 5 },
-                ]}
-              >
-                <Text style={styles.text}>
-                  {String.fromCharCode(64 + o.position)}
-                </Text>
-                <Text style={[styles.text, { flex: 1 }]}>
-                  {o.text}
-                  {correct ? " · Doğru cevap" : ""}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-        {!done && (
-          <>
-            <Button
-              secondary
-              disabled={locked || row.selected_option_id === null}
-              onPress={() =>
-                save({ row: row.id, option: null, revision: exam.revision })
-              }
-            >
-              Cevabı temizle
-            </Button>
-            <Text style={styles.muted}>
-              {task.pending
-                ? "Kaydediliyor…"
-                : blocked
-                  ? "Kayıt doğrulanmalı"
-                  : "Cevaplar sunucuda kayıtlı"}
-            </Text>
-          </>
-        )}
-        {done && row.feedback && (
-          <>
-            <Text style={styles.heading}>
-              {row.feedback.outcome === "correct"
-                ? "Doğru"
-                : row.feedback.outcome === "incorrect"
-                  ? "Yanlış"
-                  : "Boş bırakıldı"}
-            </Text>
-            {row.feedback.explanation && (
-              <Text style={styles.text}>{row.feedback.explanation}</Text>
-            )}
-          </>
-        )}
-        <ErrorNotice
-          error={task.error}
-          retry={
-            task.error instanceof ApiError && task.error.status === 409
-              ? () => {
-                  void reconcile();
-                }
-              : submission
-                ? () => save(submission)
-                : finishing !== null
-                  ? () => finish(finishing)
-                  : undefined
-          }
-        />
-        {task.error ? (
-          <Button
-            secondary
-            disabled={task.pending}
-            onPress={() => {
-              void reconcile();
-            }}
-          >
-            Güncel kaydı yükle
-          </Button>
-        ) : null}
-        <ErrorNotice
-          error={query.error}
-          retry={() => {
-            void query.reload();
-          }}
-        />
-        {seconds === 0 && !done && (
-          <Text style={styles.text}>
-            Süre doldu. Sunucudan sonuç bekleniyor; bağlantı dönünce kayıt
-            yenilenir.
-          </Text>
-        )}
-        <View style={styles.row}>
-          <Button
-            secondary
-            disabled={index === 0 || blocked}
-            onPress={() => setIndex(index - 1)}
-          >
-            Önceki soru
-          </Button>
-          <Button
-            secondary
-            disabled={index === exam.question_count - 1 || blocked}
-            onPress={() => setIndex(index + 1)}
-          >
-            Sonraki soru
-          </Button>
-        </View>
-      </Card>
-      <Card>
-        <Text style={styles.heading}>
+      <Sheet
+        visible={overview}
+        title="Soruların"
+        close={() => setOverview(false)}
+      >
+        <Text style={styles.muted}>
           {answered} / {exam.question_count} cevaplandı
         </Text>
         <View style={styles.row}>
@@ -443,23 +399,416 @@ export function Exam({
               accessibilityLabel={`Soru ${i + 1}`}
               accessibilityState={{ selected: i === index, disabled: blocked }}
               disabled={blocked}
-              onPress={() => setIndex(i)}
+              onPress={() => choose(i)}
               style={[
                 styles.smallButton,
-                q.selected_option_id && styles.selected,
-                i === index && { borderWidth: 2, borderColor: "#286549" },
+                q.selected_option_id !== null && {
+                  backgroundColor: palette.softBlue,
+                },
+                i === index && { borderWidth: 2, borderColor: palette.primary },
               ]}
             >
-              <Text style={styles.text}>{i + 1}</Text>
+              <Text
+                style={{
+                  color: q.selected_option_id ? palette.primary : palette.muted,
+                  fontSize: 14,
+                  fontWeight: "700",
+                }}
+              >
+                {i + 1}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      </Sheet>
+      <View
+        style={{
+          paddingHorizontal: 24,
+          paddingTop: 6,
+          paddingBottom: 14,
+          gap: 12,
+        }}
+      >
+        <View style={styles.between}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Soru listesi"
+            onPress={() => setOverview(true)}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+              minHeight: 44,
+            }}
+          >
+            <ListChecks size={19} color={palette.primary} />
+            <Text
+              style={{ fontSize: 13, fontWeight: "700", color: palette.ink }}
+            >
+              Soru {index + 1} / {exam.question_count}
+            </Text>
+            <ChevronDown size={15} color={palette.muted} />
+          </Pressable>
+          {!done && (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 6,
+                backgroundColor:
+                  seconds < 60 ? palette.softRed : palette.softBlue,
+                padding: 10,
+                borderRadius: 12,
+              }}
+            >
+              <Clock3
+                size={16}
+                color={seconds < 60 ? palette.red : palette.primary}
+              />
+              <Text
+                accessibilityLabel="Kalan süre"
+                style={{
+                  color: seconds < 60 ? palette.red : palette.primary,
+                  fontSize: 14,
+                  fontWeight: "800",
+                  fontVariant: ["tabular-nums"],
+                }}
+              >
+                {timeLabel(seconds)}
+              </Text>
+            </View>
+          )}
+        </View>
+        <View
+          accessibilityRole="progressbar"
+          accessibilityLabel="Cevaplanan sorular"
+          accessibilityValue={{
+            min: 0,
+            max: exam.question_count,
+            now: answered,
+          }}
+          style={{
+            height: 4,
+            borderRadius: 2,
+            backgroundColor: palette.line,
+            overflow: "hidden",
+          }}
+        >
+          <View
+            style={{
+              height: 4,
+              width: `${(answered / exam.question_count) * 100}%`,
+              backgroundColor: palette.primary,
+              borderRadius: 2,
+            }}
+          />
+        </View>
+      </View>
+      <ScrollView
+        ref={scroll}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[styles.body, { paddingTop: 8 }]}
+      >
+        {done && exam.result ? (
+          <>
+            <Heading>Deneme sonucun</Heading>
+            <Card>
+              <View
+                style={{ alignItems: "center", gap: 12, paddingVertical: 10 }}
+              >
+                <View
+                  style={{
+                    width: 140,
+                    height: 140,
+                    borderRadius: 70,
+                    borderWidth: 7,
+                    borderColor: palette.softBlue,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: palette.primary,
+                      fontSize: 32,
+                      fontWeight: "800",
+                      letterSpacing: -1,
+                    }}
+                  >
+                    %{exam.result.score_percent}
+                  </Text>
+                  <Text style={styles.muted}>doğru oranı</Text>
+                </View>
+                <Text style={styles.heading}>Bir prova daha tamam!</Text>
+              </View>
+              <View style={{ flexDirection: "row", gap: 10 }}>
+                {[
+                  {
+                    value: exam.result.correct,
+                    label: "Doğru",
+                    color: palette.success,
+                    bg: palette.softMint,
+                  },
+                  {
+                    value: exam.result.incorrect,
+                    label: "Yanlış",
+                    color: palette.red,
+                    bg: palette.softRed,
+                  },
+                  {
+                    value: exam.result.blank,
+                    label: "Boş",
+                    color: palette.muted,
+                    bg: palette.paper,
+                  },
+                ].map((stat) => (
+                  <View
+                    key={stat.label}
+                    style={{
+                      flex: 1,
+                      alignItems: "center",
+                      padding: 14,
+                      backgroundColor: stat.bg,
+                      borderRadius: 16,
+                      gap: 4,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 22,
+                        fontWeight: "800",
+                        color: stat.color,
+                      }}
+                    >
+                      {stat.value}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 11,
+                        fontWeight: "600",
+                        color: stat.color,
+                      }}
+                    >
+                      {stat.label}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+              <Text style={[styles.muted, { textAlign: "center" }]}>
+                {exam.result.correct} doğru · {exam.result.incorrect} yanlış ·{" "}
+                {exam.result.blank} boş
+              </Text>
+              <Text
+                style={[styles.muted, { fontSize: 11, textAlign: "center" }]}
+              >
+                {exam.finish_reason === "expired"
+                  ? "Süre dolduğunda tamamlandı."
+                  : "Denemeyi sen bitirdin."}{" "}
+                Çalışma puanı; geçme / kalma kararı değildir.
+              </Text>
+            </Card>
+            <SectionTitle>Cevaplarını incele</SectionTitle>
+          </>
+        ) : (
+          <Text style={styles.eyebrow}>DENEMEN DEVAM EDİYOR</Text>
+        )}
+        <Card>
+          <Text style={[styles.heading, { fontSize: 21, lineHeight: 32 }]}>
+            {row.question.stem}
+          </Text>
+          <View accessibilityRole="radiogroup" style={{ gap: 10 }}>
+            {row.question.options.map((o) => {
+              const selected =
+                submission?.row === row.id
+                  ? submission.option === o.id
+                  : row.selected_option_id === o.id;
+              const correct = done && row.feedback?.correct_option_id === o.id;
+              return (
+                <Option
+                  key={o.id}
+                  label={String.fromCharCode(64 + o.position)}
+                  text={o.text}
+                  selected={selected}
+                  correct={Boolean(correct)}
+                  incorrect={Boolean(done && selected && !correct)}
+                  disabled={locked}
+                  onPress={() =>
+                    save({ row: row.id, option: o.id, revision: exam.revision })
+                  }
+                />
+              );
+            })}
+          </View>
+          {!done && (
+            <>
+              <Text style={[styles.muted, { fontSize: 11 }]}>
+                {task.pending
+                  ? "Kaydediliyor…"
+                  : blocked
+                    ? "Kayıt doğrulanmalı"
+                    : "Cevaplar sunucuda kayıtlı"}
+              </Text>
+              <Button
+                secondary
+                disabled={locked || row.selected_option_id === null}
+                onPress={() =>
+                  save({ row: row.id, option: null, revision: exam.revision })
+                }
+              >
+                Cevabı temizle
+              </Button>
+            </>
+          )}
+          {done && row.feedback && (
+            <View
+              style={{
+                backgroundColor:
+                  row.feedback.outcome === "correct"
+                    ? palette.softMint
+                    : palette.softRed,
+                padding: 16,
+                borderRadius: 16,
+                gap: 8,
+              }}
+            >
+              <Text style={styles.heading}>
+                {row.feedback.outcome === "correct"
+                  ? "Doğru"
+                  : row.feedback.outcome === "incorrect"
+                    ? "Yanlış"
+                    : "Boş bırakıldı"}
+              </Text>
+              {row.feedback.explanation && (
+                <Text style={[styles.text, { fontSize: 14 }]}>
+                  {row.feedback.explanation}
+                </Text>
+              )}
+            </View>
+          )}
+          <ErrorNotice
+            error={task.error}
+            retry={
+              task.error instanceof ApiError && task.error.status === 409
+                ? () => {
+                    void reconcile();
+                  }
+                : submission
+                  ? () => save(submission)
+                  : finishing !== null
+                    ? () => finish(finishing)
+                    : undefined
+            }
+          />
+          {Boolean(task.error) && (
+            <Button
+              secondary
+              disabled={task.pending}
+              onPress={() => {
+                void reconcile();
+              }}
+            >
+              Güncel kaydı yükle
+            </Button>
+          )}
+          <ErrorNotice
+            error={query.error}
+            retry={() => {
+              void query.reload();
+            }}
+          />
+          {seconds === 0 && !done && (
+            <Text style={styles.text}>
+              Süre doldu. Sunucudan sonuç bekleniyor; bağlantı dönünce kayıt
+              yenilenir.
+            </Text>
+          )}
+        </Card>
+      </ScrollView>
+      <View
+        style={{
+          paddingHorizontal: 24,
+          paddingTop: 12,
+          paddingBottom: Math.max(insets.bottom, 14),
+          backgroundColor: palette.white,
+          borderTopWidth: 1,
+          borderColor: palette.line,
+          gap: 6,
+        }}
+      >
+        <View style={{ flexDirection: "row", gap: 12 }}>
+          {[
+            {
+              label: "Önceki soru",
+              text: "Önceki",
+              icon: ArrowLeft,
+              disabled: index === 0 || blocked,
+              go: () => choose(index - 1),
+            },
+            {
+              label: "Sonraki soru",
+              text: "Sonraki",
+              icon: ArrowRight,
+              disabled: index === exam.question_count - 1 || blocked,
+              go: () => choose(index + 1),
+            },
+          ].map(({ label, text, icon: Icon, disabled, go }) => (
+            <Pressable
+              key={label}
+              accessibilityRole="button"
+              accessibilityLabel={label}
+              accessibilityState={{ disabled }}
+              disabled={disabled}
+              onPress={go}
+              style={({ pressed }) => [
+                {
+                  flex: 1,
+                  flexDirection: "row",
+                  minHeight: 48,
+                  borderRadius: 14,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: 10,
+                  backgroundColor: palette.softBlue,
+                },
+                disabled && styles.disabled,
+                pressed && { opacity: 0.7 },
+              ]}
+            >
+              <Icon size={18} color={palette.primary} />
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontWeight: "700",
+                  color: palette.primary,
+                }}
+              >
+                {text}
+              </Text>
             </Pressable>
           ))}
         </View>
         {!done && (
-          <Button disabled={locked} onPress={() => setConfirm(true)}>
-            Denemeyi bitir
-          </Button>
+          <View style={styles.between}>
+            <Text style={{ fontSize: 11, color: palette.muted }}>
+              {answered} / {exam.question_count} cevaplandı
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Denemeyi bitir"
+              accessibilityState={{ disabled: locked }}
+              disabled={locked}
+              onPress={() => setConfirm(true)}
+              style={{
+                minHeight: 40,
+                justifyContent: "center",
+                opacity: locked ? 0.45 : 1,
+              }}
+            >
+              <Text style={styles.link}>Denemeyi bitir</Text>
+            </Pressable>
+          </View>
         )}
-      </Card>
-    </>
+      </View>
+    </View>
   );
 }

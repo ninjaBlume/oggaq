@@ -1,0 +1,27 @@
+// Import individual icons so Metro bundles only the icons used by the app.
+export { default as ArrowLeft } from "lucide-react-native/icons/arrow-left";
+export { default as ArrowRight } from "lucide-react-native/icons/arrow-right";
+export { default as BookOpen } from "lucide-react-native/icons/book-open";
+export { default as Building2 } from "lucide-react-native/icons/building-complex";
+export { default as Check } from "lucide-react-native/icons/check";
+export { default as CheckCircle2 } from "lucide-react-native/icons/circle-check";
+export { default as ChevronDown } from "lucide-react-native/icons/chevron-down";
+export { default as ChevronRight } from "lucide-react-native/icons/chevron-right";
+export { default as CircleHelp } from "lucide-react-native/icons/circle-question-mark";
+export { default as Clock3 } from "lucide-react-native/icons/clock-3";
+export { default as Eye } from "lucide-react-native/icons/eye";
+export { default as EyeOff } from "lucide-react-native/icons/eye-off";
+export { default as GraduationCap } from "lucide-react-native/icons/graduation-cap";
+export { default as History } from "lucide-react-native/icons/rotate-ccw-clock";
+export { default as House } from "lucide-react-native/icons/house";
+export { default as Layers3 } from "lucide-react-native/icons/layers";
+export { default as ListChecks } from "lucide-react-native/icons/list-checks";
+export { default as LockKeyhole } from "lucide-react-native/icons/lock-keyhole";
+export { default as LogOut } from "lucide-react-native/icons/log-out";
+export { default as Mail } from "lucide-react-native/icons/mail";
+export { default as Play } from "lucide-react-native/icons/play";
+export { default as ShieldCheck } from "lucide-react-native/icons/shield-check";
+export { default as SlidersHorizontal } from "lucide-react-native/icons/sliders-horizontal";
+export { default as Trophy } from "lucide-react-native/icons/trophy";
+export { default as UserRound } from "lucide-react-native/icons/user-round";
+export { default as X } from "lucide-react-native/icons/x";

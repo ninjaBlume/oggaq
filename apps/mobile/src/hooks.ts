@@ -1,5 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
+export function useOnReturn(callback: () => void) {
+  const focused = useIsFocused();
+  const blurred = useRef(false);
+  const ref = useRef(callback);
+  ref.current = callback;
+  useEffect(() => {
+    if (!focused) blurred.current = true;
+    else if (blurred.current) {
+      blurred.current = false;
+      ref.current();
+    }
+  }, [focused]);
+}
 export function useResource<T>(
   loader: (signal: AbortSignal) => Promise<T>,
   dependencies: readonly unknown[],

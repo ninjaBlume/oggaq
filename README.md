@@ -16,6 +16,8 @@ React 19/TypeScript yönetim paneli gerçek API'ye bağlıdır: cookie giriş/ç
 
 Süreli çok sorulu deneme, otomatik süre sonu, sabit soru sürümleri, atomik doğru/yanlış/boş/puan ve web ekranı eklendi. Expo iOS/Android istemcisi gerçek Bearer API ve SecureStore ile giriş, çalışma/geçmiş ve deneme akışlarını uygular. [Deneme motoru](docs/EXAMS.md), [mobil kurulum ve native doğrulama durumu](docs/MOBILE.md). Import, raporlar ve hesap silme/veri export akışları henüz geliştirilmedi. Çevrimdışı çalışma güncel [prompt.md](prompt.md) kapsamında ayrıca kararlaştırılacak; mevcut sync belgeleri tasarım önerisidir. Kuruma özel soru gelecekte merkezi içerikten ayrı yetkilendirilecek. Boş uygulama klasörlerindeki `.gitkeep` dosyaları ekran veya özellik değildir.
 
+10 Ekim 2026 mobil arayüzü yenilendi: alt sekmeler, ayrı ana ekran, profil, ders/konu panelleri ve sabit soru/deneme kontrolleri. Gerçek API ile 5 mobil Chromium E2E, 17 mobil birim testi, strict tip, Expo Doctor 21/21 ve üç platform export geçti. Önceki fiziksel iPhone giriş/çıkışı kullanıcı tarafından doğrulandı; yeni tasarımın cihaz kontrolü ayrıca izlenir. [Mobil tasarım ve doğrulama](docs/MOBILE.md).
+
 PostgreSQL/Redis otomatik testleri ve gerçek HTTP kimlik akışı doğrulandı. GitHub Actions yapılandırması hazır; uzak CI sonucu GitHub Actions üzerinden izlenir.
 
 ## Hedef yapı
