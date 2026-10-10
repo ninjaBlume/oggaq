@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
-  AccessibilityInfo,
   Animated,
-  Easing,
   Keyboard,
   Modal,
   PanResponder,
@@ -32,7 +30,8 @@ import {
   UserRound,
   X,
 } from "./icons";
-import { palette } from "./theme";
+import { motion, palette, shape } from "./theme";
+import { useReducedMotion } from "./motion";
 
 export const destinations = [
   { id: "home", label: "Ana sayfa", menuLabel: "Ana sayfa", icon: House },
@@ -138,34 +137,23 @@ export function SideMenu({
   const panelWidth = Math.min(340, width - 48);
   const progress = useRef(new Animated.Value(0)).current;
   const closing = useRef(false);
-  // Avoid motion until the system preference is known.
-  const [reducedMotion, setReducedMotion] = useState(true);
-  useEffect(() => {
-    let mounted = true;
-    void AccessibilityInfo.isReduceMotionEnabled().then(
-      (enabled) => {
-        if (mounted) setReducedMotion(enabled);
-      },
-      () => {
-        if (mounted) setReducedMotion(true);
-      },
-    );
-    const listener = AccessibilityInfo.addEventListener(
-      "reduceMotionChanged",
-      setReducedMotion,
-    );
-    return () => {
-      mounted = false;
-      listener.remove();
-      progress.stopAnimation();
-    };
-  }, [progress]);
+  const reducedMotion = useReducedMotion();
+  useEffect(() => () => progress.stopAnimation(), [progress]);
   const animate = useCallback(
     (value: number, done?: () => void) => {
-      Animated.timing(progress, {
+      progress.stopAnimation();
+      if (reducedMotion) {
+        progress.setValue(value);
+        done?.();
+        return;
+      }
+      Animated.spring(progress, {
         toValue: value,
-        duration: reducedMotion ? 0 : value === 1 ? 240 : 180,
-        easing: Easing.out(Easing.cubic),
+        ...motion.spatial,
+        overshootClamping: value === 0,
+        restDisplacementThreshold: 0.001,
+        restSpeedThreshold: 0.001,
+        isInteraction: false,
         useNativeDriver: Platform.OS !== "web",
       }).start(({ finished }) => {
         if (finished) done?.();
@@ -218,7 +206,14 @@ export function SideMenu({
           pointerEvents="none"
           style={[
             StyleSheet.absoluteFill,
-            { backgroundColor: palette.scrim, opacity: progress },
+            {
+              backgroundColor: palette.scrim,
+              opacity: progress.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 1],
+                extrapolate: "clamp",
+              }),
+            },
           ]}
         />
         <Pressable
@@ -241,6 +236,7 @@ export function SideMenu({
                   translateX: progress.interpolate({
                     inputRange: [0, 1],
                     outputRange: [-panelWidth, 0],
+                    extrapolate: "clamp",
                   }),
                 },
               ],
@@ -415,8 +411,8 @@ const navStyles = StyleSheet.create({
   panel: {
     height: "100%",
     backgroundColor: palette.white,
-    borderTopRightRadius: 24,
-    borderBottomRightRadius: 24,
+    borderTopRightRadius: shape.extraLarge,
+    borderBottomRightRadius: shape.extraLarge,
     overflow: "hidden",
   },
   account: {
@@ -455,7 +451,7 @@ const navStyles = StyleSheet.create({
     gap: 12,
     paddingHorizontal: 12,
     paddingVertical: 14,
-    borderRadius: 14,
+    borderRadius: shape.full,
   },
   menuText: {
     flex: 1,

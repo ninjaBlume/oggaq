@@ -29,6 +29,22 @@ async function screenshot(page: Page, name: string) {
   if (await panel.isVisible()) {
     await expect.poll(async () => (await panel.boundingBox())?.x).toBe(0);
   }
+  for (const entry of await page.getByTestId("expressive-entry").all()) {
+    await expect
+      .poll(() =>
+        entry.evaluate((el) => {
+          const style = getComputedStyle(el);
+          return {
+            opacity: Number(style.opacity),
+            y:
+              style.transform === "none"
+                ? 0
+                : new DOMMatrix(style.transform).m42,
+          };
+        }),
+      )
+      .toEqual({ opacity: 1, y: 0 });
+  }
   await page.screenshot({
     path: `artifacts/mobile-preview/redesign/${name}.png`,
   });
@@ -406,4 +422,94 @@ test("yan menü küçük telefon, tablet ve yatay ekranda kapanır ve sola sür�
   await page.mouse.move(80, 100, { steps: 12 });
   await page.mouse.up();
   await expect(menu).not.toBeVisible();
+});
+
+test("Expressive düğme ve seçim grupları eylemleri korur ve küçük ekrana sığar", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await login(page);
+  for (const width of [320, 390, 834]) {
+    await page.setViewportSize({ width, height: 844 });
+    await expect(
+      page.getByRole("button", { name: "Çalışmaya başla", exact: true }),
+    ).toBeInViewport();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await screenshot(page, `expressive-home-${width}`);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  const start = page.getByRole("button", {
+    name: "Çalışmaya başla",
+    exact: true,
+  });
+  const radius = await start.evaluate((el) =>
+    parseFloat(getComputedStyle(el).borderRadius),
+  );
+  await start.hover();
+  await page.mouse.down();
+  await expect
+    .poll(() =>
+      start.evaluate((el) => parseFloat(getComputedStyle(el).borderRadius)),
+    )
+    .toBeLessThan(radius);
+  await expect(page.getByText("Merhaba, E2E.", { exact: true })).toBeVisible();
+  await page.mouse.up();
+  await expect(page.getByText("Soru bankası", { exact: true })).toBeVisible();
+  await page.getByRole("tab", { name: "Deneme", exact: true }).click();
+  await page.getByRole("button", { name: "20 soru seç", exact: true }).click();
+  await expect(page.getByLabel("Soru sayısı", { exact: true })).toHaveValue(
+    "20",
+  );
+  await expect(
+    page.getByRole("button", { name: "20 soru seç", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+  await expect(
+    page.getByRole("button", { name: "10 soru seç", exact: true }),
+  ).toHaveAttribute("aria-selected", "false");
+  await page.setViewportSize({ width: 320, height: 844 });
+  await expect(
+    page.getByRole("button", { name: "20 soru seç", exact: true }),
+  ).toBeInViewport();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await screenshot(page, "expressive-exam-320");
+});
+
+test("sistem hareket azaltma tercihi canlı değişince Expressive hareket kapanır", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await login(page);
+  const start = page.getByRole("button", {
+    name: "Çalışmaya başla",
+    exact: true,
+  });
+  await start.hover();
+  await page.mouse.down();
+  const scale = () =>
+    start.evaluate(
+      (el) => new DOMMatrixReadOnly(getComputedStyle(el).transform).a,
+    );
+  await expect.poll(scale).toBe(1);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await expect.poll(scale).toBeLessThan(1);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect.poll(scale).toBe(1);
+  await page.mouse.up();
+  await expect(page.getByText("Soru bankası", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
+  const menu = page.getByLabel("Uygulama menüsü", { exact: true });
+  await expect.poll(async () => (await menu.boundingBox())?.x).toBe(0);
+  await page.keyboard.press("Escape");
+  await expect(menu).not.toBeVisible();
+  await expect(
+    page.getByRole("tab", { name: "Soru çöz", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
 });

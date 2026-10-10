@@ -38,6 +38,8 @@ import {
   Sheet,
   palette,
 } from "./ui";
+import { ChoiceGroup, Enter, ExpressiveEmblem } from "./expressive";
+import { shape, typography } from "./theme";
 import { Pagination } from "./study";
 type StartInput = components["schemas"]["StartExamInput"];
 export function Exams({
@@ -105,7 +107,8 @@ export function Exams({
         style={{
           backgroundColor: palette.navy,
           padding: 24,
-          borderRadius: 20,
+          borderRadius: shape.extraLarge,
+          borderBottomLeftRadius: shape.medium,
           gap: 12,
         }}
       >
@@ -115,8 +118,7 @@ export function Exams({
         </View>
         <Text
           style={{
-            fontSize: 25,
-            lineHeight: 32,
+            ...typography.headline,
             color: palette.white,
             fontWeight: "800",
             letterSpacing: -0.6,
@@ -152,40 +154,16 @@ export function Exams({
             />
           </View>
         </View>
-        <View style={styles.row}>
-          {[5, 10, 20].map((n) => (
-            <Pressable
-              key={n}
-              accessibilityRole="button"
-              accessibilityLabel={`${n} soru seç`}
-              accessibilityState={{
-                selected: count === String(n),
-                disabled: locked,
-              }}
-              disabled={locked}
-              onPress={() => setCount(String(n))}
-              style={{
-                backgroundColor:
-                  count === String(n) ? palette.softPrimary : palette.paper,
-                paddingHorizontal: 16,
-                minHeight: 44,
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 13,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 12,
-                  fontWeight: "700",
-                  color: count === String(n) ? palette.primary : palette.muted,
-                }}
-              >
-                {n} soru
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+        <ChoiceGroup
+          choices={[5, 10, 20].map((n) => ({
+            value: String(n),
+            label: `${n} soru`,
+            accessibilityLabel: `${n} soru seç`,
+          }))}
+          value={count}
+          onChange={setCount}
+          disabled={locked}
+        />
         <Text style={styles.muted}>
           1–100 soru, 1–120 dakika. Uygulamadan ayrılsan da süren devam eder.
           Kendi hazırlık denemen; resmî sınav şablonu değildir.
@@ -514,101 +492,100 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
         {done && exam.result ? (
           <>
             <Heading>Deneme sonucun</Heading>
-            <Card>
-              <View
-                style={{ alignItems: "center", gap: 12, paddingVertical: 10 }}
-              >
+            <Enter>
+              <Card>
                 <View
-                  style={{
-                    width: 140,
-                    height: 140,
-                    borderRadius: 70,
-                    borderWidth: 7,
-                    borderColor: palette.softPrimary,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
+                  style={{ alignItems: "center", gap: 12, paddingVertical: 10 }}
                 >
-                  <Text
-                    style={{
-                      color: palette.primary,
-                      fontSize: 32,
-                      fontWeight: "800",
-                      letterSpacing: -1,
-                    }}
-                  >
-                    %{exam.result.score_percent}
-                  </Text>
-                  <Text style={styles.muted}>doğru oranı</Text>
-                </View>
-                <Text style={styles.heading}>Bir prova daha tamam!</Text>
-              </View>
-              <View style={{ flexDirection: "row", gap: 10 }}>
-                {[
-                  {
-                    value: exam.result.correct,
-                    label: "Doğru",
-                    color: palette.success,
-                    bg: palette.softSuccess,
-                  },
-                  {
-                    value: exam.result.incorrect,
-                    label: "Yanlış",
-                    color: palette.red,
-                    bg: palette.softRed,
-                  },
-                  {
-                    value: exam.result.blank,
-                    label: "Boş",
-                    color: palette.muted,
-                    bg: palette.paper,
-                  },
-                ].map((stat) => (
-                  <View
-                    key={stat.label}
-                    style={{
-                      flex: 1,
-                      alignItems: "center",
-                      padding: 14,
-                      backgroundColor: stat.bg,
-                      borderRadius: 16,
-                      gap: 4,
-                    }}
-                  >
+                  <ExpressiveEmblem size={160}>
                     <Text
                       style={{
-                        fontSize: 22,
+                        color: palette.onPrimaryContainer,
+                        fontSize: 32,
                         fontWeight: "800",
-                        color: stat.color,
+                        letterSpacing: -1,
                       }}
                     >
-                      {stat.value}
+                      %{exam.result.score_percent}
                     </Text>
                     <Text
+                      style={[
+                        styles.muted,
+                        { color: palette.onPrimaryContainer },
+                      ]}
+                    >
+                      doğru oranı
+                    </Text>
+                  </ExpressiveEmblem>
+                  <Text style={styles.heading}>Bir prova daha tamam!</Text>
+                </View>
+                <View style={{ flexDirection: "row", gap: 10 }}>
+                  {[
+                    {
+                      value: exam.result.correct,
+                      label: "Doğru",
+                      color: palette.success,
+                      bg: palette.softSuccess,
+                    },
+                    {
+                      value: exam.result.incorrect,
+                      label: "Yanlış",
+                      color: palette.red,
+                      bg: palette.softRed,
+                    },
+                    {
+                      value: exam.result.blank,
+                      label: "Boş",
+                      color: palette.muted,
+                      bg: palette.paper,
+                    },
+                  ].map((stat) => (
+                    <View
+                      key={stat.label}
                       style={{
-                        fontSize: 11,
-                        fontWeight: "600",
-                        color: stat.color,
+                        flex: 1,
+                        alignItems: "center",
+                        padding: 14,
+                        backgroundColor: stat.bg,
+                        borderRadius: 16,
+                        gap: 4,
                       }}
                     >
-                      {stat.label}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-              <Text style={[styles.muted, { textAlign: "center" }]}>
-                {exam.result.correct} doğru · {exam.result.incorrect} yanlış ·{" "}
-                {exam.result.blank} boş
-              </Text>
-              <Text
-                style={[styles.muted, { fontSize: 11, textAlign: "center" }]}
-              >
-                {exam.finish_reason === "expired"
-                  ? "Süre dolduğunda tamamlandı."
-                  : "Denemeyi sen bitirdin."}{" "}
-                Çalışma puanı; geçme / kalma kararı değildir.
-              </Text>
-            </Card>
+                      <Text
+                        style={{
+                          fontSize: 22,
+                          fontWeight: "800",
+                          color: stat.color,
+                        }}
+                      >
+                        {stat.value}
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: 11,
+                          fontWeight: "600",
+                          color: stat.color,
+                        }}
+                      >
+                        {stat.label}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+                <Text style={[styles.muted, { textAlign: "center" }]}>
+                  {exam.result.correct} doğru · {exam.result.incorrect} yanlış ·{" "}
+                  {exam.result.blank} boş
+                </Text>
+                <Text
+                  style={[styles.muted, { fontSize: 11, textAlign: "center" }]}
+                >
+                  {exam.finish_reason === "expired"
+                    ? "Süre dolduğunda tamamlandı."
+                    : "Denemeyi sen bitirdin."}{" "}
+                  Çalışma puanı; geçme / kalma kararı değildir.
+                </Text>
+              </Card>
+            </Enter>
             <SectionTitle>Cevaplarını incele</SectionTitle>
           </>
         ) : (

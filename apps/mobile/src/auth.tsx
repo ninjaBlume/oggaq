@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Linking, Pressable, Text, View } from "react-native";
+import { Linking, Text, View } from "react-native";
 import { ArrowLeft, ArrowRight, ShieldCheck, CheckCircle2 } from "./icons";
 import brand from "../brand.json";
+import { ChoiceGroup } from "./expressive";
+import { shape, typography } from "./theme";
 import type { User } from "@oggaq/shared-types";
 import { api, frontendUrl } from "./api";
 import { deviceId, session } from "./storage";
@@ -94,7 +96,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
       <View
         style={{
           backgroundColor: palette.navy,
-          borderRadius: 20,
+          borderRadius: shape.extraLarge,
           padding: 26,
           minHeight: 235,
           overflow: "hidden",
@@ -126,10 +128,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
         <Text
           style={{
             color: palette.white,
-            fontSize: 31,
-            lineHeight: 37,
-            fontWeight: "800",
-            letterSpacing: -1,
+            ...typography.display,
             marginTop: 10,
             width: "72%",
           }}
@@ -146,48 +145,23 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
         </Text>
       </View>
       {mode !== "forgot" && (
-        <View
-          style={{
-            flexDirection: "row",
-            backgroundColor: palette.neutralSurface,
-            borderRadius: 16,
-            padding: 4,
-          }}
-        >
-          {(["login", "register"] as const).map((value) => (
-            <Pressable
-              key={value}
-              accessibilityRole="button"
-              accessibilityLabel={
-                value === "login" ? "Giriş sekmesi" : "Kayıt sekmesi"
-              }
-              accessibilityState={{
-                selected: mode === value,
-                disabled: task.pending,
-              }}
-              disabled={task.pending}
-              onPress={() => change(value)}
-              style={{
-                flex: 1,
-                minHeight: 44,
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 12,
-                backgroundColor: mode === value ? palette.white : "transparent",
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 13,
-                  fontWeight: "700",
-                  color: mode === value ? palette.ink : palette.muted,
-                }}
-              >
-                {value === "login" ? "Giriş yap" : "Hesap oluştur"}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+        <ChoiceGroup
+          choices={[
+            {
+              value: "login",
+              label: "Giriş yap",
+              accessibilityLabel: "Giriş sekmesi",
+            },
+            {
+              value: "register",
+              label: "Hesap oluştur",
+              accessibilityLabel: "Kayıt sekmesi",
+            },
+          ]}
+          value={mode}
+          onChange={change}
+          disabled={task.pending}
+        />
       )}
       <View style={{ gap: 7 }}>
         <Heading>

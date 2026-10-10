@@ -42,6 +42,8 @@ import {
 import { History, Practice, QuestionList } from "./study";
 import { Exam, Exams } from "./exams";
 import { Home } from "./home";
+import { MotionProvider } from "./motion";
+import { TabIndicator } from "./expressive";
 import { Profile } from "./profile";
 import {
   destinations as tabs,
@@ -205,21 +207,13 @@ function MainTabs({
                   gap: 5,
                 }}
               >
-                <View
-                  style={{
-                    paddingHorizontal: 14,
-                    paddingVertical: 4,
-                    borderRadius: 12,
-                    backgroundColor:
-                      tab === id ? palette.softPrimary : "transparent",
-                  }}
-                >
+                <TabIndicator selected={tab === id}>
                   <Icon
                     size={22}
                     strokeWidth={tab === id ? 2.3 : 1.7}
                     color={tab === id ? palette.primary : palette.muted}
                   />
-                </View>
+                </TabIndicator>
                 <Text
                   style={{
                     fontSize: 11,
@@ -499,12 +493,14 @@ function Application() {
 export default function App() {
   return (
     <SafeAreaProvider>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.shell}
-      >
-        <Application />
-      </KeyboardAvoidingView>
+      <MotionProvider>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.shell}
+        >
+          <Application />
+        </KeyboardAvoidingView>
+      </MotionProvider>
     </SafeAreaProvider>
   );
 }

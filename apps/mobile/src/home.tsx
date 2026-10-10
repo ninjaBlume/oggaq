@@ -10,10 +10,13 @@ import {
   Play,
 } from "./icons";
 import type { StudyContext, User } from "@oggaq/shared-types";
+import { Enter, ExpressiveEmblem, ExpressivePressable } from "./expressive";
+import { shape, typography } from "./theme";
 import { api } from "./api";
 import { useResource, useOnReturn } from "./hooks";
 import {
   Badge,
+  Button,
   EmptyState,
   ErrorNotice,
   ListRow,
@@ -77,35 +80,38 @@ export function Home({
         title={`Merhaba, ${user.name.trim().split(/\s+/)[0]}.`}
         subtitle="Bugün kendine bir adım daha yaklaş."
       />
-      <View
+      <Enter
         style={{
           backgroundColor: palette.navy,
           padding: 22,
-          borderRadius: 20,
+          borderRadius: shape.extraLarge,
+          borderTopRightRadius: shape.medium,
           overflow: "hidden",
           gap: 16,
         }}
       >
-        <Text
-          style={{
-            color: palette.accent,
-            fontSize: 10,
-            fontWeight: "800",
-            letterSpacing: 1.5,
-          }}
-        >
-          BUGÜNÜN İLK ADIMI
-        </Text>
+        <View style={styles.between}>
+          <Text
+            style={{
+              color: palette.accent,
+              fontSize: 10,
+              fontWeight: "800",
+              letterSpacing: 1.5,
+            }}
+          >
+            BUGÜNÜN İLK ADIMI
+          </Text>
+          <ExpressiveEmblem size={48} color={palette.accent}>
+            <BookOpen size={22} color={palette.navy} strokeWidth={1.8} />
+          </ExpressiveEmblem>
+        </View>
         <Text
           style={{
             color: palette.white,
-            fontSize: 25,
-            lineHeight: 32,
-            fontWeight: "800",
-            letterSpacing: -0.7,
+            ...typography.display,
           }}
         >
-          Sınava adım adım hazırlan.
+          Hazırlan.{"\n"}Bir adım ilerle.
         </Text>
         <Text
           style={{
@@ -116,32 +122,12 @@ export function Home({
         >
           Küçük adımlar, daha güçlü bir hazırlık.
         </Text>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Çalışmaya başla"
-          onPress={() => questions()}
-          style={({ pressed }) => [
-            {
-              flexDirection: "row",
-              alignSelf: "flex-start",
-              alignItems: "center",
-              gap: 12,
-              backgroundColor: palette.primary,
-              borderRadius: 14,
-              paddingHorizontal: 16,
-              minHeight: 50,
-            },
-            pressed && { opacity: 0.85 },
-          ]}
-        >
-          <Text
-            style={{ fontSize: 13, fontWeight: "700", color: palette.white }}
-          >
+        <View style={{ alignSelf: "flex-start" }}>
+          <Button secondary icon={ArrowRight} onPress={() => questions()}>
             Çalışmaya başla
-          </Text>
-          <ArrowRight size={17} color={palette.white} />
-        </Pressable>
-      </View>
+          </Button>
+        </View>
+      </Enter>
       <View style={{ flexDirection: "row", gap: 12 }}>
         {[
           {
@@ -149,42 +135,38 @@ export function Home({
             text: "Konunu seç, öğren",
             icon: BookOpen,
             press: () => questions(),
-            bg: palette.softPrimary,
-            color: palette.primary,
+            bg: palette.primaryContainer,
+            color: palette.onPrimaryContainer,
           },
           {
             title: "Deneme",
             text: "Kendini sınamak için",
             icon: Clock3,
             press: exams,
-            bg: palette.softSuccess,
-            color: palette.success,
+            bg: palette.secondaryContainer,
+            color: palette.onSecondaryContainer,
           },
         ].map(({ title, text, icon: Icon, press, bg, color }) => (
-          <Pressable
+          <ExpressivePressable
             key={title}
+            radius={title === "Soru çöz" ? shape.large : shape.extraLarge}
             accessibilityRole="button"
             accessibilityLabel={title + " ekranını aç"}
             onPress={press}
-            style={({ pressed }) => [
-              {
-                flex: 1,
-                backgroundColor: palette.white,
-                borderRadius: 18,
-                padding: 18,
-                gap: 8,
-                borderWidth: 1,
-                borderColor: palette.line,
-              },
-              pressed && { opacity: 0.8 },
-            ]}
+            style={{
+              flex: 1,
+              backgroundColor: bg,
+              borderRadius: shape.large,
+              padding: 18,
+              gap: 8,
+            }}
           >
             <View
               style={{
                 width: 42,
                 height: 42,
-                backgroundColor: bg,
-                borderRadius: 14,
+                backgroundColor: palette.white,
+                borderRadius: shape.full,
                 alignItems: "center",
                 justifyContent: "center",
                 marginBottom: 6,
@@ -192,17 +174,11 @@ export function Home({
             >
               <Icon size={21} color={color} strokeWidth={1.8} />
             </View>
-            <Text
-              style={{ color: palette.ink, fontSize: 16, fontWeight: "700" }}
-            >
+            <Text style={{ color, fontSize: 17, fontWeight: "700" }}>
               {title}
             </Text>
-            <Text
-              style={{ fontSize: 11, color: palette.muted, lineHeight: 17 }}
-            >
-              {text}
-            </Text>
-          </Pressable>
+            <Text style={{ fontSize: 12, color, lineHeight: 18 }}>{text}</Text>
+          </ExpressivePressable>
         ))}
       </View>
       {recentExams.error && (

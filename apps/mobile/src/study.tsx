@@ -17,6 +17,7 @@ import type {
   Question,
   StudyContext,
 } from "@oggaq/shared-types";
+import { ChoiceGroup } from "./expressive";
 import { api } from "./api";
 import { useResource, useTask, useOnReturn } from "./hooks";
 import {
@@ -610,47 +611,25 @@ export function History({
         title="Geçmişim"
         subtitle="Her çalışman, bir sonraki adımın için burada."
       />
-      <View
-        style={{
-          backgroundColor: palette.neutralSurface,
-          borderRadius: 16,
-          padding: 4,
-          flexDirection: "row",
+      <ChoiceGroup
+        choices={[
+          {
+            value: "practice",
+            label: "Sorular",
+            accessibilityLabel: "Soru geçmişi",
+          },
+          {
+            value: "exam",
+            label: "Denemeler",
+            accessibilityLabel: "Deneme geçmişi",
+          },
+        ]}
+        value={mode}
+        onChange={(value) => {
+          setMode(value);
+          setCursor(undefined);
         }}
-      >
-        {(["practice", "exam"] as const).map((value) => (
-          <Pressable
-            key={value}
-            accessibilityRole="button"
-            accessibilityLabel={
-              value === "practice" ? "Soru geçmişi" : "Deneme geçmişi"
-            }
-            accessibilityState={{ selected: mode === value }}
-            onPress={() => {
-              setMode(value);
-              setCursor(undefined);
-            }}
-            style={{
-              flex: 1,
-              minHeight: 44,
-              borderRadius: 12,
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: value === mode ? palette.white : "transparent",
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 13,
-                fontWeight: "700",
-                color: value === mode ? palette.ink : palette.muted,
-              }}
-            >
-              {value === "practice" ? "Sorular" : "Denemeler"}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
+      />
       {current.loading ? (
         <Loading />
       ) : current.error ? (

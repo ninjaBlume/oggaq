@@ -27,6 +27,10 @@ import {
 import type { LucideIcon } from "lucide-react-native";
 import { ApiError } from "@oggaq/api-client";
 import { palette } from "./theme";
+import { shape, typography } from "./theme";
+import { ExpressivePressable } from "./expressive";
+import { useSpringValue } from "./motion";
+import { Animated } from "react-native";
 export { palette } from "./theme";
 export const styles = StyleSheet.create({
   shell: { flex: 1, backgroundColor: palette.paper },
@@ -54,25 +58,19 @@ export const styles = StyleSheet.create({
     backgroundColor: palette.white,
     borderWidth: 1,
     borderColor: palette.line,
-    borderRadius: 20,
+    borderRadius: shape.large,
     padding: 20,
     gap: 16,
   },
   title: {
-    fontSize: 30,
-    fontWeight: "800",
+    ...typography.headline,
     color: palette.ink,
-    letterSpacing: -1,
-    lineHeight: 37,
   },
   heading: {
-    fontSize: 19,
-    fontWeight: "700",
+    ...typography.title,
     color: palette.ink,
-    letterSpacing: -0.4,
-    lineHeight: 27,
   },
-  text: { fontSize: 17, color: palette.ink, lineHeight: 27 },
+  text: { ...typography.body, color: palette.ink },
   muted: { fontSize: 13, color: palette.muted, lineHeight: 20 },
   eyebrow: {
     fontSize: 11,
@@ -82,7 +80,7 @@ export const styles = StyleSheet.create({
   },
   button: {
     minHeight: 54,
-    borderRadius: 16,
+    borderRadius: 28,
     paddingVertical: 15,
     paddingHorizontal: 20,
     backgroundColor: palette.primary,
@@ -97,8 +95,8 @@ export const styles = StyleSheet.create({
     color: palette.white,
     lineHeight: 22,
   },
-  secondary: { backgroundColor: palette.softPrimary },
-  secondaryText: { color: palette.primary },
+  secondary: { backgroundColor: palette.primaryContainer },
+  secondaryText: { color: palette.onPrimaryContainer },
   disabled: { opacity: 0.45 },
   input: {
     flex: 1,
@@ -117,7 +115,7 @@ export const styles = StyleSheet.create({
   option: {
     borderWidth: 1.5,
     borderColor: palette.line,
-    borderRadius: 18,
+    borderRadius: shape.large,
     padding: 16,
     minHeight: 64,
     flexDirection: "row",
@@ -175,26 +173,25 @@ export function Button({
   const color = danger
     ? palette.red
     : secondary
-      ? palette.primary
+      ? palette.onPrimaryContainer
       : palette.white;
   return (
-    <Pressable
+    <ExpressivePressable
       accessibilityRole="button"
       accessibilityLabel={children}
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={({ pressed }) => [
+      style={[
         styles.button,
         secondary && styles.secondary,
         danger && { backgroundColor: palette.softRed },
         disabled && styles.disabled,
-        pressed && !disabled && { opacity: 0.8, transform: [{ scale: 0.985 }] },
       ]}
     >
       {Icon && <Icon size={19} color={color} strokeWidth={2} />}
       <Text style={[styles.buttonText, { color }]}>{children}</Text>
-    </Pressable>
+    </ExpressivePressable>
   );
 }
 export function IconButton({
@@ -207,15 +204,16 @@ export function IconButton({
   onPress: () => void;
 }) {
   return (
-    <Pressable
+    <ExpressivePressable
       accessibilityRole="button"
       accessibilityLabel={label}
       onPress={onPress}
       hitSlop={4}
-      style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.6 }]}
+      radius={23}
+      style={styles.iconButton}
     >
       <Icon size={23} color={palette.ink} strokeWidth={1.8} />
-    </Pressable>
+    </ExpressivePressable>
   );
 }
 export function TextLink({
@@ -604,6 +602,10 @@ export function Option({
   disabled: boolean;
   onPress: () => void;
 }) {
+  const selection = useSpringValue(
+    selected || correct || incorrect ? 1 : 0,
+    "effects",
+  );
   const color = correct
     ? palette.success
     : incorrect
@@ -616,6 +618,8 @@ export function Option({
       accessibilityRole="radio"
       accessibilityLabel={text}
       accessibilityState={{ checked: selected, disabled }}
+      aria-checked={selected}
+      aria-disabled={disabled}
       disabled={disabled}
       onPress={onPress}
       style={({ pressed }) => [
@@ -629,11 +633,14 @@ export function Option({
         pressed && { opacity: 0.8 },
       ]}
     >
-      <View
+      <Animated.View
         style={{
           width: 32,
           height: 32,
-          borderRadius: 11,
+          borderRadius: selection.interpolate({
+            inputRange: [0, 1],
+            outputRange: [shape.small, 16],
+          }),
           backgroundColor: correct
             ? palette.success
             : incorrect
@@ -658,8 +665,8 @@ export function Option({
             {label}
           </Text>
         )}
-      </View>
-      <Text style={[styles.text, { flex: 1, fontSize: 15 }]}>
+      </Animated.View>
+      <Text style={[styles.text, { flex: 1 }]}>
         {text}
         {correct ? " · Doğru cevap" : ""}
       </Text>
