@@ -39,6 +39,14 @@ Kamerayla Expo QR kodunu tarayıp Expo Go'da açın; iOS yerel ağ iznini istiyo
 
 9 Ekim 2026 yerel hazırlığında özel ağ üzerinden API/web erişimi, mobil login endpoint validation, web origin CORS, iOS Expo manifesti, LAN adresleri gömülü native geliştirme bundle'ı ve QR çözümleme kontrol edildi. Fiziksel iPhone'da açma, giriş ve yeniden açılış kontrolü kullanıcının Expo oturumu ve cihaz erişimiyle ayrıca doğrulanmalıdır.
 
+### Telefon yerel sunucuya ulaşamıyorsa
+
+Önce iPhone Safari'de `http://MAC_IP:8081/status` açılmalı ve `packager-status:running` görülmelidir. API için `http://MAC_IP:8002/up` ayrıca kontrol edilir. Mac'in kendi adresine yaptığı başarılı istek, telefon bağlantısını doğrulamaz. Aynı Wi-Fi adı ve aynı IP aralığı da erişimi garanti etmez; misafir ağı/cihaz izolasyonu veya VPN yerel bağlantıyı engelleyebilir. Expo Go için [Yerel Ağ iznini](https://support.apple.com/en-gb/102229) kontrol edin.
+
+[Expo tüneli](https://docs.expo.dev/more/expo-cli/#tunneling) geliştirme paketini taşır; API'yi kendiliğinden erişilebilir yapmaz. Yerel bağlantı engelliyse mobil paketin API ayarı da erişilebilir HTTPS adresine yönelmelidir. [Cloudflare Quick Tunnel](https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/) geçici bir HTTPS adresi sağlayabilir; tünel süreci kapanınca adres çalışmaz. Yerel geliştirme API'sini doğrudan herkese açmayın; önizleme erişimini ayrıca sınırlandırın.
+
+10 Ekim 2026 bu cihazdaki LAN bağlantısı Safari'de başarısız kaldı. Geçici HTTPS önizlemesi rastgele erişim anahtarı isteyen bir geçit üzerinden hazırlandı; anahtarsız erişim, yönetici API yolları ve yol geçişi reddedildi. Expo manifestinin hesap bilgisi ve native iOS paketinin HTTPS API ayarı kontrol edildi; paket HTTPS üzerinden indirildi, kimliksiz API isteği `401`, eksik giriş isteği `422` döndü. Yeni QR kodu çözülerek adresi doğrulandı. Tünel, geçit, anahtar ve QR dosyaları `artifacts/iphone-preview/https/` içinde git dışındadır; normal `.env.local` LAN ayarı korunur. Bu sunucu kontrolleri fiziksel iPhone'da açılış ve giriş kanıtı değildir; o kontrol henüz bekleniyor. Bu erişim App Store/TestFlight dağıtımı değildir.
+
 ## Oturum ve e-posta
 
 Mobil `/auth/mobile-tokens` cihaz UUID'siyle finite Bearer token verir. Token/expiry ve cihaz kimliği native [SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore/) içindedir; parola tutulmaz. Yeniden açılışta kayıt yüklenir ve `/me` doğrulanır; 401/aktif olmayan hesap ekranları kapatır. Logout sunucudaki tokenı iptal eder ve secure kaydı siler. Aynı cihaz girişi eski cihaz tokenını iptal eder; diğer cihazlar bağımsızdır. Eski tokenın gecikmiş 401'i yeni oturumu silemez.
