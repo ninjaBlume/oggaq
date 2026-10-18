@@ -235,7 +235,7 @@ SQL;
         $this->assertSame(['Birinci soru; (a) \'tırnak\'', "İkinci soru & ilk yardım\nsatır", "Silah'ın ağırlığı nedir?", 'Seçeneği olmayan soru'], $armed->questions()->with('questionVersion')->get()->map(fn ($row) => $row->questionVersion->stem)->all());
         $unarmed = OfficialExam::where('title', 'like', 'ÖGG 107%Silahsız')->firstOrFail();
         $this->assertSame(3, $unarmed->questions()->count());
-        $this->assertStringContainsString('ders sırasına göre', OfficialExam::where('exam_number', '100')->firstOrFail()->title);
+        $this->assertSame('ÖGG 100. Temel Eğitim Sınavı (30.10.2022) — Silahlı', OfficialExam::where('exam_number', '100')->where('title', 'like', '%Silahlı')->firstOrFail()->title);
         $draft = Question::whereNull('published_version_id')->firstOrFail()->latestVersion;
         $this->assertSame('Seçeneği olmayan soru', $draft->stem);
         $this->assertSame(0, $draft->options()->count());

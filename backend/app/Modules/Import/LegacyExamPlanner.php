@@ -194,7 +194,7 @@ class LegacyExamPlanner
                 $label = $variant === 'silahli' ? 'Silahlı' : 'Silahsız';
                 $exams[] = [
                     'key' => "{$number}:{$variant}", 'number' => $number, 'variant' => $variant, 'date' => $dates[$number], 'year' => $year,
-                    'term' => self::MONTHS[$month], 'title' => sprintf('ÖGG %d. Temel Eğitim Sınavı (%02d.%02d.%d) — %s%s', $number, $day, $month, $year, $label, $reconstructed ? ' — ders sırasına göre (özgün sıra bilinmiyor)' : ''),
+                    'term' => self::MONTHS[$month], 'title' => sprintf('ÖGG %d. Temel Eğitim Sınavı (%02d.%02d.%d) — %s', $number, $day, $month, $year, $label),
                     'hashes' => $list, 'reconstructed_order' => $reconstructed,
                     'publishable' => ! in_array(false, array_map(fn ($hash) => $complete[$hash], $list), true),
                 ];
