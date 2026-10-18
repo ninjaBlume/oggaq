@@ -66,11 +66,26 @@ Kapsam [STUDY](STUDY.md), kurulum [öğrenci README](../apps/web/README.md) içi
 
 [EXAMS](EXAMS.md), [MOBILE](MOBILE.md); iki upstream Expo build advisory'si açık.
 
-## Sıradaki işler — resmî sınav şablonları ve ilerleme
+## Altıncı teslim — deneme sağlamlaştırma, tekrar/istatistik ve çıkmış sınav (18 Ekim 2026)
+
+Yerel PHP 8.4.26 / PostgreSQL 18.6 / Node 24.22 ile doğrulandı: 126 backend testi (875 assertion), Pint, OpenAPI lint, `generate:api`, 35 Vitest, strict tip, admin/web build ve 37 Chromium E2E (admin, web, mobil Expo web export) geçti. Native Android/iOS derlemesi ve fiziksel cihaz yeniden denenmedi.
+
+- [x] Deneme cevap çakışması deneme geneli yerine cevap bazına indirildi (`exam_answers.changed_revision`).
+- [x] Rastgele deneme seçimi soru satırı kilidi almıyor; yayımlama beklemiyor.
+- [x] Geçmiş listesi salt okunur; süre dolumu `exams:expire` veya denemeyi açma ile.
+- [x] Yanlışlarım/boşlarım/favorilerim (`review-questions`, `favorites`) ve `stats` API'si.
+- [x] Çıkmış sınav modeli (`official_exams*`), yönetici taslak/yayım uçları, öğrenci künye uçları ve `official_exam_id` ile orijinal sıralı deneme; DB trigger'ları.
+- [x] `packages/shared-types` `npm run generate:api` ile yenilendi.
+- [x] Web: Tekrar, Başarım, favori ve çıkmış sınav seçimi; yönetim paneli: çıkmış sınav oluşturma/sıralama/yayımlama; mobil: yan menüde Tekrar ve Başarım, favori, çıkmış sınav denemesi.
+- [x] Mobil ana sayfada Tekrar/Başarım kısayolları (Başarım karosu doğruluğu gösterir) ve sınav sonuç ekranından favoriye ekleme.
+- [x] `symfony/http-foundation` 7.4.21'e güncellendi; `composer audit` temiz.
+- [ ] Gerçek çıkmış sınav verisi (import onayı gerekir).
+
+## Sıradaki işler — kurum şablonları ve raporlar
 
 Ders, konu ve gerekirse alt konu; soru/seçenek/görsel/kaynak sürümleri; sınav türü/numarası/yıl/dönem; resmî sınavın özgün soru sırası ve cevap anahtarı. Bir soru birden çok sınavda kullanılabilir. Alıştırma ile süreli sınavın kuralları ayrılır; doğrulanmamış resmî sayı/süre/başarı koşulu sabitlenmez.
 
-Deneme, cevap ve merkezi değerlendirme; geçmiş sonucun soru/kural değişikliklerinden korunması. Yanlışlar, boş bırakılanlar, favoriler ve başarı projeksiyonları. Kabul kapısı gerçek PostgreSQL işlemleri, context/tenant policies, sürümleme ve puanlama testleri, gerçek API/OpenAPI tutarlılığıdır.
+Deneme, cevap ve merkezi değerlendirme; geçmiş sonucun soru/kural değişikliklerinden korunması. Yanlışlar, boş bırakılanlar, favoriler ve başarı API'si altıncı teslimde eklendi; kurum raporları ve ekranlar sürer. Kabul kapısı gerçek PostgreSQL işlemleri, context/tenant policies, sürümleme ve puanlama testleri, gerçek API/OpenAPI tutarlılığıdır.
 
 Kurumlara özel sorular/sınavlar gelecekte ayrı sahiplik/yayın kapsamı taşıyacak; merkezi havuza otomatik katılmayacak. İlk QuestionBank migration'ları yalnız merkezi tabloları oluşturur; kurum içerik modeli veya yetkisi eklenmedi. Kurum içeriği merkezi endpoint'lere tenant alanı ekleyerek açılmayacak.
 

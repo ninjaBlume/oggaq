@@ -2,11 +2,13 @@ import { Pressable, Text, View } from "react-native";
 import {
   ArrowRight,
   BookOpen,
+  ChartColumn,
   ChevronRight,
   Clock3,
   GraduationCap,
   History,
   Layers3,
+  ListChecks,
   Play,
 } from "./icons";
 import type { StudyContext, User } from "@oggaq/shared-types";
@@ -32,6 +34,8 @@ export function Home({
   questions,
   exams,
   history,
+  review,
+  stats,
   practice,
   exam,
 }: {
@@ -40,6 +44,8 @@ export function Home({
   questions: (subject?: string) => void;
   exams: () => void;
   history: () => void;
+  review: () => void;
+  stats: () => void;
   practice: (id: string) => void;
   exam: (id: string) => void;
 }) {
@@ -51,6 +57,19 @@ export function Home({
       }),
     [],
   );
+  // Quiet shortcut data: a failed request only hides the accuracy hint.
+  const summary = useResource(
+    (signal) =>
+      api.request("get", "/api/v1/contexts/{context}/stats", {
+        signal,
+        params: { context: context.id },
+      }),
+    [context.id],
+  );
+  useOnReturn(() => {
+    void summary.reload();
+  });
+  const accuracy = summary.data?.data.answers.accuracy_percent;
   const recent = useResource(
     (signal) =>
       api.request("get", "/api/v1/contexts/{context}/practice-attempts", {
@@ -128,8 +147,8 @@ export function Home({
           </Button>
         </View>
       </Enter>
-      <View style={{ flexDirection: "row", gap: 12 }}>
-        {[
+      {[
+        [
           {
             title: "Soru çöz",
             text: "Konunu seç, öğren",
@@ -146,7 +165,31 @@ export function Home({
             bg: palette.secondaryContainer,
             color: palette.onSecondaryContainer,
           },
-        ].map(({ title, text, icon: Icon, press, bg, color }) => (
+        ],
+        [
+          {
+            title: "Tekrar",
+            text: "Yanlış, boş ve favorilerin",
+            icon: ListChecks,
+            press: review,
+            bg: palette.secondaryContainer,
+            color: palette.onSecondaryContainer,
+          },
+          {
+            title: "Başarım",
+            text:
+              typeof accuracy === "number"
+                ? `Doğruluk %${accuracy.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}`
+                : "İlerlemeni gör",
+            icon: ChartColumn,
+            press: stats,
+            bg: palette.primaryContainer,
+            color: palette.onPrimaryContainer,
+          },
+        ],
+      ].map((row) => (
+      <View key={row[0]!.title} style={{ flexDirection: "row", gap: 12 }}>
+        {row.map(({ title, text, icon: Icon, press, bg, color }) => (
           <ExpressivePressable
             key={title}
             radius={title === "Soru çöz" ? shape.large : shape.extraLarge}
@@ -181,6 +224,7 @@ export function Home({
           </ExpressivePressable>
         ))}
       </View>
+      ))}
       {recentExams.error && (
         <ErrorNotice
           error={recentExams.error}

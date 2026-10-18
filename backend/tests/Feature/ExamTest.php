@@ -114,15 +114,36 @@ class ExamTest extends TestCase
         $this->assertDatabaseCount('exam_attempts', 1);
     }
 
-    public function test_stale_different_answer_and_finish_cannot_overwrite_other_device(): void
+    public function test_stale_revision_conflicts_only_for_the_changed_answer_and_finish_needs_latest(): void
     {
         $this->pool();
         $this->asToken($this->createUser());
         $exam = $this->start();
         $new = $this->answer($exam, 0, 0);
-        $this->putJson($this->url($exam, '/answers/'.$exam['questions'][1]['id']), ['base_version' => 1, 'selected_option_id' => $exam['questions'][1]['question']['options'][1]['id']])->assertConflict()->assertJsonPath('code', 'version_conflict');
+        $first = $exam['questions'][0];
+        $second = $exam['questions'][1];
+        // Another question answered with the pre-change revision is an independent write and succeeds.
+        $this->putJson($this->url($exam, '/answers/'.$second['id']), ['base_version' => 1, 'selected_option_id' => $second['question']['options'][1]['id']])->assertOk()->assertJsonPath('data.revision', 3)->assertJsonPath('data.questions.1.selected_option_id', $second['question']['options'][1]['id']);
+        // The same question changed to a different value after the client's revision still conflicts.
+        $this->putJson($this->url($exam, '/answers/'.$first['id']), ['base_version' => 1, 'selected_option_id' => $first['question']['options'][1]['id']])->assertConflict()->assertJsonPath('code', 'version_conflict');
+        // Repeating the already saved value with a stale revision is a safe no-op.
+        $this->putJson($this->url($exam, '/answers/'.$first['id']), ['base_version' => 1, 'selected_option_id' => $first['question']['options'][0]['id']])->assertOk()->assertJsonPath('data.revision', 3);
         $this->postJson($this->url($exam, '/finish'), ['base_version' => 1])->assertConflict();
-        $this->getJson($this->url($exam))->assertOk()->assertJsonPath('data.revision', $new['revision'])->assertJsonPath('data.questions.1.selected_option_id', null);
+        $this->getJson($this->url($exam))->assertOk()->assertJsonPath('data.revision', 3)->assertJsonPath('data.questions.0.selected_option_id', $new['questions'][0]['selected_option_id']);
+    }
+
+    public function test_exam_questions_report_the_contexts_favorites_before_and_after_finishing(): void
+    {
+        $this->pool();
+        $this->asToken($this->createUser());
+        $exam = $this->start();
+        $this->assertSame([false, false, false], array_column($exam['questions'], 'is_favorite'));
+        $favorite = $exam['questions'][1]['question_id'];
+        $this->putJson('/api/v1/contexts/'.$exam['context_id'].'/favorites/'.$favorite)->assertOk();
+        $done = $this->postJson($this->url($exam, '/finish'), ['base_version' => 1])->assertOk()->json('data');
+        $this->assertSame([false, true, false], array_column($done['questions'], 'is_favorite'));
+        $this->deleteJson('/api/v1/contexts/'.$exam['context_id'].'/favorites/'.$favorite)->assertOk();
+        $this->getJson($this->url($exam))->assertOk()->assertJsonPath('data.questions.1.is_favorite', false);
     }
 
     public function test_deadline_ignores_late_answer_and_ends_at_original_deadline(): void
@@ -151,15 +172,21 @@ class ExamTest extends TestCase
         $this->assertDatabaseHas('exam_attempts', ['id' => $exam['id'], 'finish_reason' => 'expired', 'revision' => 2, 'blank_count' => 3]);
     }
 
-    public function test_read_and_history_expire_attempts_without_scheduler(): void
+    public function test_opening_an_attempt_expires_it_but_history_listing_never_writes(): void
     {
         $this->pool();
         $this->asToken($this->createUser());
         $exam = $this->start();
         $this->start();
         $this->travel(60)->seconds();
+        $list = '/api/v1/contexts/'.$exam['context_id'].'/exam-attempts';
+        $this->getJson($list)->assertOk()->assertJsonCount(2, 'data')->assertJsonPath('data.0.status', 'active')->assertJsonPath('data.1.status', 'active')->assertJsonMissingPath('data.0.questions');
+        $this->assertDatabaseCount('exam_attempts', 2);
+        $this->assertSame(2, ExamAttempt::whereNull('finished_at')->count());
         $this->getJson($this->url($exam))->assertOk()->assertJsonPath('data.status', 'completed');
-        $this->getJson('/api/v1/contexts/'.$exam['context_id'].'/exam-attempts')->assertOk()->assertJsonCount(2, 'data')->assertJsonPath('data.0.status', 'completed')->assertJsonMissingPath('data.0.questions');
+        $this->artisan('exams:expire')->assertSuccessful();
+        $this->getJson($list)->assertOk()->assertJsonPath('data.0.status', 'completed')->assertJsonPath('data.1.status', 'completed');
+        $this->assertSame(0, ExamAttempt::whereNull('finished_at')->count());
     }
 
     public function test_insufficient_pool_rolls_back_all_records(): void

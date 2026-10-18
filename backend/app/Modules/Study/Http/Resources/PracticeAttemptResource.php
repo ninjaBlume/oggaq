@@ -16,7 +16,7 @@ class PracticeAttemptResource extends JsonResource
             'id' => $this->id, 'context_id' => $this->study_context_id, 'question_id' => $this->question_id,
             'question' => new QuestionVersionResource($this->questionVersion),
             'created_at' => $this->created_at->toISOString(), 'answered_at' => $this->answered_at?->toISOString(),
-            'selected_option_id' => $this->selected_option_id,
+            'selected_option_id' => $this->selected_option_id, 'is_favorite' => $this->isFavorite(),
             'outcome' => ! $answered ? 'pending' : ($this->selected_option_id === null ? 'skipped' : ($this->is_correct ? 'correct' : 'incorrect')),
             'feedback' => $answered ? [
                 'correct_option_id' => $this->questionVersion->correct_option_id,

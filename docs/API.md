@@ -6,9 +6,13 @@ Durum: Identity/Tenancy/QuestionBank/Study/Exams için [OpenAPI sözleşmesi](op
 
 Kayıt, web giriş, mobil token, logout, forgot/reset, verification/resend, profil GET/PATCH; `/me/contexts`, `/contexts/{context}`; `/admin/tenants` GET/POST; kurum profili/üye listesi/detail; `/admin/tenants/{tenant}/memberships` POST ve `/admin/tenants/{tenant}/memberships/{membership}` DELETE.
 
-QuestionBank: `/subjects`, `/exam-types`, `/subjects/{subject}/topics` GET; `/admin/subjects`, `/admin/topics`, `/admin/exam-types`, `/admin/question-sources` GET/POST; `/admin/questions` GET/POST; `/admin/questions/{question}` GET/PATCH; `/admin/questions/{question}/publish` POST; `/admin/questions/{question}/versions` GET; `/questions`, `/questions/{question}` GET. `/sanctum/csrf-cookie` ve dört Study işlemiyle beş Exams işlemiyle toplam 48 operasyon vardır. Yollar `/api/v1` öneki taşır; ayrıntı ve örnekler [QUESTION_BANK](QUESTION_BANK.md) içindedir.
+QuestionBank: `/subjects`, `/exam-types`, `/subjects/{subject}/topics` GET; `/admin/subjects`, `/admin/topics`, `/admin/exam-types`, `/admin/question-sources` GET/POST; `/admin/questions` GET/POST; `/admin/questions/{question}` GET/PATCH; `/admin/questions/{question}/publish` POST; `/admin/questions/{question}/versions` GET; `/questions`, `/questions/{question}` GET. `/sanctum/csrf-cookie`, dört Study işlemi, beş Exams işlemi, çıkmış sınav için `/official-exams` GET (liste/detay) ve `/admin/official-exams` (GET/POST, `{officialExam}` GET/PUT, `/publish` POST) ile Study tekrar/istatistik uçları (`review-questions`, `favorites`, `stats`) toplam 58 operasyon oluşturur. Yollar `/api/v1` öneki taşır; ayrıntı ve örnekler [QUESTION_BANK](QUESTION_BANK.md) içindedir.
 
 Üyelik oluşturma/iptal şimdilik platform yöneticisine açıktır; kurum yöneticisi üyeleri okuyabilir. Öğrenciye ait context endpoint'i yalnız o öğrencinindir. Doğrulama e-postası web `/verify-email` formuna gider; form imzalı verification GET çağırır; aynı kullanıcı girişi gerekir. Mobilde Bearer kimliği de desteklenir.
+
+Study tekrar ve istatistik: `GET /contexts/{context}/review-questions?kind=incorrect|blank|favorite` (son değerlendirilmiş sonuca göre yanlışlar/boşlar veya bağlam favorileri, cevap anahtarı yok), `PUT|DELETE /contexts/{context}/favorites/{question}` (idempotent açık durum; toggle yok) ve `GET /contexts/{context}/stats` (cevap/ders kırılımı ve tamamlanan deneme özeti). Ayrıntı [STUDY](STUDY.md#tekrar-listeleri-favoriler-ve-istatistik) içindedir.
+
+Çıkmış sınav: öğrenci yalnız yayımlanmış künyeyi listeler/görür; sorular `POST /contexts/{context}/exam-attempts` gövdesindeki `official_exam_id` ile sabit sırada ve sürümde gelir. Yönetim [QUESTION_BANK](QUESTION_BANK.md#çıkmış-sınavlar) içindedir.
 
 Study: `/contexts/{context}/practice-attempts` GET/POST; `/contexts/{context}/practice-attempts/{attempt}` GET; `/contexts/{context}/practice-attempts/{attempt}/answer` POST. Tek soru alıştırması, tekrar semantiği ve gizlilik [STUDY](STUDY.md) içindedir.
 
@@ -67,17 +71,16 @@ Study: `/contexts/{context}/practice-attempts` GET/POST; `/contexts/{context}/pr
 | --- | --- |
 | `GET /subjects`, `GET /subjects/{subject}/topics`, `GET /exam-types` | Uygulandı: merkezi sınıflandırmalar; taslak soru içermez |
 | `GET /questions`, `GET /questions/{question}` | Uygulandı: yayımlanmış sürüm, izinli filtreler; cevap/açıklama içermez |
-| `GET /exams`, `GET /exam-templates` | Yayınlanmış geçmiş sınav ve şablonlar |
+| `GET /official-exams`, `GET /official-exams/{officialExam}` | Uygulandı: yayımlanmış çıkmış sınav künyesi. `GET /exam-templates` (kurum/platform şablonları) planlıdır |
 | `POST /contexts/{context}/attempts` | Mod/şablon doğrulaması; pinned soru listesi |
 | `GET /contexts/{context}/attempts/{attempt}` | Sahiplik/bağlam doğrulanmış mevcut deneme |
 | `PUT /contexts/{context}/attempts/{attempt}/answers/{attempt_question}` | O sürümün seçeneği veya NULL; `base_version` |
 | `POST /contexts/{context}/attempts/{attempt}/finish` | Transaction içinde tek sonuç ve sunucu değerlendirmesi |
 | `GET /contexts/{context}/attempts/{attempt}/result` | Tamamlandıktan sonra sonuç/snapshot |
 | `GET /contexts/{context}/attempts` | Sayfalı çalışma/sınav geçmişi |
-| `GET /contexts/{context}/wrong-answers` | O bağlamdaki tekrar çalışılacak yanlışlar |
-| `GET /contexts/{context}/favorites` | O bağlamdaki favoriler |
-| `PUT /contexts/{context}/favorites/{question}` | `is_favorite` ve `base_version`; toggle yok |
-| `GET /contexts/{context}/progress` | Yetkili bağlamın türetilmiş istatistikleri |
+| `GET /contexts/{context}/review-questions?kind=` | Uygulandı: `incorrect`, `blank` (son sonuca göre) ve `favorite` listeleri |
+| `PUT/DELETE /contexts/{context}/favorites/{question}` | Uygulandı: idempotent favori ekleme/çıkarma; offline sürüm kuralı sync tasarımı kesinleşince eklenir |
+| `GET /contexts/{context}/stats` | Uygulandı: yetkili bağlamın cevap, ders ve deneme istatistikleri |
 
 Tablodaki yollar `/api/v1` önekiyle kullanılır. Answer endpoint'i `user_id`, `tenant_id`, `is_correct` veya score kabul etmez. Kişisel öğrenci route'ları şirket yöneticisinin öğrenciler arasında gezinme aracı değildir.
 

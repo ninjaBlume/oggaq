@@ -33,6 +33,10 @@ Palet/yan menü güncellemesinde strict TypeScript, 17 mobil birim testi, Expo D
 
 Strict TypeScript, 17 mobil birim testi, Expo Doctor 21/21 ve iOS/Android Hermes + web export geçti. Gerçek PostgreSQL/API ile 11 mobil Chromium E2E geçti: mevcut 9 çalışma/menü testine basış geri bildiriminin eylemi bozmaması, soru sayısı seçimi, 320/390/834px yerleşim ve canlı hareket azaltma tercihi eklendi. Ekran görüntüleri giriş animasyonu son durumuna ulaştıktan sonra alınır. Mevcut geçici HTTPS geçidinden indirilen iOS Expo Go UTF-8 JavaScript paketinde yeni başlık, renk rolleri, Expressive bileşenler ve korunmuş API taban yolu doğrulandı. Bu sürümün fiziksel iPhone animasyon/jest teyidi ve yeni native paket CI sonucu henüz yoktur; önceki başarılı native derlemeler yukarıdaki commit’lere aittir.
 
+## Tekrar, başarı ve çıkmış sınav
+
+Alt sekme çubuğu beş ana sekmede kalır. Ana sayfada Tekrar ve Başarım karoları bulunur (Başarım karosu mevcut doğruluk yüzdesini gösterir; istatistik alınamazsa yalnızca ipucu gizlenir). Yan menüde ek olarak `Tekrar listelerim` (Yanlışlarım, Boşlarım, Favorilerim) ve `Başarı durumum` bulunur; soru çözme ekranında favori ekleme/çıkarma vardır. Deneme sekmesinde `Karışık` veya `Çıkmış sınav` seçilir; çıkmış sınavda sorular orijinal sırasıyla gelir. API ayrıntıları [STUDY](STUDY.md#tekrar-listeleri-favoriler-ve-istatistik) ve [EXAMS](EXAMS.md) içindedir. Doğrulama: Expo web export üzerinde Chromium E2E (`mobile.spec.ts` yeni senaryo), strict tip ve 17 birim testi geçti; native paket derlemesi ve fiziksel cihaz bu değişiklik için yeniden denenmedi.
+
 ## Çalıştırma
 
 Node 24 ve yerel API/servisleri hazırlayın. Kökte `npm ci --ignore-scripts`; `npm run dev:mobile` Expo'yu loopback'te açar. Xcode bulunan Mac'te `npm run ios --workspace @oggaq/mobile`; Android SDK/JDK ile `npm run android --workspace @oggaq/mobile`. [Expo yerel geliştirme](https://docs.expo.dev/guides/local-app-development/) gerekli araçları açıklar. [SDK matrisi](https://docs.expo.dev/versions/latest/) SDK 57 için Xcode 26.4+, iOS 16.4+, Android 7+ ve compile/target SDK 36 belirtir.

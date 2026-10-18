@@ -2,7 +2,7 @@
   "openapi": "3.1.2",
   "info": {
     "title": "OGGAQ Backend API",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Uygulanmış Identity, Tenancy ve merkezi QuestionBank API uçları. Arayüz, sınav/cevap değerlendirme, import ve offline uçları henüz yoktur."
   },
   "servers": [
@@ -2497,7 +2497,7 @@
       "get": {
         "operationId": "listExams",
         "summary": "Bağlama ait süreli deneme geçmişi",
-        "description": "Süresi dolan kayıtları tamamlar. started_at/id ile cursor sırası; yalnız sahibi ve aktif üyelik.",
+        "description": "Salt okunur: süresi dolmuş ama henüz kapatılmamış kayıtlar status=active döner (deadline_at < server_time); kayıt zamanlanmış exams:expire komutuyla veya açıldığında tamamlanır. started_at/id ile cursor sırası; yalnız sahibi ve aktif üyelik.",
         "tags": [
           "Exams"
         ],
@@ -2571,8 +2571,8 @@
       },
       "post": {
         "operationId": "startExam",
-        "summary": "Rastgele yayımlanmış sorularla süreli çalışma başlatma",
-        "description": "UUID id ve aynı ayarlar tekrarında aynı deneme. Farklı ayarlar/bağlam 409; yetersiz havuz 422. Sorular başlangıç sürümüne sabitlenir. Kullanıcının seçtiği süre ve doğru yüzdesi çalışma amaçlıdır; resmî sınav şablonu değildir.",
+        "summary": "Rastgele sorularla veya çıkmış sınav şablonuyla süreli çalışma başlatma",
+        "description": "UUID id ve aynı ayarlar tekrarında aynı deneme. Farklı ayarlar/bağlam 409; yetersiz havuz 422. official_exam_id verilirse yayımlanmış çıkmış sınavın tüm soruları orijinal sırası ve sabit sürümleriyle kopyalanır; süre kullanıcıya aittir ve resmî sınav süresi/geçme kuralı değildir. Sorular başlangıç sürümüne sabitlenir.",
         "tags": [
           "Exams"
         ],
@@ -2709,7 +2709,7 @@
       "put": {
         "operationId": "saveExamAnswer",
         "summary": "Süre içinde deneme cevabını kaydetme veya değiştirme",
-        "description": "base_version güncel revision olmalıdır; aynı kaydedilmiş cevap tekrarı eski revision ile de güvenlidir. Farklı eski cevap 409 version_conflict. null cevabı temizler. Biten/süresi dolan denemeye geç gelen yazı değiştirilmez; tamamlanmış kayıt 200 döner.",
+        "description": "base_version, istemcinin gördüğü deneme revision değeridir. Çakışma cevap bazındadır: aynı cevap istemcinin revision değerinden sonra başka bir değere değiştiyse 409 version_conflict; başka sorulara ait eski revision ile yazılar kabul edilir. Zaten kaydedilmiş aynı seçimin tekrarı revision artırmaz. null cevabı temizler. Biten/süresi dolan denemeye geç gelen yazı değiştirilmez; tamamlanmış kayıt 200 döner.",
         "tags": [
           "Exams"
         ],
@@ -2868,6 +2868,784 @@
             }
           }
         }
+      }
+    },
+    "/api/v1/contexts/{context}/review-questions": {
+      "get": {
+        "operationId": "listReviewQuestions",
+        "summary": "Yanlışlarım, boş bıraktıklarım ve favorilerim",
+        "description": "kind=incorrect|blank her sorunun bağlamdaki son değerlendirilmiş sonucuna göre; sonradan doğru çözülen soru listeden çıkar. Alıştırma ve tamamlanmış deneme cevapları dahildir. Dönen sorular güncel yayımlanmış sürümdür; cevap anahtarı/açıklama dönmez. kind=favorite bağlam favorileridir. id sırasıyla cursor.",
+        "tags": [
+          "Study"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "incorrect",
+                "blank",
+                "favorite"
+              ]
+            },
+            "required": true
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/contexts/{context}/favorites/{question}": {
+      "put": {
+        "operationId": "addFavoriteQuestion",
+        "summary": "Soruyu bağlam favorilerine ekleme",
+        "description": "Idempotent. Yalnız yayımlanmış sorular eklenebilir; favoriler kişisel/kurum bağlamları arasında paylaşılmaz.",
+        "tags": [
+          "Study"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FavoriteResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "question",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "removeFavoriteQuestion",
+        "summary": "Soruyu bağlam favorilerinden çıkarma",
+        "description": "Idempotent; favoride olmayan soru için de 200 döner.",
+        "tags": [
+          "Study"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FavoriteResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "question",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ]
+      }
+    },
+    "/api/v1/contexts/{context}/stats": {
+      "get": {
+        "operationId": "getStudyStats",
+        "summary": "Bağlam başarı istatistikleri",
+        "description": "Her değerlendirilmiş cevap (alıştırma ve tamamlanmış deneme) bir kez sayılır; boş cevap doğru sayılmaz. Ders kırılımı soru sürümünün dersine göredir. Yalnız bağlam sahibi ve aktif üyelik erişebilir.",
+        "tags": [
+          "Study"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudyStatsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ]
+      }
+    },
+    "/api/v1/official-exams": {
+      "get": {
+        "operationId": "listOfficialExams",
+        "summary": "Yayımlanmış çıkmış sınavları listeleme",
+        "description": "Yalnız yayımlanmış sınav künyesi; sorular ve cevap anahtarı dönmez. Sorular deneme başlatılınca sabit sürümleriyle gelir. year azalan, id artan cursor sırası.",
+        "tags": [
+          "Exams"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OfficialExamList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "exam_type_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1990,
+              "maximum": 2200
+            }
+          },
+          {
+            "name": "term",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 80
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/official-exams/{officialExam}": {
+      "get": {
+        "operationId": "showOfficialExam",
+        "summary": "Yayımlanmış çıkmış sınav künyesi",
+        "description": "Taslak sınavlar 404 döner.",
+        "tags": [
+          "Exams"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OfficialExamResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "officialExam",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/official-exams": {
+      "get": {
+        "operationId": "adminListOfficialExams",
+        "summary": "Çıkmış sınavları durumlarıyla listeleme",
+        "description": "Yalnız platform yöneticisi. Taslak ve yayımlanmış sınavlar; status filtresi.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOfficialExamList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          {
+            "name": "exam_type_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "term",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 80
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "published"
+              ]
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createOfficialExam",
+        "summary": "Çıkmış sınav taslağı oluşturma",
+        "description": "Sıralı question_version_ids orijinal soru sırasını ve cevap anahtarlarını yayımlanmış sürümlere sabitler. Sınav türü, yıl, dönem ve numara tekil olmalıdır (409 duplicate_official_exam). Aynı soru başka sınavlarda da kullanılabilir.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOfficialExamResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfficialExamInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/official-exams/{officialExam}": {
+      "get": {
+        "operationId": "adminShowOfficialExam",
+        "summary": "Çıkmış sınavı soruları ve cevap anahtarıyla görüntüleme",
+        "description": "Yalnız platform yöneticisi.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOfficialExamResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "officialExam",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ]
+      },
+      "put": {
+        "operationId": "replaceOfficialExam",
+        "summary": "Taslak çıkmış sınavı tamamen değiştirme",
+        "description": "Yalnız yayımlanmamış taslak; yayımlanmış sınav 409 already_published verir. Soru listesi ve künye tam snapshot olarak değiştirilir.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOfficialExamResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "officialExam",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfficialExamInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/official-exams/{officialExam}/publish": {
+      "post": {
+        "operationId": "publishOfficialExam",
+        "summary": "Çıkmış sınavı yayımlama",
+        "description": "Idempotent. 1–100 soru gerekir. Yayımdan sonra künye, soru sırası ve sürümleri PostgreSQL trigger'larıyla değiştirilemez.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOfficialExamResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "officialExam",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ]
       }
     }
   },
@@ -4446,6 +5224,10 @@
                 "type": "null"
               }
             ]
+          },
+          "is_favorite": {
+            "type": "boolean",
+            "description": "Soru bu bağlamın favorilerinde mi."
           }
         },
         "required": [
@@ -4457,7 +5239,8 @@
           "answered_at",
           "selected_option_id",
           "outcome",
-          "feedback"
+          "feedback",
+          "is_favorite"
         ]
       },
       "PracticeAttemptResponse": {
@@ -4606,6 +5389,16 @@
                 "type": "null"
               }
             ]
+          },
+          "official_exam": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OfficialExamRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -4623,7 +5416,8 @@
           "server_time",
           "finished_at",
           "finish_reason",
-          "result"
+          "result",
+          "official_exam"
         ]
       },
       "ExamQuestion": {
@@ -4659,6 +5453,10 @@
                 "type": "null"
               }
             ]
+          },
+          "is_favorite": {
+            "type": "boolean",
+            "description": "Soru bu bağlamın favorilerinde mi; favoriler PUT/DELETE /contexts/{context}/favorites/{question} ile değişir."
           }
         },
         "required": [
@@ -4667,7 +5465,8 @@
           "position",
           "question",
           "selected_option_id",
-          "feedback"
+          "feedback",
+          "is_favorite"
         ]
       },
       "ExamAttempt": {
@@ -4762,6 +5561,16 @@
             "items": {
               "$ref": "#/components/schemas/ExamQuestion"
             }
+          },
+          "official_exam": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OfficialExamRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -4780,7 +5589,8 @@
           "finished_at",
           "finish_reason",
           "result",
-          "questions"
+          "questions",
+          "official_exam"
         ]
       },
       "ExamAttemptResponse": {
@@ -4826,7 +5636,8 @@
           "question_count": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 100
+            "maximum": 100,
+            "description": "Rastgele deneme için zorunlu; official_exam_id ile birlikte gönderilemez."
           },
           "duration_seconds": {
             "type": "integer",
@@ -4846,11 +5657,15 @@
               "null"
             ],
             "format": "uuid"
+          },
+          "official_exam_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Yayımlanmış çıkmış sınav. Soru sayısı, sırası ve sürümleri şablondan gelir; question_count/subject_id/topic_id gönderilemez."
           }
         },
         "required": [
           "id",
-          "question_count",
           "duration_seconds"
         ]
       },
@@ -4912,6 +5727,510 @@
           "correct_option_id",
           "explanation",
           "outcome"
+        ]
+      },
+      "OfficialExamRef": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer"
+          },
+          "term": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "exam_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "year",
+          "term",
+          "exam_number"
+        ]
+      },
+      "OfficialExam": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "exam_type_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "year": {
+            "type": "integer"
+          },
+          "term": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 80
+          },
+          "exam_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 40
+          },
+          "question_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuestionSource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "published_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "exam_type_id",
+          "year",
+          "term",
+          "exam_number",
+          "question_count",
+          "source",
+          "published_at"
+        ]
+      },
+      "AdminOfficialExamQuestion": {
+        "type": "object",
+        "properties": {
+          "position": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "question_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "question": {
+            "$ref": "#/components/schemas/AdminQuestionVersion"
+          }
+        },
+        "required": [
+          "position",
+          "question_id",
+          "question"
+        ]
+      },
+      "AdminOfficialExam": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "exam_type_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "year": {
+            "type": "integer"
+          },
+          "term": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 80
+          },
+          "exam_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 40
+          },
+          "question_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuestionSource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "published_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminOfficialExamQuestion"
+            },
+            "description": "Yalnız tekil görüntüleme ve kayıt yanıtlarında bulunur."
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "exam_type_id",
+          "year",
+          "term",
+          "exam_number",
+          "question_count",
+          "source",
+          "published_at",
+          "status",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "OfficialExamInput": {
+        "type": "object",
+        "properties": {
+          "exam_type_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "source_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "year": {
+            "type": "integer",
+            "minimum": 1990,
+            "maximum": 2200
+          },
+          "term": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 80
+          },
+          "exam_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 40
+          },
+          "question_version_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Yayımlanmış soru sürümleri; dizi sırası orijinal sınav sırasıdır. Aynı soru bir kez eklenir."
+          }
+        },
+        "required": [
+          "exam_type_id",
+          "title",
+          "year",
+          "question_version_ids"
+        ],
+        "additionalProperties": false
+      },
+      "OfficialExamResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/OfficialExam"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "OfficialExamList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OfficialExam"
+            }
+          },
+          "links": {
+            "$ref": "#/components/schemas/CursorLinks"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/CursorMeta"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "AdminOfficialExamResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AdminOfficialExam"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "AdminOfficialExamList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminOfficialExam"
+            }
+          },
+          "links": {
+            "$ref": "#/components/schemas/CursorLinks"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/CursorMeta"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "FavoriteState": {
+        "type": "object",
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "favorite": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "question_id",
+          "favorite"
+        ]
+      },
+      "FavoriteResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/FavoriteState"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "AnswerCounts": {
+        "type": "object",
+        "properties": {
+          "correct": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "incorrect": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "blank": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "accuracy_percent": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "correct",
+          "incorrect",
+          "blank",
+          "total",
+          "accuracy_percent"
+        ]
+      },
+      "SubjectStats": {
+        "type": "object",
+        "properties": {
+          "subject_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "correct": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "incorrect": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "blank": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "accuracy_percent": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "subject_id",
+          "name",
+          "correct",
+          "incorrect",
+          "blank",
+          "total",
+          "accuracy_percent"
+        ]
+      },
+      "ExamStats": {
+        "type": "object",
+        "properties": {
+          "completed": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "average_score_percent": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "best_score_percent": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "completed",
+          "average_score_percent",
+          "best_score_percent"
+        ]
+      },
+      "StudyStats": {
+        "type": "object",
+        "properties": {
+          "answers": {
+            "$ref": "#/components/schemas/AnswerCounts"
+          },
+          "exams": {
+            "$ref": "#/components/schemas/ExamStats"
+          },
+          "subjects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubjectStats"
+            }
+          }
+        },
+        "required": [
+          "answers",
+          "exams",
+          "subjects"
+        ]
+      },
+      "StudyStatsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/StudyStats"
+          }
+        },
+        "required": [
+          "data"
         ]
       }
     },

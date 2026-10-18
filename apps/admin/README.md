@@ -52,3 +52,5 @@ npm run test:e2e
 E2E yalnız `oggaq_test` veritabanını yeniden oluşturur ve sonunda temizler; mevcut test verileri korunmaz. PHP fixture guard'ı diğer veritabanlarını reddeder. Backend PHPUnit ve E2E'yi aynı anda çalıştırmayın. E2E, `8001` API, `5183` öğrenci ve `5184` panel portlarını kendi açıp kapatır; bu portlarda başka süreç varken mevcut sunucuyu yeniden kullanmaz. Normal `5174` panel sunucusu testlerce kullanılmaz. Test cache/session'ı izole PostgreSQL'dedir; geliştirme Redis cache'i temizlenmez.
 
 E2E ekran görüntüleri ve raporları Git dışında `artifacts/` altında tutulur. Sentetik hesap/soru verileri resmî içerik değildir. Firefox/WebKit/native iOS/Android build/test ve üretim dağıtımı yapılmadı.
+
+Çıkmış sınavlar (`/official-exams`): yayımlanmış soru sürümlerinden sıralı sınav taslağı oluşturma, soru ekleme/çıkarma/sıralama, ayrı yayım onayı ve yayımlanmış şablonun salt okunur görünümü. Sözleşme [QUESTION_BANK](../../docs/QUESTION_BANK.md#çıkmış-sınavlar); E2E: `tests/e2e/official.spec.ts`.

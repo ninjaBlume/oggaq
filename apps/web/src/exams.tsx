@@ -18,6 +18,9 @@ export function Exams() {
   const [minutes, setMinutes] = useState(15);
   const [subject, setSubject] = useState("");
   const [topic, setTopic] = useState("");
+  const [mode, setMode] = useState<"random" | "official">("random");
+  const [official, setOfficial] = useState("");
+  const [officialCursor, setOfficialCursor] = useState<string>();
   const [cursor, setCursor] = useState<string>();
   const [subjectCursor, setSubjectCursor] = useState<string>();
   const [topicCursor, setTopicCursor] = useState<string>();
@@ -38,6 +41,15 @@ export function Exams() {
         params: { subject },
         query: { per_page: 100, cursor: topicCursor },
         signal,
+      }),
+  });
+  const officialExams = useQuery({
+    queryKey: ["official-exams", officialCursor],
+    enabled: mode === "official",
+    queryFn: ({ signal }) =>
+      api.request("get", "/api/v1/official-exams", {
+        signal,
+        query: { per_page: 20, cursor: officialCursor },
       }),
   });
   const history = useQuery({
@@ -65,13 +77,21 @@ export function Exams() {
     },
   });
   function begin() {
-    submission.current ??= {
-      id: crypto.randomUUID(),
-      question_count: count,
-      duration_seconds: minutes * 60,
-      subject_id: subject || null,
-      topic_id: topic || null,
-    };
+    // A past exam fixes its own questions, order and count; only the duration is the user's choice.
+    submission.current ??=
+      mode === "official"
+        ? {
+            id: crypto.randomUUID(),
+            official_exam_id: official,
+            duration_seconds: minutes * 60,
+          }
+        : {
+            id: crypto.randomUUID(),
+            question_count: count,
+            duration_seconds: minutes * 60,
+            subject_id: subject || null,
+            topic_id: topic || null,
+          };
     start.mutate(submission.current);
   }
   const locked = start.isPending || submission.current !== null;
@@ -92,7 +112,26 @@ export function Exams() {
         >
           <fieldset disabled={locked}>
             <legend>Yeni deneme</legend>
+            <div className="tab-bar" role="group" aria-label="Deneme türü">
+              <button
+                type="button"
+                className={`tab-button${mode === "random" ? " active" : ""}`}
+                aria-pressed={mode === "random"}
+                onClick={() => setMode("random")}
+              >
+                Karışık sorular
+              </button>
+              <button
+                type="button"
+                className={`tab-button${mode === "official" ? " active" : ""}`}
+                aria-pressed={mode === "official"}
+                onClick={() => setMode("official")}
+              >
+                Çıkmış sınav
+              </button>
+            </div>
             <div className="exam-settings">
+              {mode === "random" && (
               <Field label="Soru sayısı">
                 {(props) => (
                   <input
@@ -106,6 +145,7 @@ export function Exams() {
                   />
                 )}
               </Field>
+              )}
               <Field label="Süre (dakika)">
                 {(props) => (
                   <input
@@ -119,6 +159,7 @@ export function Exams() {
                   />
                 )}
               </Field>
+              {mode === "random" && (<>
               <Field label="Deneme dersi">
                 {(props) => (
                   <select
@@ -156,9 +197,58 @@ export function Exams() {
                   </select>
                 )}
               </Field>
+              </>)}
             </div>
+            {mode === "official" && (
+              <div className="official-picker" role="radiogroup" aria-label="Çıkmış sınav">
+                {officialExams.isPending ? (
+                  <Loading />
+                ) : officialExams.isError ? (
+                  <ErrorNotice
+                    error={officialExams.error}
+                    retry={() => {
+                      void officialExams.refetch();
+                    }}
+                  />
+                ) : officialExams.data.data.length === 0 ? (
+                  <p className="muted">Henüz yayımlanmış çıkmış sınav yok.</p>
+                ) : (
+                  <>
+                    {officialExams.data.data.map((item) => (
+                      <label key={item.id} className="official-option">
+                        <input
+                          type="radio"
+                          name="official-exam"
+                          value={item.id}
+                          checked={official === item.id}
+                          onChange={() => setOfficial(item.id)}
+                        />
+                        <span>
+                          <strong>{item.title}</strong>
+                          <small>
+                            {item.year}
+                            {item.term ? ` · ${item.term}` : ""}
+                            {item.exam_number ? ` · No ${item.exam_number}` : ""}
+                            {" · "}
+                            {item.question_count} soru
+                          </small>
+                        </span>
+                      </label>
+                    ))}
+                    <CatalogPages
+                      label="Çıkmış sınav listesi"
+                      links={officialExams.data.links}
+                      change={(next) => {
+                        setOfficialCursor(next);
+                        setOfficial("");
+                      }}
+                    />
+                  </>
+                )}
+              </div>
+            )}
           </fieldset>
-          {subjects.data && (
+          {mode === "random" && subjects.data && (
             <CatalogPages
               label="Ders listesi"
               links={subjects.data.links}
@@ -169,7 +259,7 @@ export function Exams() {
               }}
             />
           )}
-          {topics.data && (
+          {mode === "random" && topics.data && (
             <CatalogPages
               label="Konu listesi"
               links={topics.data.links}
@@ -181,13 +271,19 @@ export function Exams() {
           )}
           <p className="muted">
             Süre başlatınca işler; uygulamadan ayrılınca durmaz. Puanın doğru
-            cevap yüzdesidir. Bu çalışma resmî sınav şablonu değildir.
+            cevap yüzdesidir.{" "}
+            {mode === "official"
+              ? "Sorular orijinal sırasıyla gelir. Süreyi sen seçersin; resmî sınav süresi veya geçme kararı değildir."
+              : "Bu çalışma resmî sınav şablonu değildir."}
           </p>
           <button
             className="button primary"
             type="submit"
             disabled={
-              locked || subjects.isPending || (!!subject && topics.isPending)
+              locked ||
+              (mode === "official"
+                ? !official
+                : subjects.isPending || (!!subject && topics.isPending))
             }
           >
             {start.isPending ? "Hazırlanıyor…" : "Denemeyi başlat"}
@@ -233,10 +329,16 @@ export function Exams() {
                 >
                   {exam.status === "completed"
                     ? `%${exam.result?.score_percent}`
-                    : "Devam et"}
+                    : Date.parse(exam.deadline_at) <= Date.parse(exam.server_time)
+                      ? "Sonucu gör"
+                      : "Devam et"}
                 </span>
                 <div>
-                  <h3>{exam.question_count} soruluk deneme</h3>
+                  <h3>
+                    {exam.official_exam
+                      ? exam.official_exam.title
+                      : `${exam.question_count} soruluk deneme`}
+                  </h3>
                   <p>
                     {dateLabel(exam.started_at)} · {exam.duration_seconds / 60}{" "}
                     dakika
@@ -366,6 +468,10 @@ function ExamContent({
     if (!current || current.data.revision <= response.data.revision)
       cache.setQueryData(["exam", context.id, exam.id], response);
     void cache.invalidateQueries({ queryKey: ["exams", context.id] });
+    if (response.data.status === "completed") {
+      void cache.invalidateQueries({ queryKey: ["stats", context.id] });
+      void cache.invalidateQueries({ queryKey: ["review", context.id] });
+    }
   }
   const save = useMutation({
     mutationFn: (s: Save) =>
@@ -380,6 +486,38 @@ function ExamContent({
     onSuccess: (response) => {
       accept(response);
       setSubmission(null);
+    },
+  });
+  // Favorites do not change the attempt revision, so the cached rows are updated directly.
+  const favorite = useMutation({
+    mutationFn: (next: boolean) =>
+      next
+        ? api.request(
+            "put",
+            "/api/v1/contexts/{context}/favorites/{question}",
+            { params: { context: context.id, question: exam.questions[index]!.question_id } },
+          )
+        : api.request(
+            "delete",
+            "/api/v1/contexts/{context}/favorites/{question}",
+            { params: { context: context.id, question: exam.questions[index]!.question_id } },
+          ),
+    onSuccess: (response) => {
+      cache.setQueryData<{ data: ExamAttempt }>(
+        ["exam", context.id, exam.id],
+        (old) =>
+          old && {
+            data: {
+              ...old.data,
+              questions: old.data.questions.map((item) =>
+                item.question_id === response.data.question_id
+                  ? { ...item, is_favorite: response.data.favorite }
+                  : item,
+              ),
+            },
+          },
+      );
+      void cache.invalidateQueries({ queryKey: ["review", context.id] });
     },
   });
   const finish = useMutation({
@@ -564,6 +702,20 @@ function ExamContent({
                     : "Boş bırakıldı"}
               </h3>
               {row.feedback.explanation && <p>{row.feedback.explanation}</p>}
+              <button
+                className="text-button"
+                aria-pressed={row.is_favorite}
+                disabled={favorite.isPending}
+                onClick={() => favorite.mutate(!row.is_favorite)}
+              >
+                {row.is_favorite ? "★ Favorilerde" : "☆ Favoriye ekle"}
+              </button>
+              {favorite.isError && (
+                <ErrorNotice
+                  error={favorite.error}
+                  retry={() => favorite.mutate(!row.is_favorite)}
+                />
+              )}
             </section>
           )}
           <div className="answer-actions">

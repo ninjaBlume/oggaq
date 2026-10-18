@@ -14,6 +14,10 @@ class ExamSummaryResource extends JsonResource
             'status' => $this->finished_at === null ? 'active' : 'completed',
             'question_count' => $this->question_count, 'duration_seconds' => $this->duration_seconds,
             'subject_id' => $this->subject_id, 'topic_id' => $this->topic_id, 'scoring_rule' => $this->scoring_rule,
+            'official_exam' => $this->officialExam === null ? null : [
+                'id' => $this->officialExam->id, 'title' => $this->officialExam->title, 'year' => $this->officialExam->year,
+                'term' => $this->officialExam->term, 'exam_number' => $this->officialExam->exam_number,
+            ],
             'started_at' => $this->started_at->toISOString(), 'deadline_at' => $this->deadline_at->toISOString(),
             'server_time' => now()->toISOString(), 'finished_at' => $this->finished_at?->toISOString(), 'finish_reason' => $this->finish_reason,
             'result' => $this->finished_at === null ? null : [

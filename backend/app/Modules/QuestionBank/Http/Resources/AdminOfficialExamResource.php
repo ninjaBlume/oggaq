@@ -1,0 +1,20 @@
+<?php
+
+namespace App\Modules\QuestionBank\Http\Resources;
+
+use Illuminate\Http\Request;
+
+class AdminOfficialExamResource extends OfficialExamResource
+{
+    public function toArray(Request $request): array
+    {
+        return parent::toArray($request) + [
+            'status' => $this->published_at === null ? 'draft' : 'published',
+            'created_at' => $this->created_at->toISOString(), 'updated_at' => $this->updated_at->toISOString(),
+            'questions' => $this->whenLoaded('questions', fn () => $this->questions->map(fn ($row) => [
+                'position' => $row->position, 'question_id' => $row->question_id,
+                'question' => new AdminQuestionVersionResource($row->questionVersion),
+            ])->all()),
+        ];
+    }
+}

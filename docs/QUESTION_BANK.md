@@ -43,6 +43,18 @@ GET `/api/v1/questions` ve `/questions/{question}` yalnız güncel yayımlanmı�
 
 Öğrenci filtreleri `subject_id`, `topic_id`, `exam_type_id`, `source_id` yayımlanmış sürüme uygulanır. `topic_id` tam eşleşmedir; alt konuları otomatik kapsamaz. Yönetici listesi aynı filtreleri son taslağa uygular, ek `status=draft|published` kabul eder. `draft` hiç yayımlanmamış soru demektir; yayımlanmış sorunun bekleyen taslağı `has_pending_changes` alanıyla belirtilir. Listeler varsayılan 20, en fazla 100 kayıt döndürür; cursor ve filtreler sonraki sayfa bağlantısında korunur.
 
+## Çıkmış sınavlar
+
+Merkezi `official_exams` (künye: sınav türü, yıl, dönem, numara, başlık, isteğe bağlı kaynak) ve `official_exam_questions` (`position`, `question_id`, **`question_version_id`**) tabloları orijinal soru sırasını ve cevap anahtarını yayımlanmış, değişmez soru sürümlerine sabitler. Aynı soru birden çok çıkmış sınavda kullanılabilir; bir sınavda bir kez bulunur. Sınav türü+yıl+dönem+numara `NULLS NOT DISTINCT` tekildir (409 `duplicate_official_exam`). Yalnız platform yöneticisi yönetir (`manage` kuralı).
+
+- `POST /admin/official-exams` — sıralı `question_version_ids` ile **taslak** oluşturur (1–100 yayımlanmış sürüm; dizi sırası orijinal sıradır).
+- `PUT /admin/official-exams/{officialExam}` — taslağı tam snapshot olarak değiştirir; yayımlanmışsa 409 `already_published`.
+- `POST /admin/official-exams/{officialExam}/publish` — idempotent yayımlama. Yayımdan sonra künye ve sorular PostgreSQL trigger'larıyla değiştirilemez/silinemez; yayım boş veya sırası boşluklu şablonu reddeder.
+- `GET /admin/official-exams[/{id}]` — yönetici görünümü (durum filtresi, sorular ve cevap anahtarı).
+- `GET /official-exams[/{id}]` — öğrenci yalnız yayımlanmış künyeyi ve soru sayısını görür; sorular ve cevap anahtarı yoktur. Filtre: `exam_type_id`, `year`, `term`. Sorular deneme başlatılınca gelir ([EXAMS](EXAMS.md)).
+
+Soruların `exam_type_id` alanı sınıflandırma içindir; çıkmış sınav aidiyeti `official_exam_questions` ile tutulur. Gerçek çıkmış sınav verisi bu teslimde içe aktarılmadı; import ayrıca onay ister. Resmî sınav süresi/geçme kuralı modellenmez.
+
 ## Doğrulama
 
 23 QuestionBank testi PostgreSQL üzerinde çalışır: yetkiler, taslak/cevap gizliliği, katalog/alt konu doğrulaması, yayın şartları, sürüm koruma, stale revision, transaction rollback, filtre/pagination, composite FK ve yayın değişmezliği. Toplam backend sonucu 75 test, 329 assertion'dır. Ayrı yerel API sürecinde `oggaq_test` üzerinde gerçek HTTP oluşturma/yayımlama/düzenleme/409 ve öğrenci/admin erişimi doğrulandı; sentetik veriler temizlendi.

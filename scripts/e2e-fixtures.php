@@ -4,8 +4,12 @@ use App\Models\User;
 use App\Modules\Exams\Actions\StartExam;
 use App\Modules\Identity\Notifications\ResetPasswordNotification;
 use App\Modules\Identity\Notifications\VerifyEmailNotification;
+use App\Modules\QuestionBank\Actions\PublishOfficialExam;
 use App\Modules\QuestionBank\Actions\PublishQuestion;
+use App\Modules\QuestionBank\Actions\SaveOfficialExam;
 use App\Modules\QuestionBank\Actions\SaveQuestion;
+use App\Modules\QuestionBank\Models\ExamType;
+use App\Modules\QuestionBank\Models\Question;
 use App\Modules\QuestionBank\Models\QuestionSource;
 use App\Modules\QuestionBank\Models\Subject;
 use App\Modules\QuestionBank\Models\Topic;
@@ -27,7 +31,7 @@ if (config('database.default') !== 'pgsql' || config('database.connections.pgsql
     throw new RuntimeException('Browser fixtures require the isolated oggaq_test PostgreSQL database.');
 }
 $operation = $argv[1] ?? '';
-if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'cleanup'], true)) {
+if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'official-exam', 'cleanup'], true)) {
     throw new InvalidArgumentException('Expected setup or cleanup.');
 }
 if (in_array($operation, ['verification-link', 'reset-link'], true)) {
@@ -53,6 +57,18 @@ if ($operation === 'near-deadline') {
     echo '/study/'.$context->id.'/exams/'.$exam->id;
     exit;
 }
+if ($operation === 'official-exam') {
+    // Published past exam over the setup-study questions, in reverse order, for client flows.
+    $admin = User::where('email', 'e2e-admin@example.test')->firstOrFail();
+    $versions = Question::orderBy('id')->pluck('published_version_id')->reverse()->values()->all();
+    $exam = app(SaveOfficialExam::class)->execute($admin, [
+        'exam_type_id' => ExamType::firstOrFail()->id, 'title' => 'Sentetik çıkmış sınav', 'year' => 2023,
+        'term' => '1. dönem', 'exam_number' => '1', 'question_version_ids' => $versions,
+    ]);
+    app(PublishOfficialExam::class)->execute($admin, $exam);
+    echo $exam->id;
+    exit;
+}
 Artisan::call('migrate:fresh', ['--force' => true]);
 if (in_array($operation, ['setup', 'setup-study'], true)) {
     foreach (['admin', 'student', 'unverified'] as $role) {
@@ -74,6 +90,7 @@ if ($operation === 'setup-study') {
     $subject = Subject::create(['name' => 'Sentetik çalışma dersi', 'code' => 'synthetic-study']);
     $topic = Topic::create(['subject_id' => $subject->id, 'name' => 'Sentetik konu', 'code' => 'synthetic-topic']);
     $source = QuestionSource::create(['title' => 'Sentetik test kaynağı — resmî değildir']);
+    ExamType::create(['name' => 'Sentetik sınav türü', 'code' => 'synthetic-exam-type']);
     foreach (['Sentetik birinci soru', 'Sentetik ikinci soru', 'Sentetik üçüncü soru'] as $stem) {
         $question = app(SaveQuestion::class)->execute($admin, [
             'subject_id' => $subject->id, 'topic_id' => $topic->id, 'source_id' => $source->id,

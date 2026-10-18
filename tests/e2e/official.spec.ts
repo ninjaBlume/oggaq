@@ -1,0 +1,95 @@
+import { test, expect } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { execFileSync } from "node:child_process";
+import { browserTestEnv, phpBinary } from "../../playwright.config";
+
+function fixture(operation: string) {
+  return execFileSync(phpBinary, ["scripts/e2e-fixtures.php", operation], { env: browserTestEnv, encoding: "utf8", stdio: "pipe" }).trim();
+}
+test.beforeEach(() => fixture("setup-study"));
+test.afterAll(() => fixture("cleanup"));
+
+const admin = "http://127.0.0.1:5184";
+const web = "http://127.0.0.1:5183";
+const title = "Sentetik çıkmış sınav 2023";
+
+async function adminLogin(page: Page) {
+  await page.goto(`${admin}/official-exams`);
+  await page.getByLabel("E-posta adresi", { exact: true }).fill("e2e-admin@example.test");
+  await page.getByLabel("Parola", { exact: true }).fill("Synthetic-Browser-42!");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Çıkmış sınavlar", exact: true })).toBeVisible();
+}
+async function studentLogin(page: Page) {
+  await page.goto(`${web}/`);
+  await page.getByLabel("E-posta adresi", { exact: true }).fill("e2e-student@example.test");
+  await page.getByLabel("Parola", { exact: true }).fill("Synthetic-Browser-42!");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Bugün ne çalışalım?" })).toBeVisible();
+}
+
+test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal sırayla çözer", async ({ browser }) => {
+  const adminContext = await browser.newContext();
+  const adminPage = await adminContext.newPage();
+  const errors: string[] = [];
+  adminPage.on("pageerror", (error) => errors.push(error.message));
+  await adminLogin(adminPage);
+  await expect(adminPage.getByText("Henüz çıkmış sınav yok")).toBeVisible();
+  await adminPage.getByRole("link", { name: "Yeni çıkmış sınav", exact: true }).click();
+  await adminPage.getByLabel("Sınav türü", { exact: true }).selectOption({ label: "Sentetik sınav türü" });
+  await adminPage.getByLabel("Başlık", { exact: true }).fill(title);
+  await adminPage.getByLabel("Yıl", { exact: true }).fill("2023");
+  await adminPage.getByLabel("Dönem", { exact: true }).fill("1. dönem");
+  await adminPage.getByLabel("Sınav numarası", { exact: true }).fill("1");
+  await adminPage.getByRole("button", { name: "Soru ekle", exact: true }).click();
+  const dialog = adminPage.getByRole("dialog");
+  for (const stem of ["Sentetik birinci soru", "Sentetik ikinci soru", "Sentetik üçüncü soru"]) {
+    await dialog.getByRole("listitem").filter({ hasText: stem }).getByRole("button", { name: "Ekle", exact: true }).click();
+  }
+  await dialog.getByRole("button", { name: "Tamam", exact: true }).click();
+  await adminPage.getByRole("button", { name: "3. soruyu yukarı taşı" }).click();
+  await adminPage.getByRole("button", { name: "2. soruyu yukarı taşı" }).click();
+  await adminPage.getByRole("button", { name: "Taslağı kaydet" }).click();
+  await expect(adminPage.getByRole("status").filter({ hasText: "Çıkmış sınav taslağı oluşturuldu." })).toBeVisible();
+  await adminPage.reload();
+  await expect(adminPage.locator(".exam-entry-stem").first()).toHaveText("Sentetik üçüncü soru");
+
+  // Drafts stay invisible to students.
+  const studentContext = await browser.newContext();
+  const student = await studentContext.newPage();
+  student.on("pageerror", (error) => errors.push(error.message));
+  await studentLogin(student);
+  await student.getByRole("link", { name: "Deneme", exact: true }).click();
+  await student.getByRole("button", { name: "Çıkmış sınav", exact: true }).click();
+  await expect(student.getByText("Henüz yayımlanmış çıkmış sınav yok.")).toBeVisible();
+
+  await adminPage.getByRole("button", { name: "Yayımla", exact: true }).click();
+  await adminPage.getByRole("dialog").getByRole("button", { name: "Yayımla", exact: true }).click();
+  await expect(adminPage.getByRole("status").filter({ hasText: "Çıkmış sınav yayımlandı." })).toBeVisible();
+  await expect(adminPage.getByLabel("Başlık", { exact: true })).toBeDisabled();
+
+  await student.reload();
+  await student.getByRole("button", { name: "Çıkmış sınav", exact: true }).click();
+  await student.getByRole("radio", { name: new RegExp(title) }).check();
+  await student.getByLabel("Süre (dakika)", { exact: true }).fill("5");
+  await student.getByRole("button", { name: "Denemeyi başlat" }).click();
+  await expect(student.getByRole("heading", { name: "Denemen devam ediyor" })).toBeVisible();
+  await expect(student.getByRole("heading", { name: "Sentetik üçüncü soru" })).toBeVisible();
+  await student.getByRole("button", { name: "Sonraki soru" }).click();
+  await expect(student.getByRole("heading", { name: "Sentetik birinci soru" })).toBeVisible();
+  await student.getByRole("button", { name: "Denemeyi bitir", exact: true }).click();
+  await student.getByRole("button", { name: "Bitir ve değerlendir" }).click();
+  await expect(student.getByRole("heading", { name: "Deneme sonucun" })).toBeVisible();
+  // The result screen can add the shown question to the context favorites.
+  await student.getByRole("button", { name: "☆ Favoriye ekle" }).click();
+  await expect(student.getByRole("button", { name: "★ Favorilerde" })).toBeVisible();
+  await student.getByRole("link", { name: "Tekrar", exact: true }).click();
+  await student.getByRole("button", { name: "Favorilerim" }).click();
+  await expect(student.locator(".question-card")).toHaveCount(1);
+  await student.getByRole("link", { name: "Deneme", exact: true }).click();
+  await student.getByRole("link", { name: "Deneme", exact: true }).click();
+  await expect(student.getByRole("heading", { name: title })).toBeVisible();
+  expect(errors).toEqual([]);
+  await adminContext.close();
+  await studentContext.close();
+});

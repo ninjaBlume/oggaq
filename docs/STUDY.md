@@ -29,6 +29,18 @@ Yeni çalışma güncel yayın ile `question_version_id` eşleşmezse `question_
 
 Yazmada tenant, kullanıcı, membership ve çözüm kilitleri transaction içinde güncel durumla alınır. Böylece eski actor/context nesnesi yetki sağlamaz; üyelik iptaliyle aynı tenant lock sırası kullanılır. Sunucu cevap anahtarını sabit sürümden okur; istemcinin kullanıcı/tenant/puan/sonuç alanları reddedilir. Okuma/yazma request cache'i kullanıcılar arasında paylaşılmaz.
 
+## Tekrar listeleri, favoriler ve istatistik
+
+Üç uç, çalışma geçmişinin bağlam başına türetilmiş görünümüdür. Hepsi mevcut bağlam yetkisini kullanır (kendi bağlamı; başka kullanıcı/yönetici 404, iptal üyelik 403) ve e-posta doğrulaması ister.
+
+- `GET /contexts/{context}/review-questions?kind=incorrect|blank|favorite` — `incorrect`/`blank`, her sorunun bağlamdaki **son** değerlendirilmiş sonucuna bakar. Kaynak, cevaplanmış alıştırmalar ile **tamamlanmış** denemelerin cevaplarıdır (`AnswerEvents` SQL'i); devam eden denemenin cevapları sayılmaz. "Son" sonuç `answered_at`/`finished_at` zaman damgasına göredir (saniye çözünürlüğü); aynı saniyedeki iki cevapta sıra belirsizdir. Soru sonradan doğru çözülürse listeden çıkar, boş bırakılan sonradan yanlış çözülürse `blank`ten `incorrect`e geçer. Dönen kayıt güncel yayımlanmış sürümdür (cevap anahtarı/açıklama yok); çözmek için mevcut `practice-attempts` akışı kullanılır. `id` sırasıyla cursor.
+- `PUT|DELETE /contexts/{context}/favorites/{question}` — açık durum, idempotent; toggle yok. Yalnız yayımlanmış soru favoriye eklenebilir (aksi 404). Favori `(study_context_id, question_id)` anahtarıyla bağlama aittir: kişisel favori kurum bağlamında görünmez. Sürüm/`base_version` kuralı offline sync tasarımı kesinleşince eklenecektir.
+- `GET /contexts/{context}/stats` — `answers` (doğru/yanlış/boş/toplam/doğruluk %), ders kırılımı (`subjects`, sürümün dersine göre, ad sırasıyla) ve `exams` (tamamlanan deneme sayısı, ortalama ve en iyi puan). Tekrarlanan çözümler ayrı cevaplardır; boş cevap doğru sayılmaz; toplam 0 ise yüzde `null`.
+
+Veri: `favorite_questions(study_context_id, question_id, created_at)`, bileşik birincil anahtar ve `RESTRICT` FK'ler. Başka tablo eklenmedi; listeler ve istatistik mevcut `practice_attempts`/`exam_answers`tan sorgu anında hesaplanır. Çok büyük geçmişte bu hesap ölçülmedi; gerekirse projeksiyon tablosu ayrıca düşünülür.
+
+Kanıt: `StudyInsightsTest` (PostgreSQL feature testi) son sonuç mantığını, tamamlanmamış denemenin hariç tutulmasını, anahtar gizliliğini, sayfalamayı, bağlam/kullanıcı/yönetici ayrımını, üyelik iptalini, favori idempotency'sini ve istatistik toplamlarını kapsar. Yerelde geçti (toplam 126 backend testi). Alıştırma yanıtlarında (`PracticeAttempt`) `is_favorite` bulunur; liste ve tekil okumada tek sorguyla, yeni açılan/cevaplanan kayıtta tek ek sorguyla hesaplanır. Web `Tekrar`/`Başarım`, mobilde yan menüdeki `Tekrar listelerim`/`Başarı durumum` bu uçları kullanır.
+
 ## Kanıt ve sınır
 
 18 yeni PostgreSQL testi: grading, empty answer, idempotency/conflict, eski sürüm, yetki/bağlam ayrımı/üyelik iptali, stale actor, cursor ve constraint/trigger koruması. Toplam 93 backend testi/450 assertion. Web için 9 Chromium E2E; gerçek API/CSRF, notification/broker linkleri, iki sekmede conflict ve gerçek yazmadan sonra kontrollü yanıt kaybını kapsar. Offline cevap kalıcılığı yoktur; gönderilmemiş seçim yenilemede kaybolabilir. Native istemci [MOBILE](MOBILE.md), ayrı süreli deneme [EXAMS](EXAMS.md) içinde raporlanır.

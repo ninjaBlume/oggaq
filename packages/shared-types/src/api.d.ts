@@ -729,13 +729,13 @@ export interface paths {
         };
         /**
          * Bağlama ait süreli deneme geçmişi
-         * @description Süresi dolan kayıtları tamamlar. started_at/id ile cursor sırası; yalnız sahibi ve aktif üyelik.
+         * @description Salt okunur: süresi dolmuş ama henüz kapatılmamış kayıtlar status=active döner (deadline_at < server_time); kayıt zamanlanmış exams:expire komutuyla veya açıldığında tamamlanır. started_at/id ile cursor sırası; yalnız sahibi ve aktif üyelik.
          */
         get: operations["listExams"];
         put?: never;
         /**
-         * Rastgele yayımlanmış sorularla süreli çalışma başlatma
-         * @description UUID id ve aynı ayarlar tekrarında aynı deneme. Farklı ayarlar/bağlam 409; yetersiz havuz 422. Sorular başlangıç sürümüne sabitlenir. Kullanıcının seçtiği süre ve doğru yüzdesi çalışma amaçlıdır; resmî sınav şablonu değildir.
+         * Rastgele sorularla veya çıkmış sınav şablonuyla süreli çalışma başlatma
+         * @description UUID id ve aynı ayarlar tekrarında aynı deneme. Farklı ayarlar/bağlam 409; yetersiz havuz 422. official_exam_id verilirse yayımlanmış çıkmış sınavın tüm soruları orijinal sırası ve sabit sürümleriyle kopyalanır; süre kullanıcıya aittir ve resmî sınav süresi/geçme kuralı değildir. Sorular başlangıç sürümüne sabitlenir.
          */
         post: operations["startExam"];
         delete?: never;
@@ -774,7 +774,7 @@ export interface paths {
         get?: never;
         /**
          * Süre içinde deneme cevabını kaydetme veya değiştirme
-         * @description base_version güncel revision olmalıdır; aynı kaydedilmiş cevap tekrarı eski revision ile de güvenlidir. Farklı eski cevap 409 version_conflict. null cevabı temizler. Biten/süresi dolan denemeye geç gelen yazı değiştirilmez; tamamlanmış kayıt 200 döner.
+         * @description base_version, istemcinin gördüğü deneme revision değeridir. Çakışma cevap bazındadır: aynı cevap istemcinin revision değerinden sonra başka bir değere değiştiyse 409 version_conflict; başka sorulara ait eski revision ile yazılar kabul edilir. Zaten kaydedilmiş aynı seçimin tekrarı revision artırmaz. null cevabı temizler. Biten/süresi dolan denemeye geç gelen yazı değiştirilmez; tamamlanmış kayıt 200 döner.
          */
         put: operations["saveExamAnswer"];
         post?: never;
@@ -798,6 +798,178 @@ export interface paths {
          * @description Güncel base_version gerekir; eski revision 409. Boşlar dahil sabit sürümlerden doğru/yanlış/boş ve doğru yüzdesi hesaplanır. Bitirme tekrarı aynı değişmez sonucu döndürür. Süreyi sunucu belirler.
          */
         post: operations["finishExam"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contexts/{context}/review-questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Yanlışlarım, boş bıraktıklarım ve favorilerim
+         * @description kind=incorrect|blank her sorunun bağlamdaki son değerlendirilmiş sonucuna göre; sonradan doğru çözülen soru listeden çıkar. Alıştırma ve tamamlanmış deneme cevapları dahildir. Dönen sorular güncel yayımlanmış sürümdür; cevap anahtarı/açıklama dönmez. kind=favorite bağlam favorileridir. id sırasıyla cursor.
+         */
+        get: operations["listReviewQuestions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contexts/{context}/favorites/{question}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Soruyu bağlam favorilerine ekleme
+         * @description Idempotent. Yalnız yayımlanmış sorular eklenebilir; favoriler kişisel/kurum bağlamları arasında paylaşılmaz.
+         */
+        put: operations["addFavoriteQuestion"];
+        post?: never;
+        /**
+         * Soruyu bağlam favorilerinden çıkarma
+         * @description Idempotent; favoride olmayan soru için de 200 döner.
+         */
+        delete: operations["removeFavoriteQuestion"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contexts/{context}/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Bağlam başarı istatistikleri
+         * @description Her değerlendirilmiş cevap (alıştırma ve tamamlanmış deneme) bir kez sayılır; boş cevap doğru sayılmaz. Ders kırılımı soru sürümünün dersine göredir. Yalnız bağlam sahibi ve aktif üyelik erişebilir.
+         */
+        get: operations["getStudyStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/official-exams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Yayımlanmış çıkmış sınavları listeleme
+         * @description Yalnız yayımlanmış sınav künyesi; sorular ve cevap anahtarı dönmez. Sorular deneme başlatılınca sabit sürümleriyle gelir. year azalan, id artan cursor sırası.
+         */
+        get: operations["listOfficialExams"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/official-exams/{officialExam}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Yayımlanmış çıkmış sınav künyesi
+         * @description Taslak sınavlar 404 döner.
+         */
+        get: operations["showOfficialExam"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/official-exams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Çıkmış sınavları durumlarıyla listeleme
+         * @description Yalnız platform yöneticisi. Taslak ve yayımlanmış sınavlar; status filtresi.
+         */
+        get: operations["adminListOfficialExams"];
+        put?: never;
+        /**
+         * Çıkmış sınav taslağı oluşturma
+         * @description Sıralı question_version_ids orijinal soru sırasını ve cevap anahtarlarını yayımlanmış sürümlere sabitler. Sınav türü, yıl, dönem ve numara tekil olmalıdır (409 duplicate_official_exam). Aynı soru başka sınavlarda da kullanılabilir.
+         */
+        post: operations["createOfficialExam"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/official-exams/{officialExam}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Çıkmış sınavı soruları ve cevap anahtarıyla görüntüleme
+         * @description Yalnız platform yöneticisi.
+         */
+        get: operations["adminShowOfficialExam"];
+        /**
+         * Taslak çıkmış sınavı tamamen değiştirme
+         * @description Yalnız yayımlanmamış taslak; yayımlanmış sınav 409 already_published verir. Soru listesi ve künye tam snapshot olarak değiştirilir.
+         */
+        put: operations["replaceOfficialExam"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/official-exams/{officialExam}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Çıkmış sınavı yayımlama
+         * @description Idempotent. 1–100 soru gerekir. Yayımdan sonra künye, soru sırası ve sürümleri PostgreSQL trigger'larıyla değiştirilemez.
+         */
+        post: operations["publishOfficialExam"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1211,6 +1383,8 @@ export interface components {
             /** @enum {string} */
             outcome: "pending" | "correct" | "incorrect" | "skipped";
             feedback: components["schemas"]["PracticeFeedback"] | null;
+            /** @description Soru bu bağlamın favorilerinde mi. */
+            is_favorite: boolean;
         };
         PracticeAttemptResponse: {
             data: components["schemas"]["PracticeAttempt"];
@@ -1254,6 +1428,7 @@ export interface components {
             /** @enum {string|null} */
             finish_reason: "manual" | "expired" | null;
             result: components["schemas"]["ExamResult"] | null;
+            official_exam: components["schemas"]["OfficialExamRef"] | null;
         };
         ExamQuestion: {
             /** Format: uuid */
@@ -1265,6 +1440,8 @@ export interface components {
             /** Format: uuid */
             selected_option_id: string | null;
             feedback: components["schemas"]["ExamFeedback"] | null;
+            /** @description Soru bu bağlamın favorilerinde mi; favoriler PUT/DELETE /contexts/{context}/favorites/{question} ile değişir. */
+            is_favorite: boolean;
         };
         ExamAttempt: {
             /** Format: uuid */
@@ -1294,6 +1471,7 @@ export interface components {
             finish_reason: "manual" | "expired" | null;
             result: components["schemas"]["ExamResult"] | null;
             questions: components["schemas"]["ExamQuestion"][];
+            official_exam: components["schemas"]["OfficialExamRef"] | null;
         };
         ExamAttemptResponse: {
             data: components["schemas"]["ExamAttempt"];
@@ -1306,12 +1484,18 @@ export interface components {
         StartExamInput: {
             /** Format: uuid */
             id: string;
-            question_count: number;
+            /** @description Rastgele deneme için zorunlu; official_exam_id ile birlikte gönderilemez. */
+            question_count?: number;
             duration_seconds: number;
             /** Format: uuid */
             subject_id?: string | null;
             /** Format: uuid */
             topic_id?: string | null;
+            /**
+             * Format: uuid
+             * @description Yayımlanmış çıkmış sınav. Soru sayısı, sırası ve sürümleri şablondan gelir; question_count/subject_id/topic_id gönderilemez.
+             */
+            official_exam_id?: string;
         };
         SaveExamAnswerInput: {
             /** Format: uuid */
@@ -1327,6 +1511,122 @@ export interface components {
             explanation: string | null;
             /** @enum {string} */
             outcome: "correct" | "incorrect" | "skipped";
+        };
+        OfficialExamRef: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            year: number;
+            term: string | null;
+            exam_number: string | null;
+        };
+        OfficialExam: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            /** Format: uuid */
+            exam_type_id: string;
+            year: number;
+            term: string | null;
+            exam_number: string | null;
+            question_count: number;
+            source: components["schemas"]["QuestionSource"] | null;
+            /** Format: date-time */
+            published_at: string | null;
+        };
+        AdminOfficialExamQuestion: {
+            position: number;
+            /** Format: uuid */
+            question_id: string;
+            question: components["schemas"]["AdminQuestionVersion"];
+        };
+        AdminOfficialExam: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            /** Format: uuid */
+            exam_type_id: string;
+            year: number;
+            term: string | null;
+            exam_number: string | null;
+            question_count: number;
+            source: components["schemas"]["QuestionSource"] | null;
+            /** Format: date-time */
+            published_at: string | null;
+            /** @enum {string} */
+            status: "draft" | "published";
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+            /** @description Yalnız tekil görüntüleme ve kayıt yanıtlarında bulunur. */
+            questions?: components["schemas"]["AdminOfficialExamQuestion"][];
+        };
+        OfficialExamInput: {
+            /** Format: uuid */
+            exam_type_id: string;
+            /** Format: uuid */
+            source_id?: string | null;
+            title: string;
+            year: number;
+            term?: string | null;
+            exam_number?: string | null;
+            /** @description Yayımlanmış soru sürümleri; dizi sırası orijinal sınav sırasıdır. Aynı soru bir kez eklenir. */
+            question_version_ids: string[];
+        };
+        OfficialExamResponse: {
+            data: components["schemas"]["OfficialExam"];
+        };
+        OfficialExamList: {
+            data: components["schemas"]["OfficialExam"][];
+            links: components["schemas"]["CursorLinks"];
+            meta: components["schemas"]["CursorMeta"];
+        };
+        AdminOfficialExamResponse: {
+            data: components["schemas"]["AdminOfficialExam"];
+        };
+        AdminOfficialExamList: {
+            data: components["schemas"]["AdminOfficialExam"][];
+            links: components["schemas"]["CursorLinks"];
+            meta: components["schemas"]["CursorMeta"];
+        };
+        FavoriteState: {
+            /** Format: uuid */
+            question_id: string;
+            favorite: boolean;
+        };
+        FavoriteResponse: {
+            data: components["schemas"]["FavoriteState"];
+        };
+        AnswerCounts: {
+            correct: number;
+            incorrect: number;
+            blank: number;
+            total: number;
+            accuracy_percent: number | null;
+        };
+        SubjectStats: {
+            /** Format: uuid */
+            subject_id: string;
+            name: string;
+            correct: number;
+            incorrect: number;
+            blank: number;
+            total: number;
+            accuracy_percent: number | null;
+        };
+        ExamStats: {
+            completed: number;
+            average_score_percent: number | null;
+            best_score_percent: number | null;
+        };
+        StudyStats: {
+            answers: components["schemas"]["AnswerCounts"];
+            exams: components["schemas"]["ExamStats"];
+            subjects: components["schemas"]["SubjectStats"][];
+        };
+        StudyStatsResponse: {
+            data: components["schemas"]["StudyStats"];
         };
     };
     responses: {
@@ -2722,6 +3022,335 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ExamAttemptResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    listReviewQuestions: {
+        parameters: {
+            query: {
+                kind: "incorrect" | "blank" | "favorite";
+                per_page?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                context: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionList"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    addFavoriteQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+                question: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FavoriteResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    removeFavoriteQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+                question: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FavoriteResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    getStudyStats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudyStatsResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    listOfficialExams: {
+        parameters: {
+            query?: {
+                per_page?: number;
+                cursor?: string;
+                exam_type_id?: string;
+                year?: number;
+                term?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfficialExamList"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    showOfficialExam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                officialExam: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfficialExamResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    adminListOfficialExams: {
+        parameters: {
+            query?: {
+                per_page?: number;
+                cursor?: string;
+                exam_type_id?: string;
+                year?: number;
+                term?: string;
+                status?: "draft" | "published";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminOfficialExamList"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    createOfficialExam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OfficialExamInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminOfficialExamResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    adminShowOfficialExam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                officialExam: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminOfficialExamResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    replaceOfficialExam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                officialExam: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OfficialExamInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminOfficialExamResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    publishOfficialExam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                officialExam: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminOfficialExamResponse"];
                 };
             };
             401: components["responses"]["Problem"];

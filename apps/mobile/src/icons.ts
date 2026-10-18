@@ -26,3 +26,5 @@ export { default as SlidersHorizontal } from "lucide-react-native/icons/sliders-
 export { default as Trophy } from "lucide-react-native/icons/trophy";
 export { default as UserRound } from "lucide-react-native/icons/user-round";
 export { default as X } from "lucide-react-native/icons/x";
+export { default as ChartColumn } from "lucide-react-native/icons/chart-column";
+export { default as Star } from "lucide-react-native/icons/star";

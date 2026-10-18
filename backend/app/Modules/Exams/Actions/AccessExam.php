@@ -25,18 +25,7 @@ class AccessExam
                     $this->finalize->execute($attempt);
                 }
                 if ($attempt->finished_at === null && $answer !== null) {
-                    $row = $attempt->answers()->whereKey($answer['answer_id'])->with('questionVersion.options')->firstOrFail();
-                    $option = $answer['selected_option_id'];
-                    if ($option !== null && ! $row->questionVersion->options->contains('id', $option)) {
-                        throw ValidationException::withMessages(['selected_option_id' => ['Seçenek bu soru sürümüne ait değil.']]);
-                    }
-                    if ($attempt->revision !== (int) $answer['base_version'] && $row->selected_option_id !== $option) {
-                        throw new ApiProblem(409, 'version_conflict', 'Deneme başka bir işlemde güncellendi. Güncel kaydı yükleyin.');
-                    }
-                    if ($row->selected_option_id !== $option) {
-                        $row->forceFill(['selected_option_id' => $option])->save();
-                        $attempt->forceFill(['revision' => $attempt->revision + 1])->save();
-                    }
+                    $this->saveAnswer($attempt, $answer);
                 }
                 if ($attempt->finished_at === null && $finishRevision !== null) {
                     if ($attempt->revision !== $finishRevision) {
@@ -55,5 +44,23 @@ class AccessExam
             }
             throw $exception;
         }
+    }
+
+    // Conflicts are per answer: a stale revision only blocks a different value for an answer changed after it.
+    private function saveAnswer(ExamAttempt $attempt, array $input): void
+    {
+        $row = $attempt->answers()->whereKey($input['answer_id'])->with('questionVersion.options')->firstOrFail();
+        $option = $input['selected_option_id'];
+        if ($option !== null && ! $row->questionVersion->options->contains('id', $option)) {
+            throw ValidationException::withMessages(['selected_option_id' => ['Seçenek bu soru sürümüne ait değil.']]);
+        }
+        if ($row->selected_option_id === $option) {
+            return;
+        }
+        if ($row->changed_revision > (int) $input['base_version']) {
+            throw new ApiProblem(409, 'version_conflict', 'Deneme başka bir işlemde güncellendi. Güncel kaydı yükleyin.');
+        }
+        $row->forceFill(['selected_option_id' => $option, 'changed_revision' => $attempt->revision + 1])->save();
+        $attempt->forceFill(['revision' => $attempt->revision + 1])->save();
     }
 }

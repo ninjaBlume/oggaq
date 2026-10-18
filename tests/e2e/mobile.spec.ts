@@ -132,6 +132,10 @@ test("mobil sekmeler gerçek Bearer API ile soru, deneme, geçmiş ve çıkış 
     page.getByRole("button", { name: "Bitir ve değerlendir" }),
   ).not.toBeVisible();
   await screenshot(page, "exam-result");
+  await page.getByRole("button", { name: "☆ Favoriye ekle" }).click();
+  await expect(
+    page.getByRole("button", { name: "★ Favorilerde" }),
+  ).toBeVisible();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -512,4 +516,70 @@ test("sistem hareket azaltma tercihi canlı değişince Expressive hareket kapan
   await expect(
     page.getByRole("tab", { name: "Soru çöz", exact: true }),
   ).toHaveAttribute("aria-selected", "true");
+});
+test("mobil tekrar listeleri, favori, başarı durumu ve çıkmış sınav gerçek API ile çalışır", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await login(page);
+  await page.getByRole("tab", { name: "Soru çöz", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Soruyu çöz", exact: true })
+    .first()
+    .click();
+  await page.getByRole("radio", { name: "Sentetik B", exact: true }).click();
+  await page.getByRole("button", { name: "Cevabımı kontrol et" }).click();
+  await expect(page.getByText("Yanlış", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "☆ Favoriye ekle" }).click();
+  await expect(
+    page.getByRole("button", { name: "★ Favorilerde" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Geri dön" }).click();
+
+  await page.getByRole("tab", { name: "Ana sayfa", exact: true }).click();
+  await page.getByRole("button", { name: "Tekrar ekranını aç" }).click();
+  await expect(
+    page.getByText("Sentetik birinci soru", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Boş bıraktıklarım" }).click();
+  await expect(
+    page.getByText("Boş bıraktığın soru yok.", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Favorilerim", exact: true }).click();
+  await expect(
+    page.getByText("Sentetik birinci soru", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Favorilerden çıkar" }).click();
+  await expect(
+    page.getByText("Henüz favori soru eklemedin.", { exact: true }),
+  ).toBeVisible();
+
+  await page.getByRole("tab", { name: "Ana sayfa", exact: true }).click();
+  await expect(page.getByText("Doğruluk %0", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Başarım ekranını aç" }).click();
+  await expect(
+    page.getByText("0 doğru · 1 yanlış · 0 boş", { exact: true }).first(),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Menüyü aç" }).click();
+  await expect(
+    page.getByRole("button", { name: "Tekrar listelerim" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Başarı durumum" }).click();
+
+  fixture("official-exam");
+  await page.getByRole("tab", { name: "Deneme", exact: true }).click();
+  await page.getByRole("button", { name: "Çıkmış sınav denemesi" }).click();
+  await page
+    .getByRole("button", { name: /Sentetik çıkmış sınav · 2023/ })
+    .click();
+  await page.getByLabel("Süre (dakika)", { exact: true }).fill("5");
+  await page.getByRole("button", { name: "Denemeyi başlat" }).click();
+  await expect(
+    page.getByText("DENEMEN DEVAM EDİYOR", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Sentetik üçüncü soru", { exact: true }),
+  ).toBeVisible();
+  expect(errors).toEqual([]);
 });

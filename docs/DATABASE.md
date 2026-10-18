@@ -103,6 +103,10 @@ Reklam için ertelenmiş model: `advertisers`, `campaigns` (başlangıç/bitiş,
 
 Identity/Tenancy/QuestionBank FK/CHECK/unique, transaction ve yayımlanmış içerik trigger davranışları PostgreSQL integration testlerinde doğrulandı; henüz uygulanmamış modüller için aynı kontroller gerekecek. SQLite testleri merkezi veritabanı davranışının yerine kullanılamaz. Mevcut listeler sayfalıdır; gelecekteki raporlar sadece doğrulanmış bağlamdan filtrelenecek.
 
+## Tekrar ve çıkmış sınav tabloları (uygulandı)
+
+`favorite_questions(study_context_id, question_id, created_at)`; PK `(study_context_id, question_id)`. `official_exams(id, exam_type_id, source_id?, created_by?, title, year, term?, exam_number?, published_at?)` ve `official_exam_questions(official_exam_id, position, question_id, question_version_id)` — PK `(official_exam_id, position)`, unique `(official_exam_id, question_id)`, `(question_version_id, question_id)` composite FK. `exam_attempts.official_exam_id` (nullable FK) resmî denemeyi şablona bağlar; `exam_answers.changed_revision` cevap bazlı çakışma kontrolü içindir. Trigger'lar: yayımlanmış çıkmış sınav ve soruları değişmez; yayım için bitişik 1..N sıra gerekir; soru yalnız yayımlanmış sürüm olabilir; resmî deneme yayımlanmış şablonun tamamını (sayı, sıra, soru, sürüm) kopyalamak zorundadır ve `official_exam_id` sonradan değiştirilemez. Yukarıdaki `favorites`/`exams` tasarım tabloları bu uygulanmış şemayla değiştirilmiştir.
+
 ## Uygulanan süreli deneme ve mobil
 
 [EXAMS](EXAMS.md) gerçek `exam_attempts`/`exam_answers` şemasını, yetki, sabit sürüm, revision, sunucu süresi ve değişmez sonucu anlatır. Önceki genel `attempts`/şablon/rapor tabloları gelecekteki tasarımdır. Expo istemcisinin native paket/test sınırları [MOBILE](MOBILE.md) içinde ayrıca raporlanır.

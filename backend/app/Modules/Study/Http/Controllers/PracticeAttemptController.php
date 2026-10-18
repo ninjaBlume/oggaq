@@ -20,7 +20,7 @@ class PracticeAttemptController extends Controller
     public function index(PaginationRequest $request, string $context, ResolveStudyContext $contexts): AnonymousResourceCollection
     {
         $context = $contexts->execute($request->user(), $context);
-        $attempts = PracticeAttempt::where('study_context_id', $context->id)->with(['questionVersion.options', 'questionVersion.source'])
+        $attempts = PracticeAttempt::withFavorite()->where('study_context_id', $context->id)->with(['questionVersion.options', 'questionVersion.source'])
             ->orderByDesc('created_at')->orderByDesc('id')->cursorPaginate($request->integer('per_page', 20))->withQueryString();
 
         return PracticeAttemptResource::collection($attempts);
@@ -34,7 +34,7 @@ class PracticeAttemptController extends Controller
     public function show(Request $request, string $context, string $attempt, ResolveStudyContext $contexts): PracticeAttemptResource
     {
         $context = $contexts->execute($request->user(), $context);
-        $attempt = PracticeAttempt::where('study_context_id', $context->id)->with(['questionVersion.options', 'questionVersion.source'])->findOrFail($attempt);
+        $attempt = PracticeAttempt::withFavorite()->where('study_context_id', $context->id)->with(['questionVersion.options', 'questionVersion.source'])->findOrFail($attempt);
 
         return new PracticeAttemptResource($attempt);
     }

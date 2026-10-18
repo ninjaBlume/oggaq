@@ -27,6 +27,10 @@ E2E `APP_ENV=local` ile gerçek CSRF middleware'ini kullanır; sentetik fixture'
 
 18 Study PostgreSQL testi ve 9 öğrenci Chromium E2E: doğru/yanlış/boş, sabit sürüm, kişisel/kurum ayrımı, stale actor/üyelik/kurum aktifliği, kalıcı geçmiş, yanıt kaybında aynı kayıt, iki sekmede farklı cevap çakışması, gerçek broker/notification bağlantısıyla kayıt/doğrulama/reset. Test SMTP teslimi web E2E'ye dahil değildir. Senaryolar ve test portları [web README](../apps/web/README.md) içindedir.
 
+## Altıncı teslim testleri
+
+`ExamTest` cevap bazlı çakışma ve salt okunur geçmişi, `StudyInsightsTest` tekrar listeleri/favori/istatistiği, `OfficialExamTest` çıkmış sınav yönetimi, yayım değişmezliği, orijinal sıralı deneme ve DB trigger'larını kapsar. Yerelde 126 PostgreSQL feature testi geçti. Tarayıcı: `insights.spec.ts` (web tekrar/favori/başarım, kişisel-kurum ayrımı), `official.spec.ts` (yönetici çıkmış sınavı oluşturup yayımlar, öğrenci orijinal sırayla çözer) ve `mobile.spec.ts` içindeki yeni senaryo; toplam 37 Chromium E2E geçti. `npm run test:e2e` öncesinde `npm run export:mobile:preview` gerekir.
+
 ## Kritik kabul matrisi
 
 | Senaryo | Kanıt türü |

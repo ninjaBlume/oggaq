@@ -25,7 +25,7 @@ export function CatalogPages({ label, links, change }: { label: string; links: {
   if (!links.prev && !links.next) return null;
   return <div className="catalog-pages"><span>{label}</span><button disabled={!links.prev} onClick={() => change(cursorFromLink(links.prev))}>Önceki kayıtlar</button><button disabled={!links.next} onClick={() => change(cursorFromLink(links.next))}>Sonraki kayıtlar</button></div>;
 }
-function QuestionCard({ question, subjectName, refresh }: { question: Question; subjectName?: string; refresh: () => void }) {
+export function QuestionCard({ question, subjectName, refresh }: { question: Question; subjectName?: string; refresh: () => void }) {
   const context = useStudyContext();
   const navigate = useNavigate();
   const id = useRef<string | null>(null);
@@ -64,12 +64,22 @@ function PracticeQuestion({ attempt, reload }: { attempt: PracticeAttempt; reloa
   const answer = useMutation({ mutationFn: (option: string | null) => api.request('post', '/api/v1/contexts/{context}/practice-attempts/{attempt}/answer', { params: { context: context.id, attempt: attempt.id }, body: { selected_option_id: option } }), onSuccess: (response) => {
     cache.setQueryData(['attempt', context.id, attempt.id], response);
     void cache.invalidateQueries({ queryKey: ['history', context.id] });
+    void cache.invalidateQueries({ queryKey: ['stats', context.id] });
+    void cache.invalidateQueries({ queryKey: ['review', context.id] });
     setSubmission(null); setConfirmSkip(false);
+  } });
+  // Favorite state belongs to the study context and is idempotent on the server.
+  const favorite = useMutation({ mutationFn: (next: boolean) => next
+    ? api.request('put', '/api/v1/contexts/{context}/favorites/{question}', { params: { context: context.id, question: attempt.question_id } })
+    : api.request('delete', '/api/v1/contexts/{context}/favorites/{question}', { params: { context: context.id, question: attempt.question_id } }),
+  onSuccess: (response) => {
+    cache.setQueryData<{ data: PracticeAttempt }>(['attempt', context.id, attempt.id], (old) => old && { data: { ...old.data, is_favorite: response.data.favorite } });
+    void cache.invalidateQueries({ queryKey: ['review', context.id] });
   } });
   function submit(option: string | null) { setSubmission({ option }); answer.mutate(option); }
   const locked = answered || answer.isPending || submission !== null;
   const conflict = answer.error instanceof ApiError && answer.error.status === 409;
-  return <><Link className="back-link" to={`/study/${context.id}/questions`}>← Sorulara dön</Link><PageIntro eyebrow={context.name.toLocaleUpperCase('tr')} title={answered ? 'Çözümünü incele' : 'Bir soru, bir adım'}><p>{answered ? 'Bu sonuç, çalıştığın soru sürümüyle birlikte saklandı.' : 'Bir seçenek seç. Cevabını gönderdiğinde sonucu ve açıklamayı görebilirsin.'}</p></PageIntro><div className="practice-layout"><section className="card practice-card"><div className="question-meta"><span>Ders çalışması</span><span>Sürüm {attempt.question.version}</span></div><h2 className="question-stem">{attempt.question.stem}</h2><fieldset className="answer-options" disabled={locked}><legend className="sr-only">Cevap seçenekleri</legend>{attempt.question.options.map((option) => {
+  return <><Link className="back-link" to={`/study/${context.id}/questions`}>← Sorulara dön</Link><PageIntro eyebrow={context.name.toLocaleUpperCase('tr')} title={answered ? 'Çözümünü incele' : 'Bir soru, bir adım'}><p>{answered ? 'Bu sonuç, çalıştığın soru sürümüyle birlikte saklandı.' : 'Bir seçenek seç. Cevabını gönderdiğinde sonucu ve açıklamayı görebilirsin.'}</p></PageIntro><div className="practice-layout"><section className="card practice-card"><div className="question-meta"><span>Ders çalışması</span><span>Sürüm {attempt.question.version}</span></div><div className="favorite-row"><button className="text-button" aria-pressed={attempt.is_favorite} disabled={favorite.isPending} onClick={() => favorite.mutate(!attempt.is_favorite)}>{attempt.is_favorite ? '★ Favorilerde' : '☆ Favoriye ekle'}</button></div>{favorite.isError && <ErrorNotice error={favorite.error} retry={() => favorite.mutate(!attempt.is_favorite)} />}<h2 className="question-stem">{attempt.question.stem}</h2><fieldset className="answer-options" disabled={locked}><legend className="sr-only">Cevap seçenekleri</legend>{attempt.question.options.map((option) => {
     const correct = answered && attempt.feedback?.correct_option_id === option.id;
     const picked = answered ? attempt.selected_option_id === option.id : selected === option.id;
     return <label key={option.id} className={`answer-option ${correct ? 'correct-option' : picked && answered ? 'incorrect-option' : picked ? 'selected-option' : ''}`}><input type="radio" name="answer" value={option.id} checked={picked} onChange={() => setSelected(option.id)} /><span className="option-letter">{String.fromCharCode(64 + option.position)}</span><span className="option-text">{option.text}</span>{answered && <span className="option-note">{correct ? 'Doğru cevap' : picked ? 'Senin cevabın' : ''}</span>}</label>;

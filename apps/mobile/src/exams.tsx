@@ -36,6 +36,7 @@ import {
   ScreenTitle,
   SectionTitle,
   Sheet,
+  TextLink,
   palette,
 } from "./ui";
 import { ChoiceGroup, Enter, ExpressiveEmblem } from "./expressive";
@@ -52,6 +53,9 @@ export function Exams({
   const [count, setCount] = useState("10");
   const [minutes, setMinutes] = useState("15");
   const [cursor, setCursor] = useState<string>();
+  const [mode, setMode] = useState<"random" | "official">("random");
+  const [official, setOfficial] = useState("");
+  const [officialCursor, setOfficialCursor] = useState<string>();
   const submission = useRef<StartInput | null>(null);
   const task = useTask<{ data: ExamAttempt }>();
   const query = useResource(
@@ -63,12 +67,29 @@ export function Exams({
       }),
     [context.id, cursor],
   );
+  const officialExams = useResource(
+    (signal) =>
+      api.request("get", "/api/v1/official-exams", {
+        signal,
+        query: { per_page: 10, cursor: officialCursor },
+      }),
+    [officialCursor, mode],
+    mode === "official",
+  );
   function begin() {
-    submission.current ??= {
-      id: Crypto.randomUUID(),
-      question_count: Number(count),
-      duration_seconds: Number(minutes) * 60,
-    };
+    // A past exam fixes its own questions, order and count; only the duration is the user's choice.
+    submission.current ??=
+      mode === "official"
+        ? {
+            id: Crypto.randomUUID(),
+            official_exam_id: official,
+            duration_seconds: Number(minutes) * 60,
+          }
+        : {
+            id: Crypto.randomUUID(),
+            question_count: Number(count),
+            duration_seconds: Number(minutes) * 60,
+          };
     void task.run(
       () =>
         api.request("post", "/api/v1/contexts/{context}/exam-attempts", {
@@ -134,7 +155,25 @@ export function Exams({
       </View>
       <Card>
         <Text style={styles.heading}>Denemeni hazırla</Text>
+        <ChoiceGroup
+          choices={[
+            {
+              value: "random",
+              label: "Karışık",
+              accessibilityLabel: "Karışık sorulu deneme",
+            },
+            {
+              value: "official",
+              label: "Çıkmış sınav",
+              accessibilityLabel: "Çıkmış sınav denemesi",
+            },
+          ]}
+          value={mode}
+          onChange={setMode}
+          disabled={locked}
+        />
         <View style={{ flexDirection: "row", gap: 14 }}>
+          {mode === "random" && (
           <View style={{ flex: 1 }}>
             <Field
               label="Soru sayısı"
@@ -144,6 +183,7 @@ export function Exams({
               editable={!locked}
             />
           </View>
+          )}
           <View style={{ flex: 1 }}>
             <Field
               label="Süre (dakika)"
@@ -154,22 +194,60 @@ export function Exams({
             />
           </View>
         </View>
-        <ChoiceGroup
-          choices={[5, 10, 20].map((n) => ({
-            value: String(n),
-            label: `${n} soru`,
-            accessibilityLabel: `${n} soru seç`,
-          }))}
-          value={count}
-          onChange={setCount}
-          disabled={locked}
-        />
+        {mode === "random" ? (
+          <ChoiceGroup
+            choices={[5, 10, 20].map((n) => ({
+              value: String(n),
+              label: `${n} soru`,
+              accessibilityLabel: `${n} soru seç`,
+            }))}
+            value={count}
+            onChange={setCount}
+            disabled={locked}
+          />
+        ) : officialExams.loading ? (
+          <Loading />
+        ) : officialExams.error ? (
+          <ErrorNotice
+            error={officialExams.error}
+            retry={() => {
+              void officialExams.reload();
+            }}
+          />
+        ) : officialExams.data?.data.length === 0 ? (
+          <Text style={styles.muted}>Henüz yayımlanmış çıkmış sınav yok.</Text>
+        ) : (
+          <>
+            {officialExams.data?.data.map((item) => (
+              <Button
+                key={item.id}
+                secondary={item.id !== official}
+                disabled={locked}
+                onPress={() => setOfficial(item.id)}
+              >
+                {`${item.title} · ${item.year}${item.term ? ` ${item.term}` : ""} · ${item.question_count} soru`}
+              </Button>
+            ))}
+            {officialExams.data && (
+              <Pagination
+                page={officialExams.data}
+                change={(next) => {
+                  setOfficialCursor(next);
+                  setOfficial("");
+                }}
+              />
+            )}
+          </>
+        )}
         <Text style={styles.muted}>
-          1–100 soru, 1–120 dakika. Uygulamadan ayrılsan da süren devam eder.
-          Kendi hazırlık denemen; resmî sınav şablonu değildir.
+          {mode === "official"
+            ? "Sorular orijinal sırasıyla gelir. 1–120 dakika; süreyi sen seçersin, resmî sınav süresi veya geçme kararı değildir."
+            : "1–100 soru, 1–120 dakika. Uygulamadan ayrılsan da süren devam eder. Kendi hazırlık denemen; resmî sınav şablonu değildir."}
         </Text>
         <Button
-          disabled={locked || !count || !minutes}
+          disabled={
+            locked || !minutes || (mode === "official" ? !official : !count)
+          }
           onPress={begin}
           icon={Play}
         >
@@ -198,7 +276,7 @@ export function Exams({
           <ListRow
             key={e.id}
             icon={Clock3}
-            title={`${e.question_count} soruluk deneme`}
+            title={e.official_exam?.title ?? `${e.question_count} soruluk deneme`}
             subtitle={new Date(e.started_at).toLocaleDateString("tr-TR")}
             label={e.status === "active" ? "Denemeye dön" : "Sonucu incele"}
             onPress={() => open(e.id)}
@@ -285,6 +363,36 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
   }, [exam?.server_time, done]);
+  const favorite = useTask<{ data: { question_id: string; favorite: boolean } }>();
+  // Favorites do not change the attempt revision, so the loaded rows are updated directly.
+  function toggleFavorite(questionId: string, next: boolean) {
+    void favorite.run(
+      () =>
+        next
+          ? api.request("put", "/api/v1/contexts/{context}/favorites/{question}", {
+              params: { context: context.id, question: questionId },
+            })
+          : api.request(
+              "delete",
+              "/api/v1/contexts/{context}/favorites/{question}",
+              { params: { context: context.id, question: questionId } },
+            ),
+      (response) => {
+        const mark = (value: ExamAttempt): ExamAttempt => ({
+          ...value,
+          questions: value.questions.map((item) =>
+            item.question_id === response.data.question_id
+              ? { ...item, is_favorite: response.data.favorite }
+              : item,
+          ),
+        });
+        if (latest.current) latest.current = mark(latest.current);
+        query.setData((current) =>
+          current ? { data: mark(current.data) } : current,
+        );
+      },
+    );
+  }
   function accept(r: { data: ExamAttempt }) {
     if (!latest.current || latest.current.revision <= r.data.revision) {
       latest.current = r.data;
@@ -662,6 +770,16 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
                   {row.feedback.explanation}
                 </Text>
               )}
+              <TextLink
+                onPress={() => toggleFavorite(row.question_id, !row.is_favorite)}
+              >
+                {favorite.pending
+                  ? "Kaydediliyor…"
+                  : row.is_favorite
+                    ? "★ Favorilerde"
+                    : "☆ Favoriye ekle"}
+              </TextLink>
+              <ErrorNotice error={favorite.error} />
             </View>
           )}
           <ErrorNotice

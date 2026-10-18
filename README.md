@@ -22,6 +22,8 @@ Ardından mobilde lacivert/petrol/kırık beyaz palet, sınırlı altın vurgu v
 
 Mobil tasarım daha sonra Material 3 Expressive yaklaşımına uyarlandı: merkezi şekil/tipografi sistemi, basışla şekil değiştiren düğmeler, bağlı seçim grupları, yay hareketleri ve sistem hareket azaltma desteği. Ana sayfa ve sonuç ekranı daha belirgin; soru/deneme okuma düzeni sakin kalır. 11 mobil Chromium E2E, 17 mobil birim testi, strict tip, Expo Doctor 21/21 ve üç platform export geçti. Bu Expressive sürümünün yeni native CI ve fiziksel iPhone teyidi ayrı izlenir. [Uygulama ayrıntıları ve doğrulama sınırları](docs/MOBILE.md#material-3-expressive-uyarlaması).
 
+18 Ekim 2026 (altıncı teslim): cevap bazlı deneme çakışması, kilitsiz rastgele deneme seçimi, salt okunur deneme geçmişi, yanlışlarım/boşlarım/favorilerim ve başarı istatistiği ile merkezi çıkmış sınav modeli (yönetici taslak/sırala/yayımla, öğrenci orijinal sıralı deneme) eklendi. Web: Tekrar, Başarım, favori ve çıkmış sınav seçimi; yönetim paneli: Çıkmış sınavlar; mobil: ana sayfa kısayolları ile yan menüde Tekrar listelerim ve Başarı durumum, favori (sınav sonucu dahil) ve çıkmış sınav denemesi. Yerel doğrulama: **126 backend testi/875 assertion, Pint, OpenAPI lint, 32 Vitest (11 admin, 4 web, 17 mobil) + 3 core, strict tip, admin/web build ve 37 Chromium E2E geçti**; `api.d.ts` üretildi. Native Android/iOS derlemesi ve fiziksel cihaz bu teslimde yeniden denenmedi. [Altıncı teslim](docs/ROADMAP.md).
+
 PostgreSQL/Redis otomatik testleri ve gerçek HTTP kimlik akışı doğrulandı. GitHub Actions yapılandırması hazır; uzak CI sonucu GitHub Actions üzerinden izlenir.
 
 ## Hedef yapı
@@ -58,7 +60,7 @@ docs/                     Türkçe teknik belgeler
 | [Testler](docs/TESTING.md) | Kritik senaryolar ve doğrulama yöntemi |
 | [Yol haritası](docs/ROADMAP.md) | Aşamalar, bağımlılıklar ve tamamlanma kapıları |
 | [Geliştirme ortamı](docs/DEVELOPMENT.md) | Kurulum, servisler, API, test ve yönetici hesabı |
-| [OpenAPI 3.1.2](docs/openapi.json) | Uygulanmış 48 HTTP operasyonunun makineyle doğrulanabilir sözleşmesi |
+| [OpenAPI 3.1.2](docs/openapi.json) | Uygulanmış 58 HTTP operasyonunun makineyle doğrulanabilir sözleşmesi |
 
 ## Geliştirme ortamı
 

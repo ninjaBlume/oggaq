@@ -22,8 +22,10 @@ import {
   Check,
   ChevronRight,
   Clock3,
+  ChartColumn,
   History,
   House,
+  ListChecks,
   LogOut,
   Menu,
   ShieldCheck,
@@ -50,7 +52,24 @@ export const destinations = [
   },
   { id: "profile", label: "Profil", menuLabel: "Profilim", icon: UserRound },
 ] as const;
-export type MainTab = (typeof destinations)[number]["id"];
+// Reachable from the side menu and home only; the bottom bar keeps its five primary tabs.
+export const extraDestinations = [
+  {
+    id: "review",
+    label: "Tekrar",
+    menuLabel: "Tekrar listelerim",
+    icon: ListChecks,
+  },
+  {
+    id: "stats",
+    label: "Başarım",
+    menuLabel: "Başarı durumum",
+    icon: ChartColumn,
+  },
+] as const;
+export type MainTab =
+  | (typeof destinations)[number]["id"]
+  | (typeof extraDestinations)[number]["id"];
 
 export function MainHeader({
   user,
@@ -272,7 +291,8 @@ export function SideMenu({
             contentContainerStyle={navStyles.menuBody}
           >
             <Text style={navStyles.sectionLabel}>ÇALIŞMALARIM</Text>
-            {destinations.map(({ id, menuLabel, icon: Icon }) => (
+            {[...destinations, ...extraDestinations].map(
+              ({ id, menuLabel, icon: Icon }) => (
               <Pressable
                 key={id}
                 accessibilityRole="button"
@@ -305,7 +325,8 @@ export function SideMenu({
                   <ChevronRight size={16} color={palette.muted} />
                 )}
               </Pressable>
-            ))}
+              ),
+            )}
             <View style={navStyles.separator} />
             <Text style={navStyles.sectionLabel}>ÇALIŞMA ALANIM</Text>
             {contexts.map((c) => {

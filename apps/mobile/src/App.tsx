@@ -40,6 +40,7 @@ import {
   styles,
 } from "./ui";
 import { History, Practice, QuestionList } from "./study";
+import { Review, Stats } from "./review";
 import { Exam, Exams } from "./exams";
 import { Home } from "./home";
 import { MotionProvider } from "./motion";
@@ -154,6 +155,8 @@ function MainTabs({
               questions={questions}
               exams={() => setTab("exams")}
               history={() => setTab("history")}
+              review={() => setTab("review")}
+              stats={() => setTab("stats")}
               practice={practice}
               exam={exam}
             />
@@ -167,6 +170,10 @@ function MainTabs({
             <Exams context={context} open={exam} />
           ) : tab === "history" ? (
             <History context={context} open={practice} openExam={exam} />
+          ) : tab === "review" ? (
+            <Review context={context} open={practice} />
+          ) : tab === "stats" ? (
+            <Stats context={context} />
           ) : (
             <Profile
               user={user}

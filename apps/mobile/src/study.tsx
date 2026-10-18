@@ -33,6 +33,7 @@ import {
   Option,
   ScreenTitle,
   Sheet,
+  TextLink,
   palette,
 } from "./ui";
 export function QuestionList({
@@ -276,7 +277,7 @@ export function QuestionList({
   );
 }
 
-function QuestionCard({
+export function QuestionCard({
   question,
   context,
   open,
@@ -375,6 +376,7 @@ export function Practice({
     [context.id, id],
   );
   const task = useTask<{ data: PracticeAttempt }>();
+  const favorite = useTask<{ data: { favorite: boolean } }>();
   const [selected, setSelected] = useState<string | null>(null);
   const [submission, setSubmission] = useState<{
     option: string | null;
@@ -398,6 +400,27 @@ export function Practice({
         query.setData(response);
         setSubmission(null);
         setSkip(false);
+      },
+    );
+  }
+  function toggleFavorite(next: boolean) {
+    void favorite.run(
+      () =>
+        next
+          ? api.request("put", "/api/v1/contexts/{context}/favorites/{question}", {
+              params: { context: context.id, question: attempt!.question_id },
+            })
+          : api.request(
+              "delete",
+              "/api/v1/contexts/{context}/favorites/{question}",
+              { params: { context: context.id, question: attempt!.question_id } },
+            ),
+      (response) => {
+        query.setData((current) =>
+          current
+            ? { data: { ...current.data, is_favorite: response.data.favorite } }
+            : current,
+        );
       },
     );
   }
@@ -433,6 +456,14 @@ export function Practice({
           </Text>
         </View>
         <Card>
+          <TextLink onPress={() => toggleFavorite(!attempt.is_favorite)}>
+            {favorite.pending
+              ? "Kaydediliyor…"
+              : attempt.is_favorite
+                ? "★ Favorilerde"
+                : "☆ Favoriye ekle"}
+          </TextLink>
+          <ErrorNotice error={favorite.error} />
           <Text style={[styles.heading, { fontSize: 21, lineHeight: 32 }]}>
             {attempt.question.stem}
           </Text>
@@ -683,7 +714,7 @@ export function History({
           <ListRow
             key={e.id}
             icon={Clock3}
-            title={`${e.question_count} soruluk deneme`}
+            title={e.official_exam?.title ?? `${e.question_count} soruluk deneme`}
             subtitle={new Date(e.started_at).toLocaleDateString("tr-TR")}
             label={e.status === "active" ? "Denemeye dön" : "Sonucu incele"}
             onPress={() => openExam(e.id)}

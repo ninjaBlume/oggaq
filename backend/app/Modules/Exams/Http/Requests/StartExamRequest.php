@@ -15,7 +15,9 @@ class StartExamRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => ['required', 'uuid'], 'question_count' => ['required', 'integer', 'min:1', 'max:100'],
+            'id' => ['required', 'uuid'], 'question_count' => ['required_without:official_exam_id', 'integer', 'min:1', 'max:100'],
+            // A past exam fixes its own questions, order and count, so random-selection settings cannot accompany it.
+            'official_exam_id' => ['sometimes', 'uuid', 'prohibits:question_count,subject_id,topic_id', Rule::exists('official_exams', 'id')->whereNotNull('published_at')],
             'duration_seconds' => ['required', 'integer', 'min:60', 'max:7200'],
             'subject_id' => ['nullable', 'required_with:topic_id', 'uuid', Rule::exists('subjects', 'id')],
             'topic_id' => ['nullable', 'uuid', Rule::exists('topics', 'id')->where('subject_id', $this->input('subject_id'))],
