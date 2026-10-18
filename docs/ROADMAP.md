@@ -79,7 +79,7 @@ Yerel PHP 8.4.26 / PostgreSQL 18.6 / Node 24.22 ile doğrulandı: 126 backend te
 - [x] Web: Tekrar, Başarım, favori ve çıkmış sınav seçimi; yönetim paneli: çıkmış sınav oluşturma/sıralama/yayımlama; mobil: yan menüde Tekrar ve Başarım, favori, çıkmış sınav denemesi.
 - [x] Mobil ana sayfada Tekrar/Başarım kısayolları (Başarım karosu doğruluğu gösterir) ve sınav sonuç ekranından favoriye ekleme.
 - [x] `symfony/http-foundation` 7.4.21'e güncellendi; `composer audit` temiz.
-- [ ] Gerçek çıkmış sınav verisi (import onayı gerekir).
+- [x] Gerçek çıkmış sınav verisi: `asvip-1` adapter'ı ile önizleme/onay/aktarım uygulandı ve geliştirme veritabanına aktarıldı ([IMPORTING](IMPORTING.md#uygulanan-adapter-asvip-1-kurum-arşiv-dökümü)); üretim aktarımı ve düzenleme gerektiren sorular açık.
 
 ## Sıradaki işler — kurum şablonları ve raporlar
 

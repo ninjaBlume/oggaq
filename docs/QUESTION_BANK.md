@@ -47,7 +47,7 @@ GET `/api/v1/questions` ve `/questions/{question}` yalnız güncel yayımlanmı�
 
 Merkezi `official_exams` (künye: sınav türü, yıl, dönem, numara, başlık, isteğe bağlı kaynak) ve `official_exam_questions` (`position`, `question_id`, **`question_version_id`**) tabloları orijinal soru sırasını ve cevap anahtarını yayımlanmış, değişmez soru sürümlerine sabitler. Aynı soru birden çok çıkmış sınavda kullanılabilir; bir sınavda bir kez bulunur. Sınav türü+yıl+dönem+numara `NULLS NOT DISTINCT` tekildir (409 `duplicate_official_exam`). Yalnız platform yöneticisi yönetir (`manage` kuralı).
 
-- `POST /admin/official-exams` — sıralı `question_version_ids` ile **taslak** oluşturur (1–100 yayımlanmış sürüm; dizi sırası orijinal sıradır).
+- `POST /admin/official-exams` — sıralı `question_version_ids` ile **taslak** oluşturur (1–200 yayımlanmış sürüm; silahlı sınavlar 125 soru taşır; dizi sırası orijinal sıradır).
 - `PUT /admin/official-exams/{officialExam}` — taslağı tam snapshot olarak değiştirir; yayımlanmışsa 409 `already_published`.
 - `POST /admin/official-exams/{officialExam}/publish` — idempotent yayımlama. Yayımdan sonra künye ve sorular PostgreSQL trigger'larıyla değiştirilemez/silinemez; yayım boş veya sırası boşluklu şablonu reddeder.
 - `GET /admin/official-exams[/{id}]` — yönetici görünümü (durum filtresi, sorular ve cevap anahtarı).

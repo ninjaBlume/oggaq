@@ -1,6 +1,6 @@
 # SQL ve PDF soru içe aktarma
 
-Durum: süreç tasarımı. Güncel yönergede kaynak SQL bankalarının MySQL/MariaDB biçiminde olduğu belirtilir. Gerçek SQL/PDF dosyaları sağlanmadı; kaynak şema, kolonlar, PDF yerleşimi, OCR gereksinimi ve kesin eşleme bilinmiyor.
+Durum: ilk gerçek kaynak (`u987447310_asvip.sql`, kurum arşiv veritabanı dökümü) için **adapter `asvip-1` uygulandı ve 18 Ekim 2026'da geliştirme veritabanına aktarıldı** (aşağıda). SQL dışındaki kaynaklar (PDF) ve diğer şemalar için süreç tasarımı geçerlidir; kaynak şema bilinmeden başka adapter yazılmaz.
 
 Kaynak dosyalar değiştirilmez. Gerçek kaynak veri aktarımı kullanıcı onayı olmadan başlatılmaz; geliştirme onayı bu veri aktarım onayının yerine geçmez.
 
@@ -17,6 +17,35 @@ Kaynak dosyalar değiştirilmez. Gerçek kaynak veri aktarımı kullanıcı onay
 ## Kaynak dosyayı güvenle inceleme
 
 `python3 scripts/inspect_sql_dump.py DUMP.sql` MySQL/MariaDB dökümünü **çalıştırmadan, hiçbir veritabanına bağlanmadan** metin olarak çözümler ve JSON rapor yazar: dosya SHA-256'sı, tablolar, kolon tanımları, anahtarlar, motor/karakter kümesi, INSERT satır sayıları, ifade türü sayıları ve riskli ifadeler (`GRANT`, `DROP` (IF EXISTS dışı), `CREATE USER/TRIGGER/PROCEDURE`, `LOAD DATA`, `INTO OUTFILE` vb.). Satır örnekleri varsayılan olarak kapalıdır; `--samples N` her tablo için en çok N kısaltılmış satırı yalnız terminale yazar. Rapor, adapter ve eşleme kararı için ham girdidir; import değildir ve onay yerine geçmez. `/*! ... */` koşullu yorumları atlanır (ör. `SET NAMES`); karakter kümesi raporda ayrıca kontrol edilmelidir. Sınırları: tek dosya akışı, tam MySQL ayrıştırıcısı değildir (örn. `DELIMITER` ile tanımlanan gövdeler riskli olarak işaretlenir ama çözümlenmez).
+
+## Uygulanan adapter: `asvip-1` (kurum arşiv dökümü)
+
+Kaynak dosya `docs/*.sql` git dışıdır ve kişisel veri içerir (öğrenci, sözleşme, ödeme, başvuru, cevap kayıtları). Adapter yalnızca beş tabloyu okur: `dersler`, `sinavlar`, `sorular`, `yanitlar`, `ogg_sinavlari`; diğer ifadeler ayrıştırılmadan atlanır. Dosya hiçbir veritabanında çalıştırılmaz ve değiştirilmez (`LegacyDump` yalnız metin okur).
+
+**Kaynak yapısı (gerçek dosyadan):** `sinavlar.kategori_id = 2` bir sınavın tamamı (yaklaşık 125 soru, soru bazında `ders_id`), `3` aynı sınavın derse bölünmüş kopyasıdır; sınav numarası ad içindeki `N.` değeridir (100–121) ve resmî ÖGG Temel Eğitim sınav numaralarıyla örtüşür. 125 sorunun 25'i Silah Bilgisi ve Atış dersidir: silahsız adaylar 100, silahlı adaylar 125 soruluk sınava girer. Her numara için iki çıkmış sınav oluşturulur (`ogg-temel-silahli`, `ogg-temel-silahsiz` sınav türleri). 100 numaralı sınavın yalnız ders setleri vardır; sorular ders sırasına göre dizilir ve rapor/başlık `reconstructed_order` ile işaretler (özgün sıra bilinmiyor).
+
+**Kurallar:** metin HTML karakter kodlarından arındırılır; baştaki soru numarası (`12. `) ve seçenek harfi (`A) `) temizlenir; aynı soru (metin+seçenekler+doğru cevap) tek kayıt olur ve birden çok sınava bağlanır; aynı numaralı tam sınavla çelişen ders seti kopyası **ezilir** (tam sınav özgün kabul edilir); seçeneği olmayan, boş metinli, tek doğru cevabı belirlenemeyen veya doğru cevabı metinsel olarak tekrar eden sorular **aktarılmaz** ve hata listesine girer. Yalnız yanlış seçeneği tekrar eden sorular (kaynak yazım hatası) uyarıyla aktarılır. Her soru `SaveQuestion` + `PublishQuestion` ile yayımlanır; her sınav `SaveOfficialExam` + `PublishOfficialExam` ile. Soru kaynağı sınav numarası başına bir `question_sources` kaydıdır; atıf metni sınavın EGM tarafından uygulanan resmî sınav olduğunu ve yeniden kullanım hakkının ürün sahibince beyan edildiğini yazar.
+
+**Sınav tarihleri** `ogg_sinavlari` tablosundan (107–118) gelir; eksik olanlar kamuya açık EGM kaynaklı haberlerden araştırılıp adapter'a sabitlendi. Çelişki olursa önizleme `date_conflicts` uyarısı verir ve döküm kazanır:
+
+| Sınav | Tarih | Kaynak |
+| --- | --- | --- |
+| 100 | 30.10.2022 | [Milliyet](https://www.milliyet.com.tr/galeri/ogg-sinavi-ne-zaman-basvuru-ucreti-ne-kadar-ozel-guvenlik-100-temel-egitim-ve-76-yenileme-egitimi-sinav-tarihi-2022-6829738), EGM sınav talimatı |
+| 101 | 25.12.2022 | [EGM sonuç istatistiği](https://www.egm.gov.tr/ozelguvenlik/ozel-guvenlik-101-temel-egitim-ve-77-yenileme-egitimi-sinavina-ait-sonuc-istatistigi) |
+| 102 | 30.04.2023 | EGM duyurusu (19.02.2023'ten depremle ertelendi); [Milliyet](https://www.milliyet.com.tr/galeri/ogg-sinavi-ne-zaman-yapilacak-102-ozel-guvenlik-sinav-ertelendi-mi-hangi-tarihte-yapilacak-6911389) |
+| 103 | 24.06.2023 | [EGM sonuç istatistiği](https://www.egm.gov.tr/ozelguvenlik/ozel-guvenlik-103-temel-egitim-ve-79-yenileme-egitimi-sinav-sonuc-istatistigi) |
+| 104 | 26.08.2023 | [Hürriyet](https://www.hurriyet.com.tr/bilgi/galeri/ogg-sinav-sonuclari-sorgulama-egm-gov-tr-egm-104-donem-ozel-guvenlik-sinav-sonuclari-aciklandi-mi-ne-zaman-aciklanacak-nereden-ogrenilir-42330863) |
+| 105 | 21.10.2023 | [Takvim](https://www.takvim.com.tr/memur/2023/09/20/105-ogg-sinavi-ne-zaman-hangi-tarihte-yapilacak-2023-ozel-guvenlik-105-temel-egitim-sinav-giris-belgeleri-yayimlandi-mi) ve eğitim kurumu takvimi |
+| 106 | 17.12.2023 | Milliyet (sonuç haberi), eğitim kurumu takvimi |
+| 119 | 22.02.2026 | [Yeni Şafak](https://www.yenisafak.com/foto-galeri/ozgun/ozel-guvenlik-gorevlisi-sinavi-2026-subat-takvimi-ogg-sinavi-ne-zaman-ozel-guvenlik-119-temel-egitim-ve-95-yenileme-egitimi-tarihleri-4795917) |
+| 120 | 03.05.2026 | [Hürriyet](https://www.hurriyet.com.tr/bilgi/galeri/ogg-sinavi-ne-zaman-yapilacak-ozel-guvenlik-120-temel-egitim-ve-96-yenileme-egitimi-sinavi-tarihi-2026-43141991), Türkiye Gazetesi |
+| 121 | 05.07.2026 | Milliyet 2026 takvimi (tek kaynak; EGM sayfasıyla ayrıca doğrulanmalı) |
+
+105, 106 ve 121 için resmî EGM sayfası bulunamadı; bu tarihler ikincil kaynaklara dayanır.
+
+**Süreç (önizleme → onay → aktarım):** `php artisan import:legacy-preview DOSYA` dosyayı çözümler ve `import_batches` kaydına rapor (soru/sınav sayıları, hata listesi, ezilenler, çelişen ders/seçenekler, temizlenen numaralar), dosya SHA-256'sı ve eşleme hash'ini yazar; içerik oluşturmaz. `php artisan import:legacy-commit BATCH DOSYA --approve=KOD --by=YONETICI` yalnız rapordan türeyen onay koduyla, aynı dosya ve aynı eşleme için, doğrulanmış aktif platform yöneticisi onayıyla çalışır; dosya veya eşleme değiştiyse reddeder. Soru/sınav başına `import_records` birincil anahtarı (kaynak sistemi, tablo, anahtar) yeniden çalıştırmada içeriğin çoğalmasını engeller; her soru kendi transaction'ında yazılır. Audit olayı `import.committed` kaydedilir.
+
+**18 Ekim 2026 geliştirme aktarımı:** 5.003 kaynak sorudan 2.783 benzersiz soru, 11 ders, 22 kaynak ve 44 çıkmış sınav (22 sınav × silahlı/silahsız) yayımlandı. Reddedilen 20 soru (17 seçeneksiz, 1 boş metin, 2 tekrarlı doğru cevap) ve 82 ezilen ders seti kopyası raporda; bazı sınavlar bu yüzden eksik soru taşır (ör. silahlı 119: 122, 120: 122 soru). Düzenleme gerektirenler: seçeneği eksik sorular (büyük olasılıkla görselli), aynı metinli farklı seçenekler/doğru cevaplar (104 grup), ders çelişkileri (38) ve tekrarlı yanlış seçenek uyarıları; yayımlanmış soru yönetim panelinde yeni sürümle düzeltilir, mevcut sınavlar eski sürüme sabit kalır. Aktarım yalnız geliştirme veritabanına yapıldı; üretim aktarımı ayrıca yapılmalıdır.
 
 ## Veri bütünlüğü
 

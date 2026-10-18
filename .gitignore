@@ -32,3 +32,6 @@ __pycache__/
 /apps/mobile/.expo/
 /apps/mobile/android/
 /apps/mobile/ios/
+
+# Kaynak veri dökümleri kişisel veri içerebilir; depoya girmez
+docs/*.sql

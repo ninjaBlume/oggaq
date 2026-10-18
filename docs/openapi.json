@@ -3593,7 +3593,7 @@
       "post": {
         "operationId": "publishOfficialExam",
         "summary": "Çıkmış sınavı yayımlama",
-        "description": "Idempotent. 1–100 soru gerekir. Yayımdan sonra künye, soru sırası ve sürümleri PostgreSQL trigger'larıyla değiştirilemez.",
+        "description": "Idempotent. 1–200 soru gerekir. Yayımdan sonra künye, soru sırası ve sürümleri PostgreSQL trigger'larıyla değiştirilemez.",
         "tags": [
           "QuestionBank"
         ],
@@ -5798,7 +5798,7 @@
           "question_count": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 100
+            "maximum": 200
           },
           "source": {
             "anyOf": [
@@ -5984,7 +5984,7 @@
           "question_version_ids": {
             "type": "array",
             "minItems": 1,
-            "maxItems": 100,
+            "maxItems": 200,
             "items": {
               "type": "string",
               "format": "uuid"

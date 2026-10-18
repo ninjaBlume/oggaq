@@ -967,7 +967,7 @@ export interface paths {
         put?: never;
         /**
          * Çıkmış sınavı yayımlama
-         * @description Idempotent. 1–100 soru gerekir. Yayımdan sonra künye, soru sırası ve sürümleri PostgreSQL trigger'larıyla değiştirilemez.
+         * @description Idempotent. 1–200 soru gerekir. Yayımdan sonra künye, soru sırası ve sürümleri PostgreSQL trigger'larıyla değiştirilemez.
          */
         post: operations["publishOfficialExam"];
         delete?: never;

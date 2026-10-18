@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Modules\Import\Commands\LegacyImportCommit;
+use App\Modules\Import\Commands\LegacyImportPreview;
 use App\Modules\QuestionBank\Models\Question;
 use App\Modules\QuestionBank\Policies\QuestionPolicy;
 use App\Modules\Tenancy\Models\StudyContext;
@@ -30,6 +32,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if ($this->app->runningInConsole()) {
+            $this->commands([LegacyImportPreview::class, LegacyImportCommit::class]);
+        }
         Gate::policy(Tenant::class, TenantPolicy::class);
         Gate::policy(StudyContext::class, StudyContextPolicy::class);
         Gate::policy(Question::class, QuestionPolicy::class);

@@ -21,8 +21,8 @@ class PublishOfficialExam
             $exam = OfficialExam::whereKey($exam->id)->lockForUpdate()->firstOrFail();
             if ($exam->published_at === null) {
                 $count = DB::table('official_exam_questions')->where('official_exam_id', $exam->id)->count();
-                if ($count < 1 || $count > 100) {
-                    throw ValidationException::withMessages(['question_version_ids' => ['Yayımlamak için 1–100 soru gerekir.']]);
+                if ($count < 1 || $count > 200) {
+                    throw ValidationException::withMessages(['question_version_ids' => ['Yayımlamak için 1–200 soru gerekir.']]);
                 }
                 $exam->published_at = now();
                 $exam->save();
