@@ -14,6 +14,10 @@ Kaynak dosyalar değiştirilmez. Gerçek kaynak veri aktarımı kullanıcı onay
 6. Yönetici önizleme ve hata raporunu inceler; kaynak hak durumunu ve hedef içeriği onaylar.
 7. Onaylanmış staging snapshot'ı bounded batch transaction'larıyla taslak soru sürümlerine aktarılır. Başarılı/hatalı satır sonuçları ayrı raporlanır; yayınlama ayrıca yetkilidir.
 
+## Kaynak dosyayı güvenle inceleme
+
+`python3 scripts/inspect_sql_dump.py DUMP.sql` MySQL/MariaDB dökümünü **çalıştırmadan, hiçbir veritabanına bağlanmadan** metin olarak çözümler ve JSON rapor yazar: dosya SHA-256'sı, tablolar, kolon tanımları, anahtarlar, motor/karakter kümesi, INSERT satır sayıları, ifade türü sayıları ve riskli ifadeler (`GRANT`, `DROP` (IF EXISTS dışı), `CREATE USER/TRIGGER/PROCEDURE`, `LOAD DATA`, `INTO OUTFILE` vb.). Satır örnekleri varsayılan olarak kapalıdır; `--samples N` her tablo için en çok N kısaltılmış satırı yalnız terminale yazar. Rapor, adapter ve eşleme kararı için ham girdidir; import değildir ve onay yerine geçmez. `/*! ... */` koşullu yorumları atlanır (ör. `SET NAMES`); karakter kümesi raporda ayrıca kontrol edilmelidir. Sınırları: tek dosya akışı, tam MySQL ayrıştırıcısı değildir (örn. `DELIMITER` ile tanımlanan gövdeler riskli olarak işaretlenir ama çözümlenmez).
+
 ## Veri bütünlüğü
 
 `import_batches` kaynak SHA-256, adapter/mapping sürümü, doğrulama raporu hash'i, onaylayan ve onaylanan snapshot'ı tutar. Dosya/eşleme/çıkartılmış içerik değişince eski onay kullanılamaz. `import_rows` benzersiz `(batch_id,source_row_key)` ve hedef aktarım kimliğiyle retry güvenliği sağlar. Bir batch yeniden commit edilince sorular çoğalmaz.
