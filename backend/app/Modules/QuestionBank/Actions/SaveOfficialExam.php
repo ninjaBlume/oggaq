@@ -58,12 +58,13 @@ class SaveOfficialExam
         }
     }
 
-    // Each question may appear once per exam; the same question can be used by other exams.
+    // Each question may appear once per exam; the same question can be used by other exams. A draft exam may still
+    // pin draft versions; publishing the exam requires every pinned version to be published.
     private function versions(array $ids): Collection
     {
-        $versions = QuestionVersion::whereIn('id', $ids)->whereNotNull('published_at')->get()->keyBy('id');
+        $versions = QuestionVersion::whereIn('id', $ids)->get()->keyBy('id');
         if ($versions->count() !== count($ids) || $versions->pluck('question_id')->unique()->count() !== count($ids)) {
-            throw ValidationException::withMessages(['question_version_ids' => ['Her soru bir kez ve yayımlanmış sürümüyle eklenmelidir.']]);
+            throw ValidationException::withMessages(['question_version_ids' => ['Her soru bir kez eklenmelidir.']]);
         }
 
         return $versions;

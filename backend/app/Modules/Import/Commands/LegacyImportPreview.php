@@ -17,8 +17,9 @@ class LegacyImportPreview extends Command
         $batch = $import->preview($this->argument('file'));
         $report = $batch->report;
         $this->info("Önizleme hazır: {$batch->id}");
-        $this->line("Benzersiz soru: {$report['stats']['unique_questions']} / kaynak {$report['stats']['source_questions']} · reddedilen: {$report['stats']['rejected']} · tekrar: {$report['stats']['duplicates']} · ders setinde ezilen: {$report['stats']['superseded']}");
-        $this->line('Çıkmış sınav: '.count($report['exams']).' · hata: '.count($report['errors']));
+        $this->line("Benzersiz soru: {$report['stats']['unique_questions']} / kaynak {$report['stats']['source_questions']} · taslak kalacak (eksik): {$report['stats']['incomplete']} · reddedilen: {$report['stats']['rejected']} · tekrar: {$report['stats']['duplicates']} · ders setinde ezilen: {$report['stats']['superseded']}");
+        $draftExams = count(array_filter($report['exams'], fn ($exam) => ! $exam['publishable']));
+        $this->line('Çıkmış sınav: '.count($report['exams'])." (taslak kalacak: {$draftExams}) · hata: ".count($report['errors']));
         $this->line('Raporun tamamı veritabanında (import_batches.report). Onay kodu: '.substr($batch->report_sha256, 0, 12));
 
         return self::SUCCESS;

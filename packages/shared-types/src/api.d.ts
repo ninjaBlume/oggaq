@@ -923,7 +923,7 @@ export interface paths {
         put?: never;
         /**
          * Çıkmış sınav taslağı oluşturma
-         * @description Sıralı question_version_ids orijinal soru sırasını ve cevap anahtarlarını yayımlanmış sürümlere sabitler. Sınav türü, yıl, dönem ve numara tekil olmalıdır (409 duplicate_official_exam). Aynı soru başka sınavlarda da kullanılabilir.
+         * @description Sıralı question_version_ids (taslak sınav tamamlanmamış taslak sürümleri de sabitleyebilir) orijinal soru sırasını ve cevap anahtarlarını yayımlanmış sürümlere sabitler. Sınav türü, yıl, dönem ve numara tekil olmalıdır (409 duplicate_official_exam). Aynı soru başka sınavlarda da kullanılabilir.
          */
         post: operations["createOfficialExam"];
         delete?: never;
@@ -967,7 +967,7 @@ export interface paths {
         put?: never;
         /**
          * Çıkmış sınavı yayımlama
-         * @description Idempotent. 1–200 soru gerekir. Yayımdan sonra künye, soru sırası ve sürümleri PostgreSQL trigger'larıyla değiştirilemez.
+         * @description Idempotent. 1–200 soru gerekir ve sabitlenen tüm soru sürümleri yayımlanmış olmalıdır (aksi 422, eksik sıralar listelenir). Yayımdan sonra künye, soru sırası ve sürümleri PostgreSQL trigger'larıyla değiştirilemez.
          */
         post: operations["publishOfficialExam"];
         delete?: never;
@@ -1539,6 +1539,8 @@ export interface components {
             /** Format: uuid */
             question_id: string;
             question: components["schemas"]["AdminQuestionVersion"];
+            /** @description Sorunun şu an yayımlanmış sürümü; sabitlenen sürümden farklıysa taslak sınavda bu sürümle değiştirilebilir. */
+            published_version_id: string | null;
         };
         AdminOfficialExam: {
             /** Format: uuid */
@@ -1571,7 +1573,7 @@ export interface components {
             year: number;
             term?: string | null;
             exam_number?: string | null;
-            /** @description Yayımlanmış soru sürümleri; dizi sırası orijinal sınav sırasıdır. Aynı soru bir kez eklenir. */
+            /** @description Soru sürümleri; dizi sırası orijinal sınav sırasıdır. Aynı soru bir kez eklenir. Taslak sınav henüz yayımlanmamış (tamamlanmamış) bir sürümü sabitleyebilir; yayımlamak için tüm sürümler yayımlanmış olmalıdır. */
             question_version_ids: string[];
         };
         OfficialExamResponse: {

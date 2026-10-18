@@ -12,7 +12,7 @@ class AdminOfficialExamResource extends OfficialExamResource
             'status' => $this->published_at === null ? 'draft' : 'published',
             'created_at' => $this->created_at->toISOString(), 'updated_at' => $this->updated_at->toISOString(),
             'questions' => $this->whenLoaded('questions', fn () => $this->questions->map(fn ($row) => [
-                'position' => $row->position, 'question_id' => $row->question_id,
+                'position' => $row->position, 'question_id' => $row->question_id, 'published_version_id' => $row->questionVersion->question->published_version_id,
                 'question' => new AdminQuestionVersionResource($row->questionVersion),
             ])->all()),
         ];

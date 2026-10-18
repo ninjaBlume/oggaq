@@ -23,6 +23,11 @@ class QuestionVersion extends Model
         return $this->hasMany(QuestionOption::class)->orderBy('position');
     }
 
+    public function question(): BelongsTo
+    {
+        return $this->belongsTo(Question::class);
+    }
+
     public function source(): BelongsTo
     {
         return $this->belongsTo(QuestionSource::class, 'source_id');

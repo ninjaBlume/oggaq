@@ -3409,7 +3409,7 @@
       "post": {
         "operationId": "createOfficialExam",
         "summary": "Çıkmış sınav taslağı oluşturma",
-        "description": "Sıralı question_version_ids orijinal soru sırasını ve cevap anahtarlarını yayımlanmış sürümlere sabitler. Sınav türü, yıl, dönem ve numara tekil olmalıdır (409 duplicate_official_exam). Aynı soru başka sınavlarda da kullanılabilir.",
+        "description": "Sıralı question_version_ids (taslak sınav tamamlanmamış taslak sürümleri de sabitleyebilir) orijinal soru sırasını ve cevap anahtarlarını yayımlanmış sürümlere sabitler. Sınav türü, yıl, dönem ve numara tekil olmalıdır (409 duplicate_official_exam). Aynı soru başka sınavlarda da kullanılabilir.",
         "tags": [
           "QuestionBank"
         ],
@@ -3593,7 +3593,7 @@
       "post": {
         "operationId": "publishOfficialExam",
         "summary": "Çıkmış sınavı yayımlama",
-        "description": "Idempotent. 1–200 soru gerekir. Yayımdan sonra künye, soru sırası ve sürümleri PostgreSQL trigger'larıyla değiştirilemez.",
+        "description": "Idempotent. 1–200 soru gerekir ve sabitlenen tüm soru sürümleri yayımlanmış olmalıdır (aksi 422, eksik sıralar listelenir). Yayımdan sonra künye, soru sırası ve sürümleri PostgreSQL trigger'larıyla değiştirilemez.",
         "tags": [
           "QuestionBank"
         ],
@@ -5844,12 +5844,25 @@
           },
           "question": {
             "$ref": "#/components/schemas/AdminQuestionVersion"
+          },
+          "published_version_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Sorunun şu an yayımlanmış sürümü; sabitlenen sürümden farklıysa taslak sınavda bu sürümle değiştirilebilir."
           }
         },
         "required": [
           "position",
           "question_id",
-          "question"
+          "question",
+          "published_version_id"
         ]
       },
       "AdminOfficialExam": {
@@ -5989,7 +6002,7 @@
               "type": "string",
               "format": "uuid"
             },
-            "description": "Yayımlanmış soru sürümleri; dizi sırası orijinal sınav sırasıdır. Aynı soru bir kez eklenir."
+            "description": "Soru sürümleri; dizi sırası orijinal sınav sırasıdır. Aynı soru bir kez eklenir. Taslak sınav henüz yayımlanmamış (tamamlanmamış) bir sürümü sabitleyebilir; yayımlamak için tüm sürümler yayımlanmış olmalıdır."
           }
         },
         "required": [

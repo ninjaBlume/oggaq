@@ -221,3 +221,4 @@ tbody tr:hover { background: #fbfcf9; }
 .picker-list { list-style: none; margin: 12px 0; padding: 0; display: grid; gap: 8px; }
 .picker-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
 .picker-list li>div { min-width: 0; overflow-wrap: anywhere; }
+.exam-entry-stem .badge, .exam-entry-stem .button { margin-left: 8px; vertical-align: middle; }

@@ -45,7 +45,7 @@ class LegacyExamPlanner
             $sets[$row['sinav_id']] = ['number' => (int) $match[1], 'full' => $row['kategori_id'] === 2, 'subject' => $row['ders_id']];
         }
         $questions = [];
-        $stats = ['source_questions' => count($tables['sorular']), 'cleaned' => ['entities' => 0, 'stem_number' => 0, 'option_letter' => 0], 'rejected' => 0, 'duplicates' => 0, 'superseded' => 0];
+        $stats = ['source_questions' => count($tables['sorular']), 'cleaned' => ['entities' => 0, 'stem_number' => 0, 'option_letter' => 0], 'rejected' => 0, 'incomplete' => 0, 'repaired' => 0, 'duplicates' => 0, 'superseded' => 0];
         $occurrences = [];
         $cleanLog = [];
         foreach ($tables['sorular'] as $row) {
@@ -62,6 +62,24 @@ class LegacyExamPlanner
                 continue;
             }
             $occurrences[] = ['soru_id' => $row['soru_id'], 'number' => $set['number'], 'full' => $set['full'], 'hash' => $built['hash'], 'stem_key' => $built['stem_key'], 'subject' => $subjectId, 'question' => $built];
+        }
+        // A whole-exam question without options is completed from the same exam's per-subject copy of the same stem.
+        $unfinished = [];
+        foreach ($occurrences as $index => $o) {
+            if ($o['full'] && ! $o['question']['complete']) {
+                $unfinished[$o['number']][$o['stem_key']][] = $index;
+            }
+        }
+        foreach ($occurrences as $o) {
+            if (! $o['full'] && $o['question']['complete'] && isset($unfinished[$o['number']][$o['stem_key']])) {
+                foreach ($unfinished[$o['number']][$o['stem_key']] as $index) {
+                    $warnings[] = ['type' => 'repaired_from_subject_set', 'soru_id' => $occurrences[$index]['soru_id'], 'from_soru_id' => $o['soru_id'], 'sinav_no' => $o['number']];
+                    $occurrences[$index]['hash'] = $o['hash'];
+                    $occurrences[$index]['question'] = $o['question'];
+                    $stats['repaired']++;
+                }
+                unset($unfinished[$o['number']][$o['stem_key']]);
+            }
         }
         // A per-subject copy that disagrees with the same stem inside the whole exam of that number is superseded.
         $fullStems = [];
@@ -93,6 +111,10 @@ class LegacyExamPlanner
             $questions[$o['hash']] = $o['question'] + ['subject' => $o['subject'], 'source_number' => $o['number'], 'first_soru_id' => $o['soru_id']];
         }
         foreach ($questions as $question) {
+            if (! $question['complete']) {
+                $stats['incomplete']++;
+                $warnings[] = ['type' => 'incomplete_question', 'soru_id' => $question['first_soru_id'], 'sinav_no' => $question['source_number'], 'issues' => $question['issues']];
+            }
             if ($question['duplicate_option_text']) {
                 $warnings[] = ['type' => 'duplicate_option_text', 'soru_id' => $question['first_soru_id']];
             }
@@ -156,6 +178,7 @@ class LegacyExamPlanner
                 continue;
             }
             $hashes = [];
+            $complete = [];
             foreach ($items as $o) {
                 if (isset($hashes[$o['hash']])) {
                     $warnings[] = ['type' => 'repeated_in_exam', 'soru_id' => $o['soru_id'], 'sinav_no' => $number];
@@ -163,6 +186,7 @@ class LegacyExamPlanner
                     continue;
                 }
                 $hashes[$o['hash']] = $o['subject'];
+                $complete[$o['hash']] = $o['question']['complete'];
             }
             [$year, $month, $day] = array_map('intval', explode('-', $dates[$number]));
             foreach (['silahli' => null, 'silahsiz' => $weaponId] as $variant => $excluded) {
@@ -170,8 +194,9 @@ class LegacyExamPlanner
                 $label = $variant === 'silahli' ? 'Silahlı' : 'Silahsız';
                 $exams[] = [
                     'key' => "{$number}:{$variant}", 'number' => $number, 'variant' => $variant, 'date' => $dates[$number], 'year' => $year,
-                    'term' => self::MONTHS[$month].' '.$year, 'title' => sprintf('ÖGG %d. Temel Eğitim Sınavı (%02d.%02d.%d) — %s', $number, $day, $month, $year, $label),
+                    'term' => self::MONTHS[$month], 'title' => sprintf('ÖGG %d. Temel Eğitim Sınavı (%02d.%02d.%d) — %s%s', $number, $day, $month, $year, $label, $reconstructed ? ' — ders sırasına göre (özgün sıra bilinmiyor)' : ''),
                     'hashes' => $list, 'reconstructed_order' => $reconstructed,
+                    'publishable' => ! in_array(false, array_map(fn ($hash) => $complete[$hash], $list), true),
                 ];
             }
         }
@@ -179,11 +204,13 @@ class LegacyExamPlanner
         return $exams;
     }
 
+    // A question that cannot be answered reliably is kept as an incomplete draft (never published) so editors can finish it.
     private function question(array $row, array $answers, ?int $subjectId, array $subjects, array &$stats, array &$cleanLog): array|string
     {
         if ($subjectId === null || ! isset($subjects[$subjectId])) {
             return 'Ders belirlenemedi.';
         }
+        $issues = [];
         $original = (string) $row['soru_metni'];
         $stem = $this->clean($original);
         $numbered = preg_replace('/^\d{1,3}\s*[.)\-–]\s+/u', '', $stem);
@@ -192,19 +219,17 @@ class LegacyExamPlanner
             $cleanLog[] = ['soru_id' => $row['soru_id'], 'removed' => mb_substr($stem, 0, 12)];
             $stem = $numbered;
         }
-        if ($stem === '') {
-            return 'Soru metni boş.';
-        }
         if (html_entity_decode($original, ENT_QUOTES | ENT_HTML5, 'UTF-8') !== $original) {
             $stats['cleaned']['entities']++;
         }
-        usort($answers, fn ($a, $b) => $a['yanit_id'] <=> $b['yanit_id']);
-        if (count($answers) < 2) {
-            return 'Seçenek verisi yok veya eksik.';
+        if ($stem === '') {
+            $stem = "(Soru metni kaynakta boş — kaynak kayıt #{$row['soru_id']})";
+            $issues[] = 'Soru metni boş.';
         }
+        usort($answers, fn ($a, $b) => $a['yanit_id'] <=> $b['yanit_id']);
         $texts = [];
         $correct = [];
-        foreach ($answers as $index => $answer) {
+        foreach ($answers as $answer) {
             $text = $this->clean((string) $answer['yanit_metni']);
             $stripped = preg_replace('/^[A-Ea-e]\s*[).]\s+/u', '', $text);
             if ($stripped !== $text) {
@@ -212,27 +237,34 @@ class LegacyExamPlanner
                 $text = $stripped;
             }
             if ($text === '') {
-                return 'Boş seçenek metni.';
+                $issues[] = 'Boş seçenek metni atlandı.';
+
+                continue;
+            }
+            if ((int) $answer['dogru_mu'] === 1) {
+                $correct[] = count($texts);
             }
             $texts[] = $text;
-            if ((int) $answer['dogru_mu'] === 1) {
-                $correct[] = $index;
-            }
+        }
+        if (count($texts) < 2) {
+            $issues[] = 'Seçenek verisi yok veya eksik.';
         }
         if (count($correct) !== 1) {
-            return 'Tek doğru cevap belirlenemedi.';
+            $issues[] = 'Tek doğru cevap belirlenemedi.';
         }
-        // A repeated wrong option is a source typo the editor can fix later; a repeated correct option is ambiguous.
         $normalized = array_map(fn ($t) => $this->norm($t), $texts);
         $counts = array_count_values($normalized);
-        if ($counts[$normalized[$correct[0]]] > 1) {
-            return 'Doğru cevabın metni başka bir seçenekte tekrar ediyor.';
+        $key = count($correct) === 1 ? $correct[0] : null;
+        // A repeated wrong option is a source typo; a repeated correct option makes the key ambiguous.
+        if ($key !== null && $counts[$normalized[$key]] > 1) {
+            $issues[] = 'Doğru cevabın metni başka bir seçenekte tekrar ediyor.';
         }
         $stemKey = $this->norm($stem);
 
         return [
-            'stem' => $stem, 'options' => $texts, 'correct' => $correct[0], 'stem_key' => $stemKey, 'duplicate_option_text' => count($counts) !== count($texts),
-            'hash' => hash('sha256', json_encode([$stemKey, array_map(fn ($t) => $this->norm($t), $texts), $correct[0]], JSON_UNESCAPED_UNICODE)),
+            'stem' => $stem, 'options' => $texts, 'correct' => $key, 'stem_key' => $stemKey, 'duplicate_option_text' => count($counts) !== count($texts),
+            'issues' => $issues, 'complete' => $issues === [],
+            'hash' => hash('sha256', json_encode([$stemKey, $normalized, $key], JSON_UNESCAPED_UNICODE)),
         ];
     }
 

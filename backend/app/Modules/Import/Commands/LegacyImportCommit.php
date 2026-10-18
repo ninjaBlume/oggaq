@@ -30,7 +30,7 @@ class LegacyImportCommit extends Command
 
             return self::FAILURE;
         }
-        $this->info(sprintf('Aktarıldı: %d ders, %d kaynak, %d soru, %d çıkmış sınav.', $created['subjects'], $created['sources'], $created['questions'], $created['exams']));
+        $this->info(sprintf('Aktarıldı: %d ders, %d kaynak, %d yayımlanmış + %d taslak soru, %d yayımlanmış + %d taslak çıkmış sınav.', $created['subjects'], $created['sources'], $created['questions'], $created['draft_questions'], $created['exams'], $created['draft_exams']));
 
         return self::SUCCESS;
     }

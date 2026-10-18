@@ -71,7 +71,7 @@ class LegacyImport
 
     private function apply(ImportBatch $batch, array $plan, User $actor): array
     {
-        $created = ['subjects' => 0, 'sources' => 0, 'questions' => 0, 'exams' => 0];
+        $created = ['subjects' => 0, 'sources' => 0, 'questions' => 0, 'draft_questions' => 0, 'exams' => 0, 'draft_exams' => 0];
         $subjectIds = [];
         foreach ($plan['subjects'] as $legacyId => $subject) {
             $model = Subject::firstOrCreate(['code' => $subject['code']], ['name' => $subject['name']]);
@@ -94,17 +94,22 @@ class LegacyImport
             $versions[$hash] = DB::transaction(function () use ($batch, $actor, $key, $question, $subjectIds, $sourceIds, &$created) {
                 $existing = DB::table('import_records')->where(['source_system' => self::SYSTEM, 'source_table' => 'question', 'source_key' => $key])->value('target_id');
                 if ($existing !== null) {
-                    return Question::whereKey($existing)->value('published_version_id');
+                    $row = Question::whereKey($existing)->first(['published_version_id', 'latest_version_id']);
+
+                    return $row->published_version_id ?? $row->latest_version_id;
                 }
                 $saved = $this->saveQuestion->execute($actor, [
                     'subject_id' => $subjectIds[$question['subject']], 'source_id' => $sourceIds[$question['source_number']], 'stem' => $question['stem'],
-                    'options' => $question['options'], 'correct_option_position' => $question['correct'] + 1,
+                    'options' => $question['options'], 'correct_option_position' => $question['correct'] === null ? null : $question['correct'] + 1,
                 ]);
-                $published = $this->publishQuestion->execute($actor, $saved, $saved->revision);
-                $this->record($batch, 'question', $key, 'question', $published->id);
-                $created['questions']++;
+                // Incomplete questions stay drafts: a question without a reliable answer key must never reach students.
+                if ($question['complete']) {
+                    $saved = $this->publishQuestion->execute($actor, $saved, $saved->revision);
+                }
+                $this->record($batch, 'question', $key, 'question', $saved->id);
+                $created[$question['complete'] ? 'questions' : 'draft_questions']++;
 
-                return $published->published_version_id;
+                return $saved->published_version_id ?? $saved->latest_version_id;
             });
         }
         foreach ($plan['exams'] as $exam) {
@@ -117,9 +122,12 @@ class LegacyImport
                     'exam_type_id' => $types[$exam['variant']], 'source_id' => $sourceIds[$exam['number']], 'title' => $exam['title'], 'year' => $exam['year'],
                     'term' => $exam['term'], 'exam_number' => (string) $exam['number'], 'question_version_ids' => array_map(fn ($hash) => $versions[$hash], $exam['hashes']),
                 ]);
-                $this->publishExam->execute($actor, $saved);
+                // An exam with unfinished questions stays a draft until editors complete and publish them.
+                if ($exam['publishable']) {
+                    $this->publishExam->execute($actor, $saved);
+                }
                 $this->record($batch, 'official_exam', $key, 'official_exam', $saved->id);
-                $created['exams']++;
+                $created[$exam['publishable'] ? 'exams' : 'draft_exams']++;
             });
         }
 
@@ -159,7 +167,7 @@ class LegacyImport
         $by = fn (string $type) => array_values(array_filter($plan['warnings'], fn ($w) => $w['type'] === $type));
         $sizes = [];
         foreach ($plan['exams'] as $exam) {
-            $sizes[$exam['key']] = ['questions' => count($exam['hashes']), 'date' => $exam['date'], 'reconstructed_order' => $exam['reconstructed_order']];
+            $sizes[$exam['key']] = ['questions' => count($exam['hashes']), 'date' => $exam['date'], 'reconstructed_order' => $exam['reconstructed_order'], 'publishable' => $exam['publishable']];
         }
 
         return [
@@ -167,7 +175,7 @@ class LegacyImport
             'exams' => $sizes, 'errors' => $plan['errors'],
             'warning_counts' => array_count_values(array_column($plan['warnings'], 'type')),
             'superseded' => $by('superseded_by_full_exam'), 'same_stem_different_options' => $by('same_stem_different_options'),
-            'subject_conflicts' => $by('subject_conflict'), 'duplicate_option_text' => $by('duplicate_option_text'), 'repeated_in_exam' => $by('repeated_in_exam'), 'date_conflicts' => $by('date_conflict'),
+            'incomplete_questions' => $by('incomplete_question'), 'repaired_from_subject_set' => $by('repaired_from_subject_set'), 'subject_conflicts' => $by('subject_conflict'), 'duplicate_option_text' => $by('duplicate_option_text'), 'repeated_in_exam' => $by('repeated_in_exam'), 'date_conflicts' => $by('date_conflict'),
             'stem_number_removed' => $plan['clean_log'],
         ];
     }

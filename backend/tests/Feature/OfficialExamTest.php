@@ -134,11 +134,27 @@ class OfficialExamTest extends TestCase
         $this->getJson('/api/v1/admin/official-exams?status=published')->assertOk()->assertJsonCount(0, 'data');
     }
 
-    public function test_questions_must_be_published_unique_and_the_client_cannot_set_state(): void
+    public function test_draft_exam_can_pin_a_draft_question_until_it_is_completed_published_and_swapped(): void
     {
         $this->asToken($this->admin);
-        $draftQuestion = app(SaveQuestion::class)->execute($this->admin, ['source_id' => $this->source->id, 'subject_id' => $this->subject->id, 'stem' => 'Taslak', 'options' => ['A', 'B'], 'correct_option_position' => 1]);
-        $this->postJson('/api/v1/admin/official-exams', $this->payload(['question_version_ids' => [$draftQuestion->latest_version_id]]))->assertUnprocessable()->assertJsonValidationErrors('question_version_ids.0');
+        $unfinished = app(SaveQuestion::class)->execute($this->admin, ['source_id' => $this->source->id, 'subject_id' => $this->subject->id, 'stem' => 'Seçenekleri eksik soru', 'options' => []]);
+        $ids = [$this->questions[0]->published_version_id, $unfinished->latest_version_id];
+        $exam = $this->postJson('/api/v1/admin/official-exams', $this->payload(['question_version_ids' => $ids]))->assertCreated()->assertJsonPath('data.status', 'draft')->assertJsonPath('data.questions.1.published_version_id', null)->assertJsonPath('data.questions.0.published_version_id', $ids[0])->json('data');
+        $this->postJson('/api/v1/admin/official-exams/'.$exam['id'].'/publish')->assertUnprocessable()->assertJsonValidationErrors('question_version_ids');
+        $this->asToken($this->createUser());
+        $this->getJson('/api/v1/official-exams')->assertOk()->assertJsonCount(0, 'data');
+        $this->asToken($this->admin);
+        $fixed = app(SaveQuestion::class)->execute($this->admin, ['source_id' => $this->source->id, 'subject_id' => $this->subject->id, 'stem' => 'Seçenekleri eksik soru', 'options' => ['A', 'B'], 'correct_option_position' => 2, 'base_version' => $unfinished->revision], $unfinished);
+        $published = app(PublishQuestion::class)->execute($this->admin, $fixed, $fixed->revision);
+        $shown = $this->getJson('/api/v1/admin/official-exams/'.$exam['id'])->assertOk()->assertJsonPath('data.questions.1.published_version_id', $published->published_version_id)->json('data');
+        $this->assertNotSame($shown['questions'][1]['question']['id'], $published->published_version_id);
+        $this->putJson('/api/v1/admin/official-exams/'.$exam['id'], $this->payload(['question_version_ids' => [$ids[0], $published->published_version_id]]))->assertOk();
+        $this->postJson('/api/v1/admin/official-exams/'.$exam['id'].'/publish')->assertOk()->assertJsonPath('data.status', 'published');
+    }
+
+    public function test_questions_must_be_unique_and_the_client_cannot_set_state(): void
+    {
+        $this->asToken($this->admin);
         $first = $this->questions[0];
         $oldVersion = $first->published_version_id;
         $revised = app(SaveQuestion::class)->execute($this->admin, ['source_id' => $this->source->id, 'subject_id' => $this->subject->id, 'stem' => 'Yeni sürüm', 'options' => ['A', 'B'], 'correct_option_position' => 2, 'base_version' => $first->revision], $first);
@@ -187,8 +203,10 @@ class OfficialExamTest extends TestCase
         $base = ['exam_type_id' => $this->type->id, 'title' => 'Sentetik', 'year' => 2022, 'created_at' => $now, 'updated_at' => $now];
         $this->assertRejectedByDatabase(fn () => DB::table('official_exams')->insert($base + ['id' => $id, 'published_at' => $now]));
         DB::table('official_exams')->insert($base + ['id' => $id]);
-        $this->assertRejectedByDatabase(fn () => DB::table('official_exam_questions')->insert(['official_exam_id' => $id, 'position' => 1, 'question_id' => $draftQuestion->id, 'question_version_id' => $draftQuestion->latest_version_id]));
+        // A draft exam may pin a draft version, but such an exam can never be published.
+        DB::table('official_exam_questions')->insert(['official_exam_id' => $id, 'position' => 1, 'question_id' => $draftQuestion->id, 'question_version_id' => $draftQuestion->latest_version_id]);
         $this->assertRejectedByDatabase(fn () => DB::table('official_exams')->where('id', $id)->update(['published_at' => $now]));
+        DB::table('official_exam_questions')->where('official_exam_id', $id)->delete();
         DB::table('official_exam_questions')->insert(['official_exam_id' => $id, 'position' => 2, 'question_id' => $this->questions[0]->id, 'question_version_id' => $this->questions[0]->published_version_id]);
         $this->assertRejectedByDatabase(fn () => DB::table('official_exams')->where('id', $id)->update(['published_at' => $now]));
     }

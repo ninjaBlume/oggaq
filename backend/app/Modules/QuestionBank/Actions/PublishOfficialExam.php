@@ -24,6 +24,11 @@ class PublishOfficialExam
                 if ($count < 1 || $count > 200) {
                     throw ValidationException::withMessages(['question_version_ids' => ['Yayımlamak için 1–200 soru gerekir.']]);
                 }
+                $unpublished = DB::table('official_exam_questions as q')->join('question_versions as v', 'v.id', '=', 'q.question_version_id')
+                    ->where('q.official_exam_id', $exam->id)->whereNull('v.published_at')->orderBy('q.position')->pluck('q.position');
+                if ($unpublished->isNotEmpty()) {
+                    throw ValidationException::withMessages(['question_version_ids' => ['Şu sıralardaki soruların sabitlenen sürümü yayımlanmamış: '.$unpublished->implode(', ').'. Soruyu yayımlayıp sınavda yayımlanmış sürümle değiştirin.']]);
+                }
                 $exam->published_at = now();
                 $exam->save();
                 DB::table('audit_events')->insert([

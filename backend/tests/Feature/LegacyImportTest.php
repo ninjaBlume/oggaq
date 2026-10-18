@@ -151,22 +151,26 @@ SQL;
         $batch = app(LegacyImport::class)->preview($this->path);
         $report = $batch->report;
         $this->assertSame('previewed', $batch->status);
-        $this->assertSame(6, $report['stats']['unique_questions']);
-        $this->assertSame(1, $report['stats']['rejected']);
+        $this->assertSame(7, $report['stats']['unique_questions']);
+        $this->assertSame(0, $report['stats']['rejected']);
+        $this->assertSame(1, $report['stats']['incomplete']);
         $this->assertSame(1, $report['stats']['superseded']);
         $this->assertSame(1, $report['stats']['duplicates']);
         $this->assertSame(4, count($report['exams']));
-        $this->assertSame(3, $report['exams']['107:silahli']['questions']);
-        $this->assertSame(2, $report['exams']['107:silahsiz']['questions']);
+        $this->assertSame(4, $report['exams']['107:silahli']['questions']);
+        $this->assertSame(3, $report['exams']['107:silahsiz']['questions']);
+        $this->assertFalse($report['exams']['107:silahli']['publishable']);
+        $this->assertTrue($report['exams']['100:silahli']['publishable']);
         $this->assertTrue($report['exams']['100:silahli']['reconstructed_order']);
         $this->assertSame('2022-10-30', $report['exams']['100:silahli']['date']);
-        $this->assertSame('Seçenek verisi yok veya eksik.', $report['errors'][0]['reason']);
+        $this->assertSame([], $report['errors']);
+        $this->assertSame(['Seçenek verisi yok veya eksik.', 'Tek doğru cevap belirlenemedi.'], $report['incomplete_questions'][0]['issues']);
         $this->assertStringNotContainsString('gizli.kisi', json_encode($report));
         $this->assertSame(0, Question::count());
         $this->assertSame(0, OfficialExam::count());
     }
 
-    public function test_repeated_wrong_option_is_kept_with_a_warning_but_repeated_correct_option_is_rejected(): void
+    public function test_repeated_wrong_option_is_kept_complete_but_repeated_correct_option_becomes_an_incomplete_draft(): void
     {
         $answer = fn (int $id, int $question, string $text, int $correct) => ['yanit_id' => $id, 'soru_id' => $question, 'yanit_metni' => $text, 'dogru_mu' => $correct];
         $plan = app(LegacyExamPlanner::class)->plan([
@@ -179,28 +183,63 @@ SQL;
             ],
             'ogg_sinavlari' => [],
         ]);
+        $this->assertCount(2, $plan['questions']);
+        $complete = array_values(array_filter($plan['questions'], fn ($q) => $q['complete']));
+        $this->assertCount(1, $complete);
+        $this->assertSame('Tekrarlı yanlış', $complete[0]['stem']);
+        $this->assertSame([['type' => 'duplicate_option_text', 'soru_id' => 1], ['type' => 'duplicate_option_text', 'soru_id' => 2]], array_values(array_filter($plan['warnings'], fn ($w) => $w['type'] === 'duplicate_option_text')));
+        $incomplete = array_values(array_filter($plan['questions'], fn ($q) => ! $q['complete']));
+        $this->assertSame(['Doğru cevabın metni başka bir seçenekte tekrar ediyor.'], $incomplete[0]['issues']);
+        $this->assertFalse($plan['exams'][0]['publishable']);
+        $this->assertSame([], $plan['errors']);
+    }
+
+    public function test_a_whole_exam_question_without_options_is_completed_from_its_subject_set_copy(): void
+    {
+        $answer = fn (int $id, int $question, string $text, int $correct) => ['yanit_id' => $id, 'soru_id' => $question, 'yanit_metni' => $text, 'dogru_mu' => $correct];
+        $plan = app(LegacyExamPlanner::class)->plan([
+            'dersler' => [['ders_id' => 1, 'ders_adi' => 'Ders', 'ders_seflink' => 'ders', 'ders_sira' => 1]],
+            'sinavlar' => [
+                ['sinav_id' => 1, 'sinav_adi' => '101.TEMEL EĞİTİM YAZILI SINAV SORULARI', 'kategori_id' => 2, 'ders_id' => null],
+                ['sinav_id' => 2, 'sinav_adi' => '101.TEMEL EĞİTİM SINAV SORULARI', 'kategori_id' => 3, 'ders_id' => 1],
+            ],
+            'sorular' => [['soru_id' => 1, 'sinav_id' => 1, 'ders_id' => 1, 'soru_metni' => 'Eksik soru'], ['soru_id' => 2, 'sinav_id' => 2, 'ders_id' => null, 'soru_metni' => 'Eksik soru']],
+            'yanitlar' => [$answer(1, 2, 'A', 1), $answer(2, 2, 'B', 0)],
+            'ogg_sinavlari' => [],
+        ]);
         $this->assertCount(1, $plan['questions']);
-        $this->assertSame([['type' => 'duplicate_option_text', 'soru_id' => 1]], array_values(array_filter($plan['warnings'], fn ($w) => $w['type'] === 'duplicate_option_text')));
-        $this->assertSame('Doğru cevabın metni başka bir seçenekte tekrar ediyor.', $plan['errors'][0]['reason']);
+        $this->assertTrue(array_values($plan['questions'])[0]['complete']);
+        $this->assertSame(1, $plan['stats']['repaired']);
+        $this->assertSame(0, $plan['stats']['incomplete']);
+        $this->assertTrue($plan['exams'][0]['publishable']);
+        $this->assertCount(1, $plan['exams'][0]['hashes']);
     }
 
     public function test_commit_publishes_questions_and_exams_with_original_order_and_cleaned_text(): void
     {
         [, $created] = $this->commit();
-        $this->assertSame(['subjects' => 3, 'sources' => 2, 'questions' => 6, 'exams' => 4], $created);
+        $this->assertSame(['subjects' => 3, 'sources' => 2, 'questions' => 6, 'draft_questions' => 1, 'exams' => 2, 'draft_exams' => 2], $created);
         $this->assertSame(6, Question::whereNotNull('published_version_id')->count());
-        $this->assertSame(4, OfficialExam::whereNotNull('published_at')->count());
-        $stems = Question::with('publishedVersion.options')->get()->map(fn ($q) => $q->publishedVersion->stem)->all();
+        $this->assertSame(1, Question::whereNull('published_version_id')->count());
+        $this->assertSame(2, OfficialExam::whereNotNull('published_at')->count());
+        $this->assertSame(2, OfficialExam::whereNull('published_at')->count());
+        $stems = Question::with('latestVersion')->get()->map(fn ($q) => $q->latestVersion->stem)->all();
         $this->assertContains("İkinci soru & ilk yardım\nsatır", $stems);
         $this->assertContains('Yüzüncü sınav hukuk sorusu', $stems);
         $this->assertContains('Yalnız ders setindeki soru', $stems);
         $armed = OfficialExam::where('title', 'like', 'ÖGG 107%Silahlı')->firstOrFail();
         $this->assertSame(107, (int) $armed->exam_number);
         $this->assertSame(2024, $armed->year);
-        $this->assertSame('Şubat 2024', $armed->term);
-        $this->assertSame(['Birinci soru; (a) \'tırnak\'', "İkinci soru & ilk yardım\nsatır", "Silah'ın ağırlığı nedir?"], $armed->questions()->with('questionVersion')->get()->map(fn ($row) => $row->questionVersion->stem)->all());
+        $this->assertSame('Şubat', $armed->term);
+        $this->assertNull($armed->published_at);
+        $this->assertSame(['Birinci soru; (a) \'tırnak\'', "İkinci soru & ilk yardım\nsatır", "Silah'ın ağırlığı nedir?", 'Seçeneği olmayan soru'], $armed->questions()->with('questionVersion')->get()->map(fn ($row) => $row->questionVersion->stem)->all());
         $unarmed = OfficialExam::where('title', 'like', 'ÖGG 107%Silahsız')->firstOrFail();
-        $this->assertSame(2, $unarmed->questions()->count());
+        $this->assertSame(3, $unarmed->questions()->count());
+        $this->assertStringContainsString('ders sırasına göre', OfficialExam::where('exam_number', '100')->firstOrFail()->title);
+        $draft = Question::whereNull('published_version_id')->firstOrFail()->latestVersion;
+        $this->assertSame('Seçeneği olmayan soru', $draft->stem);
+        $this->assertSame(0, $draft->options()->count());
+        $this->assertNull($draft->correct_option_id);
         $version = Question::whereHas('publishedVersion', fn ($q) => $q->where('stem', 'Birinci soru; (a) \'tırnak\''))->firstOrFail()->publishedVersion;
         $this->assertSame(3, $version->options()->count());
         $this->assertSame('Seçenek 1', $version->options()->where('id', $version->correct_option_id)->value('text'));
@@ -213,8 +252,8 @@ SQL;
         $this->commit();
         $admin = $this->admin();
         [, $again] = $this->commit(null, $admin);
-        $this->assertSame(['subjects' => 0, 'sources' => 0, 'questions' => 0, 'exams' => 0], $again);
-        $this->assertSame(6, Question::count());
+        $this->assertSame(['subjects' => 0, 'sources' => 0, 'questions' => 0, 'draft_questions' => 0, 'exams' => 0, 'draft_exams' => 0], $again);
+        $this->assertSame(7, Question::count());
         $this->assertSame(4, OfficialExam::count());
     }
 

@@ -61,6 +61,6 @@ class AdminOfficialExamController extends Controller
 
     private function detailed(OfficialExam $exam): OfficialExam
     {
-        return $exam->load('questions.questionVersion.options', 'questions.questionVersion.source');
+        return $exam->load('questions.questionVersion.options', 'questions.questionVersion.source', 'questions.questionVersion.question');
     }
 }
