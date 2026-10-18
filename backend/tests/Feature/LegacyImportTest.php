@@ -215,6 +215,41 @@ SQL;
         $this->assertCount(1, $plan['exams'][0]['hashes']);
     }
 
+    public function test_reviewed_corrections_fix_wrong_keys_and_pasted_stems_and_merge_the_copies(): void
+    {
+        $answer = fn (int $id, int $question, string $text, int $correct) => ['yanit_id' => $id, 'soru_id' => $question, 'yanit_metni' => $text, 'dogru_mu' => $correct];
+        $cleaning = ['Harbi', 'Süngü', 'Temizleyici yağ', 'Kıl fırça', 'Temizlik bezi'];
+        $rows = [];
+        $answers = [];
+        foreach ([[1, 0], [2, 1]] as [$question, $correct]) {
+            foreach ($cleaning as $index => $text) {
+                $answers[] = $answer($question * 10 + $index, $question, $text, (int) ($index === $correct));
+            }
+        }
+        foreach (['Kabza', 'Namlu', 'Sürgü', 'Harbi', 'Horoz'] as $index => $text) {
+            $answers[] = $answer(300 + $index, 3, $text, (int) ($text === 'Harbi'));
+        }
+        $plan = app(LegacyExamPlanner::class)->plan([
+            'dersler' => [['ders_id' => 1, 'ders_adi' => 'Ders', 'ders_seflink' => 'ders', 'ders_sira' => 1]],
+            'sinavlar' => [['sinav_id' => 1, 'sinav_adi' => '106.TEMEL EĞİTİM YAZILI SINAV SORULARI', 'kategori_id' => 2, 'ders_id' => null]],
+            'sorular' => [
+                ['soru_id' => 1, 'sinav_id' => 1, 'ders_id' => 1, 'soru_metni' => 'Aşağıdakilerden hangisi silah temizliğinde gerekli malzemelerden değildir?'],
+                ['soru_id' => 2, 'sinav_id' => 1, 'ders_id' => 1, 'soru_metni' => 'Aşağıdakilerden hangisi silah temizliğinde gerekli malzemelerden değildir?'],
+                ['soru_id' => 3, 'sinav_id' => 1, 'ders_id' => 1, 'soru_metni' => 'Gez ve arpacık yarı otomatik tabancaların hangi ana parçası üzerinde bulunur?'],
+            ],
+            'yanitlar' => $answers,
+            'ogg_sinavlari' => [],
+        ]);
+        $this->assertCount(2, $plan['questions']);
+        $byStem = collect($plan['questions'])->keyBy('stem');
+        $cleaningQuestion = $byStem['Aşağıdakilerden hangisi silah temizliğinde gerekli malzemelerden değildir?'];
+        $this->assertSame('Süngü', $cleaningQuestion['options'][$cleaningQuestion['correct']]);
+        $pasted = $byStem['Aşağıdakilerden hangisi silahların parçalarından biri değildir?'];
+        $this->assertSame('Harbi', $pasted['options'][$pasted['correct']]);
+        $this->assertSame(['silah-temizlik-malzeme' => 1, 'gez-arpacik-kopya' => 1], $plan['stats']['corrections']);
+        $this->assertSame(1, $plan['stats']['duplicates']);
+    }
+
     public function test_commit_publishes_questions_and_exams_with_original_order_and_cleaned_text(): void
     {
         [, $created] = $this->commit();

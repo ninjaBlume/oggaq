@@ -45,7 +45,7 @@ class LegacyExamPlanner
             $sets[$row['sinav_id']] = ['number' => (int) $match[1], 'full' => $row['kategori_id'] === 2, 'subject' => $row['ders_id']];
         }
         $questions = [];
-        $stats = ['source_questions' => count($tables['sorular']), 'cleaned' => ['entities' => 0, 'stem_number' => 0, 'option_letter' => 0], 'rejected' => 0, 'incomplete' => 0, 'repaired' => 0, 'duplicates' => 0, 'superseded' => 0];
+        $stats = ['source_questions' => count($tables['sorular']), 'cleaned' => ['entities' => 0, 'stem_number' => 0, 'option_letter' => 0], 'rejected' => 0, 'incomplete' => 0, 'repaired' => 0, 'corrections' => [], 'duplicates' => 0, 'superseded' => 0];
         $occurrences = [];
         $cleanLog = [];
         foreach ($tables['sorular'] as $row) {
@@ -252,9 +252,13 @@ class LegacyExamPlanner
         if (count($correct) !== 1) {
             $issues[] = 'Tek doğru cevap belirlenemedi.';
         }
+        $key = count($correct) === 1 ? $correct[0] : null;
+        [$stem, $key, $rules] = LegacyCorrections::apply($stem, $texts, $key, fn ($t) => $this->norm($t));
+        foreach ($rules as $rule) {
+            $stats['corrections'][$rule] = ($stats['corrections'][$rule] ?? 0) + 1;
+        }
         $normalized = array_map(fn ($t) => $this->norm($t), $texts);
         $counts = array_count_values($normalized);
-        $key = count($correct) === 1 ? $correct[0] : null;
         // A repeated wrong option is a source typo; a repeated correct option makes the key ambiguous.
         if ($key !== null && $counts[$normalized[$key]] > 1) {
             $issues[] = 'Doğru cevabın metni başka bir seçenekte tekrar ediyor.';
