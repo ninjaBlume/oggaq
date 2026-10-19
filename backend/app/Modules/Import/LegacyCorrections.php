@@ -42,6 +42,50 @@ class LegacyCorrections
             'stem' => 'tabancanın başlıca parçalarından değildir', 'options_include' => 'Kabza', 'correct_is' => 'Namlu', 'set_correct' => 'Kabza',
             'evidence' => 'Namlu tabancanın başlıca parçasıdır; EGM 114. sınav kitapçıklarında aynı kalıpta doğru şık Horoz (başlıca parça olmayan) işaretlidir. Aynı sınavdaki diğer kopya doğru şıkkı Kabza olarak verir.',
         ],
+        'kontrol-noktasi-giris-cikis' => [
+            'stem' => 'giriş ve çıkış kontrolü sırasında dikkat etmesi gereken hususlar arasında yer almaz', 'correct_is' => 'Personel kontrolü', 'set_correct' => 'Bina kontrolü',
+            'evidence' => 'EGM 102. Temel Eğitim A grubu cevaplı kitapçığı soru 37: aynı soru ve aynı seçeneklerle doğru şık E "Bina kontrolü".',
+        ],
+        'metal-yangini-su' => [
+            'stem' => 'hafif metallerin yangınlarında aşağıdaki söndürme maddelerinden hangisi kesinlikle kullanılmaz', 'correct_is' => 'Kum', 'set_correct' => 'Su',
+            'evidence' => 'EGM 104. Temel Eğitim B grubu cevaplı kitapçığı soru 41: doğru şık D "Su"; hafif metal yangınlarında su kullanılmaz, kum kullanılır.',
+        ],
+        'koruma-prensipleri' => [
+            'stem' => 'temel koruma prensiplerinden değildir', 'correct_is' => 'Koruma görevlisi koruma ile ilgili her türlü konuyu, korunan kişi ile rahatça paylaşabilmelidir', 'set_correct_prefix' => 'Korunan kişiden daha üst makamdaki',
+            'evidence' => 'EGM 104. Temel Eğitim A grubu soru 91 ve B grubu soru 9 cevaplı kitapçıkları: doğru şık B ("Korunan kişiden daha üst makamdaki… korunmasına geçilmelidir").',
+        ],
+        'koruma-gorevlisi-hususlar' => [
+            'stem' => 'koruma görevlisinin dikkat edeceği hususlardan değildir', 'correct_is' => 'Ekip uyumu en üst seviyede olmalıdır', 'set_correct_prefix' => 'Koşullara göre değişebilen koruma düzenine hazırlıklı olmamalıdır',
+            'evidence' => 'EGM 104. Temel Eğitim A grubu soru 92 ve B grubu soru 8 cevaplı kitapçıkları: doğru şık E ("…düzenine hazırlıklı olmamalıdır").',
+        ],
+        'gecici-haller-komisyon' => [
+            'stem' => 'para veya değerli eşya nakli gibi geçici veya acil hallerde', 'correct_is' => 'Özel güvenlik şirketinin özel güvenlik izin talebi', 'set_correct' => 'Komisyon kararı',
+            'evidence' => 'EGM 105. Temel Eğitim A grubu cevaplı kitapçığı soru 7: doğru şık C "Komisyon kararı"; 5188 s. Kanun md. 3 geçici ve acil hallerde komisyon kararı aranmaksızın valilik izni verilir.',
+        ],
+        'yanik-yanlis-uygulama' => [
+            'stem' => 'ısı ile oluşan yanıklarda yapılan yanlış bir uygulamadır', 'correct_is' => 'Kişi hala yanıyorsa koşması engellenir', 'set_correct' => 'Su toplamış yerler patlatılır',
+            'evidence' => 'EGM 107. Temel Eğitim A grubu soru 53 / B grubu soru 50 cevaplı kitapçıkları: doğru şık E "Su toplamış yerler patlatılır"; yanıkta su toplamış yerler patlatılmaz.',
+        ],
+        'kimlik-sorma-yetkisi' => [
+            'stem' => 'kimlik sorma yetkisi bulunmaktadır', 'correct_is' => 'I, II, III, IV, V, VI', 'set_correct' => 'I, III ve IV',
+            'evidence' => 'EGM 113. Temel Eğitim A grubu cevaplı kitapçığı soru 14: aynı seçeneklerle doğru şık A "I, III ve IV".',
+        ],
+        'yaya-kontrol-noktasi' => [
+            'stem' => 'yaya kontrol noktasında dikkat edilmesi gereken hususlar arasında yer almaz', 'correct_is' => 'Kişilerin üzerinde birden fazla suç unsuru madde olabileceği göz önünde bulundurulmalıdır', 'set_correct_prefix' => 'El tipi metal detektör şahsın vücuduna dik',
+            'evidence' => 'EGM 114. Temel Eğitim A grubu soru 30 / B grubu soru 65 cevaplı kitapçıkları: doğru şık E ("El tipi metal detektör şahsın vücuduna dik tutularak…").',
+        ],
+        'vip-makam-araci' => [
+            'stem' => 'makam aracında bulunması gereken özelliklerden değildir', 'correct_is' => 'Motoru güçlü, hızlı ve 4x4 özellikli olmalıdır', 'set_correct' => 'Araçta açılır tavan bulunmalıdır',
+            'evidence' => 'EGM 116. Temel Eğitim A grubu soru 86 / B grubu soru 12 cevaplı kitapçıkları: doğru şık E "Araçta açılır tavan bulunmalıdır".',
+        ],
+        'namlu-parcasi' => [
+            'stem' => 'tabanca namlusunun bir parçasıdır', 'correct_is' => 'Horoz', 'set_correct' => 'Dirsekli kurs',
+            'evidence' => 'EGM 117. Temel Eğitim A grubu soru 18 / B grubu soru 2 cevaplı kitapçıkları: doğru şık C "Dirsekli kurs"; horoz namlu parçası değildir.',
+        ],
+        'ateslemeyi-gerceklestiren-parca' => [
+            'stem' => 'kurulu vaziyetten kurtulup iğneye veya direk kapsüle çarpmasıyla ateşlemeyi gerçekleştiren parçadır', 'correct_is' => 'Tetik', 'set_correct' => 'Horoz',
+            'evidence' => 'EGM 117. Temel Eğitim A grubu soru 25 / B grubu soru 9 cevaplı kitapçıkları: doğru şık B "Horoz".',
+        ],
     ];
 
     /**

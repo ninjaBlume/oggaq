@@ -250,6 +250,29 @@ SQL;
         $this->assertSame(1, $plan['stats']['duplicates']);
     }
 
+    public function test_official_booklet_corrections_only_touch_the_wrong_key(): void
+    {
+        $stem = 'Alüminyum, magnezyum, titanyum gibi hafif metallerin yangınlarında aşağıdaki söndürme maddelerinden hangisi kesinlikle kullanılmaz?';
+        $options = ['Kum', 'D tozu', 'Toprak', 'Su', 'Kuru kimyevi toz'];
+        $answers = [];
+        // Question 1 carries the source typo (Kum); question 2 is a copy whose key is already the official one (Su).
+        foreach ([1 => 0, 2 => 3] as $question => $correct) {
+            foreach ($options as $index => $text) {
+                $answers[] = ['yanit_id' => $question * 10 + $index, 'soru_id' => $question, 'yanit_metni' => $text, 'dogru_mu' => (int) ($index === $correct)];
+            }
+        }
+        $plan = app(LegacyExamPlanner::class)->plan([
+            'dersler' => [['ders_id' => 1, 'ders_adi' => 'Ders', 'ders_seflink' => 'ders', 'ders_sira' => 1]],
+            'sinavlar' => [['sinav_id' => 1, 'sinav_adi' => '104.TEMEL EĞİTİM YAZILI SINAV SORULARI', 'kategori_id' => 2, 'ders_id' => null]],
+            'sorular' => [['soru_id' => 1, 'sinav_id' => 1, 'ders_id' => 1, 'soru_metni' => $stem], ['soru_id' => 2, 'sinav_id' => 1, 'ders_id' => 1, 'soru_metni' => $stem]],
+            'yanitlar' => $answers, 'ogg_sinavlari' => [],
+        ]);
+        $this->assertCount(1, $plan['questions']);
+        $question = array_values($plan['questions'])[0];
+        $this->assertSame('Su', $question['options'][$question['correct']]);
+        $this->assertSame(['metal-yangini-su' => 1], $plan['stats']['corrections']);
+    }
+
     public function test_armed_exams_end_with_the_weapon_questions_and_unarmed_exams_have_none(): void
     {
         $answer = fn (int $id, int $question) => [['yanit_id' => $id, 'soru_id' => $question, 'yanit_metni' => 'A', 'dogru_mu' => 1], ['yanit_id' => $id + 1, 'soru_id' => $question, 'yanit_metni' => 'B', 'dogru_mu' => 0]];

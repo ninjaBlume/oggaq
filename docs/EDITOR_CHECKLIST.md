@@ -16,48 +16,39 @@ Her kural `backend/app/Modules/Import/LegacyCorrections.php` içinde kanıtıyla
 | Gez ve arpacık yarı otomatik tabancaların hangi ana parçası… (107, seçenekler Kabza/Namlu/Sürgü/Harbi/Horoz) | Başka sorunun metni yapıştırılmış | Metin: **"Aşağıdakilerden hangisi silahların parçalarından biri değildir?"** (doğru: Harbi) | EGM 107. Temel A grubu soru 4 / B grubu soru 22 |
 | Tabancanın başlıca parçalarından değildir (117, seçenekler Namlu/Sürgü/Yerine getiren yay ve mili/Çerçeve/Kabza) | Aynı soru iki kez: Namlu / Kabza | **Kabza** | Namlu başlıca parçadır; EGM 114. sınavında aynı kalıpta doğru şık Horoz (başlıca parça olmayan) |
 | Doğru nişan alma aşağıdakilerden hangisidir? (101) | Dersi Hukuk girilmiş (soru silah bölümünde, 104. sırada) | Ders: **Silah Bilgisi ve Atış** | 101. sınav tam kaydında silah bölümünde; ders setinde silah sorusu |
+| Kontrol noktasında giriş-çıkış kontrolünde dikkat edilecek hususlardan yer almaz | Doğru: Personel kontrolü | **Bina kontrolü** | EGM 102. Temel (A) cevaplı kitapçık, soru 37 |
+| Hafif metal yangınlarında kesinlikle kullanılmayan söndürme maddesi | Doğru: Kum | **Su** | EGM 104. Temel (B) cevaplı kitapçık, soru 41; hafif metal yangınında su kullanılmaz |
+| Temel koruma prensiplerinden değildir | Doğru: Koruma görevlisi her konuyu rahatça paylaşabilmelidir | **Korunan kişiden daha üst makamdaki… korunmasına geçilmelidir** (B) | EGM 104. Temel (A soru 91, B soru 9) |
+| Koruma görevlisinin dikkat edeceği hususlardan değildir | Doğru: Ekip uyumu en üst seviyede olmalıdır | **Koşullara göre değişebilen koruma düzenine hazırlıklı olmamalıdır** (E) | EGM 104. Temel (A soru 92, B soru 8) |
+| Geçici ve acil hallerde “…… aranmaksızın” valilik izni | Doğru: Özel güvenlik şirketinin izin talebi | **Komisyon kararı** | EGM 105. Temel (A) soru 7; 5188 s. Kanun md. 3 |
+| Isı ile oluşan yanıklarda yanlış uygulama | Doğru: Kişi hâlâ yanıyorsa koşması engellenir | **Su toplamış yerler patlatılır** | EGM 107. Temel (A soru 53, B soru 50) |
+| Kimlik sorma yetkisinin bulunduğu yer/durumlar (I–VI) | Doğru: I, II, III, IV, V, VI | **I, III ve IV** | EGM 113. Temel (A) soru 14 |
+| Yaya kontrol noktasında dikkat edilecek hususlar arasında yer almaz | Doğru: Birden fazla suç unsuru madde… | **El tipi metal detektör şahsın vücuduna dik tutularak…** (E) | EGM 114. Temel (A soru 30, B soru 65) |
+| VIP makam aracında bulunması gereken özelliklerden değildir | Doğru: Motoru güçlü, hızlı ve 4x4 | **Araçta açılır tavan bulunmalıdır** | EGM 116. Temel (A soru 86, B soru 12) |
+| Tabanca namlusunun bir parçasıdır | Doğru: Horoz | **Dirsekli kurs** | EGM 117. Temel (A soru 18, B soru 2) |
+| Kurulu vaziyetten kurtulup iğneye çarparak ateşlemeyi gerçekleştiren parça | Doğru: Tetik | **Horoz** | EGM 117. Temel (A soru 25, B soru 9) |
 
 ## 2. Çelişki sanılan, aslında doğru olanlar
 
 - **Silah bakım ve temizliği türlerinden değildir (104: Günlük bakım / 106: Aylık bakım):** iki ayrı sınavın farklı seçenek kümeleri. 104'ün doğru şıkkı resmî A ve B kitapçığında kırmızı işaretli olarak **Günlük bakım**'dır; değişiklik gerekmez.
+- **Silah sökmeye başlamadan önce ilk işlem:** iki ayrı soru vardır. 106'daki seçenek "Silah ölü noktaya tutulur" doğru şıktır (EGM 106. Temel A cevaplı kitapçığı, soru 13); 114'te aynı seçenek "ölü noktaya tutularak horoz düşürülür" biçiminde değişmiş ve doğru şık **Şarjör çıkartılır**'dır (EGM 114. Temel). İkisi de bizdeki anahtarla uyumludur.
+- **Tabancanın başlıca parçalarından değildir (116: Tırnak/Hazne):** doğru şık **Tırnak**'tır (EGM 116. Temel B cevaplı kitapçığı, soru 5); bizdeki anahtar aynıdır.
+- **MP5 makinalı tabanca ana parçalarından değildir (116: Kurma kolu):** resmî 116 kitapçığında doğru şık **Kurma kolu**'dur; önceki otomatik karşılaştırmanın "Şarjör" uyarısı komşu soruya aitmiş.
+- Önceki sürümdeki 28 “otomatik aday” listesi, komşu sorunun kırmızı şıkkıyla karıştığı için yanlış alarm üretiyordu ve kaldırıldı. Yerine daha katı yöntem kullanıldı (bölüm 4): gerçek hatalar bölüm 1'e eklendi, geri kalanı yanlış alarmdı (ör. Esrar halüsinojendir, il milli eğitim müdürlüğü komisyon üyesi değildir, Liderler (Önderler) 113 kitapçığıyla doğrulandı).
 
-## 3. Hâlâ çözülemeyenler (resmî kitapçık bulunamadı)
+## 3. Hâlâ çözülemeyenler
 
-- **Silah sökmeye başlamadan önce ilk işlem (106):** bizdeki doğru şık "Silah ölü noktaya tutulur"; 114. sınavın resmî kitapçığında seçenek "ölü noktaya tutularak horoz düşürülür" biçimine çevrilmiş ve doğru şık **Şarjör çıkartılır**. 106. sınav kitapçığına ulaşılamadı; ürün sahibi 106 anahtarını doğrulamalı.
-- **118. ve 120. sınavların silahlı sürümleri (çözüldü):** Dökümde 118'de 24, 120'de 22 silah sorusu vardı; eksik dört soru (118 soru 19, 120 soru 23–25) resmî A grubu cevaplı kitapçıktan eklendi (`LegacySupplements`). Editörler eklenen soruları kitapçıkla bir kez daha gözden geçirebilir.
-- **Tabancanın başlıca parçalarından değildir (116: Tırnak):** seçeneklerde hem Tırnak hem Hazne başlıca parça sayılmayabilir; resmî anahtar bulunamadı.
+- **Özel Güvenlik Denetleme Başkanlığınca hazırlanan eğitim projesi (yeknesaklık, 119):** seçenekler ÖZGE / ÖGNET / PATBİS / ASİP / SEP. EGM 119. Temel **A** kitapçığında doğru şık **SEP**, **B** kitapçığında aynı seçeneklerle **ÖZGE** işaretlidir; resmî kitapçıklar birbiriyle çelişiyor. Bizdeki anahtar ÖZGE'dir. Editör resmî nihai cevap anahtarıyla (kitapçık sayfasındaki cevap anahtarı) kontrol etmeli.
+- **Resmî kitapçığı bulunamayan sınavlar (100, 101, 103, 108):** bu sınavların soruları, başka sınavlarda aynen çıkmışsa o kitapçıkla doğrulanır; yalnız bu sınavlara özgü sorular kaynaktaki anahtarla bırakıldı.
+- **Seçenekleri kaynakta olmayan 6 taslak soru** ve bunlara bağlı 7 taslak sınav: editörler soruyu resmî kitapçıktan tamamlayıp yayımlamalı ([IMPORTING](IMPORTING.md) içinde listelenmiştir).
 
-## 4. Resmî cevaplı kitapçıkla otomatik karşılaştırmada farklı çıkan adaylar
+## 4. Resmî cevaplı kitapçıkla karşılaştırma (19 Ekim 2026)
 
-Doğrulama yöntemi: 12 sınavın cevaplı kitapçığındaki kırmızı şıklar, soru metni ve seçeneklerle eşleştirilen bölgede bizim anahtarla karşılaştırıldı. Bu otomatik eşleştirme, benzer seçenekli komşu sorular ve I/II/III kombinasyonlu şıklar yüzünden **yanlış alarm üretebilir**; her satır editör tarafından kitapçıkla kontrol edilmelidir. Kaynak sınav numarası, kaynak kayıt numarası ve resmî kitapçıkta kırmızı görünen şık verilmiştir.
+Yöntem: EGM'nin yayımladığı cevaplı kitapçıklarda (A ve B grupları) doğru şık kırmızıdır. 90, 102, 104–107 ve 109–121 sınavlarının (19 sınav) kitapçıkları ayrıştırılıp içe aktarılmış her sorunun metni, **bütün** seçenekleri ve doğru şıkkı kitapçıktaki aynı soruyla karşılaştırıldı (soru metni sözcük kümesi ve tüm seçenekler eşleşmeli; komşu soruların işaretleri hariç tutulur).
 
-| Sınav | Kaynak kayıt | Soru | Bizim doğru | Kitapçıkta kırmızı |
-|---|---|---|---|---|
-| 108 | #173 | Aşağıdakilerden hangisi veya hangileri bir binaya sadece yetkili/izinli kişilerin giriş çı | Yalnız I | I ve III / I, II ve III |
-| 108 | #195 | Narkotik maddelerin sınıflandırılmasına göre aşağıdakilerden hangisi hayal gösterenler (Ha | Esrar | Eroin |
-| 108 | #213 | Günlük hayatın akışı içinde, birbirini tanımayan insanların tesadüfen bir araya gelmeleri  | Liderler (Önderler) | Tesir altında kalanlar |
-| 107 | #305 | X-Ray cihazından geçen maddelerin ekran üzerinde göründükleri renklerle ilgili aşağıdakile | IV | II- IV |
-| 106 | #502 | Aşağıdakilerden hangisi silahı sökmeye başlamadan önce yapılması gereken ilk işlemdir? | Silah ölü noktaya tutulur | Şarjör çıkartılır |
-| 105 | #574 | Kontrol noktasında görevli özel güvenlik görevlileri Sevgi ile Ayşe aşağıdaki yetkilerden  | V | III |
-| 102 | #866 | Aşağıdakilerden hangisi yarı otomatik tabancanın gövdesinde yer alır? | Tetik | Gez / Tırnak / Tırnak yayı |
-| 103 | #964 | Narkotik maddelerin sınıflandırılmasına göre aşağıdakilerden hangisi Merkezi Sinir Sistemi | Metamfetamin | Eroin |
-| 103 | #1206 | Fişek çekirdeğinin namlu içerisinde kendi etrafında bir tur dönüşü sonunda aldığı mesafeye | Hatve | Azami menzil |
-| 104 | #1268 | Kalabalık içerisinde kişi tipleri bulunmaktadır. Bu tiplerden birisi de; “Bir örgüte girer | Provokatörler | Tesir altında kalanlar ve karşı eylemcil |
-| 106 | #1665 | Narkotik maddelerin sınıflandırılmasına göre aşağıdakilerden hangisi Hayal Gösterenler (Ha | Esrar | Eroin / Eroin |
-| 101 | #1871 | 5188 sayılı Özel Güvenlik Hizmetlerine Dair Kanun’a göre, özel güvenlik görevlileri koruma | Yalnız I | I ve II / III |
-| 110 | #2450 | 5188 sayılı Özel Güvenlik Hizmetlerine Dair Kanun’a göre aşağıdakilerden hangileri ruhsat  | I, II, V | III, IV, V / I, II, III, IV, V |
-| 111 | #2775 | . 5188 sayılı Özel Güvenlik Hizmetlerine Dair Kanun’a göre aşağıdakilerinin hangisi/hangil | I ve IV | III / III, IV ve V |
-| 112 | #3028 | 5188 sayılı Özel Güvenlik Hizmetlerine Dair Kanuna göre özel güvenlik eğitimini kimler ver | I, II, III | IV, V |
-| 112 | #3048 | Aşağıdakilerden hangisi Özel Güvenlik Denetleme Başkanlığı tarafından yapılan sınavlardan  | Ehliyet Sınavı | Görev Köpeği ve İdarecisi Sınavı |
-| 114 | #3590 | Bir futbol maçında görev alan özel güvenlik görevlileri maç sonunda sahaya inen topluluk v | Kama düzeni | Hat düzeni |
-| 116 | #4013 | Aşağıdakilerden hangisi özel güvenlik görevlilerinin 5188 Sayılı Özel Güvenlik Hizmetlerin | Gözaltına alma | Yakalama / Olay yerini ve delilleri koruma |
-| 116 | #4119 | Aşağıdakilerden hangisi MP5 Makinalı tabancanın ana parçalarından değildir? | Kurma kolu | Şarjör |
-| 117 | #4200 | Aşağıdakilerden hangisi iletişim sürecinin temel ögelerinden biri değildir? | Yönetici | Kanal |
-| 117 | #4220 | Günlük hayatın akışı içinde, birbirini tanımayan insanların tesadüfen bir araya gelmeleri  | Atılganlar | Tesir altında kalanlar |
-| 118 | #4625 | Aşağıdakilerden hangisi Özel Güvenlik Denetleme Başkanlığı tarafından yapılan sınavlardan  | Ehliyet Sınavı | Görev Köpeği ve İdarecisi Sınavı |
-| 119 | #4671 | Aşağıdakilerden hangisi özel güvenlik görevlilerinin kullandığı yetkiler arasında sayılmaz | Gözaltına alma | Yakalama / Emanete alma |
-| 119 | #4710 | Sıvı yanıcı maddelerden kaynaklı yangınların söndürülmesinde hangi söndürme maddesi kullan | Su | Köpük |
-| 119 | #4749 | Aşağıdakilerden hangisi Özel Güvenlik Denetleme Başkanlığınca yürütülen projelerden değild | UYUMA | KAAN |
-| 119 | #4759 | Aşağıdakilerden hangisi MP5 Makinalı tabancanın başlıca ana parçalarından değildir? | Ateşleme iğnesi | Şarjör |
-| 121 | #4943 | CCTV (Kapalı devre kamera kayıt sistemi) için aşağıda verilen ifadelerden hangisi doğrudur | Giriş çıkış gözetlenip kayıt altına alın | Kayıt cihazlarına tüm çalışanlar rahatlı |
-| 121 | #4996 | Aşağıdakilerden hangisi Özel Güvenlik Denetleme Başkanlığının dijital projelerinden biri d | KADES | KAAN |
+- **1.864 soru** resmî kitapçıkla birebir aynı anahtara sahip (düzeltmeler uygulandıktan sonra).
+- **158 soru** belirsiz kaldı (kitapçıkta eşleşti, ancak kırmızı şık güvenle çözülemedi — ör. I/II/III birleşik şıklar).
+- **736 soru** hiçbir kitapçıkta bulunamadı (yalnız 100, 101, 103, 108 gibi kitapçığı bulunmayan sınavlara ait ya da farklı sözcüklerle çıkmış sorular); bunların anahtarı kaynak veriye dayanır.
+- **2 uyuşmazlık** kaldı ve ikisi de açıklandı: silah sökme sorusunun 114'teki farklı seçenekli sürümü (bölüm 2) ve A/B kitapçıkları birbiriyle çelişen proje sorusu (bölüm 3).
+
+Bu karşılaştırma, bu 19 sınav için resmî anahtarla uyumu gösterir; kitapçığı olmayan sorular için “doğrulandı” denemez. Karşılaştırmayı yeniden yapmak için kitapçıklar `egm.gov.tr/ozelguvenlik` duyuru sayfalarındaki bağlantılardan indirilip `pdftohtml -xml` ile renkleri okunabilir.
