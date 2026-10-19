@@ -15,6 +15,7 @@ Her kural `backend/app/Modules/Import/LegacyCorrections.php` içinde kanıtıyla
 | ÖGDB tarafından yapılan sınavlardan değildir (107) | Aynı soru iki kez: Temel ve Yenileme Eğitim Sınavı / Bomba İmha Uzmanı Sınavı | **Bomba İmha Uzmanı Sınavı** | Temel ve Yenileme sınavı ÖGDB'nin kendi sınavı; sonraki sınavlarda aynı soruda Bomba İmha seçeneği "Ehliyet Sınavı" olmuştur (EGM 113) |
 | Gez ve arpacık yarı otomatik tabancaların hangi ana parçası… (107, seçenekler Kabza/Namlu/Sürgü/Harbi/Horoz) | Başka sorunun metni yapıştırılmış | Metin: **"Aşağıdakilerden hangisi silahların parçalarından biri değildir?"** (doğru: Harbi) | EGM 107. Temel A grubu soru 4 / B grubu soru 22 |
 | Tabancanın başlıca parçalarından değildir (117, seçenekler Namlu/Sürgü/Yerine getiren yay ve mili/Çerçeve/Kabza) | Aynı soru iki kez: Namlu / Kabza | **Kabza** | Namlu başlıca parçadır; EGM 114. sınavında aynı kalıpta doğru şık Horoz (başlıca parça olmayan) |
+| Doğru nişan alma aşağıdakilerden hangisidir? (101) | Dersi Hukuk girilmiş (soru silah bölümünde, 104. sırada) | Ders: **Silah Bilgisi ve Atış** | 101. sınav tam kaydında silah bölümünde; ders setinde silah sorusu |
 
 ## 2. Çelişki sanılan, aslında doğru olanlar
 
@@ -23,6 +24,7 @@ Her kural `backend/app/Modules/Import/LegacyCorrections.php` içinde kanıtıyla
 ## 3. Hâlâ çözülemeyenler (resmî kitapçık bulunamadı)
 
 - **Silah sökmeye başlamadan önce ilk işlem (106):** bizdeki doğru şık "Silah ölü noktaya tutulur"; 114. sınavın resmî kitapçığında seçenek "ölü noktaya tutularak horoz düşürülür" biçimine çevrilmiş ve doğru şık **Şarjör çıkartılır**. 106. sınav kitapçığına ulaşılamadı; ürün sahibi 106 anahtarını doğrulamalı.
+- **118. ve 120. sınavların silahlı sürümleri eksik:** 118'de 24, 120'de 22 silah sorusu var (olması gereken 25); eksik silah soruları kaynak dökümde yok. Editörler resmî kitapçıktan ekleyip sınavı yeniden kurmalı.
 - **Tabancanın başlıca parçalarından değildir (116: Tırnak):** seçeneklerde hem Tırnak hem Hazne başlıca parça sayılmayabilir; resmî anahtar bulunamadı.
 
 ## 4. Resmî cevaplı kitapçıkla otomatik karşılaştırmada farklı çıkan adaylar
