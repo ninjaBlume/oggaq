@@ -53,7 +53,7 @@ test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal s�
   await adminPage.getByRole("button", { name: "Taslağı kaydet" }).click();
   await expect(adminPage.getByRole("status").filter({ hasText: "Çıkmış sınav taslağı oluşturuldu." })).toBeVisible();
   await adminPage.reload();
-  await expect(adminPage.locator(".exam-entry-stem").first()).toHaveText("Sentetik üçüncü soru");
+  await expect(adminPage.locator(".question-stem").first()).toHaveText("Sentetik üçüncü soru");
 
   // Drafts stay invisible to students.
   const studentContext = await browser.newContext();
@@ -68,6 +68,19 @@ test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal s�
   await adminPage.getByRole("dialog").getByRole("button", { name: "Yayımla", exact: true }).click();
   await expect(adminPage.getByRole("status").filter({ hasText: "Çıkmış sınav yayımlandı." })).toBeVisible();
   await expect(adminPage.getByLabel("Başlık", { exact: true })).toBeDisabled();
+  // The published exam shows every question below each other and a question is corrected in place:
+  // the new version is published and the exam moves to it without changing the question's position.
+  await expect(adminPage.locator(".question-card")).toHaveCount(3);
+  const third = adminPage.locator("#soru-3");
+  await expect(third.locator(".question-stem")).toHaveText("Sentetik ikinci soru");
+  await third.getByRole("button", { name: "Düzenle", exact: true }).click();
+  await third.getByLabel("Soru metni", { exact: true }).fill("Sentetik ikinci soru (düzeltildi)");
+  await third.getByRole("button", { name: "Kaydet, yayımla ve sınavda güncelle", exact: true }).click();
+  await expect(adminPage.getByRole("status").filter({ hasText: "3. soru kaydedildi, yayımlandı ve sınavda güncellendi." })).toBeVisible();
+  await expect(third.locator(".question-stem")).toHaveText("Sentetik ikinci soru (düzeltildi)");
+  await expect(third).toContainText("Sınavdaki sürüm 2");
+  await adminPage.reload();
+  await expect(adminPage.locator("#soru-3 .question-stem")).toHaveText("Sentetik ikinci soru (düzeltildi)");
   // The question list names each question's exams next to its subject and filters by exam.
   await adminPage.goto(`${admin}/questions`);
   await expect(adminPage.getByRole("row").filter({ hasText: "Sentetik birinci soru" })).toContainText("1. Temel · silahlı");

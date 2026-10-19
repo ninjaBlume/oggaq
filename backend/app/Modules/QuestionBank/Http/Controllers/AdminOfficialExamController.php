@@ -5,8 +5,10 @@ namespace App\Modules\QuestionBank\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\QuestionBank\Actions\PublishOfficialExam;
 use App\Modules\QuestionBank\Actions\SaveOfficialExam;
+use App\Modules\QuestionBank\Actions\UpdateOfficialExamQuestion;
 use App\Modules\QuestionBank\Http\Requests\OfficialExamListRequest;
 use App\Modules\QuestionBank\Http\Requests\SaveOfficialExamRequest;
+use App\Modules\QuestionBank\Http\Requests\UpdateOfficialExamQuestionRequest;
 use App\Modules\QuestionBank\Http\Resources\AdminOfficialExamResource;
 use App\Modules\QuestionBank\Models\OfficialExam;
 use App\Modules\QuestionBank\Models\Question;
@@ -52,6 +54,13 @@ class AdminOfficialExamController extends Controller
         return new AdminOfficialExamResource($this->detailed($action->execute($request->user(), $request->validated(), $officialExam)));
     }
 
+    public function updateQuestion(UpdateOfficialExamQuestionRequest $request, OfficialExam $officialExam, string $question, UpdateOfficialExamQuestion $action): AdminOfficialExamResource
+    {
+        $exam = $action->execute($request->user(), $officialExam, $question, $request->validated('question_version_id'));
+
+        return new AdminOfficialExamResource($this->detailed($exam->loadCount('questions')->load('source')));
+    }
+
     public function publish(Request $request, OfficialExam $officialExam, PublishOfficialExam $action): AdminOfficialExamResource
     {
         Gate::authorize('manage', Question::class);
@@ -61,6 +70,6 @@ class AdminOfficialExamController extends Controller
 
     private function detailed(OfficialExam $exam): OfficialExam
     {
-        return $exam->load('examType', 'questions.questionVersion.options', 'questions.questionVersion.source', 'questions.questionVersion.question');
+        return $exam->load('examType', 'questions.questionVersion.options', 'questions.questionVersion.source', 'questions.questionVersion.question.latestVersion.options', 'questions.questionVersion.question.latestVersion.source');
     }
 }

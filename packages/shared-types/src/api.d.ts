@@ -956,6 +956,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/official-exams/{officialExam}/questions/{question}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Sınavdaki bir sorunun sürümünü değiştirme
+         * @description Yalnız platform yöneticisi. Soru sırası ve üyeliği değişmez. Taslak sınav aynı sorunun herhangi bir sürümünü alabilir; yayımlanmış sınav yalnız sorunun daha yeni yayımlanmış sürümünü alır (denetim kaydıyla düzeltme). Başlamış denemeler kendi sürümlerini korur. Başka soru veya geri sürüm 422 verir.
+         */
+        put: operations["updateOfficialExamQuestion"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/official-exams/{officialExam}/publish": {
         parameters: {
             query?: never;
@@ -1558,6 +1578,10 @@ export interface components {
             question: components["schemas"]["AdminQuestionVersion"];
             /** @description Sorunun şu an yayımlanmış sürümü; sabitlenen sürümden farklıysa taslak sınavda bu sürümle değiştirilebilir. */
             published_version_id: string | null;
+            /** @description Sorunun güncel kayıt numarası; soruyu düzenlerken base_version olarak gönderilir. */
+            question_revision: number;
+            /** @description Sorunun en güncel sürümü; sabitlenen sürümle aynıysa null. Düzenleme buradan devam eder. */
+            latest_version: components["schemas"]["AdminQuestionVersion"] | null;
         };
         AdminOfficialExam: {
             /** Format: uuid */
@@ -1683,6 +1707,13 @@ export interface components {
              * @enum {string|null}
              */
             weapon_status: "armed" | "unarmed" | null;
+        };
+        OfficialExamQuestionVersionInput: {
+            /**
+             * Format: uuid
+             * @description Aynı sorunun sürümü.
+             */
+            question_version_id: string;
         };
     };
     responses: {
@@ -3375,6 +3406,39 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["OfficialExamInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminOfficialExamResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    updateOfficialExamQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                officialExam: string;
+                question: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OfficialExamQuestionVersionInput"];
             };
         };
         responses: {

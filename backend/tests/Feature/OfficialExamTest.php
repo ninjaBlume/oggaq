@@ -213,6 +213,68 @@ class OfficialExamTest extends TestCase
         $this->assertRejectedByDatabase(fn () => DB::table('official_exams')->where('id', $exam['id'])->delete());
     }
 
+    private function revise(Question $question, string $stem, bool $publish = true): Question
+    {
+        $saved = app(SaveQuestion::class)->execute($this->admin, ['source_id' => $this->source->id, 'subject_id' => $this->subject->id, 'stem' => $stem, 'options' => ['X', 'Y'], 'correct_option_position' => 2, 'base_version' => $question->revision], $question);
+
+        return $publish ? app(PublishQuestion::class)->execute($this->admin, $saved, $saved->revision) : $saved;
+    }
+
+    public function test_published_exam_takes_only_a_newer_published_version_of_the_same_question_and_keeps_old_attempts(): void
+    {
+        $exam = $this->createExam([], true);
+        $student = $this->createUser();
+        $before = $this->startOfficial($exam['id'], [], $student)->assertOk()->json('data');
+        $this->asToken($this->admin);
+        $url = '/api/v1/admin/official-exams/'.$exam['id'].'/questions/'.$this->questions[1]->id;
+        $draftOnly = $this->revise($this->questions[1], 'Yalnız taslak', false);
+        $this->putJson($url, ['question_version_id' => $draftOnly->latest_version_id])->assertUnprocessable()->assertJsonValidationErrors('question_version_id');
+        $this->putJson($url, ['question_version_id' => $this->questions[0]->published_version_id])->assertUnprocessable();
+        $this->putJson($url, ['question_version_id' => $this->questions[1]->published_version_id])->assertOk();
+        $this->assertDatabaseCount('official_exam_question_changes', 0);
+
+        $published = app(PublishQuestion::class)->execute($this->admin, $draftOnly->refresh(), $draftOnly->revision);
+        $updated = $this->putJson($url, ['question_version_id' => $published->published_version_id])->assertOk()->assertJsonPath('data.status', 'published')->assertJsonPath('data.questions.1.question.stem', 'Yalnız taslak')->assertJsonPath('data.questions.1.position', 2)->json('data');
+        $this->assertSame(3, $updated['question_count']);
+        $this->assertDatabaseHas('official_exam_question_changes', ['official_exam_id' => $exam['id'], 'question_id' => $this->questions[1]->id, 'from_version_id' => $this->questions[1]->published_version_id, 'to_version_id' => $published->published_version_id, 'actor_id' => $this->admin->id]);
+        $this->assertDatabaseHas('audit_events', ['target_id' => $exam['id'], 'action' => 'official_exam.question_version_updated']);
+        // Going back to an older version is not a correction.
+        $this->putJson($url, ['question_version_id' => $this->questions[1]->published_version_id])->assertUnprocessable();
+
+        $this->asToken($student);
+        $context = $before['context_id'];
+        $old = $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$before['id'])->assertOk()->json('data');
+        $this->assertSame($this->versionIds(), array_column(array_column($old['questions'], 'question'), 'id'));
+        $after = $this->startOfficial($exam['id'], [], $student)->assertOk()->json('data');
+        $this->assertSame('Yalnız taslak', $after['questions'][1]['question']['stem']);
+        $this->assertSame([1, 2, 3], array_column($after['questions'], 'position'));
+    }
+
+    public function test_draft_exam_can_swap_any_version_of_the_same_question_and_only_admins_may_change_it(): void
+    {
+        $exam = $this->createExam();
+        $draft = $this->revise($this->questions[2], 'Taslak sürüm', false);
+        $url = '/api/v1/admin/official-exams/'.$exam['id'].'/questions/'.$this->questions[2]->id;
+        $this->putJson($url, ['question_version_id' => $draft->latest_version_id])->assertOk()->assertJsonPath('data.questions.2.question.stem', 'Taslak sürüm')->assertJsonPath('data.questions.2.published_version_id', $this->questions[2]->published_version_id);
+        $this->putJson('/api/v1/admin/official-exams/'.$exam['id'].'/questions/'.(string) Str::uuid(), ['question_version_id' => $draft->latest_version_id])->assertNotFound();
+        $this->asToken($this->createUser());
+        $this->putJson($url, ['question_version_id' => $this->questions[2]->published_version_id])->assertForbidden();
+        $this->assertSame($draft->latest_version_id, DB::table('official_exam_questions')->where('official_exam_id', $exam['id'])->where('question_id', $this->questions[2]->id)->value('question_version_id'));
+    }
+
+    public function test_database_only_allows_the_audited_version_correction_in_a_published_exam(): void
+    {
+        $exam = $this->createExam([], true);
+        $row = fn () => DB::table('official_exam_questions')->where('official_exam_id', $exam['id'])->where('question_id', $this->questions[0]->id);
+        $unpublished = $this->revise($this->questions[0], 'Taslak', false);
+        $this->assertRejectedByDatabase(fn () => $row()->update(['question_version_id' => $unpublished->latest_version_id]));
+        $this->assertRejectedByDatabase(fn () => $row()->update(['question_version_id' => $this->questions[1]->published_version_id]));
+        $newer = app(PublishQuestion::class)->execute($this->admin, $unpublished->refresh(), $unpublished->revision);
+        $this->assertRejectedByDatabase(fn () => $row()->update(['question_version_id' => $newer->published_version_id, 'position' => 9]));
+        $this->assertSame(1, $row()->update(['question_version_id' => $newer->published_version_id]));
+        $this->assertRejectedByDatabase(fn () => $row()->update(['question_version_id' => $this->questions[0]->published_version_id]));
+    }
+
     public function test_database_rejects_unpublished_versions_and_empty_or_gapped_publication(): void
     {
         $draftQuestion = app(SaveQuestion::class)->execute($this->admin, ['source_id' => $this->source->id, 'subject_id' => $this->subject->id, 'stem' => 'Taslak', 'options' => ['A', 'B'], 'correct_option_position' => 1]);

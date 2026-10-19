@@ -54,3 +54,5 @@ E2E yalnız `oggaq_test` veritabanını yeniden oluşturur ve sonunda temizler; 
 E2E ekran görüntüleri ve raporları Git dışında `artifacts/` altında tutulur. Sentetik hesap/soru verileri resmî içerik değildir. Firefox/WebKit/native iOS/Android build/test ve üretim dağıtımı yapılmadı.
 
 Çıkmış sınavlar (`/official-exams`): yayımlanmış soru sürümlerinden sıralı sınav taslağı oluşturma, soru ekleme/çıkarma/sıralama, ayrı yayım onayı ve yayımlanmış şablonun salt okunur görünümü. Sözleşme [QUESTION_BANK](../../docs/QUESTION_BANK.md#çıkmış-sınavlar); E2E: `tests/e2e/official.spec.ts`.
+
+Sınav sayfası **sınav bazlıdır**: sınavın bütün soruları (125 soruya kadar) tam metin, seçenekler ve doğru cevapla alt alta kartlar olarak listelenir; üstteki numara şeridi sorulara atlar. Her kart yerinde düzenlenir: *Kaydet, yayımla ve sınavda güncelle* soruya yeni sürüm yazar, yayımlar ve sınavdaki sırasını bozmadan sınavı o sürüme geçirir (yayımlanmış sınavda da çalışır); *Yalnız taslak kaydet* sürümü yayımlamaz. Sırala/çıkar/ekle yalnız taslak sınavdadır. Bu işlem `PUT /admin/official-exams/{officialExam}/questions/{question}` ile yapılır.

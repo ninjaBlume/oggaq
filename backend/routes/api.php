@@ -47,6 +47,7 @@ Route::prefix('v1')->group(function () {
             Route::post('admin/official-exams', [AdminOfficialExamController::class, 'store']);
             Route::get('admin/official-exams/{officialExam}', [AdminOfficialExamController::class, 'show'])->whereUuid('officialExam');
             Route::put('admin/official-exams/{officialExam}', [AdminOfficialExamController::class, 'update'])->whereUuid('officialExam');
+            Route::put('admin/official-exams/{officialExam}/questions/{question}', [AdminOfficialExamController::class, 'updateQuestion'])->whereUuid(['officialExam', 'question']);
             Route::post('admin/official-exams/{officialExam}/publish', [AdminOfficialExamController::class, 'publish'])->whereUuid('officialExam');
             Route::get('official-exams', [OfficialExamController::class, 'index']);
             Route::get('official-exams/{officialExam}', [OfficialExamController::class, 'show'])->whereUuid('officialExam');

@@ -3629,6 +3629,84 @@
         }
       }
     },
+    "/api/v1/admin/official-exams/{officialExam}/questions/{question}": {
+      "put": {
+        "operationId": "updateOfficialExamQuestion",
+        "summary": "Sınavdaki bir sorunun sürümünü değiştirme",
+        "description": "Yalnız platform yöneticisi. Soru sırası ve üyeliği değişmez. Taslak sınav aynı sorunun herhangi bir sürümünü alabilir; yayımlanmış sınav yalnız sorunun daha yeni yayımlanmış sürümünü alır (denetim kaydıyla düzeltme). Başlamış denemeler kendi sürümlerini korur. Başka soru veya geri sürüm 422 verir.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOfficialExamResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "officialExam",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          },
+          {
+            "name": "question",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfficialExamQuestionVersionInput"
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/admin/official-exams/{officialExam}/publish": {
       "post": {
         "operationId": "publishOfficialExam",
@@ -5938,7 +6016,7 @@
           "position": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 100
+            "maximum": 200
           },
           "question_id": {
             "type": "string",
@@ -5958,13 +6036,31 @@
               }
             ],
             "description": "Sorunun şu an yayımlanmış sürümü; sabitlenen sürümden farklıysa taslak sınavda bu sürümle değiştirilebilir."
+          },
+          "question_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Sorunun güncel kayıt numarası; soruyu düzenlerken base_version olarak gönderilir."
+          },
+          "latest_version": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdminQuestionVersion"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Sorunun en güncel sürümü; sabitlenen sürümle aynıysa null. Düzenleme buradan devam eder."
           }
         },
         "required": [
           "position",
           "question_id",
           "question",
-          "published_version_id"
+          "published_version_id",
+          "question_revision",
+          "latest_version"
         ]
       },
       "AdminOfficialExam": {
@@ -6002,7 +6098,7 @@
           "question_count": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 100
+            "maximum": 200
           },
           "source": {
             "anyOf": [
@@ -6463,6 +6559,19 @@
           "position",
           "status",
           "weapon_status"
+        ]
+      },
+      "OfficialExamQuestionVersionInput": {
+        "type": "object",
+        "properties": {
+          "question_version_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Aynı sorunun sürümü."
+          }
+        },
+        "required": [
+          "question_version_id"
         ]
       }
     },
