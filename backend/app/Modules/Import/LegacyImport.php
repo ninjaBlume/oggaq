@@ -179,7 +179,7 @@ class LegacyImport
             'exams' => $sizes, 'errors' => $plan['errors'],
             'warning_counts' => array_count_values(array_column($plan['warnings'], 'type')),
             'superseded' => $by('superseded_by_full_exam'), 'same_stem_different_options' => $by('same_stem_different_options'),
-            'corrections_applied' => array_map(fn ($id) => ['rule' => $id, 'questions' => $plan['stats']['corrections'][$id], 'evidence' => LegacyCorrections::RULES[$id]['evidence']], array_keys($plan['stats']['corrections'])), 'incomplete_questions' => $by('incomplete_question'), 'repaired_from_subject_set' => $by('repaired_from_subject_set'), 'subject_conflicts' => $by('subject_conflict'), 'duplicate_option_text' => $by('duplicate_option_text'), 'repeated_in_exam' => $by('repeated_in_exam'), 'date_conflicts' => $by('date_conflict'),
+            'corrections_applied' => array_map(fn ($id) => ['rule' => $id, 'questions' => $plan['stats']['corrections'][$id], 'evidence' => LegacyCorrections::RULES[$id]['evidence']], array_keys($plan['stats']['corrections'])), 'incomplete_questions' => $by('incomplete_question'), 'repaired_from_subject_set' => $by('repaired_from_subject_set'), 'subject_conflicts' => $by('subject_conflict'), 'exam_structure' => $by('exam_structure'), 'duplicate_option_text' => $by('duplicate_option_text'), 'repeated_in_exam' => $by('repeated_in_exam'), 'date_conflicts' => $by('date_conflict'),
             'stem_number_removed' => $plan['clean_log'],
         ];
     }

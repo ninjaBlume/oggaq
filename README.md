@@ -78,7 +78,7 @@ Bu komutlar PATH'te PHP 8.4 seçili olmasını gerektirir. Horizon'u ayrı termi
 
 Paneli kökte `npm run dev:admin` ile `http://127.0.0.1:5174` adresinde çalıştırın. Yönetici hesabı için panel kurulum belgesindeki `app:create-admin` komutunu kullanın; hazır/parolası sabit bir hesap oluşturulmaz.
 
-Her soruda ders ve ait olduğu çıkmış sınavlar ayrı gösterilir ve ayrı filtrelenir ([QUESTION_BANK](docs/QUESTION_BANK.md#sorudersinav-ilişkisi)). Kurum arşiv dökümü (MySQL) `import:legacy-preview`/`import:legacy-commit` ile geliştirme veritabanına aktarıldı: 2.783 yayımlanmış ve 6 taslak soru, 11 ders ve 44 çıkmış sınav (37 yayımlanmış, 7 taslak; 22 sınav × silahlı/silahsız). Kaynak dosya kişisel veri içerir ve git dışıdır; üretim aktarımı yapılmadı. Ayrıntı: [IMPORTING](docs/IMPORTING.md). PDF kaynakları sağlanmadı.
+Her soruda ders ve ait olduğu çıkmış sınavlar ayrı gösterilir ve ayrı filtrelenir ([QUESTION_BANK](docs/QUESTION_BANK.md#sorudersinav-ilişkisi)). Kurum arşiv dökümü (MySQL) `import:legacy-preview`/`import:legacy-commit` ile geliştirme veritabanına aktarıldı: 2.755 yayımlanmış ve 6 taslak soru, 11 ders ve 44 çıkmış sınav (37 yayımlanmış, 7 taslak; 22 sınav × silahlı/silahsız). Kaynak dosya kişisel veri içerir ve git dışıdır; üretim aktarımı yapılmadı. Ayrıntı: [IMPORTING](docs/IMPORTING.md). PDF kaynakları sağlanmadı.
 
 Öğrenci uygulamasını kökte `npm run dev:web` ile `http://127.0.0.1:5173` adresinde açın. Normal veritabanı boşsa yönetim panelinde yayımlanan sorular listelenene kadar boş durum gösterilir.
 

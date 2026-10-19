@@ -13,6 +13,11 @@ class LegacyExamPlanner
 
     private const WEAPON_SUBJECT = 'silah-bilgisi-ve-atis';
 
+    // Armed exams have 125 questions (100 general + 25 weapon, weapon last); unarmed exams have the 100 general ones.
+    public const GENERAL_QUESTIONS = 100;
+
+    public const WEAPON_QUESTIONS = 25;
+
     // Exam dates absent from ogg_sinavlari; each was looked up in public EGM-based reporting (see docs/IMPORTING.md).
     public const SUPPLEMENTAL_DATES = [
         100 => '2022-10-30', 101 => '2022-12-25', 102 => '2023-04-30', 103 => '2023-06-24', 104 => '2023-08-26',
@@ -61,7 +66,7 @@ class LegacyExamPlanner
 
                 continue;
             }
-            $occurrences[] = ['soru_id' => $row['soru_id'], 'number' => $set['number'], 'full' => $set['full'], 'hash' => $built['hash'], 'stem_key' => $built['stem_key'], 'subject' => $subjectId, 'question' => $built];
+            $occurrences[] = ['soru_id' => $row['soru_id'], 'number' => $set['number'], 'full' => $set['full'], 'hash' => $built['hash'], 'stem_key' => $built['stem_key'], 'subject' => $built['subject_override'] ?? $subjectId, 'question' => $built];
         }
         // A whole-exam question without options is completed from the same exam's per-subject copy of the same stem.
         $unfinished = [];
@@ -189,8 +194,15 @@ class LegacyExamPlanner
                 $complete[$o['hash']] = $o['question']['complete'];
             }
             [$year, $month, $day] = array_map('intval', explode('-', $dates[$number]));
-            foreach (['silahli' => null, 'silahsiz' => $weaponId] as $variant => $excluded) {
-                $list = array_keys(array_filter($hashes, fn ($subject) => $excluded === null || $subject !== $excluded));
+            // Unarmed candidates sit the general questions only; armed candidates get the same questions followed by the
+            // weapon-subject questions (the last 25 of the 125), whatever order the source rows were entered in.
+            $general = array_keys(array_filter($hashes, fn ($subject) => $subject !== $weaponId));
+            $weapon = $weaponId === null ? [] : array_keys(array_filter($hashes, fn ($subject) => $subject === $weaponId));
+            if (count($general) !== self::GENERAL_QUESTIONS || count($weapon) !== self::WEAPON_QUESTIONS) {
+                $warnings[] = ['type' => 'exam_structure', 'sinav_no' => $number, 'general' => count($general), 'weapon' => count($weapon)];
+            }
+            foreach (['silahli' => $weapon, 'silahsiz' => []] as $variant => $tail) {
+                $list = array_merge($general, $tail);
                 $label = $variant === 'silahli' ? 'Silahlı' : 'Silahsız';
                 $exams[] = [
                     'key' => "{$number}:{$variant}", 'number' => $number, 'variant' => $variant, 'date' => $dates[$number], 'year' => $year,
@@ -219,7 +231,7 @@ class LegacyExamPlanner
             $cleanLog[] = ['soru_id' => $row['soru_id'], 'removed' => mb_substr($stem, 0, 12)];
             $stem = $numbered;
         }
-        if (html_entity_decode($original, ENT_QUOTES | ENT_HTML5, 'UTF-8') !== $original) {
+        if ($this->decode($original) !== $original) {
             $stats['cleaned']['entities']++;
         }
         if ($stem === '') {
@@ -253,7 +265,13 @@ class LegacyExamPlanner
             $issues[] = 'Tek doğru cevap belirlenemedi.';
         }
         $key = count($correct) === 1 ? $correct[0] : null;
-        [$stem, $key, $rules] = LegacyCorrections::apply($stem, $texts, $key, fn ($t) => $this->norm($t));
+        [$stem, $key, $rules, $subjectCode] = LegacyCorrections::apply($stem, $texts, $key, fn ($t) => $this->norm($t));
+        $subjectOverride = null;
+        foreach ($subjects as $id => $subject) {
+            if ($subjectCode !== null && $subject['code'] === $subjectCode) {
+                $subjectOverride = $id;
+            }
+        }
         foreach ($rules as $rule) {
             $stats['corrections'][$rule] = ($stats['corrections'][$rule] ?? 0) + 1;
         }
@@ -267,7 +285,7 @@ class LegacyExamPlanner
 
         return [
             'stem' => $stem, 'options' => $texts, 'correct' => $key, 'stem_key' => $stemKey, 'duplicate_option_text' => count($counts) !== count($texts),
-            'issues' => $issues, 'complete' => $issues === [],
+            'issues' => $issues, 'complete' => $issues === [], 'subject_override' => $subjectOverride,
             'hash' => hash('sha256', json_encode([$stemKey, $normalized, $key], JSON_UNESCAPED_UNICODE)),
         ];
     }
@@ -288,9 +306,23 @@ class LegacyExamPlanner
         return $dates;
     }
 
+    // The source holds text that was HTML-escaped several times over (&amp;amp;quot;); decode until it is stable.
+    private function decode(string $text): string
+    {
+        for ($pass = 0; $pass < 40; $pass++) {
+            $decoded = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            if ($decoded === $text) {
+                break;
+            }
+            $text = $decoded;
+        }
+
+        return $text;
+    }
+
     private function clean(string $text): string
     {
-        $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = $this->decode($text);
         $text = str_replace(["\r\n", "\r"], "\n", $text);
 
         return trim((string) preg_replace('/[ \t]+/u', ' ', $text));

@@ -250,6 +250,43 @@ SQL;
         $this->assertSame(1, $plan['stats']['duplicates']);
     }
 
+    public function test_armed_exams_end_with_the_weapon_questions_and_unarmed_exams_have_none(): void
+    {
+        $answer = fn (int $id, int $question) => [['yanit_id' => $id, 'soru_id' => $question, 'yanit_metni' => 'A', 'dogru_mu' => 1], ['yanit_id' => $id + 1, 'soru_id' => $question, 'yanit_metni' => 'B', 'dogru_mu' => 0]];
+        $stems = ['W1' => 2, 'G1' => 1, 'G2' => 1, 'W2' => 2, 'Doğru nişan alma aşağıdakilerden hangisidir?' => 1];
+        $rows = [];
+        $answers = [];
+        foreach (array_keys($stems) as $index => $stem) {
+            $rows[] = ['soru_id' => $index + 1, 'sinav_id' => 1, 'ders_id' => $stems[$stem], 'soru_metni' => $stem];
+            $answers = array_merge($answers, $answer(($index + 1) * 10, $index + 1));
+        }
+        $plan = app(LegacyExamPlanner::class)->plan([
+            'dersler' => [['ders_id' => 1, 'ders_adi' => 'Genel', 'ders_seflink' => 'genel', 'ders_sira' => 1], ['ders_id' => 2, 'ders_adi' => 'Silah', 'ders_seflink' => 'silah-bilgisi-ve-atis', 'ders_sira' => 2]],
+            'sinavlar' => [['sinav_id' => 1, 'sinav_adi' => '101.TEMEL EĞİTİM YAZILI SINAV SORULARI', 'kategori_id' => 2, 'ders_id' => null]],
+            'sorular' => $rows, 'yanitlar' => $answers, 'ogg_sinavlari' => [],
+        ]);
+        $stemsOf = fn (array $exam) => array_map(fn ($hash) => $plan['questions'][$hash]['stem'], $exam['hashes']);
+        $byKey = collect($plan['exams'])->keyBy('key');
+        $this->assertSame(['G1', 'G2', 'W1', 'W2', 'Doğru nişan alma aşağıdakilerden hangisidir?'], $stemsOf($byKey['101:silahli']));
+        $this->assertSame(['G1', 'G2'], $stemsOf($byKey['101:silahsiz']));
+        // The subject correction moved the mis-tagged shooting question into the weapon section (3 weapon, 2 general).
+        $this->assertSame(['type' => 'exam_structure', 'sinav_no' => 101, 'general' => 2, 'weapon' => 3], collect($plan['warnings'])->firstWhere('type', 'exam_structure'));
+    }
+
+    public function test_text_escaped_several_times_is_decoded_until_stable(): void
+    {
+        $plan = app(LegacyExamPlanner::class)->plan([
+            'dersler' => [['ders_id' => 1, 'ders_adi' => 'Ders', 'ders_seflink' => 'ders', 'ders_sira' => 1]],
+            'sinavlar' => [['sinav_id' => 1, 'sinav_adi' => '101.TEMEL EĞİTİM YAZILI SINAV SORULARI', 'kategori_id' => 2, 'ders_id' => null]],
+            'sorular' => [['soru_id' => 1, 'sinav_id' => 1, 'ders_id' => 1, 'soru_metni' => 'ABC zincirinin &amp;amp;amp;quot;B&amp;amp;amp;quot; si Mehmet&amp;#039;in']],
+            'yanitlar' => [['yanit_id' => 1, 'soru_id' => 1, 'yanit_metni' => 'Anababa&amp;amp;amp;anababa', 'dogru_mu' => 1], ['yanit_id' => 2, 'soru_id' => 1, 'yanit_metni' => 'Tom &amp; Jerry', 'dogru_mu' => 0]],
+            'ogg_sinavlari' => [],
+        ]);
+        $question = array_values($plan['questions'])[0];
+        $this->assertSame('ABC zincirinin "B" si Mehmet\'in', $question['stem']);
+        $this->assertSame(['Anababa&anababa', 'Tom & Jerry'], $question['options']);
+    }
+
     public function test_commit_publishes_questions_and_exams_with_original_order_and_cleaned_text(): void
     {
         [, $created] = $this->commit();
@@ -270,7 +307,8 @@ SQL;
         $this->assertSame(2024, $armed->year);
         $this->assertSame('Şubat', $armed->term);
         $this->assertNull($armed->published_at);
-        $this->assertSame(['Birinci soru; (a) \'tırnak\'', "İkinci soru & ilk yardım\nsatır", "Silah'ın ağırlığı nedir?", 'Seçeneği olmayan soru'], $armed->questions()->with('questionVersion')->get()->map(fn ($row) => $row->questionVersion->stem)->all());
+        // Weapon-subject questions are always the last ones of an armed exam, whatever the source order.
+        $this->assertSame(['Birinci soru; (a) \'tırnak\'', "İkinci soru & ilk yardım\nsatır", 'Seçeneği olmayan soru', "Silah'ın ağırlığı nedir?"], $armed->questions()->with('questionVersion')->get()->map(fn ($row) => $row->questionVersion->stem)->all());
         $unarmed = OfficialExam::where('title', 'like', 'ÖGG 107%Silahsız')->firstOrFail();
         $this->assertSame('unarmed', $unarmed->weapon_status);
         $this->assertSame($armed->exam_type_id, $unarmed->exam_type_id);

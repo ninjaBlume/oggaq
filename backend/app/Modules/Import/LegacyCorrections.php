@@ -34,6 +34,10 @@ class LegacyCorrections
             'set_stem' => 'Aşağıdakilerden hangisi silahların parçalarından biri değildir?',
             'evidence' => 'EGM 107. Temel Eğitim A grubu soru 4 / B grubu soru 22: seçenekleri Kabza, Namlu, Sürgü, Harbi, Horoz olan soru "silahların parçalarından biri değildir?" biçimindedir; kaynakta başka sorunun metni yapıştırılmış.',
         ],
+        'dogru-nisan-alma' => [
+            'stem' => 'doğru nişan alma aşağıdakilerden hangisidir', 'set_subject' => 'silah-bilgisi-ve-atis',
+            'evidence' => '101. sınavın tam kaydında silah bölümünde (104. sıra) yer alır ve ders setinde Silah Bilgisi sorusudur; tam sınav kaydında dersi yanlış (Hukuk) girilmiş.',
+        ],
         'tabanca-ana-parca' => [
             'stem' => 'tabancanın başlıca parçalarından değildir', 'options_include' => 'Kabza', 'correct_is' => 'Namlu', 'set_correct' => 'Kabza',
             'evidence' => 'Namlu tabancanın başlıca parçasıdır; EGM 114. sınav kitapçıklarında aynı kalıpta doğru şık Horoz (başlıca parça olmayan) işaretlidir. Aynı sınavdaki diğer kopya doğru şıkkı Kabza olarak verir.',
@@ -42,11 +46,12 @@ class LegacyCorrections
 
     /**
      * @param  list<string>  $options  cleaned option texts in order
-     * @return array{0: string, 1: ?int, 2: list<string>} stem, correct index, ids of applied rules
+     * @return array{0: string, 1: ?int, 2: list<string>, 3: ?string} stem, correct index, ids of applied rules, corrected subject code
      */
     public static function apply(string $stem, array $options, ?int $correct, callable $norm): array
     {
         $applied = [];
+        $subject = null;
         $normalizedStem = self::loose($stem);
         $normalizedOptions = array_map($norm, $options);
         foreach (self::RULES as $id => $rule) {
@@ -58,6 +63,9 @@ class LegacyCorrections
             }
             if (isset($rule['correct_is']) && ($correct === null || $normalizedOptions[$correct] !== $norm($rule['correct_is']))) {
                 continue;
+            }
+            if (isset($rule['set_subject'])) {
+                $subject = $rule['set_subject'];
             }
             if (isset($rule['set_stem'])) {
                 $stem = $rule['set_stem'];
@@ -71,7 +79,7 @@ class LegacyCorrections
             $applied[] = $id;
         }
 
-        return [$stem, $correct, $applied];
+        return [$stem, $correct, $applied, $subject];
     }
 
     private static function loose(string $text): string
