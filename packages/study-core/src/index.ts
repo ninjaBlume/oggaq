@@ -31,15 +31,20 @@ export function timeLabel(seconds: number): string {
     .padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`;
 }
 
-// A question's exams are shown apart from its subject: "107. sınav · silahlı", at most `limit` labels plus a count.
+// A question's exams are shown apart from its subject. The exam type is Temel or Yenileme; armed/unarmed is a
+// separate attribute: "107. Temel · silahlı". At most `limit` labels are listed plus a count.
 export interface ExamMembership {
   exam_number: string | null;
   year: number;
   exam_type_name: string;
+  weapon_status: 'armed' | 'unarmed' | null;
+}
+export const weaponLabels = { armed: 'silahlı', unarmed: 'silahsız' } as const;
+export function examTypeShort(name: string): string {
+  return name.replace(/\s+(Eğitimi?|Sınavı)$/i, '').trim();
 }
 export function examLabel(exam: ExamMembership): string {
-  const variant = /\(([^)]+)\)\s*$/.exec(exam.exam_type_name)?.[1];
-  return [`${exam.exam_number ?? exam.year}. sınav`, variant].filter(Boolean).join(' · ');
+  return [`${exam.exam_number ?? exam.year}. ${examTypeShort(exam.exam_type_name)}`, exam.weapon_status ? weaponLabels[exam.weapon_status] : null].filter(Boolean).join(' · ');
 }
 export function examSummary(exams: readonly ExamMembership[], limit = 3): string {
   if (exams.length === 0) return 'Çıkmış sınavlarda yok';

@@ -26,14 +26,23 @@ describe("server deadline display", () => {
   });
 });
 
-import { examLabel, examSummary } from './index';
+import { examLabel, examSummary, examTypeShort } from './index';
 describe('exam labels', () => {
-  const armed = { exam_number: '107', year: 2024, exam_type_name: 'Özel güvenlik temel eğitim sınavı (silahlı)' };
-  it('shows the exam number and variant', () => expect(examLabel(armed)).toBe('107. sınav · silahlı'));
-  it('falls back to the year without a number', () => expect(examLabel({ ...armed, exam_number: null, exam_type_name: 'Genel' })).toBe('2024. sınav'));
+  const basic = { exam_number: '107', year: 2024, exam_type_name: 'Temel Eğitim', weapon_status: 'armed' as const };
+  it('names the exam type and keeps armed/unarmed separate', () => {
+    expect(examLabel(basic)).toBe('107. Temel · silahlı');
+    expect(examLabel({ ...basic, weapon_status: 'unarmed' })).toBe('107. Temel · silahsız');
+    expect(examLabel({ ...basic, exam_number: '83', exam_type_name: 'Yenileme Eğitimi', weapon_status: null })).toBe('83. Yenileme');
+  });
+  it('shortens only the generic suffix of a type name', () => {
+    expect(examTypeShort('Temel Eğitim')).toBe('Temel');
+    expect(examTypeShort('Yenileme Eğitimi')).toBe('Yenileme');
+    expect(examTypeShort('Özel')).toBe('Özel');
+  });
+  it('falls back to the year without a number', () => expect(examLabel({ ...basic, exam_number: null, weapon_status: null })).toBe('2024. Temel'));
   it('limits the list and counts the rest', () => {
-    const many = ['100', '101', '102', '103', '104'].map((n) => ({ ...armed, exam_number: n }));
-    expect(examSummary(many)).toBe('100. sınav · silahlı, 101. sınav · silahlı, 102. sınav · silahlı +2');
+    const many = ['100', '101', '102', '103', '104'].map((n) => ({ ...basic, exam_number: n }));
+    expect(examSummary(many)).toBe('100. Temel · silahlı, 101. Temel · silahlı, 102. Temel · silahlı +2');
     expect(examSummary([])).toBe('Çıkmış sınavlarda yok');
   });
 });

@@ -923,7 +923,7 @@ export interface paths {
         put?: never;
         /**
          * Çıkmış sınav taslağı oluşturma
-         * @description Sıralı question_version_ids (taslak sınav tamamlanmamış taslak sürümleri de sabitleyebilir) orijinal soru sırasını ve cevap anahtarlarını yayımlanmış sürümlere sabitler. Sınav türü, yıl, dönem ve numara tekil olmalıdır (409 duplicate_official_exam). Aynı soru başka sınavlarda da kullanılabilir.
+         * @description Sıralı question_version_ids (taslak sınav tamamlanmamış taslak sürümleri de sabitleyebilir) orijinal soru sırasını ve cevap anahtarlarını yayımlanmış sürümlere sabitler. Sınav türü, yıl, dönem ve numara tekil olmalıdır (409 duplicate_official_exam). Aynı soru başka sınavlarda da kullanılabilir. weapon_status (armed/unarmed) sınav türünden ayrı bir özelliktir; aynı tür/yıl/dönem/numara silahlı ve silahsız için birer kez bulunabilir.
          */
         post: operations["createOfficialExam"];
         delete?: never;
@@ -1539,6 +1539,17 @@ export interface components {
             source: components["schemas"]["QuestionSource"] | null;
             /** Format: date-time */
             published_at: string | null;
+            /** @description Sınav türü (Temel / Yenileme). */
+            exam_type: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            } | null;
+            /**
+             * @description Silahlı/silahsız adaylar için sınav. Sınav türünden (Temel/Yenileme) bağımsız bir özelliktir.
+             * @enum {string|null}
+             */
+            weapon_status: "armed" | "unarmed" | null;
         };
         AdminOfficialExamQuestion: {
             position: number;
@@ -1569,6 +1580,17 @@ export interface components {
             updated_at: string;
             /** @description Yalnız tekil görüntüleme ve kayıt yanıtlarında bulunur. */
             questions?: components["schemas"]["AdminOfficialExamQuestion"][];
+            /** @description Sınav türü (Temel / Yenileme). */
+            exam_type: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            } | null;
+            /**
+             * @description Silahlı/silahsız adaylar için sınav. Sınav türünden (Temel/Yenileme) bağımsız bir özelliktir.
+             * @enum {string|null}
+             */
+            weapon_status: "armed" | "unarmed" | null;
         };
         OfficialExamInput: {
             /** Format: uuid */
@@ -1581,6 +1603,11 @@ export interface components {
             exam_number?: string | null;
             /** @description Soru sürümleri; dizi sırası orijinal sınav sırasıdır. Aynı soru bir kez eklenir. Taslak sınav henüz yayımlanmamış (tamamlanmamış) bir sürümü sabitleyebilir; yayımlamak için tüm sürümler yayımlanmış olmalıdır. */
             question_version_ids: string[];
+            /**
+             * @description Silahlı/silahsız adaylar için sınav. Sınav türünden (Temel/Yenileme) bağımsız bir özelliktir.
+             * @enum {string|null}
+             */
+            weapon_status?: "armed" | "unarmed" | null;
         };
         OfficialExamResponse: {
             data: components["schemas"]["OfficialExam"];
@@ -1651,6 +1678,11 @@ export interface components {
              * @enum {string}
              */
             status: "draft" | "published";
+            /**
+             * @description Silahlı/silahsız adaylar için sınav. Sınav türünden (Temel/Yenileme) bağımsız bir özelliktir.
+             * @enum {string|null}
+             */
+            weapon_status: "armed" | "unarmed" | null;
         };
     };
     responses: {
@@ -3186,6 +3218,7 @@ export interface operations {
                 exam_type_id?: string;
                 year?: number;
                 term?: string;
+                weapon_status?: "armed" | "unarmed";
             };
             header?: never;
             path?: never;
@@ -3247,6 +3280,7 @@ export interface operations {
                 year?: number;
                 term?: string;
                 status?: "draft" | "published";
+                weapon_status?: "armed" | "unarmed";
             };
             header?: never;
             path?: never;

@@ -9,19 +9,19 @@ import { ErrorNotice, Field, Icon, Loading, Modal, dateLabel, useNotify } from '
 
 type OfficialExam = components['schemas']['AdminOfficialExam'];
 type Entry = { questionId: string; versionId: string; stem: string; published: boolean; latestPublished: string | null };
-type Form = { exam_type_id: string; source_id: string; title: string; year: string; term: string; exam_number: string; entries: Entry[] };
+type Form = { exam_type_id: string; weapon_status: '' | 'armed' | 'unarmed'; source_id: string; title: string; year: string; term: string; exam_number: string; entries: Entry[] };
 
-const emptyForm: Form = { exam_type_id: '', source_id: '', title: '', year: String(new Date().getFullYear()), term: '', exam_number: '', entries: [] };
+const emptyForm: Form = { exam_type_id: '', weapon_status: '', source_id: '', title: '', year: String(new Date().getFullYear()), term: '', exam_number: '', entries: [] };
 function toForm(exam?: OfficialExam): Form {
   if (!exam) return emptyForm;
   return {
-    exam_type_id: exam.exam_type_id, source_id: exam.source?.id ?? '', title: exam.title, year: String(exam.year), term: exam.term ?? '', exam_number: exam.exam_number ?? '',
+    exam_type_id: exam.exam_type_id, weapon_status: exam.weapon_status ?? '', source_id: exam.source?.id ?? '', title: exam.title, year: String(exam.year), term: exam.term ?? '', exam_number: exam.exam_number ?? '',
     entries: (exam.questions ?? []).map((row) => ({ questionId: row.question_id, versionId: row.question.id, stem: row.question.stem, published: row.question.published_at !== null, latestPublished: row.published_version_id })),
   };
 }
 export function toInput(form: Form) {
   return {
-    exam_type_id: form.exam_type_id, source_id: form.source_id || null, title: form.title.trim(), year: Number(form.year),
+    exam_type_id: form.exam_type_id, weapon_status: form.weapon_status || null, source_id: form.source_id || null, title: form.title.trim(), year: Number(form.year),
     term: form.term.trim() || null, exam_number: form.exam_number.trim() || null, question_version_ids: form.entries.map((entry) => entry.versionId),
   };
 }
@@ -79,6 +79,7 @@ function OfficialExamEditor({ exam, catalogs }: { exam?: OfficialExam; catalogs:
     <form onSubmit={submit} className="editor-layout"><fieldset className="editor-main" disabled={busy || published}>
       <section className="card editor-card"><div className="section-title"><span className="step-number">1</span><div><h2>Sınav bilgileri</h2><p className="muted small-text">Sınav türü, yıl, dönem ve numara birlikte tekil olmalıdır.</p></div></div><div className="form-grid">
         <Field label="Sınav türü" name="exam_type_id" error={fieldError('exam_type_id')}>{(props) => <select {...props} required value={form.exam_type_id} onChange={(event) => patch('exam_type_id', event.target.value)}><option value="">Sınav türü seçin</option>{catalogs['exam-types'].map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select>}</Field>
+        <Field label="Silah durumu" name="weapon_status" error={fieldError('weapon_status')} hint="Sınav türünden (Temel/Yenileme) ayrıdır; silahlı ve silahsız sınav ayrı kayıtlardır.">{(props) => <select {...props} value={form.weapon_status} onChange={(event) => patch('weapon_status', event.target.value as Form['weapon_status'])}><option value="">Belirtilmedi</option><option value="armed">Silahlı</option><option value="unarmed">Silahsız</option></select>}</Field>
         <Field label="Kaynak" name="source_id" error={fieldError('source_id')} hint="Sınavın duyurulduğu belge veya yayın (isteğe bağlı).">{(props) => <select {...props} value={form.source_id} onChange={(event) => patch('source_id', event.target.value)}><option value="">Kaynak seçilmedi</option>{catalogs['question-sources'].map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select>}</Field>
         <Field label="Başlık" name="title" error={fieldError('title')}>{(props) => <input {...props} required maxLength={240} value={form.title} onChange={(event) => patch('title', event.target.value)} />}</Field>
         <Field label="Yıl" name="year" error={fieldError('year')}>{(props) => <input {...props} type="number" required min={1990} max={2200} value={form.year} onChange={(event) => patch('year', event.target.value)} />}</Field>

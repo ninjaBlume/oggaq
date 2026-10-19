@@ -68,7 +68,7 @@ if ($operation === 'official-exam') {
     ]);
     app(PublishQuestion::class)->execute($admin, $outside, $outside->revision);
     $exam = app(SaveOfficialExam::class)->execute($admin, [
-        'exam_type_id' => ExamType::firstOrFail()->id, 'title' => 'Sentetik çıkmış sınav', 'year' => 2023,
+        'exam_type_id' => ExamType::where('code', 'synthetic-basic')->firstOrFail()->id, 'weapon_status' => 'armed', 'title' => 'Sentetik çıkmış sınav', 'year' => 2023,
         'term' => '1. dönem', 'exam_number' => '1', 'question_version_ids' => $versions,
     ]);
     app(PublishOfficialExam::class)->execute($admin, $exam);
@@ -96,7 +96,8 @@ if ($operation === 'setup-study') {
     $subject = Subject::create(['name' => 'Sentetik çalışma dersi', 'code' => 'synthetic-study']);
     $topic = Topic::create(['subject_id' => $subject->id, 'name' => 'Sentetik konu', 'code' => 'synthetic-topic']);
     $source = QuestionSource::create(['title' => 'Sentetik test kaynağı — resmî değildir']);
-    ExamType::create(['name' => 'Sentetik sınav türü', 'code' => 'synthetic-exam-type']);
+    ExamType::create(['name' => 'Temel Eğitim', 'code' => 'synthetic-basic']);
+    ExamType::create(['name' => 'Yenileme Eğitimi', 'code' => 'synthetic-renewal']);
     foreach (['Sentetik birinci soru', 'Sentetik ikinci soru', 'Sentetik üçüncü soru'] as $stem) {
         $question = app(SaveQuestion::class)->execute($admin, [
             'subject_id' => $subject->id, 'topic_id' => $topic->id, 'source_id' => $source->id,

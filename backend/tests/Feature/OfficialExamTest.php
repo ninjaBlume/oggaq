@@ -111,12 +111,30 @@ class OfficialExamTest extends TestCase
         $this->assertSame($published['published_at'], $again['published_at']);
         $this->asToken($this->createUser());
         $list = $this->getJson('/api/v1/official-exams')->assertOk()->assertJsonCount(1, 'data')->json('data');
-        $this->assertSame(['id', 'title', 'exam_type_id', 'year', 'term', 'exam_number', 'question_count', 'source', 'published_at'], array_keys($list[0]));
+        $this->assertSame(['id', 'title', 'exam_type_id', 'exam_type', 'weapon_status', 'year', 'term', 'exam_number', 'question_count', 'source', 'published_at'], array_keys($list[0]));
         $this->getJson('/api/v1/official-exams/'.$draft['id'])->assertOk()->assertJsonPath('data.question_count', 3)->assertJsonMissingPath('data.questions');
         $this->getJson('/api/v1/official-exams?year=2023')->assertOk()->assertJsonCount(1, 'data');
         $this->getJson('/api/v1/official-exams?year=2020')->assertOk()->assertJsonCount(0, 'data');
         $this->getJson('/api/v1/official-exams?exam_type_id='.$this->type->id)->assertOk()->assertJsonCount(1, 'data');
         $this->getJson('/api/v1/official-exams?status=draft')->assertUnprocessable();
+    }
+
+    public function test_weapon_status_is_a_separate_attribute_from_the_exam_type(): void
+    {
+        $this->asToken($this->admin);
+        $armed = $this->postJson('/api/v1/admin/official-exams', $this->payload(['weapon_status' => 'armed']))->assertCreated()->assertJsonPath('data.weapon_status', 'armed')->assertJsonPath('data.exam_type.name', $this->type->name)->json('data');
+        // The same type, year, term and number can exist once per weapon status.
+        $this->postJson('/api/v1/admin/official-exams', $this->payload(['weapon_status' => 'unarmed']))->assertCreated();
+        $this->postJson('/api/v1/admin/official-exams', $this->payload(['weapon_status' => 'armed']))->assertConflict()->assertJsonPath('code', 'duplicate_official_exam');
+        $this->postJson('/api/v1/admin/official-exams', $this->payload(['weapon_status' => 'sometimes']))->assertUnprocessable()->assertJsonValidationErrors('weapon_status');
+        foreach (DB::table('official_exams')->pluck('id') as $id) {
+            $this->postJson('/api/v1/admin/official-exams/'.$id.'/publish')->assertOk();
+        }
+        $this->asToken($this->createUser());
+        $this->getJson('/api/v1/official-exams?weapon_status=armed')->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $armed['id']);
+        $this->getJson('/api/v1/official-exams?weapon_status=unarmed&exam_type_id='.$this->type->id)->assertOk()->assertJsonCount(1, 'data');
+        $this->getJson('/api/v1/official-exams?weapon_status=bogus')->assertUnprocessable();
+        $this->assertRejectedByDatabase(fn () => DB::table('official_exams')->insert(['id' => (string) Str::uuid(), 'exam_type_id' => $this->type->id, 'title' => 'Sentetik', 'year' => 2020, 'weapon_status' => 'both', 'created_at' => now(), 'updated_at' => now()]));
     }
 
     public function test_only_platform_admin_manages_official_exams(): void

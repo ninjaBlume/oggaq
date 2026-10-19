@@ -16,6 +16,11 @@ class OfficialExam extends Model
         return ['published_at' => 'immutable_datetime'];
     }
 
+    public function examType(): BelongsTo
+    {
+        return $this->belongsTo(ExamType::class);
+    }
+
     public function source(): BelongsTo
     {
         return $this->belongsTo(QuestionSource::class, 'source_id');

@@ -2,7 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiError, cursorFromLink } from "@oggaq/api-client";
-import { anchorClock, remainingSeconds, timeLabel } from "@oggaq/study-core";
+import {
+  anchorClock,
+  remainingSeconds,
+  timeLabel,
+  weaponLabels,
+} from "@oggaq/study-core";
 import type { ExamAttempt, components } from "@oggaq/shared-types";
 import { api } from "./api";
 import { PageIntro, useStudyContext } from "./App";
@@ -20,6 +25,8 @@ export function Exams() {
   const [topic, setTopic] = useState("");
   const [mode, setMode] = useState<"random" | "official">("random");
   const [official, setOfficial] = useState("");
+  const [examType, setExamType] = useState("");
+  const [weapon, setWeapon] = useState<"" | "armed" | "unarmed">("");
   const [officialCursor, setOfficialCursor] = useState<string>();
   const [cursor, setCursor] = useState<string>();
   const [subjectCursor, setSubjectCursor] = useState<string>();
@@ -43,13 +50,27 @@ export function Exams() {
         signal,
       }),
   });
+  const examTypes = useQuery({
+    queryKey: ["exam-types"],
+    enabled: mode === "official",
+    queryFn: ({ signal }) =>
+      api.request("get", "/api/v1/exam-types", {
+        signal,
+        query: { per_page: 100 },
+      }),
+  });
   const officialExams = useQuery({
-    queryKey: ["official-exams", officialCursor],
+    queryKey: ["official-exams", examType, weapon, officialCursor],
     enabled: mode === "official",
     queryFn: ({ signal }) =>
       api.request("get", "/api/v1/official-exams", {
         signal,
-        query: { per_page: 20, cursor: officialCursor },
+        query: {
+          per_page: 20,
+          cursor: officialCursor,
+          exam_type_id: examType || undefined,
+          weapon_status: weapon || undefined,
+        },
       }),
   });
   const history = useQuery({
@@ -200,6 +221,47 @@ export function Exams() {
               </>)}
             </div>
             {mode === "official" && (
+              <div className="exam-filters">
+                <Field label="Sınav türü">
+                  {(props) => (
+                    <select
+                      {...props}
+                      value={examType}
+                      onChange={(e) => {
+                        setExamType(e.target.value);
+                        setOfficial("");
+                        setOfficialCursor(undefined);
+                      }}
+                    >
+                      <option value="">Tüm türler</option>
+                      {examTypes.data?.data.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </Field>
+                <Field label="Silah durumu">
+                  {(props) => (
+                    <select
+                      {...props}
+                      value={weapon}
+                      onChange={(e) => {
+                        setWeapon(e.target.value as typeof weapon);
+                        setOfficial("");
+                        setOfficialCursor(undefined);
+                      }}
+                    >
+                      <option value="">Silahlı ve silahsız</option>
+                      <option value="armed">Silahlı</option>
+                      <option value="unarmed">Silahsız</option>
+                    </select>
+                  )}
+                </Field>
+              </div>
+            )}
+            {mode === "official" && (
               <div className="official-picker" role="radiogroup" aria-label="Çıkmış sınav">
                 {officialExams.isPending ? (
                   <Loading />
@@ -226,6 +288,9 @@ export function Exams() {
                         <span>
                           <strong>{item.title}</strong>
                           <small>
+                            {item.exam_type?.name ?? ""}
+                            {item.weapon_status ? ` · ${weaponLabels[item.weapon_status]}` : ""}
+                            {" · "}
                             {item.year}
                             {item.term ? ` · ${item.term}` : ""}
                             {item.exam_number ? ` · No ${item.exam_number}` : ""}

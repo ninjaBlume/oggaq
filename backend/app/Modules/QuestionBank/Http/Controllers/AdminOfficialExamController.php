@@ -20,8 +20,8 @@ class AdminOfficialExamController extends Controller
     public function index(OfficialExamListRequest $request): AnonymousResourceCollection
     {
         Gate::authorize('manage', Question::class);
-        $query = OfficialExam::with('source')->withCount('questions');
-        foreach (['exam_type_id', 'year', 'term'] as $filter) {
+        $query = OfficialExam::with('source', 'examType')->withCount('questions');
+        foreach (['exam_type_id', 'year', 'term', 'weapon_status'] as $filter) {
             if ($request->has($filter)) {
                 $query->where($filter, $request->validated($filter));
             }
@@ -44,7 +44,7 @@ class AdminOfficialExamController extends Controller
     {
         Gate::authorize('manage', Question::class);
 
-        return new AdminOfficialExamResource($this->detailed($officialExam->loadCount('questions')->load('source')));
+        return new AdminOfficialExamResource($this->detailed($officialExam->loadCount('questions')->load('source', 'examType')));
     }
 
     public function update(SaveOfficialExamRequest $request, OfficialExam $officialExam, SaveOfficialExam $action): AdminOfficialExamResource
@@ -61,6 +61,6 @@ class AdminOfficialExamController extends Controller
 
     private function detailed(OfficialExam $exam): OfficialExam
     {
-        return $exam->load('questions.questionVersion.options', 'questions.questionVersion.source', 'questions.questionVersion.question');
+        return $exam->load('examType', 'questions.questionVersion.options', 'questions.questionVersion.source', 'questions.questionVersion.question');
     }
 }

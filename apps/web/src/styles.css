@@ -1070,3 +1070,14 @@ small {
   border-radius:999px;
   padding:2px 10px
 }
+.exam-filters {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-top:14px
+}
+@media(max-width:600px) {
+  .exam-filters {
+    grid-template-columns:1fr
+  }
+}

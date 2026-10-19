@@ -36,7 +36,8 @@ test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal s�
   await adminLogin(adminPage);
   await expect(adminPage.getByText("Henüz çıkmış sınav yok")).toBeVisible();
   await adminPage.getByRole("link", { name: "Yeni çıkmış sınav", exact: true }).click();
-  await adminPage.getByLabel("Sınav türü", { exact: true }).selectOption({ label: "Sentetik sınav türü" });
+  await adminPage.getByLabel("Sınav türü", { exact: true }).selectOption({ label: "Temel Eğitim" });
+  await adminPage.getByLabel("Silah durumu", { exact: true }).selectOption({ label: "Silahlı" });
   await adminPage.getByLabel("Başlık", { exact: true }).fill(title);
   await adminPage.getByLabel("Yıl", { exact: true }).fill("2023");
   await adminPage.getByLabel("Dönem", { exact: true }).fill("1. dönem");
@@ -69,12 +70,19 @@ test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal s�
   await expect(adminPage.getByLabel("Başlık", { exact: true })).toBeDisabled();
   // The question list names each question's exams next to its subject and filters by exam.
   await adminPage.goto(`${admin}/questions`);
-  await expect(adminPage.getByRole("row").filter({ hasText: "Sentetik birinci soru" })).toContainText("1. sınav");
+  await expect(adminPage.getByRole("row").filter({ hasText: "Sentetik birinci soru" })).toContainText("1. Temel · silahlı");
   await adminPage.getByLabel("Çıkmış sınav", { exact: true }).selectOption({ label: title });
   await expect(adminPage.getByRole("row").filter({ hasText: "Sentetik" })).toHaveCount(3);
 
   await student.reload();
   await student.getByRole("button", { name: "Çıkmış sınav", exact: true }).click();
+  // Exam type (Temel/Yenileme) and armed/unarmed are separate filters.
+  await student.getByLabel("Silah durumu", { exact: true }).selectOption({ label: "Silahsız" });
+  await expect(student.getByText("Henüz yayımlanmış çıkmış sınav yok.")).toBeVisible();
+  await student.getByLabel("Silah durumu", { exact: true }).selectOption({ label: "Silahlı" });
+  await student.getByLabel("Sınav türü", { exact: true }).selectOption({ label: "Yenileme Eğitimi" });
+  await expect(student.getByText("Henüz yayımlanmış çıkmış sınav yok.")).toBeVisible();
+  await student.getByLabel("Sınav türü", { exact: true }).selectOption({ label: "Temel Eğitim" });
   await student.getByRole("radio", { name: new RegExp(title) }).check();
   await student.getByLabel("Süre (dakika)", { exact: true }).fill("5");
   await student.getByRole("button", { name: "Denemeyi başlat" }).click();

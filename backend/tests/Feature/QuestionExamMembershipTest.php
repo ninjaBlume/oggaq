@@ -31,14 +31,14 @@ class QuestionExamMembershipTest extends TestCase
         $law = Subject::create(['name' => 'Sentetik hukuk', 'code' => 'law']);
         $aid = Subject::create(['name' => 'Sentetik ilk yardım', 'code' => 'aid']);
         $source = QuestionSource::create(['title' => 'Sentetik kaynak']);
-        $type = ExamType::create(['name' => 'Sentetik temel sınav (silahlı)', 'code' => 'armed']);
+        $type = ExamType::create(['name' => 'Sentetik temel sınav', 'code' => 'basic']);
         foreach ([[$law, 'Birinci'], [$law, 'İkinci'], [$aid, 'Üçüncü']] as [$subject, $stem]) {
             $q = app(SaveQuestion::class)->execute($this->admin, ['subject_id' => $subject->id, 'source_id' => $source->id, 'stem' => $stem, 'options' => ['A', 'B'], 'correct_option_position' => 1]);
             $this->questions[$stem] = app(PublishQuestion::class)->execute($this->admin, $q, $q->revision);
         }
         $make = function (string $number, int $year, array $stems, bool $publish) use ($type) {
             $exam = app(SaveOfficialExam::class)->execute($this->admin, [
-                'exam_type_id' => $type->id, 'title' => "Sınav {$number}", 'year' => $year, 'term' => 'Şubat', 'exam_number' => $number,
+                'exam_type_id' => $type->id, 'weapon_status' => 'armed', 'title' => "Sınav {$number}", 'year' => $year, 'term' => 'Şubat', 'exam_number' => $number,
                 'question_version_ids' => array_map(fn ($stem) => $this->questions[$stem]->published_version_id, $stems),
             ]);
 
@@ -71,7 +71,8 @@ class QuestionExamMembershipTest extends TestCase
         $this->assertSame(['101', '100'], array_column($items['İkinci']['exams'], 'exam_number'));
         // The position is the question's place inside each exam.
         $this->assertSame([1, 2], array_column($items['İkinci']['exams'], 'position'));
-        $this->assertSame('Sentetik temel sınav (silahlı)', $items['İkinci']['exams'][0]['exam_type_name']);
+        $this->assertSame('Sentetik temel sınav', $items['İkinci']['exams'][0]['exam_type_name']);
+        $this->assertSame('armed', $items['İkinci']['exams'][0]['weapon_status']);
         // A draft exam is never visible to students.
         $this->assertSame([], $items['Üçüncü']['exams']);
         $this->getJson('/api/v1/questions/'.$this->questions['İkinci']->id)->assertOk()->assertJsonCount(2, 'data.exams');

@@ -3260,6 +3260,17 @@
               "type": "string",
               "maxLength": 80
             }
+          },
+          {
+            "name": "weapon_status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "armed",
+                "unarmed"
+              ]
+            }
           }
         ]
       }
@@ -3421,13 +3432,24 @@
                 "published"
               ]
             }
+          },
+          {
+            "name": "weapon_status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "armed",
+                "unarmed"
+              ]
+            }
           }
         ]
       },
       "post": {
         "operationId": "createOfficialExam",
         "summary": "Çıkmış sınav taslağı oluşturma",
-        "description": "Sıralı question_version_ids (taslak sınav tamamlanmamış taslak sürümleri de sabitleyebilir) orijinal soru sırasını ve cevap anahtarlarını yayımlanmış sürümlere sabitler. Sınav türü, yıl, dönem ve numara tekil olmalıdır (409 duplicate_official_exam). Aynı soru başka sınavlarda da kullanılabilir.",
+        "description": "Sıralı question_version_ids (taslak sınav tamamlanmamış taslak sürümleri de sabitleyebilir) orijinal soru sırasını ve cevap anahtarlarını yayımlanmış sürümlere sabitler. Sınav türü, yıl, dönem ve numara tekil olmalıdır (409 duplicate_official_exam). Aynı soru başka sınavlarda da kullanılabilir. weapon_status (armed/unarmed) sınav türünden ayrı bir özelliktir; aynı tür/yıl/dönem/numara silahlı ve silahsız için birer kez bulunabilir.",
         "tags": [
           "QuestionBank"
         ],
@@ -5858,6 +5880,42 @@
               "null"
             ],
             "format": "date-time"
+          },
+          "exam_type": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Sınav türü (Temel / Yenileme)."
+          },
+          "weapon_status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "armed",
+              "unarmed",
+              null
+            ],
+            "description": "Silahlı/silahsız adaylar için sınav. Sınav türünden (Temel/Yenileme) bağımsız bir özelliktir."
           }
         },
         "required": [
@@ -5869,7 +5927,9 @@
           "exam_number",
           "question_count",
           "source",
-          "published_at"
+          "published_at",
+          "exam_type",
+          "weapon_status"
         ]
       },
       "AdminOfficialExamQuestion": {
@@ -5982,6 +6042,42 @@
               "$ref": "#/components/schemas/AdminOfficialExamQuestion"
             },
             "description": "Yalnız tekil görüntüleme ve kayıt yanıtlarında bulunur."
+          },
+          "exam_type": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Sınav türü (Temel / Yenileme)."
+          },
+          "weapon_status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "armed",
+              "unarmed",
+              null
+            ],
+            "description": "Silahlı/silahsız adaylar için sınav. Sınav türünden (Temel/Yenileme) bağımsız bir özelliktir."
           }
         },
         "required": [
@@ -5996,7 +6092,9 @@
           "published_at",
           "status",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "exam_type",
+          "weapon_status"
         ]
       },
       "OfficialExamInput": {
@@ -6045,6 +6143,18 @@
               "format": "uuid"
             },
             "description": "Soru sürümleri; dizi sırası orijinal sınav sırasıdır. Aynı soru bir kez eklenir. Taslak sınav henüz yayımlanmamış (tamamlanmamış) bir sürümü sabitleyebilir; yayımlamak için tüm sürümler yayımlanmış olmalıdır."
+          },
+          "weapon_status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "armed",
+              "unarmed",
+              null
+            ],
+            "description": "Silahlı/silahsız adaylar için sınav. Sınav türünden (Temel/Yenileme) bağımsız bir özelliktir."
           }
         },
         "required": [
@@ -6329,6 +6439,18 @@
               "published"
             ],
             "description": "Öğrenci yanıtlarında yalnız published gelir."
+          },
+          "weapon_status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "armed",
+              "unarmed",
+              null
+            ],
+            "description": "Silahlı/silahsız adaylar için sınav. Sınav türünden (Temel/Yenileme) bağımsız bir özelliktir."
           }
         },
         "required": [
@@ -6339,7 +6461,8 @@
           "term",
           "exam_type_name",
           "position",
-          "status"
+          "status",
+          "weapon_status"
         ]
       }
     },

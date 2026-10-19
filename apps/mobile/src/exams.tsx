@@ -17,7 +17,13 @@ import type {
   components,
 } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
-import { anchorClock, remainingSeconds, timeLabel } from "@oggaq/study-core";
+import {
+  anchorClock,
+  examTypeShort,
+  remainingSeconds,
+  timeLabel,
+  weaponLabels,
+} from "@oggaq/study-core";
 import { api } from "./api";
 import { useResource, useResume, useTask, useOnReturn } from "./hooks";
 import {
@@ -55,6 +61,8 @@ export function Exams({
   const [cursor, setCursor] = useState<string>();
   const [mode, setMode] = useState<"random" | "official">("random");
   const [official, setOfficial] = useState("");
+  const [examType, setExamType] = useState("");
+  const [weapon, setWeapon] = useState<"all" | "armed" | "unarmed">("all");
   const [officialCursor, setOfficialCursor] = useState<string>();
   const submission = useRef<StartInput | null>(null);
   const task = useTask<{ data: ExamAttempt }>();
@@ -67,13 +75,27 @@ export function Exams({
       }),
     [context.id, cursor],
   );
+  const examTypes = useResource(
+    (signal) =>
+      api.request("get", "/api/v1/exam-types", {
+        signal,
+        query: { per_page: 100 },
+      }),
+    [mode],
+    mode === "official",
+  );
   const officialExams = useResource(
     (signal) =>
       api.request("get", "/api/v1/official-exams", {
         signal,
-        query: { per_page: 10, cursor: officialCursor },
+        query: {
+          per_page: 10,
+          cursor: officialCursor,
+          exam_type_id: examType || undefined,
+          weapon_status: weapon === "all" ? undefined : weapon,
+        },
       }),
-    [officialCursor, mode],
+    [officialCursor, mode, examType, weapon],
     mode === "official",
   );
   function begin() {
@@ -194,6 +216,57 @@ export function Exams({
             />
           </View>
         </View>
+        {mode === "official" && (
+          <>
+            <ChoiceGroup
+              choices={[
+                {
+                  value: "all",
+                  label: "Tüm türler",
+                  accessibilityLabel: "Tüm sınav türleri",
+                },
+                ...(examTypes.data?.data ?? []).map((type) => ({
+                  value: type.id,
+                  label: examTypeShort(type.name),
+                  accessibilityLabel: `${type.name} sınavları`,
+                })),
+              ]}
+              value={examType || "all"}
+              onChange={(value) => {
+                setExamType(value === "all" ? "" : value);
+                setOfficial("");
+                setOfficialCursor(undefined);
+              }}
+              disabled={locked}
+            />
+            <ChoiceGroup
+              choices={[
+                {
+                  value: "all",
+                  label: "Hepsi",
+                  accessibilityLabel: "Silahlı ve silahsız",
+                },
+                {
+                  value: "armed",
+                  label: "Silahlı",
+                  accessibilityLabel: "Yalnız silahlı sınavlar",
+                },
+                {
+                  value: "unarmed",
+                  label: "Silahsız",
+                  accessibilityLabel: "Yalnız silahsız sınavlar",
+                },
+              ]}
+              value={weapon}
+              onChange={(value) => {
+                setWeapon(value);
+                setOfficial("");
+                setOfficialCursor(undefined);
+              }}
+              disabled={locked}
+            />
+          </>
+        )}
         {mode === "random" ? (
           <ChoiceGroup
             choices={[5, 10, 20].map((n) => ({
@@ -225,7 +298,7 @@ export function Exams({
                 disabled={locked}
                 onPress={() => setOfficial(item.id)}
               >
-                {`${item.title} · ${item.year}${item.term ? ` ${item.term}` : ""} · ${item.question_count} soru`}
+                {`${item.title} · ${item.exam_type ? examTypeShort(item.exam_type.name) : ""}${item.weapon_status ? ` · ${weaponLabels[item.weapon_status]}` : ""} · ${item.question_count} soru`}
               </Button>
             ))}
             {officialExams.data && (

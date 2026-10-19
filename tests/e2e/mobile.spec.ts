@@ -527,7 +527,7 @@ test("mobil soru kartı dersi ve çıkmış sınavı ayrı gösterir ve sınava 
     page.getByText("Ders: Sentetik çalışma dersi", { exact: true }).first(),
   ).toBeVisible();
   await expect(
-    page.getByText("Sınav: 1. sınav", { exact: true }).first(),
+    page.getByText("Sınav: 1. Temel · silahlı", { exact: true }).first(),
   ).toBeVisible();
   await expect(
     page.getByText("Sınav: Çıkmış sınavlarda yok", { exact: true }),
@@ -597,7 +597,7 @@ test("mobil tekrar listeleri, favori, başarı durumu ve çıkmış sınav gerç
   await page.getByRole("tab", { name: "Deneme", exact: true }).click();
   await page.getByRole("button", { name: "Çıkmış sınav denemesi" }).click();
   await page
-    .getByRole("button", { name: /Sentetik çıkmış sınav · 2023/ })
+    .getByRole("button", { name: /Sentetik çıkmış sınav/ })
     .click();
   await page.getByLabel("Süre (dakika)", { exact: true }).fill("5");
   await page.getByRole("button", { name: "Denemeyi başlat" }).click();

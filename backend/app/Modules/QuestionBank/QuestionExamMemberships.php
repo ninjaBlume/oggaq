@@ -22,12 +22,12 @@ class QuestionExamMemberships
             ->whereIn('q.question_id', $questionIds)
             ->when($publishedOnly, fn ($query) => $query->whereNotNull('e.published_at'))
             ->orderByDesc('e.year')->orderByDesc('e.exam_number')->orderBy('t.name')
-            ->get(['q.question_id', 'q.position', 'e.id', 'e.title', 'e.exam_number', 'e.year', 'e.term', 'e.published_at', 't.name as exam_type_name']);
+            ->get(['q.question_id', 'q.position', 'e.id', 'e.title', 'e.exam_number', 'e.year', 'e.term', 'e.published_at', 'e.weapon_status', 't.name as exam_type_name']);
         $result = [];
         foreach ($rows as $row) {
             $result[$row->question_id][] = [
                 'id' => $row->id, 'title' => $row->title, 'exam_number' => $row->exam_number, 'year' => (int) $row->year, 'term' => $row->term,
-                'exam_type_name' => $row->exam_type_name, 'position' => (int) $row->position, 'status' => $row->published_at === null ? 'draft' : 'published',
+                'exam_type_name' => $row->exam_type_name, 'weapon_status' => $row->weapon_status, 'position' => (int) $row->position, 'status' => $row->published_at === null ? 'draft' : 'published',
             ];
         }
 
