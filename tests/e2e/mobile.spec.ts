@@ -517,6 +517,32 @@ test("sistem hareket azaltma tercihi canlı değişince Expressive hareket kapan
     page.getByRole("tab", { name: "Soru çöz", exact: true }),
   ).toHaveAttribute("aria-selected", "true");
 });
+test("mobil soru kartı dersi ve çıkmış sınavı ayrı gösterir ve sınava göre filtreler", async ({
+  page,
+}) => {
+  fixture("official-exam");
+  await login(page);
+  await page.getByRole("tab", { name: "Soru çöz", exact: true }).click();
+  await expect(
+    page.getByText("Ders: Sentetik çalışma dersi", { exact: true }).first(),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Sınav: 1. sınav", { exact: true }).first(),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Sınav: Çıkmış sınavlarda yok", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Sınav filtresi" }).click();
+  await page
+    .getByRole("button", { name: "Sentetik çıkmış sınav", exact: true })
+    .click();
+  await expect(
+    page.getByText("Sınav: Çıkmış sınavlarda yok", { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByText("Sentetik birinci soru", { exact: true }),
+  ).toBeVisible();
+});
 test("mobil tekrar listeleri, favori, başarı durumu ve çıkmış sınav gerçek API ile çalışır", async ({
   page,
 }) => {

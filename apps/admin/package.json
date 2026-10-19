@@ -12,6 +12,7 @@
   "dependencies": {
     "@oggaq/api-client": "*",
     "@oggaq/shared-types": "*",
+    "@oggaq/study-core": "*",
     "@tanstack/react-query": "5.104.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",

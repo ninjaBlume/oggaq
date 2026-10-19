@@ -222,3 +222,5 @@ tbody tr:hover { background: #fbfcf9; }
 .picker-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
 .picker-list li>div { min-width: 0; overflow-wrap: anywhere; }
 .exam-entry-stem .badge, .exam-entry-stem .button { margin-left: 8px; vertical-align: middle; }
+.exam-cell { max-width: 260px; }
+.exam-tag { display: inline-block; margin: 0 4px 4px 0; padding: 2px 8px; border-radius: 999px; background: #eef2ee; color: #35604a; font-size: 11px; white-space: nowrap; }

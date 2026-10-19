@@ -4,6 +4,7 @@ namespace App\Modules\Study\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PaginationRequest;
+use App\Modules\QuestionBank\QuestionExamMemberships;
 use App\Modules\Study\Actions\AnswerPracticeAttempt;
 use App\Modules\Study\Actions\ResolveStudyContext;
 use App\Modules\Study\Actions\StartPracticeAttempt;
@@ -22,6 +23,8 @@ class PracticeAttemptController extends Controller
         $context = $contexts->execute($request->user(), $context);
         $attempts = PracticeAttempt::withFavorite()->where('study_context_id', $context->id)->with(['questionVersion.options', 'questionVersion.source'])
             ->orderByDesc('created_at')->orderByDesc('id')->cursorPaginate($request->integer('per_page', 20))->withQueryString();
+
+        QuestionExamMemberships::attach($attempts->getCollection(), 'question_id');
 
         return PracticeAttemptResource::collection($attempts);
     }

@@ -11,6 +11,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Crypto from "expo-crypto";
 import { cursorFromLink } from "@oggaq/api-client";
+import { examLabel, examSummary } from "@oggaq/study-core";
 import type {
   Page,
   PracticeAttempt,
@@ -47,7 +48,10 @@ export function QuestionList({
 }) {
   const [cursor, setCursor] = useState<string>();
   const [subject, setSubject] = useState(initialSubject ?? "");
-  const [filter, setFilter] = useState<"subject" | "topic" | null>(null);
+  const [filter, setFilter] = useState<"subject" | "topic" | "exam" | null>(
+    null,
+  );
+  const [exam, setExam] = useState("");
   const [catalogCursor, setCatalogCursor] = useState<string>();
   const [topic, setTopic] = useState("");
   const [topicCursor, setTopicCursor] = useState<string>();
@@ -69,6 +73,14 @@ export function QuestionList({
     [subject, topicCursor],
     Boolean(subject),
   );
+  const exams = useResource(
+    (signal) =>
+      api.request("get", "/api/v1/official-exams", {
+        signal,
+        query: { per_page: 100 },
+      }),
+    [],
+  );
   const query = useResource(
     (signal) =>
       api.request("get", "/api/v1/questions", {
@@ -78,9 +90,10 @@ export function QuestionList({
           cursor,
           subject_id: subject || undefined,
           topic_id: topic || undefined,
+          official_exam_id: exam || undefined,
         },
       }),
-    [context.id, cursor, subject, topic],
+    [context.id, cursor, subject, topic, exam],
   );
   function chooseSubject(value: string) {
     setSubject(value);
@@ -161,6 +174,75 @@ export function QuestionList({
           </Pressable>
         )}
       </View>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Sınav filtresi"
+        onPress={() => setFilter("exam")}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 9,
+          backgroundColor: palette.white,
+          padding: 15,
+          borderRadius: 16,
+          borderWidth: 1,
+          borderColor: exam ? palette.primary : palette.line,
+        }}
+      >
+        <Clock3 size={17} color={palette.primary} />
+        <Text
+          numberOfLines={1}
+          style={{
+            flex: 1,
+            fontSize: 12,
+            fontWeight: "700",
+            color: palette.ink,
+          }}
+        >
+          {exams.data?.data.find((item) => item.id === exam)?.title ??
+            (exam ? "Seçili sınav" : "Tüm çıkmış sınavlar")}
+        </Text>
+        <ChevronDown size={15} color={palette.muted} />
+      </Pressable>
+      <Sheet
+        visible={filter === "exam"}
+        title="Hangi sınavın soruları?"
+        close={() => setFilter(null)}
+      >
+        <Button
+          secondary={Boolean(exam)}
+          onPress={() => {
+            setExam("");
+            setCursor(undefined);
+            setFilter(null);
+          }}
+        >
+          Tüm çıkmış sınavlar
+        </Button>
+        {exams.loading ? (
+          <Loading />
+        ) : (
+          exams.data?.data.map((item) => (
+            <Button
+              key={item.id}
+              secondary={item.id !== exam}
+              onPress={() => {
+                setExam(item.id);
+                setCursor(undefined);
+                setFilter(null);
+              }}
+            >
+              {item.title}
+            </Button>
+          ))
+        )}
+        <ErrorNotice
+          error={exams.error}
+          retry={() => {
+            void exams.reload();
+          }}
+        />
+      </Sheet>
       <Sheet
         visible={filter === "subject"}
         title="Hangi dersi çalışalım?"
@@ -269,6 +351,10 @@ export function QuestionList({
             question={q}
             context={context}
             open={open}
+            subjectName={
+              subjects.data?.data.find((s) => s.id === q.version.subject_id)
+                ?.name
+            }
           />
         ))
       )}
@@ -281,10 +367,12 @@ export function QuestionCard({
   question,
   context,
   open,
+  subjectName,
 }: {
   question: Question;
   context: StudyContext;
   open: (id: string) => void;
+  subjectName?: string;
 }) {
   const id = useRef(Crypto.randomUUID());
   const task = useTask<{ data: PracticeAttempt }>();
@@ -329,11 +417,14 @@ export function QuestionCard({
           <View style={styles.row}>
             <BookOpen size={16} color={palette.primary} />
             <Text style={{ color: palette.muted, fontSize: 11 }}>
-              Çoktan seçmeli
+              {`Ders: ${subjectName ?? "—"}`}
             </Text>
           </View>
           <ChevronRight size={18} color={palette.primary} />
         </View>
+        <Text style={{ color: palette.muted, fontSize: 11, lineHeight: 16 }}>
+          {`Sınav: ${examSummary(question.exams)}`}
+        </Text>
         <Text
           numberOfLines={3}
           style={{
@@ -376,6 +467,14 @@ export function Practice({
     [context.id, id],
   );
   const task = useTask<{ data: PracticeAttempt }>();
+  const subjects = useResource(
+    (signal) =>
+      api.request("get", "/api/v1/subjects", {
+        signal,
+        query: { per_page: 100 },
+      }),
+    [],
+  );
   const favorite = useTask<{ data: { favorite: boolean } }>();
   const [selected, setSelected] = useState<string | null>(null);
   const [submission, setSubmission] = useState<{
@@ -456,6 +555,14 @@ export function Practice({
           </Text>
         </View>
         <Card>
+          <Text style={styles.muted}>
+            {`Ders: ${subjects.data?.data.find((s) => s.id === attempt.question.subject_id)?.name ?? "—"}`}
+          </Text>
+          <Text style={styles.muted}>
+            {attempt.exams.length === 0
+              ? "Sınav: çıkmış sınavlarda yok"
+              : `Sınav: ${attempt.exams.map(examLabel).join(", ")}`}
+          </Text>
           <TextLink onPress={() => toggleFavorite(!attempt.is_favorite)}>
             {favorite.pending
               ? "Kaydediliyor…"

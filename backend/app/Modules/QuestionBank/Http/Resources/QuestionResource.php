@@ -2,6 +2,7 @@
 
 namespace App\Modules\QuestionBank\Http\Resources;
 
+use App\Modules\QuestionBank\QuestionExamMemberships;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -9,6 +10,6 @@ class QuestionResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        return ['id' => $this->id, 'version' => new QuestionVersionResource($this->publishedVersion)];
+        return ['id' => $this->id, 'version' => new QuestionVersionResource($this->publishedVersion), 'exams' => QuestionExamMemberships::of($this)];
     }
 }

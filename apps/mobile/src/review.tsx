@@ -43,6 +43,14 @@ export function Review({
 }) {
   const [kind, setKind] = useState<Kind>("incorrect");
   const [cursor, setCursor] = useState<string>();
+  const subjects = useResource(
+    (signal) =>
+      api.request("get", "/api/v1/subjects", {
+        signal,
+        query: { per_page: 100 },
+      }),
+    [],
+  );
   const query = useResource(
     (signal) =>
       api.request("get", "/api/v1/contexts/{context}/review-questions", {
@@ -104,7 +112,15 @@ export function Review({
       ) : (
         query.data?.data.map((q) => (
           <View key={`${kind}-${q.id}-${q.version.id}`} style={{ gap: 4 }}>
-            <QuestionCard question={q} context={context} open={open} />
+            <QuestionCard
+              question={q}
+              context={context}
+              open={open}
+              subjectName={
+                subjects.data?.data.find((s) => s.id === q.version.subject_id)
+                  ?.name
+              }
+            />
             {kind === "favorite" && (
               <RemoveFavorite
                 context={context}

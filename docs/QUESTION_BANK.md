@@ -43,6 +43,16 @@ GET `/api/v1/questions` ve `/questions/{question}` yalnız güncel yayımlanmı�
 
 Öğrenci filtreleri `subject_id`, `topic_id`, `exam_type_id`, `source_id` yayımlanmış sürüme uygulanır. `topic_id` tam eşleşmedir; alt konuları otomatik kapsamaz. Yönetici listesi aynı filtreleri son taslağa uygular, ek `status=draft|published` kabul eder. `draft` hiç yayımlanmamış soru demektir; yayımlanmış sorunun bekleyen taslağı `has_pending_changes` alanıyla belirtilir. Listeler varsayılan 20, en fazla 100 kayıt döndürür; cursor ve filtreler sonraki sayfa bağlantısında korunur.
 
+## Soru–ders–sınav ilişkisi
+
+Bir sorunun **dersi** (`version.subject_id`) ile **sınavları** ayrı bilgilerdir: soru tek bir derse aittir, birden çok çıkmış sınavda (her sınavda bir sırada) yer alabilir. Soru tek kayıt olarak durur; sınav üyeliği `official_exam_questions` satırlarıdır, sorunun kendisinde saklanmaz.
+
+- Öğrenci soru yanıtları (`/questions`, `/questions/{id}`, tekrar listeleri) ve alıştırma kayıtları `exams` listesini taşır: sınav kimliği, başlık, sınav numarası, yıl, dönem, sınav türü adı ve sorunun o sınavdaki sırası. Yalnız **yayımlanmış** sınavlar görünür; liste yeniden eskiye sıralıdır.
+- Yönetici soru yanıtları (`/admin/questions`) taslak sınavlar dahil tüm üyelikleri `status` ile verir.
+- Filtreler bağımsızdır ve birleştirilebilir: `subject_id` (ders), `topic_id`, `official_exam_id` (yalnız o sınavın soruları; öğrencide taslak sınav boş döner).
+- Liste yanıtlarında üyelikler tek sorguyla toplu yüklenir; tekil yanıtlarda tek ek sorgu yapılır.
+- Ekranlar: öğrenci web ve mobilde soru kartı ve çalışma ekranı "Ders:" ve "Sınav:" satırlarını ayrı gösterir, soru listesinde Ders ve Çıkmış sınav filtreleri vardır; yönetim panelinde soru tablosunda ayrı bir "Sınavlar" sütunu ve sınav filtresi bulunur.
+
 ## Çıkmış sınavlar
 
 Merkezi `official_exams` (künye: sınav türü, yıl, dönem, numara, başlık, isteğe bağlı kaynak) ve `official_exam_questions` (`position`, `question_id`, **`question_version_id`**) tabloları orijinal soru sırasını ve cevap anahtarını yayımlanmış, değişmez soru sürümlerine sabitler. Aynı soru birden çok çıkmış sınavda kullanılabilir; bir sınavda bir kez bulunur. Sınav türü+yıl+dönem+numara `NULLS NOT DISTINCT` tekildir (409 `duplicate_official_exam`). Yalnız platform yöneticisi yönetir (`manage` kuralı).

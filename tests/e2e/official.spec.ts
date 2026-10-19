@@ -67,6 +67,11 @@ test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal s�
   await adminPage.getByRole("dialog").getByRole("button", { name: "Yayımla", exact: true }).click();
   await expect(adminPage.getByRole("status").filter({ hasText: "Çıkmış sınav yayımlandı." })).toBeVisible();
   await expect(adminPage.getByLabel("Başlık", { exact: true })).toBeDisabled();
+  // The question list names each question's exams next to its subject and filters by exam.
+  await adminPage.goto(`${admin}/questions`);
+  await expect(adminPage.getByRole("row").filter({ hasText: "Sentetik birinci soru" })).toContainText("1. sınav");
+  await adminPage.getByLabel("Çıkmış sınav", { exact: true }).selectOption({ label: title });
+  await expect(adminPage.getByRole("row").filter({ hasText: "Sentetik" })).toHaveCount(3);
 
   await student.reload();
   await student.getByRole("button", { name: "Çıkmış sınav", exact: true }).click();

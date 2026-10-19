@@ -379,8 +379,8 @@ small {
 }
 .filter-fields {
   display:grid;
-  grid-template-columns:1fr 1fr 1.15fr;
-  gap:24px;
+  grid-template-columns:1fr 1fr 1fr 1.1fr;
+  gap:20px;
   align-items:center
 }
 .filter-fields label {
@@ -1048,4 +1048,25 @@ small {
 .official-option small {
   display:block;
   color:var(--muted)
+}
+.question-exams {
+  margin:2px 0 8px;
+  font-size:13px;
+  color:var(--muted)
+}
+.exam-chips {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px;
+  margin:4px 0 12px;
+  font-size:13px;
+  color:var(--muted)
+}
+.chip {
+  border:1px solid var(--border);
+  background:#f1f5f1;
+  color:var(--green);
+  border-radius:999px;
+  padding:2px 10px
 }

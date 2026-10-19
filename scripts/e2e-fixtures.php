@@ -61,6 +61,12 @@ if ($operation === 'official-exam') {
     // Published past exam over the setup-study questions, in reverse order, for client flows.
     $admin = User::where('email', 'e2e-admin@example.test')->firstOrFail();
     $versions = Question::orderBy('id')->pluck('published_version_id')->reverse()->values()->all();
+    // One published question that belongs to no exam, to prove exam filters and exam labels.
+    $outside = app(SaveQuestion::class)->execute($admin, [
+        'subject_id' => Subject::firstOrFail()->id, 'source_id' => QuestionSource::firstOrFail()->id, 'stem' => 'Sınavda olmayan sentetik soru',
+        'options' => ['Sentetik A', 'Sentetik B'], 'correct_option_position' => 1,
+    ]);
+    app(PublishQuestion::class)->execute($admin, $outside, $outside->revision);
     $exam = app(SaveOfficialExam::class)->execute($admin, [
         'exam_type_id' => ExamType::firstOrFail()->id, 'title' => 'Sentetik çıkmış sınav', 'year' => 2023,
         'term' => '1. dönem', 'exam_number' => '1', 'question_version_ids' => $versions,

@@ -30,3 +30,19 @@ export function timeLabel(seconds: number): string {
     .toString()
     .padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`;
 }
+
+// A question's exams are shown apart from its subject: "107. sınav · silahlı", at most `limit` labels plus a count.
+export interface ExamMembership {
+  exam_number: string | null;
+  year: number;
+  exam_type_name: string;
+}
+export function examLabel(exam: ExamMembership): string {
+  const variant = /\(([^)]+)\)\s*$/.exec(exam.exam_type_name)?.[1];
+  return [`${exam.exam_number ?? exam.year}. sınav`, variant].filter(Boolean).join(' · ');
+}
+export function examSummary(exams: readonly ExamMembership[], limit = 3): string {
+  if (exams.length === 0) return 'Çıkmış sınavlarda yok';
+  const shown = exams.slice(0, limit).map(examLabel).join(', ');
+  return exams.length > limit ? `${shown} +${exams.length - limit}` : shown;
+}

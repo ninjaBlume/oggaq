@@ -1210,6 +1210,8 @@ export interface components {
             /** Format: uuid */
             id: string;
             version: components["schemas"]["QuestionVersion"];
+            /** @description Sorunun ait olduğu çıkmış sınavlar (yeniden eski). Sorunun dersi ayrı alandadır (subject_id); bir soru tek derse, birden çok sınava ait olabilir. */
+            exams: components["schemas"]["QuestionExam"][];
         };
         AdminQuestion: {
             /** Format: uuid */
@@ -1225,6 +1227,8 @@ export interface components {
             created_at: string;
             /** Format: date-time */
             updated_at: string;
+            /** @description Sorunun ait olduğu çıkmış sınavlar (yeniden eski). Sorunun dersi ayrı alandadır (subject_id); bir soru tek derse, birden çok sınava ait olabilir. */
+            exams: components["schemas"]["QuestionExam"][];
         };
         SubjectResponse: {
             data: components["schemas"]["Subject"];
@@ -1385,6 +1389,8 @@ export interface components {
             feedback: components["schemas"]["PracticeFeedback"] | null;
             /** @description Soru bu bağlamın favorilerinde mi. */
             is_favorite: boolean;
+            /** @description Sorunun ait olduğu çıkmış sınavlar (yeniden eski). Sorunun dersi ayrı alandadır (subject_id); bir soru tek derse, birden çok sınava ait olabilir. */
+            exams: components["schemas"]["QuestionExam"][];
         };
         PracticeAttemptResponse: {
             data: components["schemas"]["PracticeAttempt"];
@@ -1629,6 +1635,22 @@ export interface components {
         };
         StudyStatsResponse: {
             data: components["schemas"]["StudyStats"];
+        };
+        QuestionExam: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            exam_number: string | null;
+            year: number;
+            term: string | null;
+            exam_type_name: string;
+            /** @description Sorunun bu sınavdaki sırası. */
+            position: number;
+            /**
+             * @description Öğrenci yanıtlarında yalnız published gelir.
+             * @enum {string}
+             */
+            status: "draft" | "published";
         };
     };
     responses: {
@@ -2518,6 +2540,8 @@ export interface operations {
                 exam_type_id?: string;
                 source_id?: string;
                 status?: "draft" | "published";
+                /** @description Yalnız bu çıkmış sınavın soruları (taslak sınav dahil). */
+                official_exam_id?: string;
             };
             header?: never;
             path?: never;
@@ -2700,6 +2724,8 @@ export interface operations {
                 topic_id?: string;
                 exam_type_id?: string;
                 source_id?: string;
+                /** @description Yalnız bu çıkmış sınavın soruları (öğrencide yayımlanmış sınav; taslak sınav boş döner). subject_id ile birlikte kullanılabilir. */
+                official_exam_id?: string;
             };
             header?: never;
             path?: never;

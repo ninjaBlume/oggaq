@@ -4,6 +4,7 @@ namespace App\Modules\Study\Actions;
 
 use App\Models\User;
 use App\Modules\QuestionBank\Models\Question;
+use App\Modules\QuestionBank\QuestionExamMemberships;
 use App\Modules\Study\AnswerEvents;
 use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Support\Facades\DB;
@@ -26,6 +27,9 @@ class ListReviewQuestions
             );
         }
 
-        return $query->orderBy('id')->cursorPaginate($perPage)->withQueryString();
+        $page = $query->orderBy('id')->cursorPaginate($perPage)->withQueryString();
+        QuestionExamMemberships::attach($page->getCollection());
+
+        return $page;
     }
 }

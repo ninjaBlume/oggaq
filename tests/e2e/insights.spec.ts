@@ -65,6 +65,25 @@ test("yanlışlar, boşlar, favoriler ve başarı durumu son sonuca göre günce
   expect(errors).toEqual([]);
 });
 
+test("soru dersi ve çıkmış sınavları ayrı gösterir; sınava ve derse göre filtrelenir", async ({ page }) => {
+  fixture("official-exam");
+  await login(page);
+  const card = (name: string) => page.locator("article").filter({ has: page.getByRole("heading", { name, exact: true }) });
+  await expect(card("Sentetik birinci soru")).toContainText("Ders: Sentetik çalışma dersi");
+  await expect(card("Sentetik birinci soru")).toContainText("Sınav: 1. sınav");
+  await expect(card("Sınavda olmayan sentetik soru")).toContainText("Sınav: Çıkmış sınavlarda yok");
+  await expect(card("Sınavda olmayan sentetik soru")).toContainText("Ders: Sentetik çalışma dersi");
+  await page.getByLabel("Çıkmış sınav", { exact: true }).selectOption({ label: "Sentetik çıkmış sınav" });
+  await expect(page.locator("article")).toHaveCount(3);
+  await expect(page.getByRole("heading", { name: "Sınavda olmayan sentetik soru", exact: true })).toHaveCount(0);
+  await page.getByLabel("Ders", { exact: true }).selectOption({ label: "Sentetik çalışma dersi" });
+  await expect(page.locator("article")).toHaveCount(3);
+  await card("Sentetik üçüncü soru").getByRole("button", { name: "Soruyu çöz" }).click();
+  await expect(page.getByRole("heading", { name: "Bir soru, bir adım" })).toBeVisible();
+  await expect(page.locator(".question-meta")).toContainText("Ders: Sentetik çalışma dersi");
+  await expect(page.getByLabel("Çıkmış sınavlar")).toContainText("1. sınav");
+});
+
 test("kişisel ve kurum alanlarının tekrar listeleri ayrıdır", async ({ page }) => {
   await login(page);
   await solve(page, "Sentetik birinci soru", "B");

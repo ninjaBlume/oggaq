@@ -12,8 +12,10 @@ use App\Modules\QuestionBank\Http\Requests\SaveQuestionRequest;
 use App\Modules\QuestionBank\Http\Resources\AdminQuestionResource;
 use App\Modules\QuestionBank\Http\Resources\AdminQuestionVersionResource;
 use App\Modules\QuestionBank\Models\Question;
+use App\Modules\QuestionBank\QuestionExamMemberships;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class AdminQuestionController extends Controller
@@ -27,11 +29,17 @@ class AdminQuestionController extends Controller
                 $query->whereHas('latestVersion', fn ($version) => $version->where($filter, $request->validated($filter)));
             }
         }
+        if ($request->has('official_exam_id')) {
+            $query->whereIn('id', DB::table('official_exam_questions')->select('question_id')->where('official_exam_id', $request->validated('official_exam_id')));
+        }
         if ($request->has('status')) {
             $request->validated('status') === 'draft' ? $query->whereNull('published_version_id') : $query->whereNotNull('published_version_id');
         }
 
-        return AdminQuestionResource::collection($query->orderBy('id')->cursorPaginate($request->integer('per_page', 20))->withQueryString());
+        $page = $query->orderBy('id')->cursorPaginate($request->integer('per_page', 20))->withQueryString();
+        QuestionExamMemberships::attach($page->getCollection(), publishedOnly: false);
+
+        return AdminQuestionResource::collection($page);
     }
 
     public function store(SaveQuestionRequest $request, SaveQuestion $action): JsonResponse

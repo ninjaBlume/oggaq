@@ -1783,6 +1783,15 @@
                 "published"
               ]
             }
+          },
+          {
+            "name": "official_exam_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Yalnız bu çıkmış sınavın soruları (taslak sınav dahil)."
           }
         ]
       },
@@ -2151,6 +2160,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "official_exam_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Yalnız bu çıkmış sınavın soruları (öğrencide yayımlanmış sınav; taslak sınav boş döner). subject_id ile birlikte kullanılabilir."
           }
         ]
       }
@@ -4525,11 +4543,19 @@
           },
           "version": {
             "$ref": "#/components/schemas/QuestionVersion"
+          },
+          "exams": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionExam"
+            },
+            "description": "Sorunun ait olduğu çıkmış sınavlar (yeniden eski). Sorunun dersi ayrı alandadır (subject_id); bir soru tek derse, birden çok sınava ait olabilir."
           }
         },
         "required": [
           "id",
-          "version"
+          "version",
+          "exams"
         ]
       },
       "AdminQuestion": {
@@ -4570,6 +4596,13 @@
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "exams": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionExam"
+            },
+            "description": "Sorunun ait olduğu çıkmış sınavlar (yeniden eski). Sorunun dersi ayrı alandadır (subject_id); bir soru tek derse, birden çok sınava ait olabilir."
           }
         },
         "required": [
@@ -4580,7 +4613,8 @@
           "has_pending_changes",
           "latest_version",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "exams"
         ]
       },
       "SubjectResponse": {
@@ -5228,6 +5262,13 @@
           "is_favorite": {
             "type": "boolean",
             "description": "Soru bu bağlamın favorilerinde mi."
+          },
+          "exams": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionExam"
+            },
+            "description": "Sorunun ait olduğu çıkmış sınavlar (yeniden eski). Sorunun dersi ayrı alandadır (subject_id); bir soru tek derse, birden çok sınava ait olabilir."
           }
         },
         "required": [
@@ -5240,7 +5281,8 @@
           "selected_option_id",
           "outcome",
           "feedback",
-          "is_favorite"
+          "is_favorite",
+          "exams"
         ]
       },
       "PracticeAttemptResponse": {
@@ -6244,6 +6286,60 @@
         },
         "required": [
           "data"
+        ]
+      },
+      "QuestionExam": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "exam_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "year": {
+            "type": "integer"
+          },
+          "term": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "exam_type_name": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Sorunun bu sınavdaki sırası."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published"
+            ],
+            "description": "Öğrenci yanıtlarında yalnız published gelir."
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "exam_number",
+          "year",
+          "term",
+          "exam_type_name",
+          "position",
+          "status"
         ]
       }
     },
