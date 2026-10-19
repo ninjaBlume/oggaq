@@ -24,7 +24,7 @@ Her kural `backend/app/Modules/Import/LegacyCorrections.php` içinde kanıtıyla
 ## 3. Hâlâ çözülemeyenler (resmî kitapçık bulunamadı)
 
 - **Silah sökmeye başlamadan önce ilk işlem (106):** bizdeki doğru şık "Silah ölü noktaya tutulur"; 114. sınavın resmî kitapçığında seçenek "ölü noktaya tutularak horoz düşürülür" biçimine çevrilmiş ve doğru şık **Şarjör çıkartılır**. 106. sınav kitapçığına ulaşılamadı; ürün sahibi 106 anahtarını doğrulamalı.
-- **118. ve 120. sınavların silahlı sürümleri eksik:** 118'de 24, 120'de 22 silah sorusu var (olması gereken 25); eksik silah soruları kaynak dökümde yok. Editörler resmî kitapçıktan ekleyip sınavı yeniden kurmalı.
+- **118. ve 120. sınavların silahlı sürümleri (çözüldü):** Dökümde 118'de 24, 120'de 22 silah sorusu vardı; eksik dört soru (118 soru 19, 120 soru 23–25) resmî A grubu cevaplı kitapçıktan eklendi (`LegacySupplements`). Editörler eklenen soruları kitapçıkla bir kez daha gözden geçirebilir.
 - **Tabancanın başlıca parçalarından değildir (116: Tırnak):** seçeneklerde hem Tırnak hem Hazne başlıca parça sayılmayabilir; resmî anahtar bulunamadı.
 
 ## 4. Resmî cevaplı kitapçıkla otomatik karşılaştırmada farklı çıkan adaylar

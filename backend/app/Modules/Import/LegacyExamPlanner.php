@@ -133,7 +133,18 @@ class LegacyExamPlanner
                 $warnings[] = ['type' => 'same_stem_different_options', 'soru_ids' => $ids];
             }
         }
-        $exams = $this->exams($kept, $sets, $subjects, $dates, $warnings, $errors);
+        $supplements = $this->supplements($subjects);
+        $exams = $this->exams($kept, $sets, $subjects, $dates, $supplements, $warnings, $errors);
+        // Only supplements an exam actually took become questions; the rest are not imported.
+        foreach ($supplements as $items) {
+            foreach ($items as $item) {
+                foreach ($exams as $exam) {
+                    if (in_array($item['hash'], $exam['hashes'], true)) {
+                        $questions[$item['hash']] ??= $item['question'];
+                    }
+                }
+            }
+        }
         $sources = [];
         foreach ($questions as $question) {
             $sources[$question['source_number']] = true;
@@ -144,6 +155,7 @@ class LegacyExamPlanner
         ksort($sources);
         $stats['unique_questions'] = count($questions);
         $stats['exams'] = count($exams);
+        $stats['supplemented'] = count(array_filter($warnings, fn ($w) => $w['type'] === 'supplemented_from_official_booklet'));
 
         return [
             'adapter' => self::VERSION, 'subjects' => $subjects,
@@ -152,7 +164,36 @@ class LegacyExamPlanner
         ];
     }
 
-    private function exams(array $kept, array $sets, array $subjects, array $dates, array &$warnings, array &$errors): array
+    // Official-booklet questions missing from the dump, keyed by exam number then supplement id, each as hash => question.
+    private function supplements(array $subjects): array
+    {
+        $byNumber = [];
+        foreach (LegacySupplements::QUESTIONS as $id => $item) {
+            $subjectId = null;
+            foreach ($subjects as $legacyId => $subject) {
+                if ($subject['code'] === $item['subject']) {
+                    $subjectId = $legacyId;
+                }
+            }
+            if ($subjectId === null) {
+                continue;
+            }
+            $options = array_map(fn ($text) => $this->clean($text), $item['options']);
+            $stem = $this->clean($item['stem']);
+            $stemKey = $this->norm($stem);
+            $normalized = array_map(fn ($text) => $this->norm($text), $options);
+            $hash = hash('sha256', json_encode([$stemKey, $normalized, $item['correct'] - 1], JSON_UNESCAPED_UNICODE));
+            $byNumber[$item['exam']][$id] = ['hash' => $hash, 'question' => [
+                'stem' => $stem, 'options' => $options, 'correct' => $item['correct'] - 1, 'stem_key' => $stemKey, 'duplicate_option_text' => false,
+                'issues' => [], 'complete' => true, 'subject_override' => null, 'hash' => $hash,
+                'subject' => $subjectId, 'source_number' => $item['exam'], 'first_soru_id' => $id,
+            ]];
+        }
+
+        return $byNumber;
+    }
+
+    private function exams(array $kept, array $sets, array $subjects, array $dates, array $supplements, array &$warnings, array &$errors): array
     {
         $weaponId = null;
         foreach ($subjects as $id => $subject) {
@@ -198,6 +239,13 @@ class LegacyExamPlanner
             // weapon-subject questions (the last 25 of the 125), whatever order the source rows were entered in.
             $general = array_keys(array_filter($hashes, fn ($subject) => $subject !== $weaponId));
             $weapon = $weaponId === null ? [] : array_keys(array_filter($hashes, fn ($subject) => $subject === $weaponId));
+            foreach ($supplements[$number] ?? [] as $id => $item) {
+                if (count($weapon) < self::WEAPON_QUESTIONS && ! isset($hashes[$item['hash']])) {
+                    $weapon[] = $item['hash'];
+                    $complete[$item['hash']] = true;
+                    $warnings[] = ['type' => 'supplemented_from_official_booklet', 'sinav_no' => $number, 'supplement' => $id];
+                }
+            }
             if (count($general) !== self::GENERAL_QUESTIONS || count($weapon) !== self::WEAPON_QUESTIONS) {
                 $warnings[] = ['type' => 'exam_structure', 'sinav_no' => $number, 'general' => count($general), 'weapon' => count($weapon)];
             }

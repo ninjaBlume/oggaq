@@ -273,6 +273,40 @@ SQL;
         $this->assertSame(['type' => 'exam_structure', 'sinav_no' => 101, 'general' => 2, 'weapon' => 3], collect($plan['warnings'])->firstWhere('type', 'exam_structure'));
     }
 
+    public function test_missing_weapon_questions_come_from_the_official_booklet_only_when_the_exam_is_short(): void
+    {
+        $plan = function (int $weaponCount) {
+            $rows = [['soru_id' => 1, 'sinav_id' => 1, 'ders_id' => 1, 'soru_metni' => 'G1']];
+            $answers = [['yanit_id' => 1, 'soru_id' => 1, 'yanit_metni' => 'A', 'dogru_mu' => 1], ['yanit_id' => 2, 'soru_id' => 1, 'yanit_metni' => 'B', 'dogru_mu' => 0]];
+            for ($i = 1; $i <= $weaponCount; $i++) {
+                $rows[] = ['soru_id' => 100 + $i, 'sinav_id' => 1, 'ders_id' => 2, 'soru_metni' => "W{$i}"];
+                $answers[] = ['yanit_id' => 1000 + $i * 2, 'soru_id' => 100 + $i, 'yanit_metni' => 'A', 'dogru_mu' => 1];
+                $answers[] = ['yanit_id' => 1001 + $i * 2, 'soru_id' => 100 + $i, 'yanit_metni' => 'B', 'dogru_mu' => 0];
+            }
+
+            return app(LegacyExamPlanner::class)->plan([
+                'dersler' => [['ders_id' => 1, 'ders_adi' => 'Genel', 'ders_seflink' => 'genel', 'ders_sira' => 1], ['ders_id' => 2, 'ders_adi' => 'Silah', 'ders_seflink' => 'silah-bilgisi-ve-atis', 'ders_sira' => 2]],
+                'sinavlar' => [['sinav_id' => 1, 'sinav_adi' => '118.TEMEL EĞİTİM YAZILI SINAV SORULARI', 'kategori_id' => 2, 'ders_id' => null]],
+                'sorular' => $rows, 'yanitlar' => $answers, 'ogg_sinavlari' => [['ogg_sinav_adi' => '118. TEMEL EĞİTİM SINAVI', 'ogg_sinav_tarihi' => '2025-10-05']],
+            ]);
+        };
+
+        $short = $plan(24);
+        $armed = collect($short['exams'])->firstWhere('key', '118:silahli');
+        $lastQuestion = $short['questions'][end($armed['hashes'])];
+        $this->assertCount(26, $armed['hashes']);
+        $this->assertStringContainsString('iğne kapsüle çok hafif vurmuş', $lastQuestion['stem']);
+        $this->assertSame('İğne yayı arızalıdır', $lastQuestion['options'][$lastQuestion['correct']]);
+        $this->assertTrue($armed['publishable']);
+        $this->assertCount(1, collect($short['exams'])->firstWhere('key', '118:silahsiz')['hashes']);
+        $this->assertSame(1, $short['stats']['supplemented']);
+
+        $full = $plan(25);
+        $this->assertCount(26, collect($full['exams'])->firstWhere('key', '118:silahli')['hashes']);
+        $this->assertSame(0, $full['stats']['supplemented']);
+        $this->assertNotContains('egm-118-silah-19', array_column($full['questions'], 'first_soru_id'));
+    }
+
     public function test_text_escaped_several_times_is_decoded_until_stable(): void
     {
         $plan = app(LegacyExamPlanner::class)->plan([
