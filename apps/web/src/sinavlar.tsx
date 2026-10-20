@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, cursorFromLink } from '@oggaq/api-client';
 import type { components } from '@oggaq/shared-types';
-import { suggestedMinutes } from '@oggaq/study-core';
+import { randomId, suggestedMinutes } from '@oggaq/study-core';
 import { api } from './api';
 import { PageIntro, useStudyContext } from './App';
 import { dateLabel, ErrorNotice, Field, Loading } from './ui';
@@ -64,7 +64,7 @@ function ExamRow({ exam, title, attempts }: { exam: OfficialExam; title: string;
     onError: (error) => { if (error instanceof ApiError && [409, 422].includes(error.status)) submission.current = null; },
   });
   function begin() {
-    submission.current ??= { id: crypto.randomUUID(), official_exam_id: exam.id, duration_seconds: Math.round(minutes) * 60 };
+    submission.current ??= { id: randomId(), official_exam_id: exam.id, duration_seconds: Math.round(minutes) * 60 };
     start.mutate(submission.current);
   }
   const locked = start.isPending || submission.current !== null;

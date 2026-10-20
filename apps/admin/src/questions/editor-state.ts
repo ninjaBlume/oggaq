@@ -1,4 +1,5 @@
 import type { AdminQuestionVersion, QuestionInput } from '@oggaq/shared-types';
+import { randomId } from '@oggaq/study-core';
 
 export interface EditorOption { key: string; text: string }
 export interface EditorState {
@@ -10,7 +11,7 @@ export function initialEditor(version?: AdminQuestionVersion): EditorState {
   return {
     subject_id: version?.subject_id ?? '', topic_id: version?.topic_id ?? '', exam_type_id: version?.exam_type_id ?? '', source_id: version?.source?.id ?? '',
     stem: version?.stem ?? '', explanation: version?.explanation ?? '',
-    options: version ? version.options.map((option) => ({ key: option.id, text: option.text })) : [0, 1].map(() => ({ key: crypto.randomUUID(), text: '' })),
+    options: version ? version.options.map((option) => ({ key: option.id, text: option.text })) : [0, 1].map(() => ({ key: randomId(), text: '' })),
     correct: version?.correct_option_id ? version.options.findIndex((option) => option.id === version.correct_option_id) : null,
   };
 }

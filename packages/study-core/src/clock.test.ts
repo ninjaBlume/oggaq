@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { anchorClock, remainingSeconds, timeLabel } from "./index";
+import { anchorClock, randomId, remainingSeconds, timeLabel } from "./index";
 describe("server deadline display", () => {
   it("uses server time instead of a wrong device date", () => {
     const c = anchorClock("2026-10-09T10:01:00Z", "2026-10-09T10:00:00Z", 700);
@@ -45,5 +45,19 @@ describe('exam labels', () => {
     const many = ['100', '101', '102', '103', '104'].map((n) => ({ ...basic, exam_number: n }));
     expect(examSummary(many)).toBe('100. Deneme · silahlı, 101. Deneme · silahlı, 102. Deneme · silahlı +2');
     expect(examSummary([])).toBe('Çıkmış sınavlarda yok');
+  });
+});
+
+describe("random ids", () => {
+  it("builds a valid v4 UUID even where crypto.randomUUID is missing (insecure LAN origin)", () => {
+    const original = globalThis.crypto.randomUUID;
+    Object.defineProperty(globalThis.crypto, "randomUUID", { value: undefined, configurable: true });
+    try {
+      const ids = new Set(Array.from({ length: 50 }, () => randomId()));
+      expect(ids.size).toBe(50);
+      for (const id of ids) expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    } finally {
+      Object.defineProperty(globalThis.crypto, "randomUUID", { value: original, configurable: true });
+    }
   });
 });

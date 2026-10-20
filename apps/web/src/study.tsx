@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { PracticeAttempt, Question, QuestionVersion } from '@oggaq/shared-types';
-import { examLabel, examSummary } from '@oggaq/study-core';
+import { examLabel, examSummary, randomId } from '@oggaq/study-core';
 import { ApiError } from '@oggaq/api-client';
 import { api } from './api';
 import { Disclosure, PageIntro, useStudyContext } from './App';
@@ -13,7 +13,7 @@ export function QuestionCard({ question, subjectName, refresh }: { question: Que
   const navigate = useNavigate();
   const id = useRef<string | null>(null);
   const start = useMutation({ mutationFn: () => {
-    id.current ??= crypto.randomUUID();
+    id.current ??= randomId();
     return api.request('post', '/api/v1/contexts/{context}/practice-attempts', { params: { context: context.id }, body: { id: id.current, question_id: question.id, question_version_id: question.version.id } });
   }, onSuccess: (response) => navigate(`/study/${context.id}/attempts/${response.data.id}`) });
   const changed = start.error instanceof ApiError && start.error.problem.code === 'question_changed';

@@ -1,4 +1,5 @@
 import type { AdminQuestionVersion, Catalogs } from '@oggaq/shared-types';
+import { randomId } from '@oggaq/study-core';
 import { Field, Icon } from '../ui';
 import { removeOption } from '../questions/editor-state';
 import type { EditorState } from '../questions/editor-state';
@@ -31,7 +32,7 @@ export function QuestionFields({ form, setForm, catalogs, idPrefix, fieldError }
       <button type="button" className="icon-button remove-option" aria-label={`${letter(index)} seçeneğini sil`} onClick={() => setForm((current) => removeOption(current, index))}><Icon name="close" size={18} /></button>
     </div>)}</div>
     {(fieldError('options') || fieldError('correct_option_position')) && <p className="field-error">{fieldError('options') ?? fieldError('correct_option_position')}</p>}
-    <div className="option-footer"><button type="button" className="button secondary small" disabled={form.options.length >= 10} onClick={() => patch('options', [...form.options, { key: crypto.randomUUID(), text: '' }])}><Icon name="plus" size={16} />Seçenek ekle</button><span className="muted small-text">Doğru cevabı soldaki daireden seçin.</span></div>
+    <div className="option-footer"><button type="button" className="button secondary small" disabled={form.options.length >= 10} onClick={() => patch('options', [...form.options, { key: randomId(), text: '' }])}><Icon name="plus" size={16} />Seçenek ekle</button><span className="muted small-text">Doğru cevabı soldaki daireden seçin.</span></div>
     <Field label="Cevap açıklaması" name={`${idPrefix}-explanation`} error={fieldError('explanation')}>{(props) => <textarea {...props} rows={2} maxLength={20000} value={form.explanation} onChange={(event) => patch('explanation', event.target.value)} />}</Field>
   </>;
 }
