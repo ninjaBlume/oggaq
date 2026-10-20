@@ -63,6 +63,7 @@ export function Exams({
   const [official, setOfficial] = useState("");
   const [examType, setExamType] = useState("");
   const [weapon, setWeapon] = useState<"all" | "armed" | "unarmed">("all");
+  const [officialSubject, setOfficialSubject] = useState("");
   const [officialCursor, setOfficialCursor] = useState<string>();
   const submission = useRef<StartInput | null>(null);
   const task = useTask<{ data: ExamAttempt }>();
@@ -84,6 +85,15 @@ export function Exams({
     [mode],
     mode === "official",
   );
+  const subjectChoices = useResource(
+    (signal) =>
+      api.request("get", "/api/v1/subjects", {
+        signal,
+        query: { per_page: 100 },
+      }),
+    [mode],
+    mode === "official",
+  );
   const officialExams = useResource(
     (signal) =>
       api.request("get", "/api/v1/official-exams", {
@@ -93,9 +103,10 @@ export function Exams({
           cursor: officialCursor,
           exam_type_id: examType || undefined,
           weapon_status: weapon === "all" ? undefined : weapon,
+          subject_id: officialSubject || undefined,
         },
       }),
-    [officialCursor, mode, examType, weapon],
+    [officialCursor, mode, examType, weapon, officialSubject],
     mode === "official",
   );
   function begin() {
@@ -265,6 +276,27 @@ export function Exams({
               }}
               disabled={locked}
             />
+            <ChoiceGroup
+              choices={[
+                {
+                  value: "all",
+                  label: "Tüm dersler",
+                  accessibilityLabel: "Tüm derslerin sınavları",
+                },
+                ...(subjectChoices.data?.data ?? []).map((item) => ({
+                  value: item.id,
+                  label: item.name,
+                  accessibilityLabel: `${item.name} dersi sınavları`,
+                })),
+              ]}
+              value={officialSubject || "all"}
+              onChange={(value) => {
+                setOfficialSubject(value === "all" ? "" : value);
+                setOfficial("");
+                setOfficialCursor(undefined);
+              }}
+              disabled={locked}
+            />
           </>
         )}
         {mode === "random" ? (
@@ -298,7 +330,7 @@ export function Exams({
                 disabled={locked}
                 onPress={() => setOfficial(item.id)}
               >
-                {`${item.title} · ${item.exam_type ? examTypeShort(item.exam_type.name) : ""}${item.weapon_status ? ` · ${weaponLabels[item.weapon_status]}` : ""} · ${item.question_count} soru`}
+                {`${item.title} · ${item.exam_type ? examTypeShort(item.exam_type.name) : ""}${item.subject ? ` · ${item.subject.name}` : ""}${item.weapon_status ? ` · ${weaponLabels[item.weapon_status]}` : ""} · ${item.question_count} soru`}
               </Button>
             ))}
             {officialExams.data && (

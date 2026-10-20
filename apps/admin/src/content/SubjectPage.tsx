@@ -52,14 +52,14 @@ function ExamView({ subjectId, status, catalogs, onChanged }: { subjectId: strin
   const groups = groupSubjectExams(stats.data.data);
   return <div className="exam-view">
     {catalogs['exam-types'].map((type) => { const own = groups.filter((group) => group.typeId === type.id); return <div key={type.id}>
-      <h2 className="exam-type-heading">{type.name} sınavları<small>{own.length} sınav</small></h2>
-      {own.length === 0 ? <p className="muted small-text exam-type-empty">Bu derste {type.name} sınavı sorusu yok.</p> : <div className="question-stack">{own.map((group) => <ExamSection key={group.key} title={`${group.number ? `${group.number}. ` : ''}${type.name}`} caption={`${group.year}${group.term ? ` · ${group.term}` : ''} · ${group.variants.map((variant) => `${weaponLabel(variant.weapon_status)} ${variant.total}`).join(' · ')}`} count={group.best.total} draft={group.best.draft}>{() => <QuestionStream subjectId={subjectId} status={status} examId={group.best.official_exam_id} catalogs={catalogs} onChanged={onChanged} />}</ExamSection>)}</div>}
+      <h2 className="exam-type-heading">{type.name}<small>{own.length} sınav</small></h2>
+      {own.length === 0 ? <p className="muted small-text exam-type-empty">Bu dersin {type.name} içinde sorusu yok.</p> : <div className="question-stack">{own.map((group) => <ExamSection key={group.key} title={`${group.number ? `${group.number}. ` : ''}${type.name}`} caption={`${group.year}${group.term ? ` · ${group.term}` : ''} · ${group.variants.map((variant) => `${weaponLabel(variant.weapon_status)} ${variant.total}`).join(' · ')}`} count={group.best.total} draft={group.best.draft}>{() => <QuestionStream subjectId={subjectId} status={status} examId={group.best.official_exam_id} catalogs={catalogs} onChanged={onChanged} />}</ExamSection>)}</div>}
     </div>; })}
     {stats.data.without_exam > 0 && <div><h2 className="exam-type-heading">Hiçbir sınavda olmayan sorular<small>{stats.data.without_exam} soru</small></h2><ExamSection title="Sınava bağlı olmayan sorular" count={stats.data.without_exam}>{() => <QuestionStream subjectId={subjectId} status={status} examId="none" catalogs={catalogs} onChanged={onChanged} />}</ExamSection></div>}
   </div>;
 }
 
-// One subject, two ways to walk it: by topic, or by exam (Temel / Yenileme, then exam number). Every question is shown in full and edited in place.
+// One subject, two ways to walk it: by topic, or by exam (Deneme / Ders exams, then exam number). Every question is shown in full and edited in place.
 export function SubjectPage() {
   const { subjectId = '' } = useParams();
   const [view, setView] = useState<'topic' | 'exam'>('topic');

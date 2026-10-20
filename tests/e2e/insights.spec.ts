@@ -70,7 +70,7 @@ test("soru dersi ve çıkmış sınavları ayrı gösterir; sınava ve derse gö
   await login(page);
   const card = (name: string) => page.locator("article").filter({ has: page.getByRole("heading", { name, exact: true }) });
   await expect(card("Sentetik birinci soru")).toContainText("Ders: Sentetik çalışma dersi");
-  await expect(card("Sentetik birinci soru")).toContainText("Sınav: 1. Temel · silahlı");
+  await expect(card("Sentetik birinci soru")).toContainText("Sınav: 1. Deneme · silahlı");
   await expect(card("Sınavda olmayan sentetik soru")).toContainText("Sınav: Çıkmış sınavlarda yok");
   await expect(card("Sınavda olmayan sentetik soru")).toContainText("Ders: Sentetik çalışma dersi");
   await page.getByLabel("Çıkmış sınav", { exact: true }).selectOption({ label: "Sentetik çıkmış sınav" });
@@ -81,7 +81,7 @@ test("soru dersi ve çıkmış sınavları ayrı gösterir; sınava ve derse gö
   await card("Sentetik üçüncü soru").getByRole("button", { name: "Soruyu çöz" }).click();
   await expect(page.getByRole("heading", { name: "Bir soru, bir adım" })).toBeVisible();
   await expect(page.locator(".question-meta")).toContainText("Ders: Sentetik çalışma dersi");
-  await expect(page.getByLabel("Çıkmış sınavlar")).toContainText("1. Temel · silahlı");
+  await expect(page.getByLabel("Çıkmış sınavlar")).toContainText("1. Deneme · silahlı");
 });
 
 test("kişisel ve kurum alanlarının tekrar listeleri ayrıdır", async ({ page }) => {

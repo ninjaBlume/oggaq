@@ -112,7 +112,7 @@ class OfficialExamTest extends TestCase
         $this->assertSame($published['published_at'], $again['published_at']);
         $this->asToken($this->createUser());
         $list = $this->getJson('/api/v1/official-exams')->assertOk()->assertJsonCount(1, 'data')->json('data');
-        $this->assertSame(['id', 'title', 'exam_type_id', 'exam_type', 'weapon_status', 'year', 'term', 'exam_number', 'question_count', 'source', 'published_at'], array_keys($list[0]));
+        $this->assertSame(['id', 'title', 'exam_type_id', 'exam_type', 'weapon_status', 'subject', 'year', 'term', 'exam_number', 'question_count', 'source', 'published_at'], array_keys($list[0]));
         $this->getJson('/api/v1/official-exams/'.$draft['id'])->assertOk()->assertJsonPath('data.question_count', 3)->assertJsonMissingPath('data.questions');
         $this->getJson('/api/v1/official-exams?year=2023')->assertOk()->assertJsonCount(1, 'data');
         $this->getJson('/api/v1/official-exams?year=2020')->assertOk()->assertJsonCount(0, 'data');
@@ -334,6 +334,26 @@ class OfficialExamTest extends TestCase
         $this->getJson('/api/v1/admin/subjects/'.Str::uuid().'/exam-stats')->assertOk()->assertJsonPath('without_exam', 0);
         $this->asToken($this->createUser());
         $this->getJson('/api/v1/admin/subjects/'.$this->subject->id.'/exam-stats')->assertForbidden();
+    }
+
+    public function test_a_subject_exam_names_its_subject_and_identity_includes_it(): void
+    {
+        $this->asToken($this->admin);
+        $other = Subject::create(['name' => 'Başka ders', 'code' => Str::uuid()]);
+        $subjectExam = fn (Subject $subject, array $ids) => $this->postJson('/api/v1/admin/official-exams', $this->payload(['subject_id' => $subject->id, 'title' => 'Ders sınavı '.$subject->name, 'question_version_ids' => $ids]));
+        $first = $subjectExam($this->subject, $this->versionIds([0, 1]))->assertCreated()->assertJsonPath('data.subject.id', $this->subject->id)->assertJsonPath('data.subject.name', 'Sentetik ders')->json('data');
+        // Same type, year, term and number: another subject is a different exam, the same subject is a duplicate.
+        $subjectExam($other, $this->versionIds([2]))->assertCreated();
+        $subjectExam($this->subject, $this->versionIds([2]))->assertConflict()->assertJsonPath('code', 'duplicate_official_exam');
+        $this->postJson('/api/v1/admin/official-exams', $this->payload(['subject_id' => (string) Str::uuid()]))->assertUnprocessable()->assertJsonValidationErrors('subject_id');
+        $this->postJson('/api/v1/admin/official-exams/'.$first['id'].'/publish')->assertOk();
+        $this->getJson('/api/v1/admin/official-exams?subject_id='.$this->subject->id)->assertOk()->assertJsonCount(1, 'data');
+        $this->asToken($this->createUser());
+        $this->getJson('/api/v1/official-exams?subject_id='.$this->subject->id)->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.subject.name', 'Sentetik ders');
+        $this->getJson('/api/v1/official-exams?subject_id='.$other->id)->assertOk()->assertJsonCount(0, 'data');
+        $this->asToken($this->admin);
+        $membership = $this->getJson('/api/v1/admin/questions/'.$this->questions[0]->id)->assertOk()->json('data.exams.0');
+        $this->assertSame('Sentetik ders', $membership['subject_name']);
     }
 
     public function test_database_only_allows_the_audited_version_correction_in_a_published_exam(): void

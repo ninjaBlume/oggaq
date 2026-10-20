@@ -156,7 +156,9 @@ SQL;
         $this->assertSame(1, $report['stats']['incomplete']);
         $this->assertSame(1, $report['stats']['superseded']);
         $this->assertSame(1, $report['stats']['duplicates']);
-        $this->assertSame(4, count($report['exams']));
+        // Four whole exams (100 and 107, armed and unarmed) plus the subject exams of those two numbers.
+        $this->assertSame(9, count($report['exams']));
+        $this->assertCount(5, array_filter(array_keys($report['exams']), fn ($key) => str_contains($key, ':ders:')));
         $this->assertSame(4, $report['exams']['107:silahli']['questions']);
         $this->assertSame(3, $report['exams']['107:silahsiz']['questions']);
         $this->assertFalse($report['exams']['107:silahli']['publishable']);
@@ -347,19 +349,24 @@ SQL;
     public function test_commit_publishes_questions_and_exams_with_original_order_and_cleaned_text(): void
     {
         [, $created] = $this->commit();
-        $this->assertSame(['subjects' => 3, 'sources' => 2, 'questions' => 6, 'draft_questions' => 1, 'exams' => 2, 'draft_exams' => 2], $created);
+        $this->assertSame(['subjects' => 3, 'sources' => 2, 'questions' => 6, 'draft_questions' => 1, 'exams' => 6, 'draft_exams' => 3], $created);
         $this->assertSame(6, Question::whereNotNull('published_version_id')->count());
         $this->assertSame(1, Question::whereNull('published_version_id')->count());
-        $this->assertSame(2, OfficialExam::whereNotNull('published_at')->count());
-        $this->assertSame(2, OfficialExam::whereNull('published_at')->count());
+        $this->assertSame(6, OfficialExam::whereNotNull('published_at')->count());
+        $this->assertSame(3, OfficialExam::whereNull('published_at')->count());
         $stems = Question::with('latestVersion')->get()->map(fn ($q) => $q->latestVersion->stem)->all();
         $this->assertContains("İkinci soru & ilk yardım\nsatır", $stems);
         $this->assertContains('Yüzüncü sınav hukuk sorusu', $stems);
         $this->assertContains('Yalnız ders setindeki soru', $stems);
         $armed = OfficialExam::where('title', 'like', 'ÖGG 107%Silahlı')->firstOrFail();
         $this->assertSame('armed', $armed->weapon_status);
-        $this->assertSame('Temel Eğitim', $armed->examType->name);
-        $this->assertSame(['Temel Eğitim', 'Yenileme Eğitimi'], ExamType::orderBy('name')->pluck('name')->all());
+        $this->assertSame('Deneme Sınavı', $armed->examType->name);
+        $this->assertSame(['Deneme Sınavı', 'Ders Sınavı'], ExamType::orderBy('name')->pluck('name')->all());
+        // Subject exams carry their subject, no armed/unarmed status, and together hold exactly the armed exam's questions.
+        $ders = OfficialExam::where('exam_number', '107')->whereNotNull('subject_id')->get();
+        $this->assertTrue($ders->every(fn ($exam) => $exam->examType->name === 'Ders Sınavı' && $exam->weapon_status === null));
+        $this->assertSame($armed->questions()->count(), $ders->sum(fn ($exam) => $exam->questions()->count()));
+        $this->assertStringContainsString('Ders Sınavı —', $ders->first()->title);
         $this->assertSame(107, (int) $armed->exam_number);
         $this->assertSame(2024, $armed->year);
         $this->assertSame('Şubat', $armed->term);
@@ -370,7 +377,7 @@ SQL;
         $this->assertSame('unarmed', $unarmed->weapon_status);
         $this->assertSame($armed->exam_type_id, $unarmed->exam_type_id);
         $this->assertSame(3, $unarmed->questions()->count());
-        $this->assertSame('ÖGG 100. Temel Eğitim Sınavı (30.10.2022) — Silahlı', OfficialExam::where('exam_number', '100')->where('title', 'like', '%Silahlı')->firstOrFail()->title);
+        $this->assertSame('ÖGG 100. Deneme Sınavı (30.10.2022) — Silahlı', OfficialExam::where('exam_number', '100')->where('title', 'like', '%Silahlı')->firstOrFail()->title);
         $draft = Question::whereNull('published_version_id')->firstOrFail()->latestVersion;
         $this->assertSame('Seçeneği olmayan soru', $draft->stem);
         $this->assertSame(0, $draft->options()->count());
@@ -389,7 +396,7 @@ SQL;
         [, $again] = $this->commit(null, $admin);
         $this->assertSame(['subjects' => 0, 'sources' => 0, 'questions' => 0, 'draft_questions' => 0, 'exams' => 0, 'draft_exams' => 0], $again);
         $this->assertSame(7, Question::count());
-        $this->assertSame(4, OfficialExam::count());
+        $this->assertSame(9, OfficialExam::count());
     }
 
     public function test_commit_requires_the_reviewed_report_the_unchanged_file_and_a_platform_admin(): void

@@ -27,6 +27,8 @@ export function Exams() {
   const [official, setOfficial] = useState("");
   const [examType, setExamType] = useState("");
   const [weapon, setWeapon] = useState<"" | "armed" | "unarmed">("");
+  // A Ders Sınavı holds one subject's questions of an exam number; the subject narrows the long list.
+  const [officialSubject, setOfficialSubject] = useState("");
   const [officialCursor, setOfficialCursor] = useState<string>();
   const [cursor, setCursor] = useState<string>();
   const [subjectCursor, setSubjectCursor] = useState<string>();
@@ -60,7 +62,7 @@ export function Exams() {
       }),
   });
   const officialExams = useQuery({
-    queryKey: ["official-exams", examType, weapon, officialCursor],
+    queryKey: ["official-exams", examType, weapon, officialSubject, officialCursor],
     enabled: mode === "official",
     queryFn: ({ signal }) =>
       api.request("get", "/api/v1/official-exams", {
@@ -70,6 +72,7 @@ export function Exams() {
           cursor: officialCursor,
           exam_type_id: examType || undefined,
           weapon_status: weapon || undefined,
+          subject_id: officialSubject || undefined,
         },
       }),
   });
@@ -259,6 +262,26 @@ export function Exams() {
                     </select>
                   )}
                 </Field>
+                <Field label="Sınav dersi">
+                  {(props) => (
+                    <select
+                      {...props}
+                      value={officialSubject}
+                      onChange={(e) => {
+                        setOfficialSubject(e.target.value);
+                        setOfficial("");
+                        setOfficialCursor(undefined);
+                      }}
+                    >
+                      <option value="">Tüm dersler</option>
+                      {subjects.data?.data.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </Field>
               </div>
             )}
             {mode === "official" && (
@@ -289,6 +312,7 @@ export function Exams() {
                           <strong>{item.title}</strong>
                           <small>
                             {item.exam_type?.name ?? ""}
+                            {item.subject ? ` · ${item.subject.name}` : ""}
                             {item.weapon_status ? ` · ${weaponLabels[item.weapon_status]}` : ""}
                             {" · "}
                             {item.year}

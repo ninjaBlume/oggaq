@@ -527,7 +527,7 @@ test("mobil soru kartı dersi ve çıkmış sınavı ayrı gösterir ve sınava 
     page.getByText("Ders: Sentetik çalışma dersi", { exact: true }).first(),
   ).toBeVisible();
   await expect(
-    page.getByText("Sınav: 1. Temel · silahlı", { exact: true }).first(),
+    page.getByText("Sınav: 1. Deneme · silahlı", { exact: true }).first(),
   ).toBeVisible();
   await expect(
     page.getByText("Sınav: Çıkmış sınavlarda yok", { exact: true }),

@@ -21,11 +21,11 @@ class LegacyImport
 {
     private const SYSTEM = 'asvip-dump';
 
-    // Exam types are Temel and Yenileme; armed/unarmed is a separate attribute. The dump only holds Temel exams,
-    // the Yenileme type is created so editors can add those exams to the same catalog.
+    // The institution's own categories (kategoriler): Deneme Sınavları are whole exams, Ders Sınavları hold one subject's
+    // questions. Armed/unarmed is a separate attribute of a whole exam.
     private const EXAM_TYPES = [
-        'temel' => ['code' => 'ogg-temel', 'name' => 'Temel Eğitim'],
-        'yenileme' => ['code' => 'ogg-yenileme', 'name' => 'Yenileme Eğitimi'],
+        'deneme' => ['code' => 'ogg-deneme', 'name' => 'Deneme Sınavı'],
+        'ders' => ['code' => 'ogg-ders', 'name' => 'Ders Sınavı'],
     ];
 
     private const WEAPON_STATUS = ['silahli' => 'armed', 'silahsiz' => 'unarmed'];
@@ -117,13 +117,13 @@ class LegacyImport
             });
         }
         foreach ($plan['exams'] as $exam) {
-            DB::transaction(function () use ($batch, $actor, $exam, $versions, $types, $sourceIds, &$created) {
+            DB::transaction(function () use ($batch, $actor, $exam, $versions, $types, $sourceIds, $subjectIds, &$created) {
                 $key = $exam['key'];
                 if (DB::table('import_records')->where(['source_system' => self::SYSTEM, 'source_table' => 'official_exam', 'source_key' => $key])->exists()) {
                     return;
                 }
                 $saved = $this->saveExam->execute($actor, [
-                    'exam_type_id' => $types['temel'], 'weapon_status' => self::WEAPON_STATUS[$exam['variant']], 'source_id' => $sourceIds[$exam['number']], 'title' => $exam['title'], 'year' => $exam['year'],
+                    'exam_type_id' => $types[$exam['kind']], 'weapon_status' => $exam['variant'] === null ? null : self::WEAPON_STATUS[$exam['variant']], 'subject_id' => $exam['subject'] === null ? null : $subjectIds[$exam['subject']], 'source_id' => $sourceIds[$exam['number']], 'title' => $exam['title'], 'year' => $exam['year'],
                     'term' => $exam['term'], 'exam_number' => (string) $exam['number'], 'question_version_ids' => array_map(fn ($hash) => $versions[$hash], $exam['hashes']),
                 ]);
                 // An exam with unfinished questions stays a draft until editors complete and publish them.

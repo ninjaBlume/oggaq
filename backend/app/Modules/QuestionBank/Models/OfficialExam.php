@@ -21,6 +21,11 @@ class OfficialExam extends Model
         return $this->belongsTo(ExamType::class);
     }
 
+    public function subject(): BelongsTo
+    {
+        return $this->belongsTo(Subject::class);
+    }
+
     public function source(): BelongsTo
     {
         return $this->belongsTo(QuestionSource::class, 'source_id');

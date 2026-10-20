@@ -1619,17 +1619,23 @@ export interface components {
             source: components["schemas"]["QuestionSource"] | null;
             /** Format: date-time */
             published_at: string | null;
-            /** @description Sınav türü (Temel / Yenileme). */
+            /** @description Sınav türü (Deneme / Ders). */
             exam_type: {
                 /** Format: uuid */
                 id: string;
                 name: string;
             } | null;
             /**
-             * @description Silahlı/silahsız adaylar için sınav. Sınav türünden (Temel/Yenileme) bağımsız bir özelliktir.
+             * @description Silahlı/silahsız adaylar için sınav. Sınav türünden (Deneme/Ders) bağımsız bir özelliktir.
              * @enum {string|null}
              */
             weapon_status: "armed" | "unarmed" | null;
+            /** @description Ders sınavında dersin kendisi; Deneme (tam) sınavda null. */
+            subject: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            } | null;
         };
         AdminOfficialExamQuestion: {
             position: number;
@@ -1666,14 +1672,14 @@ export interface components {
             updated_at: string;
             /** @description Yalnız tekil görüntüleme ve kayıt yanıtlarında bulunur. */
             questions?: components["schemas"]["AdminOfficialExamQuestion"][];
-            /** @description Sınav türü (Temel / Yenileme). */
+            /** @description Sınav türü (Deneme / Ders). */
             exam_type: {
                 /** Format: uuid */
                 id: string;
                 name: string;
             } | null;
             /**
-             * @description Silahlı/silahsız adaylar için sınav. Sınav türünden (Temel/Yenileme) bağımsız bir özelliktir.
+             * @description Silahlı/silahsız adaylar için sınav. Sınav türünden (Deneme/Ders) bağımsız bir özelliktir.
              * @enum {string|null}
              */
             weapon_status: "armed" | "unarmed" | null;
@@ -1681,6 +1687,12 @@ export interface components {
             draft_question_count: number;
             /** @description Sorunun sınavda sabitlenen sürümden daha yeni bir sürümü olan soru sayısı (düzeltme sınava henüz ulaşmamış). */
             outdated_question_count: number;
+            /** @description Ders sınavında dersin kendisi; Deneme (tam) sınavda null. */
+            subject: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            } | null;
         };
         OfficialExamInput: {
             /** Format: uuid */
@@ -1694,10 +1706,15 @@ export interface components {
             /** @description Soru sürümleri; dizi sırası orijinal sınav sırasıdır. Aynı soru bir kez eklenir. Taslak sınav henüz yayımlanmamış (tamamlanmamış) bir sürümü sabitleyebilir; yayımlamak için tüm sürümler yayımlanmış olmalıdır. */
             question_version_ids: string[];
             /**
-             * @description Silahlı/silahsız adaylar için sınav. Sınav türünden (Temel/Yenileme) bağımsız bir özelliktir.
+             * @description Silahlı/silahsız adaylar için sınav. Sınav türünden (Deneme/Ders) bağımsız bir özelliktir.
              * @enum {string|null}
              */
             weapon_status?: "armed" | "unarmed" | null;
+            /**
+             * Format: uuid
+             * @description Ders sınavında dersin kimliği; tam (Deneme) sınavda boş bırakılır. Kimlik türü, yıl, dönem, numara, silah durumu ve dersle birlikte tekildir.
+             */
+            subject_id?: string | null;
         };
         OfficialExamResponse: {
             data: components["schemas"]["OfficialExam"];
@@ -1769,10 +1786,12 @@ export interface components {
              */
             status: "draft" | "published";
             /**
-             * @description Silahlı/silahsız adaylar için sınav. Sınav türünden (Temel/Yenileme) bağımsız bir özelliktir.
+             * @description Silahlı/silahsız adaylar için sınav. Sınav türünden (Deneme/Ders) bağımsız bir özelliktir.
              * @enum {string|null}
              */
             weapon_status: "armed" | "unarmed" | null;
+            /** @description Ders sınavında dersin adı. */
+            subject_name: string | null;
         };
         OfficialExamQuestionVersionInput: {
             /**
@@ -3368,6 +3387,8 @@ export interface operations {
                 year?: number;
                 term?: string;
                 weapon_status?: "armed" | "unarmed";
+                /** @description Yalnız bu dersin Ders Sınavları. */
+                subject_id?: string;
             };
             header?: never;
             path?: never;
@@ -3430,6 +3451,8 @@ export interface operations {
                 term?: string;
                 status?: "draft" | "published";
                 weapon_status?: "armed" | "unarmed";
+                /** @description Yalnız bu dersin Ders Sınavları. */
+                subject_id?: string;
             };
             header?: never;
             path?: never;

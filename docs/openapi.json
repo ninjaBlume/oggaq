@@ -3272,6 +3272,15 @@
                 "unarmed"
               ]
             }
+          },
+          {
+            "name": "subject_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Yalnız bu dersin Ders Sınavları."
           }
         ]
       }
@@ -3444,6 +3453,15 @@
                 "unarmed"
               ]
             }
+          },
+          {
+            "name": "subject_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Yalnız bu dersin Ders Sınavları."
           }
         ]
       },
@@ -6137,7 +6155,7 @@
                 "type": "null"
               }
             ],
-            "description": "Sınav türü (Temel / Yenileme)."
+            "description": "Sınav türü (Deneme / Ders)."
           },
           "weapon_status": {
             "type": [
@@ -6149,7 +6167,31 @@
               "unarmed",
               null
             ],
-            "description": "Silahlı/silahsız adaylar için sınav. Sınav türünden (Temel/Yenileme) bağımsız bir özelliktir."
+            "description": "Silahlı/silahsız adaylar için sınav. Sınav türünden (Deneme/Ders) bağımsız bir özelliktir."
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Ders sınavında dersin kendisi; Deneme (tam) sınavda null."
           }
         },
         "required": [
@@ -6163,7 +6205,8 @@
           "source",
           "published_at",
           "exam_type",
-          "weapon_status"
+          "weapon_status",
+          "subject"
         ]
       },
       "AdminOfficialExamQuestion": {
@@ -6323,7 +6366,7 @@
                 "type": "null"
               }
             ],
-            "description": "Sınav türü (Temel / Yenileme)."
+            "description": "Sınav türü (Deneme / Ders)."
           },
           "weapon_status": {
             "type": [
@@ -6335,7 +6378,7 @@
               "unarmed",
               null
             ],
-            "description": "Silahlı/silahsız adaylar için sınav. Sınav türünden (Temel/Yenileme) bağımsız bir özelliktir."
+            "description": "Silahlı/silahsız adaylar için sınav. Sınav türünden (Deneme/Ders) bağımsız bir özelliktir."
           },
           "draft_question_count": {
             "type": "integer",
@@ -6346,6 +6389,30 @@
             "type": "integer",
             "minimum": 0,
             "description": "Sorunun sınavda sabitlenen sürümden daha yeni bir sürümü olan soru sayısı (düzeltme sınava henüz ulaşmamış)."
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Ders sınavında dersin kendisi; Deneme (tam) sınavda null."
           }
         },
         "required": [
@@ -6364,7 +6431,8 @@
           "exam_type",
           "weapon_status",
           "draft_question_count",
-          "outdated_question_count"
+          "outdated_question_count",
+          "subject"
         ]
       },
       "OfficialExamInput": {
@@ -6424,7 +6492,15 @@
               "unarmed",
               null
             ],
-            "description": "Silahlı/silahsız adaylar için sınav. Sınav türünden (Temel/Yenileme) bağımsız bir özelliktir."
+            "description": "Silahlı/silahsız adaylar için sınav. Sınav türünden (Deneme/Ders) bağımsız bir özelliktir."
+          },
+          "subject_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Ders sınavında dersin kimliği; tam (Deneme) sınavda boş bırakılır. Kimlik türü, yıl, dönem, numara, silah durumu ve dersle birlikte tekildir."
           }
         },
         "required": [
@@ -6720,7 +6796,14 @@
               "unarmed",
               null
             ],
-            "description": "Silahlı/silahsız adaylar için sınav. Sınav türünden (Temel/Yenileme) bağımsız bir özelliktir."
+            "description": "Silahlı/silahsız adaylar için sınav. Sınav türünden (Deneme/Ders) bağımsız bir özelliktir."
+          },
+          "subject_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Ders sınavında dersin adı."
           }
         },
         "required": [
@@ -6732,7 +6815,8 @@
           "exam_type_name",
           "position",
           "status",
-          "weapon_status"
+          "weapon_status",
+          "subject_name"
         ]
       },
       "OfficialExamQuestionVersionInput": {

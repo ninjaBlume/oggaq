@@ -37,7 +37,7 @@ class SaveOfficialExam
                 $exam->forceFill([
                     'exam_type_id' => $attributes['exam_type_id'], 'source_id' => $attributes['source_id'] ?? null,
                     'title' => $attributes['title'], 'year' => $attributes['year'],
-                    'term' => $attributes['term'] ?? null, 'exam_number' => $attributes['exam_number'] ?? null, 'weapon_status' => $attributes['weapon_status'] ?? null,
+                    'term' => $attributes['term'] ?? null, 'exam_number' => $attributes['exam_number'] ?? null, 'weapon_status' => $attributes['weapon_status'] ?? null, 'subject_id' => $attributes['subject_id'] ?? null,
                 ])->save();
                 DB::table('official_exam_questions')->where('official_exam_id', $exam->id)->delete();
                 foreach ($attributes['question_version_ids'] as $index => $versionId) {
@@ -51,7 +51,7 @@ class SaveOfficialExam
                     'target_id' => $exam->id, 'action' => $creating ? 'official_exam.created' : 'official_exam.revised', 'created_at' => now(),
                 ]);
 
-                return $exam->loadCount('questions')->load('source', 'examType');
+                return $exam->loadCount('questions')->load('source', 'examType', 'subject');
             });
         } catch (UniqueConstraintViolationException) {
             throw new ApiProblem(409, 'duplicate_official_exam', 'Bu sınav türü, yıl, dönem ve numara için kayıt zaten var.');

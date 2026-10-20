@@ -37,7 +37,7 @@ class PublishOfficialExam
                 ]);
             }
 
-            return $exam->loadCount('questions')->load('source', 'examType');
+            return $exam->loadCount('questions')->load('source', 'examType', 'subject');
         });
     }
 }

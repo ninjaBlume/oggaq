@@ -242,6 +242,7 @@ class LegacyExamPlanner
             foreach ($supplements[$number] ?? [] as $id => $item) {
                 if (count($weapon) < self::WEAPON_QUESTIONS && ! isset($hashes[$item['hash']])) {
                     $weapon[] = $item['hash'];
+                    $hashes[$item['hash']] = $weaponId;
                     $complete[$item['hash']] = true;
                     $warnings[] = ['type' => 'supplemented_from_official_booklet', 'sinav_no' => $number, 'supplement' => $id];
                 }
@@ -249,12 +250,26 @@ class LegacyExamPlanner
             if (count($general) !== self::GENERAL_QUESTIONS || count($weapon) !== self::WEAPON_QUESTIONS) {
                 $warnings[] = ['type' => 'exam_structure', 'sinav_no' => $number, 'general' => count($general), 'weapon' => count($weapon)];
             }
-            foreach (['silahli' => $weapon, 'silahsiz' => []] as $variant => $tail) {
-                $list = array_merge($general, $tail);
+            // Deneme exams are the whole exam (armed or unarmed); Ders exams hold one subject's questions of that number.
+            $armed = array_merge($general, $weapon);
+            foreach (['silahli' => $armed, 'silahsiz' => $general] as $variant => $list) {
                 $label = $variant === 'silahli' ? 'Silahlı' : 'Silahsız';
                 $exams[] = [
-                    'key' => "{$number}:{$variant}", 'number' => $number, 'variant' => $variant, 'date' => $dates[$number], 'year' => $year,
-                    'term' => self::MONTHS[$month], 'title' => sprintf('ÖGG %d. Temel Eğitim Sınavı (%02d.%02d.%d) — %s', $number, $day, $month, $year, $label),
+                    'key' => "{$number}:{$variant}", 'kind' => 'deneme', 'number' => $number, 'variant' => $variant, 'subject' => null, 'date' => $dates[$number], 'year' => $year,
+                    'term' => self::MONTHS[$month], 'title' => sprintf('ÖGG %d. Deneme Sınavı (%02d.%02d.%d) — %s', $number, $day, $month, $year, $label),
+                    'hashes' => $list, 'reconstructed_order' => $reconstructed,
+                    'publishable' => ! in_array(false, array_map(fn ($hash) => $complete[$hash], $list), true),
+                ];
+            }
+            $bySubject = [];
+            foreach ($armed as $hash) {
+                $bySubject[$hashes[$hash]][] = $hash;
+            }
+            uksort($bySubject, fn ($a, $b) => ($subjects[$a]['order'] ?? 0) <=> ($subjects[$b]['order'] ?? 0));
+            foreach ($bySubject as $subjectId => $list) {
+                $exams[] = [
+                    'key' => "{$number}:ders:{$subjectId}", 'kind' => 'ders', 'number' => $number, 'variant' => null, 'subject' => $subjectId, 'date' => $dates[$number], 'year' => $year,
+                    'term' => self::MONTHS[$month], 'title' => sprintf('ÖGG %d. Ders Sınavı — %s (%02d.%02d.%d)', $number, $subjects[$subjectId]['name'], $day, $month, $year),
                     'hashes' => $list, 'reconstructed_order' => $reconstructed,
                     'publishable' => ! in_array(false, array_map(fn ($hash) => $complete[$hash], $list), true),
                 ];

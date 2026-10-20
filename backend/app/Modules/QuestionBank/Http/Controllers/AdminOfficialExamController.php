@@ -23,8 +23,8 @@ class AdminOfficialExamController extends Controller
     public function index(OfficialExamListRequest $request): AnonymousResourceCollection
     {
         Gate::authorize('manage', Question::class);
-        $query = OfficialExam::with('source', 'examType')->withCount('questions');
-        foreach (['exam_type_id', 'year', 'term', 'weapon_status'] as $filter) {
+        $query = OfficialExam::with('source', 'examType', 'subject')->withCount('questions');
+        foreach (['exam_type_id', 'year', 'term', 'weapon_status', 'subject_id'] as $filter) {
             if ($request->has($filter)) {
                 $query->where($filter, $request->validated($filter));
             }
@@ -50,7 +50,7 @@ class AdminOfficialExamController extends Controller
     {
         Gate::authorize('manage', Question::class);
 
-        return new AdminOfficialExamResource($this->detailed($officialExam->loadCount('questions')->load('source', 'examType')));
+        return new AdminOfficialExamResource($this->detailed($officialExam->loadCount('questions')->load('source', 'examType', 'subject')));
     }
 
     public function update(SaveOfficialExamRequest $request, OfficialExam $officialExam, SaveOfficialExam $action): AdminOfficialExamResource
@@ -76,6 +76,6 @@ class AdminOfficialExamController extends Controller
     {
         OfficialExamHealth::attach([$exam]);
 
-        return $exam->load('examType', 'questions.questionVersion.options', 'questions.questionVersion.source', 'questions.questionVersion.question.latestVersion.options', 'questions.questionVersion.question.latestVersion.source');
+        return $exam->load('examType', 'subject', 'questions.questionVersion.options', 'questions.questionVersion.source', 'questions.questionVersion.question.latestVersion.options', 'questions.questionVersion.question.latestVersion.source');
     }
 }

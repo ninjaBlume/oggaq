@@ -291,3 +291,5 @@ tbody tr:hover { background: #fbfcf9; }
 .exam-section-body { padding: 0 18px 18px; }
 .exam-section-body .question-card { box-shadow: none; }
 .type-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+.ders-cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
+.ders-cells .exam-cell-link { min-width: 0; }
