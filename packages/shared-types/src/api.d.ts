@@ -1036,6 +1036,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/subjects/{subject}/exam-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Bir dersin sorularının sınavlara göre dağılımı
+         * @description Yalnız platform yöneticisi. Dersin soruları hangi sınavlarda (silahlı/silahsız ayrı kayıt) kaç soruyla yer alıyor ve kaç soru hiçbir sınavda değil.
+         */
+        get: operations["adminSubjectExamStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1787,6 +1807,30 @@ export interface components {
         };
         AppliedExamsResponse: {
             data: components["schemas"]["AppliedExam"][];
+        };
+        SubjectExamStat: {
+            /** Format: uuid */
+            official_exam_id: string;
+            /** Format: uuid */
+            exam_type_id: string;
+            exam_type_name: string;
+            exam_number: string | null;
+            year: number;
+            term: string | null;
+            /** @enum {string|null} */
+            weapon_status: "armed" | "unarmed" | null;
+            title: string;
+            /** @enum {string} */
+            status: "draft" | "published";
+            /** @description Dersin bu sınavdaki soru sayısı. */
+            total: number;
+            /** @description Bunlardan yayımlanmamış olanlar. */
+            draft: number;
+        };
+        SubjectExamStatsResponse: {
+            data: components["schemas"]["SubjectExamStat"][];
+            /** @description Dersin hiçbir sınavda yer almayan soru sayısı. */
+            without_exam: number;
         };
     };
     responses: {
@@ -2677,7 +2721,7 @@ export interface operations {
                 exam_type_id?: string;
                 source_id?: string;
                 status?: "draft" | "published";
-                /** @description Yalnız bu çıkmış sınavın soruları (taslak sınav dahil). */
+                /** @description Çıkmış sınav kimliği; "none" hiçbir sınavda yer almayan soruları getirir. */
                 official_exam_id?: string;
             };
             header?: never;
@@ -3612,6 +3656,31 @@ export interface operations {
             403: components["responses"]["Problem"];
             404: components["responses"]["Problem"];
             422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    adminSubjectExamStats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                subject: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubjectExamStatsResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
             429: components["responses"]["Problem"];
         };
     };

@@ -11,7 +11,7 @@ class QuestionListRequest extends PaginationRequest
     {
         return parent::rules() + [
             'subject_id' => ['sometimes', 'uuid'], 'topic_id' => ['sometimes', 'regex:/^(none|[0-9a-fA-F-]{36})$/'],
-            'exam_type_id' => ['sometimes', 'uuid'], 'source_id' => ['sometimes', 'uuid'], 'official_exam_id' => ['sometimes', 'uuid'],
+            'exam_type_id' => ['sometimes', 'uuid'], 'source_id' => ['sometimes', 'uuid'], 'official_exam_id' => ['sometimes', 'regex:/^(none|[0-9a-fA-F-]{36})$/'],
             'status' => [$this->is('api/v1/admin/*') ? 'sometimes' : 'prohibited', Rule::in(['draft', 'published'])],
             'tenant_id' => ['prohibited'], 'include_answers' => ['prohibited'],
         ];

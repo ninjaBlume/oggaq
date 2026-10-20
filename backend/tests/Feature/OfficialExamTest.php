@@ -317,6 +317,25 @@ class OfficialExamTest extends TestCase
         $this->getJson('/api/v1/admin/question-stats')->assertForbidden();
     }
 
+    public function test_subject_exam_stats_group_a_subjects_questions_by_exam(): void
+    {
+        $this->asToken($this->admin);
+        $a = $this->createExam(['exam_number' => '1'], true);
+        $b = $this->postJson('/api/v1/admin/official-exams', $this->payload(['exam_number' => '2', 'question_version_ids' => $this->versionIds([0, 1])]))->assertCreated()->json('data');
+        $lonely = $this->publishedQuestion('Sınavsız soru');
+        $stats = $this->getJson('/api/v1/admin/subjects/'.$this->subject->id.'/exam-stats')->assertOk()->json();
+        $byId = collect($stats['data'])->keyBy('official_exam_id');
+        $this->assertSame([3, 'published', 'Sentetik sınav türü'], [$byId[$a['id']]['total'], $byId[$a['id']]['status'], $byId[$a['id']]['exam_type_name']]);
+        $this->assertSame([2, 'draft'], [$byId[$b['id']]['total'], $byId[$b['id']]['status']]);
+        $this->assertSame(1, $stats['without_exam']);
+        $this->getJson('/api/v1/admin/questions?subject_id='.$this->subject->id.'&official_exam_id=none')->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $lonely->id);
+        $this->getJson('/api/v1/admin/questions?official_exam_id='.$b['id'])->assertOk()->assertJsonCount(2, 'data');
+        $this->getJson('/api/v1/admin/questions?official_exam_id=bogus')->assertUnprocessable();
+        $this->getJson('/api/v1/admin/subjects/'.Str::uuid().'/exam-stats')->assertOk()->assertJsonPath('without_exam', 0);
+        $this->asToken($this->createUser());
+        $this->getJson('/api/v1/admin/subjects/'.$this->subject->id.'/exam-stats')->assertForbidden();
+    }
+
     public function test_database_only_allows_the_audited_version_correction_in_a_published_exam(): void
     {
         $exam = $this->createExam([], true);

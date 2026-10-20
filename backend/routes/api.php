@@ -38,6 +38,7 @@ Route::prefix('v1')->group(function () {
                 Route::post('admin/'.$catalog, [CatalogController::class, 'store'])->defaults('catalog', $catalog);
             }
             Route::get('admin/question-stats', [AdminQuestionController::class, 'stats']);
+            Route::get('admin/subjects/{subject}/exam-stats', [AdminQuestionController::class, 'subjectExamStats'])->whereUuid('subject');
             Route::get('admin/questions', [AdminQuestionController::class, 'index']);
             Route::post('admin/questions', [AdminQuestionController::class, 'store']);
             Route::get('admin/questions/{question}', [AdminQuestionController::class, 'show'])->whereUuid('question');

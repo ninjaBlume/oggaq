@@ -1790,9 +1790,9 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "format": "uuid"
+              "pattern": "^(none|[0-9a-fA-F-]{36})$"
             },
-            "description": "Yalnız bu çıkmış sınavın soruları (taslak sınav dahil)."
+            "description": "Çıkmış sınav kimliği; \"none\" hiçbir sınavda yer almayan soruları getirir."
           }
         ]
       },
@@ -3870,6 +3870,56 @@
         "tags": [
           "QuestionBank"
         ]
+      }
+    },
+    "/api/v1/admin/subjects/{subject}/exam-stats": {
+      "get": {
+        "operationId": "adminSubjectExamStats",
+        "summary": "Bir dersin sorularının sınavlara göre dağılımı",
+        "description": "Yalnız platform yöneticisi. Dersin soruları hangi sınavlarda (silahlı/silahsız ayrı kayıt) kaç soruyla yer alıyor ve kaç soru hiçbir sınavda değil.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "subject",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectExamStatsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
       }
     }
   },
@@ -6805,6 +6855,101 @@
         },
         "required": [
           "data"
+        ]
+      },
+      "SubjectExamStat": {
+        "type": "object",
+        "properties": {
+          "official_exam_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "exam_type_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "exam_type_name": {
+            "type": "string"
+          },
+          "exam_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "year": {
+            "type": "integer"
+          },
+          "term": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "weapon_status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "armed",
+              "unarmed",
+              null
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published"
+            ]
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Dersin bu sınavdaki soru sayısı."
+          },
+          "draft": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Bunlardan yayımlanmamış olanlar."
+          }
+        },
+        "required": [
+          "official_exam_id",
+          "exam_type_id",
+          "exam_type_name",
+          "exam_number",
+          "year",
+          "term",
+          "weapon_status",
+          "title",
+          "status",
+          "total",
+          "draft"
+        ]
+      },
+      "SubjectExamStatsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubjectExamStat"
+            }
+          },
+          "without_exam": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Dersin hiçbir sınavda yer almayan soru sayısı."
+          }
+        },
+        "required": [
+          "data",
+          "without_exam"
         ]
       }
     },

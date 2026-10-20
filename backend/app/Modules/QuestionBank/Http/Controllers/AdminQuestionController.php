@@ -34,7 +34,10 @@ class AdminQuestionController extends Controller
             }
         }
         if ($request->has('official_exam_id')) {
-            $query->whereIn('id', DB::table('official_exam_questions')->select('question_id')->where('official_exam_id', $request->validated('official_exam_id')));
+            $inExams = DB::table('official_exam_questions')->select('question_id');
+            $request->validated('official_exam_id') === 'none'
+                ? $query->whereNotIn('id', $inExams)
+                : $query->whereIn('id', $inExams->where('official_exam_id', $request->validated('official_exam_id')));
         }
         if ($request->has('status')) {
             $request->validated('status') === 'draft' ? $query->whereNull('published_version_id') : $query->whereNotNull('published_version_id');
@@ -55,6 +58,20 @@ class AdminQuestionController extends Controller
             ->get()->map(fn ($row) => ['subject_id' => $row->subject_id, 'topic_id' => $row->topic_id, 'total' => (int) $row->total, 'published' => (int) $row->published, 'draft' => (int) $row->draft, 'pending' => (int) $row->pending])->all();
 
         return response()->json(['data' => $rows]);
+    }
+
+    // The exams that use a subject's questions, with how many of the subject's questions each contains (exam based view of a subject).
+    public function subjectExamStats(string $subject): JsonResponse
+    {
+        Gate::authorize('manage', Question::class);
+        $inSubject = fn () => DB::table('questions as q')->join('question_versions as v', 'v.id', '=', 'q.latest_version_id')->where('v.subject_id', $subject);
+        $exams = $inSubject()->join('official_exam_questions as eq', 'eq.question_id', '=', 'q.id')->join('official_exams as e', 'e.id', '=', 'eq.official_exam_id')->join('exam_types as t', 't.id', '=', 'e.exam_type_id')
+            ->groupBy('e.id', 't.name')->orderByDesc('e.year')->orderBy('e.id')
+            ->selectRaw('e.id as official_exam_id, e.exam_type_id, t.name as exam_type_name, e.exam_number, e.year, e.term, e.weapon_status, e.title, (e.published_at is not null) as published, count(*) as total, count(*) filter (where q.published_version_id is null) as draft')
+            ->get()->map(fn ($row) => ['official_exam_id' => $row->official_exam_id, 'exam_type_id' => $row->exam_type_id, 'exam_type_name' => $row->exam_type_name, 'exam_number' => $row->exam_number, 'year' => (int) $row->year, 'term' => $row->term, 'weapon_status' => $row->weapon_status, 'title' => $row->title, 'status' => $row->published ? 'published' : 'draft', 'total' => (int) $row->total, 'draft' => (int) $row->draft])->all();
+        $without = $inSubject()->whereNotIn('q.id', DB::table('official_exam_questions')->select('question_id'))->count();
+
+        return response()->json(['data' => $exams, 'without_exam' => $without]);
     }
 
     public function applyToExams(ApplyQuestionToExamsRequest $request, Question $question, ApplyQuestionVersionToExams $action): JsonResponse

@@ -276,3 +276,18 @@ tbody tr:hover { background: #fbfcf9; }
 .exam-attention { background: #fbf1dc; color: #906c27; border-radius: 5px; padding: 2px 7px; font-size: 10px; font-weight: 600; }
 .exam-filters { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
 .page-heading .button { white-space: nowrap; }
+.view-toggle { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 18px; }
+.view-toggle>button { padding: 8px 16px; border: 1px solid var(--border); border-radius: 8px; background: #fff; font: inherit; font-size: 13px; cursor: pointer; }
+.view-toggle>button.active { background: #e9f3e9; border-color: #85a98b; font-weight: 600; }
+.view-toggle>button:focus-visible { outline: 3px solid #85a98b; outline-offset: 2px; }
+.exam-type-heading { display: flex; align-items: baseline; gap: 10px; margin: 26px 0 12px; font-size: 18px; }
+.exam-type-heading small { color: #74836f; font-size: 12px; font-weight: 400; }
+.exam-type-empty { margin: 0 0 8px; }
+.exam-section-toggle { display: flex; justify-content: space-between; align-items: center; gap: 14px; width: 100%; padding: 14px 18px; border: 0; background: transparent; font: inherit; text-align: left; cursor: pointer; }
+.exam-section-toggle strong { display: block; }
+.exam-section-toggle small { display: block; color: #74836f; font-size: 12px; margin-top: 3px; }
+.exam-section-toggle:focus-visible { outline: 3px solid #85a98b; outline-offset: -3px; border-radius: 12px; }
+.exam-section-count { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.exam-section-body { padding: 0 18px 18px; }
+.exam-section-body .question-card { box-shadow: none; }
+.type-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }

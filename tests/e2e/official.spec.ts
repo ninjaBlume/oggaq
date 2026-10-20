@@ -92,8 +92,21 @@ test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal s�
   await adminPage.getByRole("link", { name: "Sentetik çalışma dersi", exact: true }).click();
   await expect(adminPage.locator(".question-card").filter({ hasText: "Sentetik birinci soru" }).locator(".exam-tag")).toContainText("1. Temel · silahlı");
   await expect(adminPage.locator(".question-card").filter({ hasText: "Sentetik" })).toHaveCount(3);
+  // The subject also opens by exam: Temel and Yenileme sections, then the exam number with this subject's questions.
+  await adminPage.getByRole("button", { name: "Sınava göre", exact: true }).click();
+  await expect(adminPage.getByRole("heading", { name: /^Temel Eğitim sınavları/ })).toBeVisible();
+  await expect(adminPage.getByRole("heading", { name: /^Yenileme Eğitimi sınavları/ })).toBeVisible();
+  await expect(adminPage.getByText("Bu derste Yenileme Eğitimi sınavı sorusu yok.")).toBeVisible();
+  await adminPage.getByRole("button", { name: /^1\. Temel Eğitim/ }).click();
+  await expect(adminPage.locator(".exam-section-body .question-card")).toHaveCount(3);
+  await adminPage.getByRole("button", { name: "Konuya göre", exact: true }).click();
   await adminPage.goto(`${admin}/official-exams`);
   await expect(adminPage.getByRole("link", { name: `${title} sınavını aç` })).toContainText("3 soru");
+  // Every exam type has a tab; Yenileme has no exam yet and says so.
+  await adminPage.getByRole("button", { name: /^Yenileme Eğitimi/ }).click();
+  await expect(adminPage.getByText("Henüz Yenileme Eğitimi sınavı yok")).toBeVisible();
+  await adminPage.getByRole("button", { name: /^Temel Eğitim/ }).click();
+  await expect(adminPage.getByRole("link", { name: `${title} sınavını aç` })).toBeVisible();
 
   await student.reload();
   await student.getByRole("button", { name: "Çıkmış sınav", exact: true }).click();
