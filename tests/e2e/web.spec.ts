@@ -1,84 +1,88 @@
 import { test, expect } from '@playwright/test';
-import type { Page } from '@playwright/test';
-import { execFileSync } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
-import { browserTestEnv, phpBinary } from '../../playwright.config';
+import { answer, enterDeneme, enterDers, finish, fixture, login, openFromReview } from './student';
 
 test.use({ baseURL: 'http://127.0.0.1:5183' });
-function fixture(operation: string, email?: string) {
-  return execFileSync(phpBinary, ['scripts/e2e-fixtures.php', operation, ...(email ? [email] : [])], { env: browserTestEnv, encoding: 'utf8', stdio: 'pipe' }).trim();
-}
-test.beforeEach(() => fixture('setup-study'));
+test.beforeEach(() => { fixture('setup-study'); fixture('official-exam'); fixture('subject-exam'); });
 test.afterAll(() => fixture('cleanup'));
-async function login(page: Page) {
-  await page.goto('/');
-  await page.getByLabel('E-posta adresi', { exact: true }).fill('e2e-student@example.test');
-  await page.getByLabel('Parola', { exact: true }).fill('Synthetic-Browser-42!');
-  await page.getByRole('button', { name: 'Giriş yap', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Bugün ne çalışalım?' })).toBeVisible();
-}
-async function openQuestion(page: Page, name = 'Sentetik birinci soru') {
-  await page.locator('article').filter({ has: page.getByRole('heading', { name, exact: true }) }).getByRole('button', { name: 'Soruyu çöz' }).click();
-  await expect(page.getByRole('heading', { name: 'Bir soru, bir adım' })).toBeVisible();
-}
-async function back(page: Page) {
-  await page.getByRole('link', { name: 'Sorulara dön', exact: false }).click();
-  await expect(page.getByRole('heading', { name: 'Bugün ne çalışalım?' })).toBeVisible();
-}
 
-test('öğrenci doğru, yanlış ve boş cevapları gerçek API ile çözer; geçmiş kalır', async ({ page }) => {
+test('öğrenci deneme sınavına girer; cevaplar, sonuç ve geçmiş kalır', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await login(page);
-  await page.getByLabel('Ders', { exact: true }).selectOption({ label: 'Sentetik çalışma dersi' });
-  await page.getByLabel('Konu / alt konu').selectOption({ label: 'Sentetik konu' });
-  await expect(page.getByRole('heading', { name: 'Sentetik birinci soru', exact: true })).toBeVisible();
+  // Only the two kinds of exam exist in the app: there is no question bank to browse.
+  await expect(page.getByRole('link', { name: 'Soru çöz' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Çalışma geçmişim' })).toHaveCount(0);
+  const row = page.locator('.sinav-row').filter({ hasText: '1. Deneme Sınavı' });
+  await expect(row).toContainText('3 soru');
+  await expect(row).toContainText('önerilen süre 150 dk');
+  await expect(row).toContainText('Henüz girmedin');
   mkdirSync('artifacts/web-preview', { recursive: true });
-  await page.screenshot({ path: 'artifacts/web-preview/questions.png', fullPage: true });
-  await openQuestion(page);
-  await expect(page.getByText('Sentetik açıklama', { exact: false })).toHaveCount(0);
-  await page.reload();
-  await expect(page.getByRole('heading', { name: 'Sentetik birinci soru' })).toBeVisible();
-  await page.getByRole('radio', { name: /Sentetik A/ }).check();
-  await page.getByRole('button', { name: 'Cevabımı kontrol et' }).click();
-  await expect(page.getByRole('status')).toContainText('Doğru');
-  await expect(page.getByText('Sentetik açıklama — gerçek sınav içeriği değildir.', { exact: true })).toBeVisible();
-  await page.reload();
-  await expect(page.getByRole('heading', { name: 'Çözümünü incele' })).toBeVisible();
+  await page.screenshot({ path: 'artifacts/web-preview/deneme.png', fullPage: true });
+  // The fixture exam is an armed exam; the unarmed list is empty.
+  await page.getByRole('button', { name: 'Silahsız sınav' }).click();
+  await expect(page.getByRole('heading', { name: 'Henüz deneme sınavı yok' })).toBeVisible();
+  await page.getByRole('button', { name: 'Silahlı sınav' }).click();
+  await row.getByRole('button', { name: 'Sınava gir', exact: true }).click();
+  await expect(row.getByLabel('Süre (dakika)', { exact: true })).toHaveValue('150');
+  await row.getByLabel('Süre (dakika)', { exact: true }).fill('5');
+  await row.getByRole('button', { name: 'Sınavı başlat' }).click();
+  await expect(page.getByRole('heading', { name: 'Denemen devam ediyor' })).toBeVisible();
+  await answer(page, 'A');
+  await page.getByRole('button', { name: 'Sonraki soru' }).click();
+  await answer(page, 'B');
+  await finish(page);
+  await expect(page.getByRole('status').filter({ hasText: 'DOĞRU YÜZDESİ' })).toContainText('1 doğru · 1 yanlış · 1 boş');
   await page.screenshot({ path: 'artifacts/web-preview/result.png', fullPage: true });
-  await back(page); await openQuestion(page, 'Sentetik ikinci soru');
-  await page.getByRole('radio', { name: /Sentetik B/ }).check();
-  await page.getByRole('button', { name: 'Cevabımı kontrol et' }).click();
-  await expect(page.getByRole('status')).toContainText('Yanlış');
-  await back(page); await openQuestion(page, 'Sentetik üçüncü soru');
-  await page.getByRole('button', { name: 'Boş bırak', exact: true }).click();
-  await page.getByRole('button', { name: 'Boş olarak kaydet' }).click();
-  await expect(page.getByRole('status')).toContainText('Boş bırakıldı');
-  await page.getByRole('link', { name: 'Çalışma geçmişim', exact: true }).click();
-  await expect(page.getByRole('region', { name: 'Çözüm geçmişi' }).getByRole('link')).toHaveCount(3);
+  await page.getByRole('link', { name: 'Sonuçlarıma dön' }).click();
+  await expect(page.getByRole('region', { name: 'Sınav sonuçları' }).getByRole('link')).toHaveCount(1);
   await page.screenshot({ path: 'artifacts/web-preview/history.png', fullPage: true });
   await page.getByRole('button', { name: 'Çıkış yap' }).click();
   await expect(page.getByRole('heading', { name: 'Hoş geldin' })).toBeVisible();
   await login(page);
-  await page.getByRole('link', { name: 'Çalışma geçmişim', exact: true }).click();
-  await expect(page.getByRole('region', { name: 'Çözüm geçmişi' }).getByRole('link')).toHaveCount(3);
+  await page.getByRole('link', { name: 'Sonuçlarım', exact: true }).click();
+  await expect(page.getByRole('region', { name: 'Sınav sonuçları' }).getByRole('link')).toHaveCount(1);
+  await page.getByRole('link', { name: 'Deneme sınavları', exact: true }).click();
+  await expect(page.locator('.sinav-row').filter({ hasText: '1. Deneme Sınavı' })).toContainText('1 kez tamamlandı');
   expect(errors).toEqual([]);
 });
 
-test('yarım çalışma sürdürülür; kişisel ve kurum geçmişleri ayrıdır', async ({ page }) => {
-  await login(page); await openQuestion(page);
-  const personalUrl = page.url();
-  await page.getByRole('link', { name: 'Çalışma geçmişim', exact: true }).click();
-  await page.getByRole('link').filter({ hasText: 'Devam ediyor' }).click();
-  await expect(page).toHaveURL(personalUrl);
-  await expect(page.getByRole('heading', { name: 'Bir soru, bir adım' })).toBeVisible();
+test('ders sınavı dersine göre bulunur ve çözülür', async ({ page }) => {
+  await login(page);
+  await page.getByRole('link', { name: 'Ders sınavları', exact: true }).click();
+  await expect(page.getByRole('button', { name: /^Sentetik çalışma dersi/ })).toHaveAttribute('aria-pressed', 'true');
+  const row = page.locator('.sinav-row').filter({ hasText: '1. Ders Sınavı' });
+  await expect(row).toContainText('3 soru');
+  // Subject exams have no official duration: the suggestion is 1.2 minutes per question, at least five minutes.
+  await expect(row).toContainText('önerilen süre 5 dk');
+  await enterDers(page);
+  await answer(page, 'A');
+  await page.getByRole('button', { name: 'Sonraki soru' }).click();
+  await answer(page, 'A');
+  await page.getByRole('button', { name: 'Sonraki soru' }).click();
+  await answer(page, 'A');
+  await finish(page);
+  await expect(page.getByRole('status').filter({ hasText: 'DOĞRU YÜZDESİ' })).toContainText('3 doğru · 0 yanlış · 0 boş');
+  await page.getByRole('link', { name: 'Ders sınavları', exact: true }).click();
+  await expect(page.locator('.sinav-row').filter({ hasText: '1. Ders Sınavı' })).toContainText('en iyi %100');
+});
+
+test('yarım kalan sınav sürdürülür; kişisel ve kurum sonuçları ayrıdır', async ({ page }) => {
+  await login(page); await enterDeneme(page);
+  const examUrl = page.url();
+  await page.getByRole('link', { name: 'Sonuçlarım', exact: true }).click();
+  await page.getByRole('link').filter({ hasText: 'Devam et' }).click();
+  await expect(page).toHaveURL(examUrl);
+  await expect(page.getByRole('heading', { name: 'Denemen devam ediyor' })).toBeVisible();
+  await page.getByRole('link', { name: 'Deneme sınavları', exact: true }).click();
+  await expect(page.locator('.sinav-row').filter({ hasText: '1. Deneme Sınavı' }).getByRole('link', { name: 'Devam et' })).toBeVisible();
   await page.getByLabel('Çalışma alanı').selectOption({ label: 'Sentetik eğitim kurumu' });
-  await expect(page.getByRole('heading', { name: 'Bugün ne çalışalım?' })).toBeVisible();
-  await page.getByRole('link', { name: 'Çalışma geçmişim', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'İlk çalışmana hazır mısın?' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Deneme sınavları' })).toBeVisible();
+  await page.getByRole('link', { name: 'Sonuçlarım', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Henüz bir sınava girmedin' })).toBeVisible();
   await page.getByLabel('Çalışma alanı').selectOption({ label: 'Kişisel çalışma' });
-  await page.getByRole('link', { name: 'Çalışma geçmişim', exact: true }).click();
-  await expect(page.getByRole('link').filter({ hasText: 'Devam ediyor' })).toHaveCount(1);
+  await page.getByRole('link', { name: 'Sonuçlarım', exact: true }).click();
+  await expect(page.getByRole('link').filter({ hasText: 'Devam et' })).toHaveCount(1);
 });
 
 test('bireysel kayıt, giriş ve imzalı e-posta doğrulama öğrenci ekranından çalışır', async ({ page }) => {
@@ -97,7 +101,7 @@ test('bireysel kayıt, giriş ve imzalı e-posta doğrulama öğrenci ekranında
   await page.getByRole('button', { name: 'E-postamı doğrula', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'E-postan doğrulandı' })).toBeVisible();
   await page.getByRole('link', { name: 'Çalışmaya başla' }).click();
-  await expect(page.getByRole('heading', { name: 'Bugün ne çalışalım?' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Deneme sınavları' })).toBeVisible();
 });
 
 test('parola sıfırlama formu gerçek token ile yeni giriş sağlar', async ({ page }) => {
@@ -116,11 +120,42 @@ test('parola sıfırlama formu gerçek token ile yeni giriş sağlar', async ({ 
   await page.getByLabel('E-posta adresi', { exact: true }).fill('e2e-student@example.test');
   await page.getByLabel('Parola', { exact: true }).fill('Synthetic-New-Password-42!');
   await page.getByRole('button', { name: 'Giriş yap' }).click();
-  await expect(page.getByRole('heading', { name: 'Bugün ne çalışalım?' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Deneme sınavları' })).toBeVisible();
 });
 
-test('sunucu cevabı kaydettikten sonra yanıt kaybolsa da tekrar tek sonucu getirir', async ({ page }) => {
-  await login(page); await openQuestion(page);
+test('sınav yokken öğrenciye boş durum gösterilir', async ({ page }) => {
+  fixture('setup');
+  await login(page);
+  await expect(page.getByRole('heading', { name: 'Henüz deneme sınavı yok' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Sınava gir' })).toHaveCount(0);
+  await page.getByRole('link', { name: 'Ders sınavları', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Henüz ders sınavı yok' })).toBeVisible();
+});
+
+test('başlatma yanıtı kaybolduğunda aynı işlem kimliğiyle tekrar edilir', async ({ page }) => {
+  await login(page);
+  const ids: string[] = [];
+  await page.route('**/contexts/*/exam-attempts', async (route) => {
+    if (route.request().method() !== 'POST') { await route.continue(); return; }
+    ids.push(route.request().postDataJSON().id);
+    if (ids.length === 1) { await route.fetch(); await route.abort('internetdisconnected'); }
+    else await route.continue();
+  });
+  const row = page.locator('.sinav-row').filter({ hasText: '1. Deneme Sınavı' });
+  await row.getByRole('button', { name: 'Sınava gir', exact: true }).click();
+  await row.getByLabel('Süre (dakika)', { exact: true }).fill('5');
+  await row.getByRole('button', { name: 'Sınavı başlat' }).click();
+  await expect(row.getByRole('alert')).toContainText('Sunucuya ulaşılamıyor.');
+  await row.getByRole('button', { name: 'Yeniden dene' }).click();
+  await expect(page.getByRole('heading', { name: 'Denemen devam ediyor' })).toBeVisible();
+  expect(ids).toHaveLength(2); expect(ids[0]).toBe(ids[1]);
+  await page.getByRole('link', { name: 'Sonuçlarım', exact: true }).click();
+  await expect(page.getByRole('region', { name: 'Sınav sonuçları' }).getByRole('link')).toHaveCount(1);
+});
+
+test('tekrar listesinden çözülen soruda kaybolan yanıt tek sonuç bırakır', async ({ page }) => {
+  fixture('favorite');
+  await login(page); await openFromReview(page);
   let lost = false;
   await page.route('**/practice-attempts/*/answer', async (route) => {
     if (!lost) { lost = true; await route.fetch(); await route.abort('internetdisconnected'); }
@@ -132,51 +167,13 @@ test('sunucu cevabı kaydettikten sonra yanıt kaybolsa da tekrar tek sonucu get
   await expect(page.getByRole('radio', { name: /Sentetik B/ })).toBeDisabled();
   await page.getByRole('button', { name: 'Yeniden dene' }).click();
   await expect(page.getByRole('status')).toContainText('Doğru');
-  await page.getByRole('link', { name: 'Çalışma geçmişim', exact: true }).click();
-  await expect(page.getByRole('region', { name: 'Çözüm geçmişi' }).getByRole('link')).toHaveCount(1);
-});
-
-test('telefon ve tablette soru çözme düzeni taşmaz', async ({ page }) => {
-  await login(page); await openQuestion(page);
-  for (const width of [834, 390]) {
-    await page.setViewportSize({ width, height: 900 });
-    await expect(page.getByRole('radio', { name: /Sentetik A/ })).toBeVisible();
-    const dimensions = await page.evaluate(() => ({ viewport: window.innerWidth, content: document.documentElement.scrollWidth }));
-    expect(dimensions.content).toBeLessThanOrEqual(dimensions.viewport);
-  }
-  mkdirSync('artifacts/web-preview', { recursive: true });
-  await page.screenshot({ path: 'artifacts/web-preview/mobile-practice.png', fullPage: true });
-});
-
-test('gerçek soru bankası boşken öğrenciye boş durum gösterilir', async ({ page }) => {
-  fixture('setup');
-  await login(page);
-  await expect(page.getByRole('heading', { name: 'Henüz yayımlanmış soru yok' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Soruyu çöz' })).toHaveCount(0);
-});
-
-
-test('çalışma açma yanıtı kaybolduğunda aynı işlem kimliğiyle tekrar edilir', async ({ page }) => {
-  await login(page);
-  const ids: string[] = [];
-  await page.route('**/contexts/*/practice-attempts', async (route) => {
-    if (route.request().method() !== 'POST') { await route.continue(); return; }
-    ids.push(route.request().postDataJSON().id);
-    if (ids.length === 1) { await route.fetch(); await route.abort('internetdisconnected'); }
-    else await route.continue();
-  });
-  const card = page.locator('article').filter({ has: page.getByRole('heading', { name: 'Sentetik birinci soru', exact: true }) });
-  await card.getByRole('button', { name: 'Soruyu çöz' }).click();
-  await expect(card.getByRole('alert')).toContainText('Sunucuya ulaşılamıyor.');
-  await card.getByRole('button', { name: 'Yeniden dene' }).click();
-  await expect(page.getByRole('heading', { name: 'Bir soru, bir adım' })).toBeVisible();
-  expect(ids).toHaveLength(2); expect(ids[0]).toBe(ids[1]);
-  await page.getByRole('link', { name: 'Çalışma geçmişim', exact: true }).click();
-  await expect(page.getByRole('region', { name: 'Çözüm geçmişi' }).getByRole('link')).toHaveCount(1);
+  await expect(page.getByLabel('Çıkmış sınavlar')).toContainText('1. Deneme · silahlı');
+  await expect(page.getByLabel('Çıkmış sınavlar')).toContainText('1. Ders · Sentetik çalışma dersi');
 });
 
 test('iki sekmede farklı cevap gönderilirse ilk sonuç korunur ve ikinci sekme yenilenir', async ({ page }) => {
-  await login(page); await openQuestion(page);
+  fixture('favorite');
+  await login(page); await openFromReview(page);
   const other = await page.context().newPage();
   await other.goto(page.url());
   await expect(other.getByRole('heading', { name: 'Bir soru, bir adım' })).toBeVisible();
@@ -189,4 +186,24 @@ test('iki sekmede farklı cevap gönderilirse ilk sonuç korunur ve ikinci sekme
   await other.getByRole('button', { name: 'Kaydı yenile' }).click();
   await expect(other.getByRole('status')).toContainText('Doğru');
   await other.close();
+});
+
+test('telefon ve tablette sınav listeleri ve sınav ekranı taşmaz', async ({ page }) => {
+  fixture('favorite');
+  await login(page);
+  const fits = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  for (const width of [834, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.getByRole('link', { name: 'Deneme sınavları', exact: true }).click();
+    await expect(page.locator('.sinav-row').first()).toBeVisible(); await fits();
+    await page.getByRole('link', { name: 'Ders sınavları', exact: true }).click();
+    await expect(page.locator('.sinav-row').first()).toBeVisible(); await fits();
+  }
+  await enterDers(page);
+  for (const width of [834, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect(page.getByRole('radio', { name: /Sentetik A/ })).toBeVisible(); await fits();
+  }
+  mkdirSync('artifacts/web-preview', { recursive: true });
+  await page.screenshot({ path: 'artifacts/web-preview/mobile-exam.png', fullPage: true });
 });

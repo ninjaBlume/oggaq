@@ -5958,7 +5958,7 @@
           "duration_seconds": {
             "type": "integer",
             "minimum": 60,
-            "maximum": 7200
+            "maximum": 10800
           },
           "subject_id": {
             "type": [

@@ -15,6 +15,8 @@ npm run dev:web
 
 Yeni backend migration'ını PHP 8.4 ile `backend/` içinde `php artisan migrate` kullanarak uygulayın. Mevcut geliştirme verisini silmek için `migrate:fresh` kullanılmaz.
 
+**Gezinme.** Üst menü: **Deneme sınavları**, **Ders sınavları**, **Sonuçlarım**, **Tekrar**, **Başarım**. Soru bankası ve çalışma geçmişi yoktur; öğrenci iki sınav türüne girer. *Deneme sınavları* silahlı/silahsız seçtirip tam sınavları listeler (silahlı 125, silahsız 100 soru); *Ders sınavları* dersi seçtirip o dersin her sınav numarasındaki sınavını listeler. Her sınav satırı önceki sonucu (kez, en iyi %) gösterir; “Sınava gir” süre sorar (önerilen: silahlı 150, silahsız 120 dk — EGM sınav talimatı 4.3; ders sınavında 1,2 dk/soru; en çok 180) ve açık denemede “Devam et” verir. *Sonuçlarım* girilen tüm sınavları saklar. *Tekrar* yanlış, boş ve favori soruları listeler ve tek soru çalışması olarak çözdürür. Eski adresler (`questions`, `exams`, `history`) yeni sayfalara yönlenir.
+
 Kullanıcı kayıt formuyla kurum üyeliği olmadan hesap açabilir. Parola kuralı backend'de en az 12 karakter, büyük/küçük harf, rakam ve semboldür. Yerel e-postalar Horizon üzerinden [Mailpit](http://127.0.0.1:58025) kutusuna gider; dışarıya gönderilmez. İmzalı doğrulama bağlantısı web uygulamasını açar, aynı hesaba giriş ve sunucuda onay gerekir. Parola sıfırlama formu da gerçek backend token akışını kullanır. Yeni geliştirme kodunu almak için açık Horizon worker'ını yeniden başlatın.
 
 ## Çalışan özellikler

@@ -31,22 +31,20 @@ import {
 export function Home({
   user,
   context,
-  questions,
-  exams,
+  deneme,
+  ders,
   history,
   review,
   stats,
-  practice,
   exam,
 }: {
   user: User;
   context: StudyContext;
-  questions: (subject?: string) => void;
-  exams: () => void;
+  deneme: () => void;
+  ders: (subject?: string) => void;
   history: () => void;
   review: () => void;
   stats: () => void;
-  practice: (id: string) => void;
   exam: (id: string) => void;
 }) {
   const subjects = useResource(
@@ -70,15 +68,6 @@ export function Home({
     void summary.reload();
   });
   const accuracy = summary.data?.data.answers.accuracy_percent;
-  const recent = useResource(
-    (signal) =>
-      api.request("get", "/api/v1/contexts/{context}/practice-attempts", {
-        signal,
-        params: { context: context.id },
-        query: { per_page: 3 },
-      }),
-    [context.id],
-  );
   const recentExams = useResource(
     (signal) =>
       api.request("get", "/api/v1/contexts/{context}/exam-attempts", {
@@ -89,7 +78,6 @@ export function Home({
     [context.id],
   );
   useOnReturn(() => {
-    void recent.reload();
     void recentExams.reload();
   });
   const activeExam = recentExams.data?.data.find((e) => e.status === "active");
@@ -142,26 +130,26 @@ export function Home({
           Küçük adımlar, daha güçlü bir hazırlık.
         </Text>
         <View style={{ alignSelf: "flex-start" }}>
-          <Button secondary icon={ArrowRight} onPress={() => questions()}>
-            Çalışmaya başla
+          <Button secondary icon={ArrowRight} onPress={deneme}>
+            Sınava gir
           </Button>
         </View>
       </Enter>
       {[
         [
           {
-            title: "Soru çöz",
-            text: "Konunu seç, öğren",
-            icon: BookOpen,
-            press: () => questions(),
+            title: "Deneme sınavları",
+            text: "Tam sınav, gerçek süre",
+            icon: Clock3,
+            press: deneme,
             bg: palette.primaryContainer,
             color: palette.onPrimaryContainer,
           },
           {
-            title: "Deneme",
-            text: "Kendini sınamak için",
-            icon: Clock3,
-            press: exams,
+            title: "Ders sınavları",
+            text: "Ders ders çalış",
+            icon: BookOpen,
+            press: () => ders(),
             bg: palette.secondaryContainer,
             color: palette.onSecondaryContainer,
           },
@@ -192,7 +180,7 @@ export function Home({
         {row.map(({ title, text, icon: Icon, press, bg, color }) => (
           <ExpressivePressable
             key={title}
-            radius={title === "Soru çöz" ? shape.large : shape.extraLarge}
+            radius={title === "Deneme sınavları" ? shape.large : shape.extraLarge}
             accessibilityRole="button"
             accessibilityLabel={title + " ekranını aç"}
             onPress={press}
@@ -242,7 +230,7 @@ export function Home({
           badge={<Badge>Devam ediyor</Badge>}
         />
       )}
-      <SectionTitle action="Tüm dersler" onPress={() => questions()}>
+      <SectionTitle action="Tüm dersler" onPress={() => ders()}>
         Derslerini keşfet
       </SectionTitle>
       {subjects.loading ? (
@@ -267,7 +255,7 @@ export function Home({
               key={s.id}
               accessibilityRole="button"
               accessibilityLabel={`${s.name} dersini aç`}
-              onPress={() => questions(s.id)}
+              onPress={() => ders(s.id)}
               style={({ pressed }) => [
                 {
                   width: "47.8%",
@@ -306,49 +294,33 @@ export function Home({
         </View>
       )}
       <SectionTitle action="Tümünü gör" onPress={history}>
-        Son çalışmaların
+        Son sınavların
       </SectionTitle>
-      {recent.loading ? (
+      {recentExams.loading ? (
         <Loading />
-      ) : recent.error ? (
-        <ErrorNotice
-          error={recent.error}
-          retry={() => {
-            void recent.reload();
-          }}
-        />
-      ) : recent.data?.data.length === 0 ? (
+      ) : recentExams.data?.data.length === 0 ? (
         <EmptyState
           icon={History}
-          title="İlk adımın burada"
-          message="Çözdüğün sorular ve öğrendiklerin burada birikir. Bir soruyla başlayabilirsin."
-          action="Soru çözmeye başla"
-          onPress={() => questions()}
+          title="İlk sınavın burada"
+          message="Girdiğin deneme ve ders sınavları burada birikir. Bir deneme sınavıyla başlayabilirsin."
+          action="Deneme sınavlarına git"
+          onPress={deneme}
         />
       ) : (
-        recent.data?.data.map((a) => (
+        recentExams.data?.data.map((e) => (
           <ListRow
-            key={a.id}
-            title={a.question.stem}
-            subtitle={new Date(a.created_at).toLocaleDateString("tr-TR")}
-            onPress={() => practice(a.id)}
+            key={e.id}
+            icon={Clock3}
+            title={e.official_exam?.title ?? `${e.question_count} soruluk deneme`}
+            subtitle={new Date(e.started_at).toLocaleDateString("tr-TR")}
+            onPress={() => exam(e.id)}
             badge={
-              <Badge
-                tone={
-                  a.outcome === "correct"
-                    ? "success"
-                    : a.outcome === "incorrect"
-                      ? "red"
-                      : "neutral"
-                }
-              >
-                {a.outcome === "pending"
+              <Badge tone={e.status === "completed" ? "success" : "primary"}>
+                {e.status === "active"
                   ? "Devam ediyor"
-                  : a.outcome === "correct"
-                    ? "Doğru"
-                    : a.outcome === "incorrect"
-                      ? "Yanlış"
-                      : "Boş bırakıldı"}
+                  : e.result
+                    ? `%${e.result.score_percent} doğru`
+                    : "Sonuç bekleniyor"}
               </Badge>
             }
           />

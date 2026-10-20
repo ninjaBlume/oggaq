@@ -4,7 +4,7 @@ import { ApiError } from '@oggaq/api-client';
 
 export function Loading() { return <div role="status" className="loading">Yükleniyor…</div>; }
 export function ErrorNotice({ error, retry }: { error: unknown; retry?: () => void }) {
-  return <div className="notice error" role="alert"><p>{error instanceof ApiError ? error.message : 'İşlem tamamlanamadı. Yeniden deneyin.'}</p>{retry && <button className="button secondary" onClick={retry}>Yeniden dene</button>}</div>;
+  return <div className="notice error" role="alert"><p>{error instanceof ApiError ? error.message : 'İşlem tamamlanamadı. Yeniden deneyin.'}</p>{retry && <button type="button" className="button secondary" onClick={retry}>Yeniden dene</button>}</div>;
 }
 export function Field({ label, error, hint, children }: { label: string; error?: string; hint?: string; children: (props: { id: string; 'aria-invalid': boolean; 'aria-describedby'?: string }) => ReactNode }) {
   const id = useId();

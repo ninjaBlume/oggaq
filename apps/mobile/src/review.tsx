@@ -30,7 +30,7 @@ const copy: Record<Kind, { empty: string; hint: string }> = {
   },
   favorite: {
     empty: "Henüz favori soru eklemedin.",
-    hint: "Bir soruyu çözerken favoriye ekleyebilirsin.",
+    hint: "Sınav sonucunda bir soruyu favoriye ekleyebilirsin.",
   },
 };
 
@@ -107,7 +107,7 @@ export function Review({
         <EmptyState
           icon={ListChecks}
           title={copy[kind].empty}
-          message="Soru çözdükçe bu liste güncellenir."
+          message="Sınavlara girdikçe bu liste güncellenir."
         />
       ) : (
         query.data?.data.map((q) => (
@@ -208,7 +208,7 @@ export function Stats({ context }: { context: StudyContext }) {
         <EmptyState
           icon={Trophy}
           title="Henüz istatistik yok"
-          message="Soru çözdükçe ve deneme bitirdikçe sonuçların burada görünür."
+          message="Sınavlara girdikçe sonuçların burada görünür."
         />
       ) : (
         <>

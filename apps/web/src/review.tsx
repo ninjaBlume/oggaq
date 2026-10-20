@@ -12,7 +12,7 @@ type Kind = 'incorrect' | 'blank' | 'favorite';
 const kinds: { id: Kind; label: string; empty: string; hint: string }[] = [
   { id: 'incorrect', label: 'Yanlışlarım', empty: 'Şu an tekrar edeceğin yanlış soru yok.', hint: 'Son cevabın yanlış olan sorular. Doğru çözdüğün soru listeden çıkar.' },
   { id: 'blank', label: 'Boş bıraktıklarım', empty: 'Boş bıraktığın soru yok.', hint: 'Son cevabın boş olan sorular. Çözdüğünde listeden çıkar.' },
-  { id: 'favorite', label: 'Favorilerim', empty: 'Henüz favori soru eklemedin.', hint: 'Bir soruyu çözerken favoriye ekleyebilirsin.' },
+  { id: 'favorite', label: 'Favorilerim', empty: 'Henüz favori soru eklemedin.', hint: 'Sınav sonucunda bir soruyu favoriye ekleyebilirsin.' },
 ];
 
 export function Review() {
@@ -25,7 +25,7 @@ export function Review() {
   return <>
     <PageIntro eyebrow="TEKRAR ET" title="Tekrar listelerim"><p>{context.name} alanındaki cevaplarından oluşur. {current.hint}</p></PageIntro>
     <nav className="tab-bar" aria-label="Tekrar listeleri">{kinds.map((item) => <button key={item.id} className={`tab-button${item.id === kind ? ' active' : ''}`} aria-pressed={item.id === kind} onClick={() => { setKind(item.id); setCursor(undefined); }}>{item.label}</button>)}</nav>
-    {list.isPending ? <Loading /> : list.isError ? <ErrorNotice error={list.error} retry={() => { void list.refetch(); }} /> : list.data.data.length === 0 ? <section className="card empty"><h2>{current.empty}</h2><p>Soru çözdükçe bu liste güncellenir.</p><Link className="button primary" to={`/study/${context.id}/questions`}>Soru çözmeye git</Link></section> : <>
+    {list.isPending ? <Loading /> : list.isError ? <ErrorNotice error={list.error} retry={() => { void list.refetch(); }} /> : list.data.data.length === 0 ? <section className="card empty"><h2>{current.empty}</h2><p>Sınavlara girdikçe bu liste güncellenir.</p><Link className="button primary" to={`/study/${context.id}/deneme`}>Deneme sınavlarına git</Link></section> : <>
       <div className="question-grid">{list.data.data.map((question) => <ReviewItem key={`${kind}-${question.id}-${question.version.id}`} question={question} kind={kind} subjectName={subjects.data?.data.find((item) => item.id === question.version.subject_id)?.name} refresh={() => { void list.refetch(); }} />)}</div>
       <nav className="pagination" aria-label="Sayfalama"><button className="button secondary" disabled={!list.data.links.prev} onClick={() => setCursor(cursorFromLink(list.data.links.prev))}>← Önceki sayfa</button><button className="button secondary" disabled={!list.data.links.next} onClick={() => setCursor(cursorFromLink(list.data.links.next))}>Sonraki sayfa →</button></nav>
     </>}

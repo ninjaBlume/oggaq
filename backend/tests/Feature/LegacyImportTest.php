@@ -444,9 +444,12 @@ SQL;
         app(PublishOfficialExam::class)->execute($admin, $exam);
         $student = $this->createUser();
         $this->asToken($student);
-        $response = $this->postJson('/api/v1/contexts/'.$student->studyContexts()->firstOrFail()->id.'/exam-attempts', ['id' => (string) Str::uuid(), 'official_exam_id' => $exam->id, 'duration_seconds' => 7200])->assertOk();
+        $response = $this->postJson('/api/v1/contexts/'.$student->studyContexts()->firstOrFail()->id.'/exam-attempts', ['id' => (string) Str::uuid(), 'official_exam_id' => $exam->id, 'duration_seconds' => 9000])->assertOk();
         $this->assertSame(125, $response->json('data.question_count'));
         $this->assertCount(125, $response->json('data.questions'));
         $this->assertSame('Sentetik 125', $response->json('data.questions.124.question.stem'));
+        // A full armed exam lasts 150 minutes (EGM instruction 4.3); more than three hours is refused.
+        $this->assertSame(9000, $response->json('data.duration_seconds'));
+        $this->postJson('/api/v1/contexts/'.$student->studyContexts()->firstOrFail()->id.'/exam-attempts', ['id' => (string) Str::uuid(), 'official_exam_id' => $exam->id, 'duration_seconds' => 10801])->assertUnprocessable()->assertJsonValidationErrors('duration_seconds');
     }
 }

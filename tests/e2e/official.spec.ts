@@ -25,7 +25,7 @@ async function studentLogin(page: Page) {
   await page.getByLabel("E-posta adresi", { exact: true }).fill("e2e-student@example.test");
   await page.getByLabel("Parola", { exact: true }).fill("Synthetic-Browser-42!");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Bugün ne çalışalım?" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Deneme sınavları" })).toBeVisible();
 }
 
 test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal sırayla çözer", async ({ browser }) => {
@@ -60,9 +60,7 @@ test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal s�
   const student = await studentContext.newPage();
   student.on("pageerror", (error) => errors.push(error.message));
   await studentLogin(student);
-  await student.getByRole("link", { name: "Deneme", exact: true }).click();
-  await student.getByRole("button", { name: "Çıkmış sınav", exact: true }).click();
-  await expect(student.getByText("Henüz yayımlanmış çıkmış sınav yok.")).toBeVisible();
+  await expect(student.getByRole("heading", { name: "Henüz deneme sınavı yok" })).toBeVisible();
 
   await adminPage.getByRole("button", { name: "Yayımla", exact: true }).click();
   await adminPage.getByRole("dialog").getByRole("button", { name: "Yayımla", exact: true }).click();
@@ -109,17 +107,14 @@ test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal s�
   await expect(adminPage.getByRole("link", { name: `${title} sınavını aç` })).toBeVisible();
 
   await student.reload();
-  await student.getByRole("button", { name: "Çıkmış sınav", exact: true }).click();
-  // Exam type (Deneme/Ders) and armed/unarmed are separate filters.
-  await student.getByLabel("Silah durumu", { exact: true }).selectOption({ label: "Silahsız" });
-  await expect(student.getByText("Henüz yayımlanmış çıkmış sınav yok.")).toBeVisible();
-  await student.getByLabel("Silah durumu", { exact: true }).selectOption({ label: "Silahlı" });
-  await student.getByLabel("Sınav türü", { exact: true }).selectOption({ label: "Ders Sınavı" });
-  await expect(student.getByText("Henüz yayımlanmış çıkmış sınav yok.")).toBeVisible();
-  await student.getByLabel("Sınav türü", { exact: true }).selectOption({ label: "Deneme Sınavı" });
-  await student.getByRole("radio", { name: new RegExp(title) }).check();
-  await student.getByLabel("Süre (dakika)", { exact: true }).fill("5");
-  await student.getByRole("button", { name: "Denemeyi başlat" }).click();
+  // The exam appears among the armed Deneme sınavları, not among the unarmed ones.
+  await student.getByRole("button", { name: "Silahsız sınav" }).click();
+  await expect(student.getByRole("heading", { name: "Henüz deneme sınavı yok" })).toBeVisible();
+  await student.getByRole("button", { name: "Silahlı sınav" }).click();
+  const row = student.locator(".sinav-row").filter({ hasText: "1. Deneme Sınavı" });
+  await row.getByRole("button", { name: "Sınava gir", exact: true }).click();
+  await row.getByLabel("Süre (dakika)", { exact: true }).fill("5");
+  await row.getByRole("button", { name: "Sınavı başlat" }).click();
   await expect(student.getByRole("heading", { name: "Denemen devam ediyor" })).toBeVisible();
   await expect(student.getByRole("heading", { name: "Sentetik üçüncü soru" })).toBeVisible();
   await student.getByRole("button", { name: "Sonraki soru" }).click();
@@ -128,13 +123,12 @@ test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal s�
   await student.getByRole("button", { name: "Bitir ve değerlendir" }).click();
   await expect(student.getByRole("heading", { name: "Deneme sonucun" })).toBeVisible();
   // The result screen can add the shown question to the context favorites.
-  await student.getByRole("button", { name: "☆ Favoriye ekle" }).click();
+  await student.getByRole("button", { name: "☆ Favoriye ekle" }).first().click();
   await expect(student.getByRole("button", { name: "★ Favorilerde" })).toBeVisible();
   await student.getByRole("link", { name: "Tekrar", exact: true }).click();
   await student.getByRole("button", { name: "Favorilerim" }).click();
   await expect(student.locator(".question-card")).toHaveCount(1);
-  await student.getByRole("link", { name: "Deneme", exact: true }).click();
-  await student.getByRole("link", { name: "Deneme", exact: true }).click();
+  await student.getByRole("link", { name: "Sonuçlarım", exact: true }).click();
   await expect(student.getByRole("heading", { name: title })).toBeVisible();
   expect(errors).toEqual([]);
   await adminContext.close();

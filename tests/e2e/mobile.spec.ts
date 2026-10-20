@@ -49,9 +49,24 @@ async function screenshot(page: Page, name: string) {
     path: `artifacts/mobile-preview/redesign/${name}.png`,
   });
 }
-test.beforeEach(() => fixture("setup-study"));
+test.beforeEach(() => {
+  fixture("setup-study");
+  fixture("official-exam");
+  fixture("subject-exam");
+});
 test.afterAll(() => fixture("cleanup"));
-test("mobil sekmeler gerçek Bearer API ile soru, deneme, geçmiş ve çıkış akışını tamamlar", async ({
+// The student enters an exam from its tab: the fixture Deneme Sınavı (armed, three questions in reverse order) or Ders Sınavı.
+async function enter(page: Page, tab: "Deneme" | "Ders", minutes = "5") {
+  await page.getByRole("tab", { name: tab, exact: true }).click();
+  await page.getByRole("button", { name: "Sınava gir", exact: true }).click();
+  await page.getByLabel("Süre (dakika)", { exact: true }).fill(minutes);
+  await page.getByRole("button", { name: "Sınavı başlat" }).click();
+  await expect(
+    page.getByText("DENEMEN DEVAM EDİYOR", { exact: true }),
+  ).toBeVisible();
+}
+const tabs = ["Ana sayfa", "Deneme", "Ders", "Sonuçlar", "Profil"];
+test("mobil sekmeler gerçek Bearer API ile deneme sınavı, sonuçlar ve çıkış akışını tamamlar", async ({
   page,
 }) => {
   const errors: string[] = [];
@@ -69,44 +84,26 @@ test("mobil sekmeler gerçek Bearer API ile soru, deneme, geçmiş ve çıkış 
   await screenshot(page, "login");
   await login(page);
   await screenshot(page, "home");
-  for (const label of ["Ana sayfa", "Soru çöz", "Deneme", "Geçmiş", "Profil"])
+  for (const label of tabs)
     await expect(
       page.getByRole("tab", { name: label, exact: true }),
     ).toBeVisible();
-  await page.getByRole("tab", { name: "Soru çöz", exact: true }).click();
-  await expect(page.getByText("Soru bankası", { exact: true })).toBeVisible();
-  await screenshot(page, "questions");
-  await page
-    .getByRole("button", { name: "Soruyu çöz", exact: true })
-    .first()
-    .click();
-  await expect(page.getByRole("tab", { name: "Profil" })).not.toBeVisible();
-  await page.getByRole("radio", { name: "Sentetik A", exact: true }).click();
-  await page.getByRole("button", { name: "Cevabımı kontrol et" }).click();
-  await expect(page.getByText("Doğru", { exact: true })).toBeVisible();
-  await screenshot(page, "practice-result");
-  await page.getByRole("button", { name: "Geri dön" }).click();
-  await page
-    .getByRole("button", { name: "Soruyu çöz", exact: true })
-    .first()
-    .click();
-  await expect(
-    page.getByRole("radio", { name: "Sentetik A", exact: true }),
-  ).toBeEnabled();
-  await page.getByRole("radio", { name: "Sentetik B", exact: true }).click();
-  await page.getByRole("button", { name: "Cevabımı kontrol et" }).click();
-  await expect(page.getByText("Yanlış", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Geri dön" }).click();
-  await page.getByRole("tab", { name: "Geçmiş", exact: true }).click();
-  await expect(
-    page.getByRole("button", { name: "Sonucu incele" }).first(),
-  ).toBeVisible();
-  await screenshot(page, "history");
+  // There is no question bank to browse any more.
+  await expect(page.getByRole("tab", { name: "Soru çöz" })).toHaveCount(0);
   await page.getByRole("tab", { name: "Deneme", exact: true }).click();
-  await page.getByLabel("Soru sayısı", { exact: true }).fill("3");
+  await expect(
+    page.getByText("Deneme sınavları", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("1. Deneme Sınavı", { exact: true })).toBeVisible();
+  await expect(page.getByText(/önerilen süre 150 dk/)).toBeVisible();
+  await screenshot(page, "deneme");
+  await page.getByRole("button", { name: "Sınava gir", exact: true }).click();
+  await expect(page.getByLabel("Süre (dakika)", { exact: true })).toHaveValue(
+    "150",
+  );
   await page.getByLabel("Süre (dakika)", { exact: true }).fill("1");
   await screenshot(page, "exam-setup");
-  await page.getByRole("button", { name: "Denemeyi başlat" }).click();
+  await page.getByRole("button", { name: "Sınavı başlat" }).click();
   await expect(
     page.getByText("DENEMEN DEVAM EDİYOR", { exact: true }),
   ).toBeVisible();
@@ -144,52 +141,50 @@ test("mobil sekmeler gerçek Bearer API ile soru, deneme, geçmiş ve çıkış 
   expect(await page.evaluate(() => Object.keys(localStorage))).toEqual([]);
   expect(bearerSeen).toBe(true);
   await page.getByRole("button", { name: "Geri dön" }).click();
-  await expect(
-    page.getByRole("button", { name: "Denemeyi başlat" }),
-  ).toBeEnabled();
-  await page.getByRole("tab", { name: "Geçmiş", exact: true }).click();
-  await page.getByRole("button", { name: "Deneme geçmişi" }).click();
+  await expect(page.getByText(/1 kez · en iyi %33.33/)).toBeVisible();
+  await page.getByRole("tab", { name: "Sonuçlar", exact: true }).click();
+  await expect(page.getByText("Sonuçlarım", { exact: true })).toBeVisible();
   await expect(page.getByText("%33.33 doğru", { exact: true })).toBeVisible();
+  await screenshot(page, "results");
   await page.getByRole("tab", { name: "Profil", exact: true }).click();
   await screenshot(page, "profile");
   await page.getByRole("button", { name: "Çıkış yap" }).click();
   await expect(page.getByText("Hoş geldin", { exact: true })).toBeVisible();
   expect(errors).toEqual([]);
 });
-test("ders ve konu panelleri filtreler; çalışma alanı değişimi kişisel geçmişi ayırır", async ({
+test("ders sınavı dersine göre bulunur ve çözülür; çalışma alanı değişimi kişisel sonuçları ayırır", async ({
   page,
 }) => {
   await login(page);
   await page
     .getByRole("button", { name: "Sentetik çalışma dersi dersini aç" })
     .click();
-  await expect(page.getByText("Soru bankası", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Konu filtresi" }).click();
-  await page
-    .getByRole("button", { name: "Sentetik konu", exact: true })
-    .click();
+  await expect(page.getByText("Ders sınavları", { exact: true })).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Konu filtresi" }),
-  ).toContainText("Sentetik konu");
-  await page
-    .getByRole("button", { name: "Soruyu çöz", exact: true })
-    .first()
-    .click();
-  await page.getByRole("radio", { name: "Sentetik B", exact: true }).click();
-  await page.getByRole("button", { name: "Cevabımı kontrol et" }).click();
-  await expect(page.getByText("Yanlış", { exact: true })).toBeVisible();
+    page.getByRole("button", { name: "Sentetik çalışma dersi dersi sınavları" }),
+  ).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByText("1. Ders Sınavı", { exact: true })).toBeVisible();
+  await expect(page.getByText(/3 soru · önerilen süre 5 dk/)).toBeVisible();
+  await page.getByRole("button", { name: "Sınava gir", exact: true }).click();
+  await page.getByLabel("Süre (dakika)", { exact: true }).fill("5");
+  await page.getByRole("button", { name: "Sınavı başlat" }).click();
+  await expect(
+    page.getByText("DENEMEN DEVAM EDİYOR", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("radio", { name: "Sentetik A", exact: true }).click();
   await page.getByRole("button", { name: "Geri dön" }).click();
+  await expect(page.getByText(/Devam eden denemen var/)).toBeVisible();
   await page.getByRole("tab", { name: "Profil", exact: true }).click();
   await page
     .getByRole("button", { name: "Sentetik eğitim kurumu çalışma alanını seç" })
     .click();
   await expect(page.getByText("Merhaba, E2E.", { exact: true })).toBeVisible();
-  await page.getByRole("tab", { name: "Geçmiş", exact: true }).click();
+  await page.getByRole("tab", { name: "Sonuçlar", exact: true }).click();
   await expect(
-    page.getByText("Yeni bir başlangıç", { exact: true }),
+    page.getByText("Henüz bir sınava girmedin", { exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Sonucu incele" }),
+    page.getByRole("button", { name: "Sınava dön" }),
   ).not.toBeVisible();
 });
 test("mobil gezinme küçük telefon ve tablette içerikten bağımsız görünür kalır", async ({
@@ -198,21 +193,23 @@ test("mobil gezinme küçük telefon ve tablette içerikten bağımsız görün�
   await login(page);
   for (const width of [320, 390, 834]) {
     await page.setViewportSize({ width, height: 844 });
-    await page.getByRole("tab", { name: "Soru çöz", exact: true }).click();
-    await page
-      .getByRole("button", { name: "Soruyu çöz", exact: true })
-      .last()
-      .scrollIntoViewIfNeeded();
-    for (const label of ["Ana sayfa", "Soru çöz", "Deneme", "Geçmiş", "Profil"])
-      await expect(
-        page.getByRole("tab", { name: label, exact: true }),
-      ).toBeInViewport();
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= innerWidth,
-      ),
-    ).toBe(true);
-    await screenshot(page, `questions-${width}`);
+    for (const tab of ["Deneme", "Ders"]) {
+      await page.getByRole("tab", { name: tab, exact: true }).click();
+      await page
+        .getByRole("button", { name: "Sınava gir", exact: true })
+        .last()
+        .scrollIntoViewIfNeeded();
+      for (const label of tabs)
+        await expect(
+          page.getByRole("tab", { name: label, exact: true }),
+        ).toBeInViewport();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      await screenshot(page, `${tab.toLowerCase()}-${width}`);
+    }
   }
 });
 test("mobil önizleme yenilenince kalıcı olmayan token yeniden giriş gerektirir", async ({
@@ -223,7 +220,7 @@ test("mobil önizleme yenilenince kalıcı olmayan token yeniden giriş gerektir
   await expect(page.getByText("Hoş geldin", { exact: true })).toBeVisible();
 });
 
-test("boş içerik gerçek API ile açıklanır ve örnek soru gösterilmez", async ({
+test("sınav yokken gerçek API ile boş durum açıklanır ve örnek sınav gösterilmez", async ({
   page,
 }) => {
   fixture("setup");
@@ -231,14 +228,18 @@ test("boş içerik gerçek API ile açıklanır ve örnek soru gösterilmez", as
   await expect(
     page.getByText("Dersler hazırlanıyor", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("tab", { name: "Soru çöz", exact: true }).click();
+  await page.getByRole("tab", { name: "Deneme", exact: true }).click();
   await expect(
-    page.getByText("Sorular hazırlanıyor", { exact: true }),
+    page.getByText("Henüz deneme sınavı yok", { exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Soruyu çöz", exact: true }),
+    page.getByRole("button", { name: "Sınava gir", exact: true }),
   ).not.toBeVisible();
-  await screenshot(page, "empty-questions");
+  await page.getByRole("tab", { name: "Ders", exact: true }).click();
+  await expect(
+    page.getByText("Henüz ders sınavı yok", { exact: true }),
+  ).toBeVisible();
+  await screenshot(page, "empty-exams");
 });
 
 test("yan menü gerçek ekranlara gider, seçimi gösterir ve odağı içinde tutar", async ({
@@ -246,9 +247,9 @@ test("yan menü gerçek ekranlara gider, seçimi gösterir ve odağı içinde tu
 }) => {
   await login(page);
   const destinations = [
-    { menu: "Soru bankası", title: "Soru bankası", tab: "Soru çöz" },
-    { menu: "Deneme sınavı", title: "Deneme sınavı", tab: "Deneme" },
-    { menu: "Çalışma geçmişi", title: "Geçmişim", tab: "Geçmiş" },
+    { menu: "Deneme sınavları", title: "Deneme sınavları", tab: "Deneme" },
+    { menu: "Ders sınavları", title: "Ders sınavları", tab: "Ders" },
+    { menu: "Sonuçlarım", title: "Sonuçlarım", tab: "Sonuçlar" },
     { menu: "Profilim", title: "Profilim", tab: "Profil" },
     { menu: "Ana sayfa", title: "Merhaba, E2E.", tab: "Ana sayfa" },
   ];
@@ -269,6 +270,10 @@ test("yan menü gerçek ekranlara gider, seçimi gösterir ve odağı içinde tu
   await expect(
     menu.getByRole("button", { name: "Ana sayfa", exact: true }),
   ).toHaveAttribute("aria-selected", "true");
+  // The question bank is gone from the menu too.
+  await expect(
+    menu.getByRole("button", { name: "Soru bankası", exact: true }),
+  ).toHaveCount(0);
   await screenshot(page, "sidebar");
   for (let i = 0; i < 16; i++) {
     await page.keyboard.press("Tab");
@@ -292,14 +297,8 @@ test("yan menü çalışma alanını ayırır ve gerçek tokenı iptal ederek ç
   page,
 }) => {
   await login(page);
-  await page.getByRole("tab", { name: "Soru çöz", exact: true }).click();
-  await page
-    .getByRole("button", { name: "Soruyu çöz", exact: true })
-    .first()
-    .click();
+  await enter(page, "Deneme");
   await page.getByRole("radio", { name: "Sentetik A", exact: true }).click();
-  await page.getByRole("button", { name: "Cevabımı kontrol et" }).click();
-  await expect(page.getByText("Doğru", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Geri dön" }).click();
   await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
   const menu = page.getByRole("dialog");
@@ -308,13 +307,11 @@ test("yan menü çalışma alanını ayırır ve gerçek tokenı iptal ederek ç
     .click();
   await expect(menu).not.toBeVisible();
   await expect(page.getByText("Merhaba, E2E.", { exact: true })).toBeVisible();
-  await page.getByRole("tab", { name: "Geçmiş", exact: true }).click();
+  await page.getByRole("tab", { name: "Sonuçlar", exact: true }).click();
   await expect(
-    page.getByText("Yeni bir başlangıç", { exact: true }),
+    page.getByText("Henüz bir sınava girmedin", { exact: true }),
   ).toBeVisible();
-  await expect(page.getByRole("button", { name: "Sonucu incele" })).toHaveCount(
-    0,
-  );
+  await expect(page.getByRole("button", { name: "Sınava dön" })).toHaveCount(0);
   await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
   await expect(
     menu.getByRole("button", {
@@ -337,7 +334,6 @@ test("yan menü çalışma alanını ayırır ve gerçek tokenı iptal ederek ç
   expect(me.status()).toBe(401);
   await expect(page.getByText("Hoş geldin", { exact: true })).toBeVisible();
 });
-
 test("yan menüden çıkış başarısızsa oturum korunur ve tekrar denenebilir", async ({
   page,
 }) => {
@@ -436,7 +432,7 @@ test("Expressive düğme ve seçim grupları eylemleri korur ve küçük ekrana 
   for (const width of [320, 390, 834]) {
     await page.setViewportSize({ width, height: 844 });
     await expect(
-      page.getByRole("button", { name: "Çalışmaya başla", exact: true }),
+      page.getByRole("button", { name: "Sınava gir", exact: true }),
     ).toBeInViewport();
     expect(
       await page.evaluate(
@@ -446,10 +442,7 @@ test("Expressive düğme ve seçim grupları eylemleri korur ve küçük ekrana 
     await screenshot(page, `expressive-home-${width}`);
   }
   await page.setViewportSize({ width: 390, height: 844 });
-  const start = page.getByRole("button", {
-    name: "Çalışmaya başla",
-    exact: true,
-  });
+  const start = page.getByRole("button", { name: "Sınava gir", exact: true });
   const radius = await start.evaluate((el) =>
     parseFloat(getComputedStyle(el).borderRadius),
   );
@@ -462,21 +455,24 @@ test("Expressive düğme ve seçim grupları eylemleri korur ve küçük ekrana 
     .toBeLessThan(radius);
   await expect(page.getByText("Merhaba, E2E.", { exact: true })).toBeVisible();
   await page.mouse.up();
-  await expect(page.getByText("Soru bankası", { exact: true })).toBeVisible();
-  await page.getByRole("tab", { name: "Deneme", exact: true }).click();
-  await page.getByRole("button", { name: "20 soru seç", exact: true }).click();
-  await expect(page.getByLabel("Soru sayısı", { exact: true })).toHaveValue(
-    "20",
-  );
   await expect(
-    page.getByRole("button", { name: "20 soru seç", exact: true }),
+    page.getByText("Deneme sınavları", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Silahsız sınavlar", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Silahsız sınavlar", exact: true }),
   ).toHaveAttribute("aria-selected", "true");
   await expect(
-    page.getByRole("button", { name: "10 soru seç", exact: true }),
+    page.getByRole("button", { name: "Silahlı sınavlar", exact: true }),
   ).toHaveAttribute("aria-selected", "false");
+  await expect(
+    page.getByText("Henüz deneme sınavı yok", { exact: true }),
+  ).toBeVisible();
   await page.setViewportSize({ width: 320, height: 844 });
   await expect(
-    page.getByRole("button", { name: "20 soru seç", exact: true }),
+    page.getByRole("button", { name: "Silahsız sınavlar", exact: true }),
   ).toBeInViewport();
   expect(
     await page.evaluate(
@@ -491,10 +487,7 @@ test("sistem hareket azaltma tercihi canlı değişince Expressive hareket kapan
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await login(page);
-  const start = page.getByRole("button", {
-    name: "Çalışmaya başla",
-    exact: true,
-  });
+  const start = page.getByRole("button", { name: "Sınava gir", exact: true });
   await start.hover();
   await page.mouse.down();
   const scale = () =>
@@ -507,56 +500,44 @@ test("sistem hareket azaltma tercihi canlı değişince Expressive hareket kapan
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect.poll(scale).toBe(1);
   await page.mouse.up();
-  await expect(page.getByText("Soru bankası", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Deneme sınavları", { exact: true }),
+  ).toBeVisible();
   await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
   const menu = page.getByLabel("Uygulama menüsü", { exact: true });
   await expect.poll(async () => (await menu.boundingBox())?.x).toBe(0);
   await page.keyboard.press("Escape");
   await expect(menu).not.toBeVisible();
   await expect(
-    page.getByRole("tab", { name: "Soru çöz", exact: true }),
+    page.getByRole("tab", { name: "Deneme", exact: true }),
   ).toHaveAttribute("aria-selected", "true");
 });
-test("mobil soru kartı dersi ve çıkmış sınavı ayrı gösterir ve sınava göre filtreler", async ({
-  page,
-}) => {
-  fixture("official-exam");
+test("mobil deneme ve ders sınavları ayrı listelenir", async ({ page }) => {
   await login(page);
-  await page.getByRole("tab", { name: "Soru çöz", exact: true }).click();
-  await expect(
-    page.getByText("Ders: Sentetik çalışma dersi", { exact: true }).first(),
-  ).toBeVisible();
-  await expect(
-    page.getByText("Sınav: 1. Deneme · silahlı", { exact: true }).first(),
-  ).toBeVisible();
-  await expect(
-    page.getByText("Sınav: Çıkmış sınavlarda yok", { exact: true }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Sınav filtresi" }).click();
-  await page
-    .getByRole("button", { name: "Sentetik çıkmış sınav", exact: true })
-    .click();
-  await expect(
-    page.getByText("Sınav: Çıkmış sınavlarda yok", { exact: true }),
-  ).toHaveCount(0);
-  await expect(
-    page.getByText("Sentetik birinci soru", { exact: true }),
-  ).toBeVisible();
+  await page.getByRole("tab", { name: "Deneme", exact: true }).click();
+  await expect(page.getByText("1. Deneme Sınavı", { exact: true })).toBeVisible();
+  await expect(page.getByText("1. Ders Sınavı", { exact: true })).toHaveCount(0);
+  await page.getByRole("tab", { name: "Ders", exact: true }).click();
+  await expect(page.getByText("1. Ders Sınavı", { exact: true })).toBeVisible();
+  await expect(page.getByText("1. Deneme Sınavı", { exact: true })).toHaveCount(0);
 });
-test("mobil tekrar listeleri, favori, başarı durumu ve çıkmış sınav gerçek API ile çalışır", async ({
+test("mobil tekrar listeleri, favori, başarı durumu ve sınavlar gerçek API ile çalışır", async ({
   page,
 }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await login(page);
-  await page.getByRole("tab", { name: "Soru çöz", exact: true }).click();
-  await page
-    .getByRole("button", { name: "Soruyu çöz", exact: true })
-    .first()
-    .click();
+  // Ders Sınavı: first question wrong, the other two left blank.
+  await enter(page, "Ders");
   await page.getByRole("radio", { name: "Sentetik B", exact: true }).click();
-  await page.getByRole("button", { name: "Cevabımı kontrol et" }).click();
-  await expect(page.getByText("Yanlış", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Cevaplar sunucuda kayıtlı", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Denemeyi bitir", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Bitir ve değerlendir" }).click();
+  await expect(page.getByText("Deneme sonucun", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "☆ Favoriye ekle" }).click();
   await expect(
     page.getByRole("button", { name: "★ Favorilerde" }),
@@ -570,7 +551,7 @@ test("mobil tekrar listeleri, favori, başarı durumu ve çıkmış sınav gerç
   ).toBeVisible();
   await page.getByRole("button", { name: "Boş bıraktıklarım" }).click();
   await expect(
-    page.getByText("Boş bıraktığın soru yok.", { exact: true }),
+    page.getByText("Sentetik ikinci soru", { exact: true }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Favorilerim", exact: true }).click();
   await expect(
@@ -585,7 +566,7 @@ test("mobil tekrar listeleri, favori, başarı durumu ve çıkmış sınav gerç
   await expect(page.getByText("Doğruluk %0", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Başarım ekranını aç" }).click();
   await expect(
-    page.getByText("0 doğru · 1 yanlış · 0 boş", { exact: true }).first(),
+    page.getByText("0 doğru · 1 yanlış · 2 boş", { exact: true }).first(),
   ).toBeVisible();
   await page.getByRole("button", { name: "Menüyü aç" }).click();
   await expect(
@@ -593,17 +574,7 @@ test("mobil tekrar listeleri, favori, başarı durumu ve çıkmış sınav gerç
   ).toBeVisible();
   await page.getByRole("button", { name: "Başarı durumum" }).click();
 
-  fixture("official-exam");
-  await page.getByRole("tab", { name: "Deneme", exact: true }).click();
-  await page.getByRole("button", { name: "Çıkmış sınav denemesi" }).click();
-  await page
-    .getByRole("button", { name: /Sentetik çıkmış sınav/ })
-    .click();
-  await page.getByLabel("Süre (dakika)", { exact: true }).fill("5");
-  await page.getByRole("button", { name: "Denemeyi başlat" }).click();
-  await expect(
-    page.getByText("DENEMEN DEVAM EDİYOR", { exact: true }),
-  ).toBeVisible();
+  await enter(page, "Deneme");
   await expect(
     page.getByText("Sentetik üçüncü soru", { exact: true }),
   ).toBeVisible();

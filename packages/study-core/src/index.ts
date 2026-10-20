@@ -54,3 +54,12 @@ export function examSummary(exams: readonly ExamMembership[], limit = 3): string
   const shown = exams.slice(0, limit).map(examLabel).join(', ');
   return exams.length > limit ? `${shown} +${exams.length - limit}` : shown;
 }
+
+// EGM exam instruction 4.3: armed exam 150 minutes (125 questions), unarmed 120 (100), weapon-difference exam 30 (25).
+// Subject exams use the same ratio of 1.2 minutes per question (the 25 weapon questions come out at 30), at least five
+// minutes. A whole exam is one without a subject. The student may change the suggestion.
+export function suggestedMinutes(exam: { subject: unknown; weapon_status: 'armed' | 'unarmed' | null; question_count: number }): number {
+  if (!exam.subject && exam.weapon_status === 'armed') return 150;
+  if (!exam.subject && exam.weapon_status === 'unarmed') return 120;
+  return Math.max(5, Math.ceil(exam.question_count * 1.2));
+}

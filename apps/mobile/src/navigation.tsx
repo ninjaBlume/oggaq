@@ -37,19 +37,9 @@ import { useReducedMotion } from "./motion";
 
 export const destinations = [
   { id: "home", label: "Ana sayfa", menuLabel: "Ana sayfa", icon: House },
-  {
-    id: "questions",
-    label: "Soru çöz",
-    menuLabel: "Soru bankası",
-    icon: BookOpen,
-  },
-  { id: "exams", label: "Deneme", menuLabel: "Deneme sınavı", icon: Clock3 },
-  {
-    id: "history",
-    label: "Geçmiş",
-    menuLabel: "Çalışma geçmişi",
-    icon: History,
-  },
+  { id: "deneme", label: "Deneme", menuLabel: "Deneme sınavları", icon: Clock3 },
+  { id: "ders", label: "Ders", menuLabel: "Ders sınavları", icon: BookOpen },
+  { id: "history", label: "Sonuçlar", menuLabel: "Sonuçlarım", icon: History },
   { id: "profile", label: "Profil", menuLabel: "Profilim", icon: UserRound },
 ] as const;
 // Reachable from the side menu and home only; the bottom bar keeps its five primary tabs.

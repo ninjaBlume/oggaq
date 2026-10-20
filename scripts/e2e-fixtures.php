@@ -19,6 +19,7 @@ use App\Modules\Tenancy\Models\Tenant;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 
@@ -31,7 +32,7 @@ if (config('database.default') !== 'pgsql' || config('database.connections.pgsql
     throw new RuntimeException('Browser fixtures require the isolated oggaq_test PostgreSQL database.');
 }
 $operation = $argv[1] ?? '';
-if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'official-exam', 'cleanup'], true)) {
+if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'official-exam', 'subject-exam', 'favorite', 'cleanup'], true)) {
     throw new InvalidArgumentException('Expected setup or cleanup.');
 }
 if (in_array($operation, ['verification-link', 'reset-link'], true)) {
@@ -73,6 +74,27 @@ if ($operation === 'official-exam') {
     ]);
     app(PublishOfficialExam::class)->execute($admin, $exam);
     echo $exam->id;
+    exit;
+}
+if ($operation === 'subject-exam') {
+    // Published Ders Sınavı (one subject's questions, natural order) over the setup-study questions.
+    $admin = User::where('email', 'e2e-admin@example.test')->firstOrFail();
+    $versions = Question::whereHas('latestVersion', fn ($version) => $version->where('stem', 'like', 'Sentetik % soru'))->orderBy('id')->pluck('published_version_id')->all();
+    $exam = app(SaveOfficialExam::class)->execute($admin, [
+        'exam_type_id' => ExamType::where('code', 'synthetic-subject')->firstOrFail()->id, 'subject_id' => Subject::firstOrFail()->id, 'title' => 'Sentetik ders sınavı', 'year' => 2023,
+        'term' => '1. dönem', 'exam_number' => '1', 'question_version_ids' => $versions,
+    ]);
+    app(PublishOfficialExam::class)->execute($admin, $exam);
+    echo $exam->id;
+    exit;
+}
+if ($operation === 'favorite') {
+    // The three setup-study questions as favorites of the student's personal context (the review list screens need them).
+    $student = User::where('email', 'e2e-student@example.test')->firstOrFail();
+    $context = $student->studyContexts()->whereNull('tenant_id')->firstOrFail();
+    foreach (Question::whereHas('latestVersion', fn ($version) => $version->where('stem', 'like', 'Sentetik % soru'))->pluck('id') as $questionId) {
+        DB::table('favorite_questions')->insert(['study_context_id' => $context->id, 'question_id' => $questionId, 'created_at' => now()]);
+    }
     exit;
 }
 Artisan::call('migrate:fresh', ['--force' => true]);

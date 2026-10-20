@@ -1,45 +1,35 @@
 import { test, expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { execFileSync } from "node:child_process";
-import { browserTestEnv, phpBinary } from "../../playwright.config";
+import { answer, enterDers, finish, fixture, login, openFromReview } from "./student";
 
 test.use({ baseURL: "http://127.0.0.1:5183" });
-function fixture(operation: string) {
-  return execFileSync(phpBinary, ["scripts/e2e-fixtures.php", operation], { env: browserTestEnv, encoding: "utf8", stdio: "pipe" }).trim();
-}
-test.beforeEach(() => fixture("setup-study"));
+test.beforeEach(() => { fixture("setup-study"); fixture("official-exam"); fixture("subject-exam"); });
 test.afterAll(() => fixture("cleanup"));
-async function login(page: Page) {
-  await page.goto("/");
-  await page.getByLabel("E-posta adresi", { exact: true }).fill("e2e-student@example.test");
-  await page.getByLabel("Parola", { exact: true }).fill("Synthetic-Browser-42!");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Bugün ne çalışalım?" })).toBeVisible();
-}
-async function solve(page: Page, name: string, answer: "A" | "B" | null) {
-  await page.getByRole("link", { name: "Soru çöz", exact: true }).click();
-  await page.locator("article").filter({ has: page.getByRole("heading", { name, exact: true }) }).getByRole("button", { name: "Soruyu çöz" }).click();
-  await expect(page.getByRole("heading", { name: "Bir soru, bir adım" })).toBeVisible();
-  if (answer) {
-    await page.getByRole("radio", { name: new RegExp(`Sentetik ${answer}`) }).check();
-    await page.getByRole("button", { name: "Cevabımı kontrol et" }).click();
-  } else {
-    await page.getByRole("button", { name: "Boş bırak" }).click();
-    await page.getByRole("button", { name: "Boş olarak kaydet" }).click();
-  }
-  await expect(page.getByRole("heading", { name: "Çözümünü incele" })).toBeVisible();
+
+// The Ders Sınavı holds the three questions in order: first answer b (wrong), second blank, third a (correct), unless told otherwise.
+async function solveDers(page: Page, first: "A" | "B") {
+  await enterDers(page);
+  await answer(page, first);
+  await page.getByRole("button", { name: "Sonraki soru" }).click();
+  await page.getByRole("button", { name: "Sonraki soru" }).click();
+  await answer(page, "A");
+  await finish(page);
 }
 
 test("yanlışlar, boşlar, favoriler ve başarı durumu son sonuca göre güncellenir", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await login(page);
-  await solve(page, "Sentetik birinci soru", "B");
+  await solveDers(page, "B");
+  await expect(page.getByRole("status").filter({ hasText: "DOĞRU YÜZDESİ" })).toContainText("1 doğru · 1 yanlış · 1 boş");
+  // The result shows one question at a time; go back to the first (wrong) one before favoriting it.
+  await page.getByRole("button", { name: "Önceki soru" }).click();
+  await page.getByRole("button", { name: "Önceki soru" }).click();
+  await expect(page.getByRole("heading", { name: "Sentetik birinci soru" })).toBeVisible();
   await page.getByRole("button", { name: "☆ Favoriye ekle" }).click();
   await expect(page.getByRole("button", { name: "★ Favorilerde" })).toBeVisible();
   await page.reload();
   await expect(page.getByRole("button", { name: "★ Favorilerde" })).toBeVisible();
-  await solve(page, "Sentetik ikinci soru", null);
 
   await page.getByRole("link", { name: "Tekrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Tekrar listelerim" })).toBeVisible();
@@ -54,39 +44,36 @@ test("yanlışlar, boşlar, favoriler ve başarı durumu son sonuca göre günce
 
   // Timestamps have second precision; the corrected answer must be the latest one.
   await page.waitForTimeout(1100);
-  await solve(page, "Sentetik birinci soru", "A");
+  await solveDers(page, "A");
   await page.getByRole("link", { name: "Tekrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Şu an tekrar edeceğin yanlış soru yok." })).toBeVisible();
 
   await page.getByRole("link", { name: "Başarım", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Başarı durumum" })).toBeVisible();
-  await expect(page.getByText("1 doğru · 1 yanlış · 1 boş").first()).toBeVisible();
-  await expect(page.getByRole("img", { name: /Sentetik çalışma dersi: 1 doğru, 1 yanlış, 1 boş/ })).toBeVisible();
+  // Two attempts: (correct, wrong, blank, correct... counted per attempt) = 3 correct, 1 wrong, 2 blank.
+  await expect(page.getByText("3 doğru · 1 yanlış · 2 boş").first()).toBeVisible();
+  await expect(page.getByRole("img", { name: /Sentetik çalışma dersi: 3 doğru, 1 yanlış, 2 boş/ })).toBeVisible();
   expect(errors).toEqual([]);
 });
 
-test("soru dersi ve çıkmış sınavları ayrı gösterir; sınava ve derse göre filtrelenir", async ({ page }) => {
-  fixture("official-exam");
+test("soru dersi ve sınavları ayrı gösterir; tekrar sorusu hangi sınavlarda olduğunu söyler", async ({ page }) => {
+  fixture("favorite");
   await login(page);
-  const card = (name: string) => page.locator("article").filter({ has: page.getByRole("heading", { name, exact: true }) });
-  await expect(card("Sentetik birinci soru")).toContainText("Ders: Sentetik çalışma dersi");
-  await expect(card("Sentetik birinci soru")).toContainText("Sınav: 1. Deneme · silahlı");
-  await expect(card("Sınavda olmayan sentetik soru")).toContainText("Sınav: Çıkmış sınavlarda yok");
-  await expect(card("Sınavda olmayan sentetik soru")).toContainText("Ders: Sentetik çalışma dersi");
-  await page.getByLabel("Çıkmış sınav", { exact: true }).selectOption({ label: "Sentetik çıkmış sınav" });
-  await expect(page.locator("article")).toHaveCount(3);
-  await expect(page.getByRole("heading", { name: "Sınavda olmayan sentetik soru", exact: true })).toHaveCount(0);
-  await page.getByLabel("Ders", { exact: true }).selectOption({ label: "Sentetik çalışma dersi" });
-  await expect(page.locator("article")).toHaveCount(3);
-  await card("Sentetik üçüncü soru").getByRole("button", { name: "Soruyu çöz" }).click();
-  await expect(page.getByRole("heading", { name: "Bir soru, bir adım" })).toBeVisible();
+  // The Deneme list has the whole exam only, the Ders list has the subject exam only.
+  await expect(page.locator(".sinav-row")).toHaveCount(1);
+  await expect(page.locator(".sinav-row")).toContainText("1. Deneme Sınavı");
+  await page.getByRole("link", { name: "Ders sınavları", exact: true }).click();
+  await expect(page.locator(".sinav-row")).toHaveCount(1);
+  await expect(page.locator(".sinav-row")).toContainText("1. Ders Sınavı");
+  await openFromReview(page, "Sentetik üçüncü soru");
   await expect(page.locator(".question-meta")).toContainText("Ders: Sentetik çalışma dersi");
   await expect(page.getByLabel("Çıkmış sınavlar")).toContainText("1. Deneme · silahlı");
+  await expect(page.getByLabel("Çıkmış sınavlar")).toContainText("1. Ders · Sentetik çalışma dersi");
 });
 
 test("kişisel ve kurum alanlarının tekrar listeleri ayrıdır", async ({ page }) => {
   await login(page);
-  await solve(page, "Sentetik birinci soru", "B");
+  await solveDers(page, "B");
   await page.getByLabel("Çalışma alanı", { exact: true }).selectOption({ label: "Sentetik eğitim kurumu" });
   await page.getByRole("link", { name: "Tekrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Şu an tekrar edeceğin yanlış soru yok." })).toBeVisible();

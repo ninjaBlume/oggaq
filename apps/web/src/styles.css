@@ -1081,3 +1081,14 @@ small {
     grid-template-columns:1fr
   }
 }
+
+.sinav-list { display: grid; gap: 12px; }
+.sinav-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 18px; align-items: center; padding: 18px 22px; }
+.sinav-main h2 { margin: 0 0 4px; font-size: 1.15rem; }
+.sinav-main p { margin: 0; color: var(--muted); font-size: 14px; }
+.sinav-main .sinav-progress { margin-top: 6px; color: var(--green); font-weight: 600; }
+.start-panel { grid-column: 1 / -1; border-top: 1px solid var(--border); padding-top: 14px; margin-top: 4px; }
+.start-panel fieldset { border: 0; padding: 0; margin: 0; }
+.start-panel .field { max-width: 360px; }
+.tab-button small { opacity: .75; font-weight: 400; }
+@media (max-width: 600px) { .sinav-row { grid-template-columns: 1fr; } .sinav-action .button { width: 100%; } }

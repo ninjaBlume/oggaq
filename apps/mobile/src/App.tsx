@@ -39,9 +39,10 @@ import {
   palette,
   styles,
 } from "./ui";
-import { History, Practice, QuestionList } from "./study";
+import { Practice } from "./study";
 import { Review, Stats } from "./review";
-import { Exam, Exams } from "./exams";
+import { Exam } from "./exams";
+import { ExamList, Results } from "./sinavlar";
 import { Home } from "./home";
 import { MotionProvider } from "./motion";
 import { TabIndicator } from "./expressive";
@@ -116,12 +117,12 @@ function MainTabs({
     });
     return () => back.remove();
   }, [focused, tab]);
-  function questions(subjectId?: string) {
+  function ders(subjectId?: string) {
     setSubject(subjectId);
-    setTab("questions");
+    setTab("ders");
   }
   function selectTab(id: MainTab) {
-    if (id === "questions") setSubject(undefined);
+    if (id === "ders") setSubject(undefined);
     if (tab === id) content.current?.scrollTo({ y: 0, animated: true });
     else setTab(id);
   }
@@ -152,24 +153,24 @@ function MainTabs({
             <Home
               user={user}
               context={context}
-              questions={questions}
-              exams={() => setTab("exams")}
+              deneme={() => setTab("deneme")}
+              ders={ders}
               history={() => setTab("history")}
               review={() => setTab("review")}
               stats={() => setTab("stats")}
-              practice={practice}
               exam={exam}
             />
-          ) : tab === "questions" ? (
-            <QuestionList
+          ) : tab === "deneme" ? (
+            <ExamList context={context} kind="deneme" open={exam} />
+          ) : tab === "ders" ? (
+            <ExamList
               context={context}
-              open={practice}
+              kind="ders"
+              open={exam}
               initialSubject={subject}
             />
-          ) : tab === "exams" ? (
-            <Exams context={context} open={exam} />
           ) : tab === "history" ? (
-            <History context={context} open={practice} openExam={exam} />
+            <Results context={context} openExam={exam} />
           ) : tab === "review" ? (
             <Review context={context} open={practice} />
           ) : tab === "stats" ? (
@@ -368,7 +369,7 @@ function Workspace({
             />
           )}
         </Stack.Screen>
-        <Stack.Screen name="Exam" options={{ title: "Deneme" }}>
+        <Stack.Screen name="Exam" options={{ title: "Sınav" }}>
           {({ route }) => <ExamDetail context={context} id={route.params.id} />}
         </Stack.Screen>
       </Stack.Navigator>
