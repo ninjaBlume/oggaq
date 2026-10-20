@@ -4,8 +4,10 @@ namespace App\Modules\QuestionBank\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PaginationRequest;
+use App\Modules\QuestionBank\Actions\ApplyQuestionVersionToExams;
 use App\Modules\QuestionBank\Actions\PublishQuestion;
 use App\Modules\QuestionBank\Actions\SaveQuestion;
+use App\Modules\QuestionBank\Http\Requests\ApplyQuestionToExamsRequest;
 use App\Modules\QuestionBank\Http\Requests\PublishQuestionRequest;
 use App\Modules\QuestionBank\Http\Requests\QuestionListRequest;
 use App\Modules\QuestionBank\Http\Requests\SaveQuestionRequest;
@@ -25,7 +27,9 @@ class AdminQuestionController extends Controller
         Gate::authorize('manage', Question::class);
         $query = Question::with('latestVersion.options', 'latestVersion.source');
         foreach (['subject_id', 'topic_id', 'exam_type_id', 'source_id'] as $filter) {
-            if ($request->has($filter)) {
+            if ($filter === 'topic_id' && $request->validated('topic_id') === 'none') {
+                $query->whereHas('latestVersion', fn ($version) => $version->whereNull('topic_id'));
+            } elseif ($request->has($filter)) {
                 $query->whereHas('latestVersion', fn ($version) => $version->where($filter, $request->validated($filter)));
             }
         }
@@ -40,6 +44,22 @@ class AdminQuestionController extends Controller
         QuestionExamMemberships::attach($page->getCollection(), publishedOnly: false);
 
         return AdminQuestionResource::collection($page);
+    }
+
+    // Counts per subject and topic (latest version), so editors can track progress without paging through questions.
+    public function stats(): JsonResponse
+    {
+        Gate::authorize('manage', Question::class);
+        $rows = DB::table('questions as q')->join('question_versions as v', 'v.id', '=', 'q.latest_version_id')->groupBy('v.subject_id', 'v.topic_id')
+            ->selectRaw('v.subject_id, v.topic_id, count(*) as total, count(*) filter (where q.published_version_id is not null) as published, count(*) filter (where q.published_version_id is null) as draft, count(*) filter (where q.published_version_id is not null and q.published_version_id <> q.latest_version_id) as pending')
+            ->get()->map(fn ($row) => ['subject_id' => $row->subject_id, 'topic_id' => $row->topic_id, 'total' => (int) $row->total, 'published' => (int) $row->published, 'draft' => (int) $row->draft, 'pending' => (int) $row->pending])->all();
+
+        return response()->json(['data' => $rows]);
+    }
+
+    public function applyToExams(ApplyQuestionToExamsRequest $request, Question $question, ApplyQuestionVersionToExams $action): JsonResponse
+    {
+        return response()->json(['data' => $action->execute($request->user(), $question, $request->validated('question_version_id'))]);
     }
 
     public function store(SaveQuestionRequest $request, SaveQuestion $action): JsonResponse

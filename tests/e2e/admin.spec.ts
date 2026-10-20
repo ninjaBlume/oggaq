@@ -12,7 +12,7 @@ async function login(page: Page, role = 'admin') {
   await page.getByLabel('E-posta adresi', { exact: true }).fill(`e2e-${role}@example.test`);
   await page.getByLabel('Parola', { exact: true }).fill('Synthetic-Browser-42!');
   await page.getByRole('button', { name: 'Giriş yap', exact: true }).click();
-  await expect(page.getByRole('heading', { name: role === 'admin' ? 'Soru bankası' : role === 'student' ? 'Bu panel için yetkiniz yok' : 'E-postanızı doğrulayın', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: role === 'admin' ? 'Dersler' : role === 'student' ? 'Bu panel için yetkiniz yok' : 'E-postanızı doğrulayın', exact: true })).toBeVisible();
 }
 
 async function catalogs(page: Page) {
@@ -34,7 +34,7 @@ async function catalogs(page: Page) {
   await page.getByLabel('Kaynak notu / referans', { exact: true }).fill('Yalnız tarayıcı testinde kullanılan sentetik içerik.');
   await page.getByRole('button', { name: 'Kaydı oluştur', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Kaynak oluşturuldu.' })).toBeVisible();
-  await page.getByRole('link', { name: 'Soru bankası', exact: true }).click();
+  await page.getByRole('link', { name: 'Dersler', exact: true }).click();
 }
 
 async function fillQuestion(page: Page, stem = 'Sentetik E2E soru — resmî değildir') {
@@ -54,8 +54,8 @@ test('cookie giriş, katalog, taslak, sürüm, yayın, geçmiş ve logout gerçe
   const consoleErrors: string[] = [];
   page.on('pageerror', (error) => consoleErrors.push(error.message));
   await login(page);
-  await expect(page.getByRole('heading', { name: 'Soru bankası', exact: true })).toBeVisible();
-  await expect(page.getByText('Soru bankanız hazır, ilk soruyu ekleyin')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Dersler', exact: true })).toBeVisible();
+  await expect(page.getByText('Henüz ders yok')).toBeVisible();
   await catalogs(page);
   await fillQuestion(page);
   await page.getByRole('button', { name: 'Önizle', exact: true }).click();
@@ -91,8 +91,17 @@ test('cookie giriş, katalog, taslak, sürüm, yayın, geçmiş ve logout gerçe
   mkdirSync('artifacts/admin-preview', { recursive: true });
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: 'artifacts/admin-preview/editor.png', fullPage: true });
-  await page.getByRole('link', { name: 'Soru bankasına dön' }).click();
-  await expect(page.getByRole('link', { name: 'İkinci sentetik E2E sürümü', exact: true })).toBeVisible();
+  await page.getByRole('link', { name: 'Derse dön' }).click();
+  await expect(page.getByRole('heading', { name: 'Sentetik E2E ders', exact: true })).toBeVisible();
+  const card = page.locator('.question-card');
+  await expect(card).toHaveCount(1);
+  await expect(card).toContainText('İkinci sentetik E2E sürümü');
+  // The subject page edits a question in place: new version, published, no exam needs updating.
+  await card.getByRole('button', { name: 'Düzenle', exact: true }).click();
+  await card.getByLabel('Soru metni', { exact: true }).fill('Dersten düzenlenen sentetik soru');
+  await card.getByRole('button', { name: 'Kaydet ve yayımla', exact: true }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Soru yayımlandı.' })).toBeVisible();
+  await expect(page.locator('.question-card .question-stem')).toHaveText('Dersten düzenlenen sentetik soru');
   await page.screenshot({ path: 'artifacts/admin-preview/questions.png', fullPage: true });
   await page.getByRole('button', { name: 'Çıkış yap', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Tekrar hoş geldiniz' })).toBeVisible();
@@ -179,19 +188,19 @@ test('tablet ve telefon düzeni ekranı yatay taşırmaz', async ({ page }) => {
 
 test('API bağlantı hatası ve yeniden deneme akışı görünür', async ({ page }) => {
   await login(page);
-  await expect(page.getByRole('heading', { name: 'Soru bankası', exact: true })).toBeVisible();
-  await page.route('**/api/v1/admin/questions?*', (route) => route.abort('internetdisconnected'));
+  await expect(page.getByRole('heading', { name: 'Dersler', exact: true })).toBeVisible();
+  await page.route('**/api/v1/admin/question-stats*', (route) => route.abort('internetdisconnected'));
   await page.reload();
   await expect(page.getByRole('alert')).toContainText('Sunucuya ulaşılamıyor.');
-  await page.unroute('**/api/v1/admin/questions?*');
+  await page.unroute('**/api/v1/admin/question-stats*');
   await page.getByRole('button', { name: 'Yeniden dene', exact: true }).click();
-  await expect(page.getByText('Soru bankanız hazır, ilk soruyu ekleyin')).toBeVisible();
+  await expect(page.getByText('Henüz ders yok')).toBeVisible();
 });
 
 test('korumalı API oturumu sona erdiğinde panel giriş ekranına döner', async ({ page }) => {
   await login(page);
-  await expect(page.getByRole('heading', { name: 'Soru bankası', exact: true })).toBeVisible();
-  await page.route('**/api/v1/admin/questions?*', (route) => route.fulfill({ status: 401, contentType: 'application/problem+json', body: JSON.stringify({ code: 'unauthenticated', detail: 'Oturum sona erdi.' }) }));
+  await expect(page.getByRole('heading', { name: 'Dersler', exact: true })).toBeVisible();
+  await page.route('**/api/v1/admin/question-stats*', (route) => route.fulfill({ status: 401, contentType: 'application/problem+json', body: JSON.stringify({ code: 'unauthenticated', detail: 'Oturum sona erdi.' }) }));
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Tekrar hoş geldiniz' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Yeni soru' })).toHaveCount(0);

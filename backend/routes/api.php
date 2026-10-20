@@ -37,11 +37,13 @@ Route::prefix('v1')->group(function () {
                 Route::get('admin/'.$catalog, [CatalogController::class, 'index'])->defaults('catalog', $catalog);
                 Route::post('admin/'.$catalog, [CatalogController::class, 'store'])->defaults('catalog', $catalog);
             }
+            Route::get('admin/question-stats', [AdminQuestionController::class, 'stats']);
             Route::get('admin/questions', [AdminQuestionController::class, 'index']);
             Route::post('admin/questions', [AdminQuestionController::class, 'store']);
             Route::get('admin/questions/{question}', [AdminQuestionController::class, 'show'])->whereUuid('question');
             Route::patch('admin/questions/{question}', [AdminQuestionController::class, 'update'])->whereUuid('question');
             Route::post('admin/questions/{question}/publish', [AdminQuestionController::class, 'publish'])->whereUuid('question');
+            Route::post('admin/questions/{question}/apply-to-exams', [AdminQuestionController::class, 'applyToExams'])->whereUuid('question');
             Route::get('admin/questions/{question}/versions', [AdminQuestionController::class, 'versions'])->whereUuid('question');
             Route::get('admin/official-exams', [AdminOfficialExamController::class, 'index']);
             Route::post('admin/official-exams', [AdminOfficialExamController::class, 'store']);

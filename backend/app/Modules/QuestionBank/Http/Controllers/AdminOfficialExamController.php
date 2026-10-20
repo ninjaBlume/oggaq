@@ -12,6 +12,7 @@ use App\Modules\QuestionBank\Http\Requests\UpdateOfficialExamQuestionRequest;
 use App\Modules\QuestionBank\Http\Resources\AdminOfficialExamResource;
 use App\Modules\QuestionBank\Models\OfficialExam;
 use App\Modules\QuestionBank\Models\Question;
+use App\Modules\QuestionBank\OfficialExamHealth;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -32,7 +33,10 @@ class AdminOfficialExamController extends Controller
             $request->validated('status') === 'draft' ? $query->whereNull('published_at') : $query->whereNotNull('published_at');
         }
 
-        return AdminOfficialExamResource::collection($query->orderByDesc('year')->orderBy('id')->cursorPaginate($request->integer('per_page', 20))->withQueryString());
+        $page = $query->orderByDesc('year')->orderBy('id')->cursorPaginate($request->integer('per_page', 20))->withQueryString();
+        OfficialExamHealth::attach($page->getCollection());
+
+        return AdminOfficialExamResource::collection($page);
     }
 
     public function store(SaveOfficialExamRequest $request, SaveOfficialExam $action): JsonResponse
@@ -70,6 +74,8 @@ class AdminOfficialExamController extends Controller
 
     private function detailed(OfficialExam $exam): OfficialExam
     {
+        OfficialExamHealth::attach([$exam]);
+
         return $exam->load('examType', 'questions.questionVersion.options', 'questions.questionVersion.source', 'questions.questionVersion.question.latestVersion.options', 'questions.questionVersion.question.latestVersion.source');
     }
 }

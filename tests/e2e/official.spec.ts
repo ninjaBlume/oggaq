@@ -18,7 +18,7 @@ async function adminLogin(page: Page) {
   await page.getByLabel("E-posta adresi", { exact: true }).fill("e2e-admin@example.test");
   await page.getByLabel("Parola", { exact: true }).fill("Synthetic-Browser-42!");
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Çıkmış sınavlar", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Sınavlar", exact: true })).toBeVisible();
 }
 async function studentLogin(page: Page) {
   await page.goto(`${web}/`);
@@ -34,8 +34,8 @@ test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal s�
   const errors: string[] = [];
   adminPage.on("pageerror", (error) => errors.push(error.message));
   await adminLogin(adminPage);
-  await expect(adminPage.getByText("Henüz çıkmış sınav yok")).toBeVisible();
-  await adminPage.getByRole("link", { name: "Yeni çıkmış sınav", exact: true }).click();
+  await expect(adminPage.getByText("Henüz sınav yok")).toBeVisible();
+  await adminPage.getByRole("link", { name: "Yeni sınav", exact: true }).click();
   await adminPage.getByLabel("Sınav türü", { exact: true }).selectOption({ label: "Temel Eğitim" });
   await adminPage.getByLabel("Silah durumu", { exact: true }).selectOption({ label: "Silahlı" });
   await adminPage.getByLabel("Başlık", { exact: true }).fill(title);
@@ -87,11 +87,13 @@ test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal s�
   await expect(third).toContainText("Sınavdaki sürüm 2");
   await adminPage.reload();
   await expect(adminPage.locator("#soru-3 .question-stem")).toHaveText("Sentetik ikinci soru (düzeltildi)");
-  // The question list names each question's exams next to its subject and filters by exam.
-  await adminPage.goto(`${admin}/questions`);
-  await expect(adminPage.getByRole("row").filter({ hasText: "Sentetik birinci soru" })).toContainText("1. Temel · silahlı");
-  await adminPage.getByLabel("Çıkmış sınav", { exact: true }).selectOption({ label: title });
-  await expect(adminPage.getByRole("row").filter({ hasText: "Sentetik" })).toHaveCount(3);
+  // Subject based view: each question card names the exams that use it, next to its subject; the exam list shows the exam.
+  await adminPage.goto(`${admin}/subjects`);
+  await adminPage.getByRole("link", { name: "Sentetik çalışma dersi", exact: true }).click();
+  await expect(adminPage.locator(".question-card").filter({ hasText: "Sentetik birinci soru" }).locator(".exam-tag")).toContainText("1. Temel · silahlı");
+  await expect(adminPage.locator(".question-card").filter({ hasText: "Sentetik" })).toHaveCount(3);
+  await adminPage.goto(`${admin}/official-exams`);
+  await expect(adminPage.getByRole("link", { name: `${title} sınavını aç` })).toContainText("3 soru");
 
   await student.reload();
   await student.getByRole("button", { name: "Çıkmış sınav", exact: true }).click();

@@ -996,6 +996,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/question-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ders ve konuya göre soru sayıları
+         * @description Yalnız platform yöneticisi. Her ders/konu için toplam, yayımlanmış, taslak ve bekleyen değişikliği olan soru sayısı (en son sürüme göre); konu null ise konusuz sorular.
+         */
+        get: operations["adminQuestionStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/questions/{question}/apply-to-exams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sorunun sürümünü onu kullanan sınavlara uygulama
+         * @description Yalnız platform yöneticisi. Sorunun yayımlanmış bir sürümünü, daha eski sürümü sabitleyen her sınava (taslak veya yayımlanmış) uygular; zaten bu sürümde veya daha yenisinde olan sınavlara dokunmaz. Yayımlanmış sınavlarda yalnız denetimli sürüm geçişi yapılır. Yanıt değişen sınavları listeler.
+         */
+        post: operations["applyQuestionToExams"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1582,6 +1622,8 @@ export interface components {
             question_revision: number;
             /** @description Sorunun en güncel sürümü; sabitlenen sürümle aynıysa null. Düzenleme buradan devam eder. */
             latest_version: components["schemas"]["AdminQuestionVersion"] | null;
+            /** @description Bu soruyu içeren sınav sayısı (bu sınav dahil; taslaklar dahil). */
+            exam_count: number;
         };
         AdminOfficialExam: {
             /** Format: uuid */
@@ -1615,6 +1657,10 @@ export interface components {
              * @enum {string|null}
              */
             weapon_status: "armed" | "unarmed" | null;
+            /** @description Sabitlenen sürümü henüz yayımlanmamış soru sayısı; sıfır olmadan sınav yayımlanamaz. */
+            draft_question_count: number;
+            /** @description Sorunun sınavda sabitlenen sürümden daha yeni bir sürümü olan soru sayısı (düzeltme sınava henüz ulaşmamış). */
+            outdated_question_count: number;
         };
         OfficialExamInput: {
             /** Format: uuid */
@@ -1714,6 +1760,33 @@ export interface components {
              * @description Aynı sorunun sürümü.
              */
             question_version_id: string;
+        };
+        QuestionStat: {
+            /** Format: uuid */
+            subject_id: string;
+            topic_id: string | null;
+            total: number;
+            published: number;
+            draft: number;
+            /** @description Yayımlanmış olup yayımlanmamış daha yeni taslağı bulunan soru sayısı. */
+            pending: number;
+        };
+        QuestionStatsResponse: {
+            data: components["schemas"]["QuestionStat"][];
+        };
+        ExamQuestionVersionApply: {
+            /** Format: uuid */
+            question_version_id: string;
+        };
+        AppliedExam: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            /** @enum {string} */
+            status: "draft" | "published";
+        };
+        AppliedExamsResponse: {
+            data: components["schemas"]["AppliedExam"][];
         };
     };
     responses: {
@@ -2599,6 +2672,7 @@ export interface operations {
                 per_page?: number;
                 cursor?: string;
                 subject_id?: string;
+                /** @description Konu kimliği; "none" konusu olmayan soruları getirir. */
                 topic_id?: string;
                 exam_type_id?: string;
                 source_id?: string;
@@ -3483,6 +3557,60 @@ export interface operations {
             403: components["responses"]["Problem"];
             404: components["responses"]["Problem"];
             409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    adminQuestionStats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionStatsResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    applyQuestionToExams: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                question: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExamQuestionVersionApply"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppliedExamsResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
             422: components["responses"]["Problem"];
             429: components["responses"]["Problem"];
         };

@@ -95,8 +95,8 @@ function OfficialExamEditor({ exam, catalogs }: { exam?: OfficialExam; catalogs:
   }
   function submit(event: FormEvent) { event.preventDefault(); if (!busy && complete) { publish.reset(); save.mutate(); } }
 
-  return <><Link className="back-link" to="/official-exams"><Icon name="back" size={16} />Çıkmış sınavlara dön</Link>
-    <header className="page-heading editor-heading"><div><span className="eyebrow">ÇIKMIŞ SINAV</span><h1>{snapshot ? snapshot.title : 'Yeni çıkmış sınav'}</h1><p className="muted">{published ? `Yayımlandı: ${dateLabel(snapshot?.published_at)}. Künye, sıra ve soru listesi sabittir; soruları aşağıda düzenleyebilirsiniz.` : 'Soru sırası orijinal sınav sırasıdır. Kaydetmek sınavı öğrencilere açmaz.'}</p></div>{snapshot && <span className={`badge ${published ? 'green' : 'amber'}`}><span />{published ? 'Yayında' : 'Taslak'}</span>}</header>
+  return <><Link className="back-link" to="/official-exams"><Icon name="back" size={16} />Sınavlara dön</Link>
+    <header className="page-heading editor-heading"><div><span className="eyebrow">SINAV</span><h1>{snapshot ? snapshot.title : 'Yeni sınav'}</h1><p className="muted">{published ? `Yayımlandı: ${dateLabel(snapshot?.published_at)}. Künye, sıra ve soru listesi sabittir; soruları aşağıda düzenleyebilirsiniz.` : 'Soru sırası orijinal sınav sırasıdır. Kaydetmek sınavı öğrencilere açmaz.'}</p></div>{snapshot && <span className={`badge ${published ? 'green' : 'amber'}`}><span />{published ? 'Yayında' : 'Taslak'}</span>}</header>
     {mutationError && <ErrorNotice error={mutationError} />}
     <form onSubmit={submit} className="editor-layout"><fieldset className="editor-main" disabled={busy || published}>
       <details className="card editor-card info-card" open={!published}><summary className="section-title"><span className="step-number">1</span><div><h2>Sınav bilgileri</h2><p className="muted small-text">{published ? 'Yayımlanmış künye değiştirilemez; görmek için açın.' : 'Sınav türü, yıl, dönem ve numara birlikte tekil olmalıdır.'}</p></div></summary><div className="form-grid">

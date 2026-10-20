@@ -9,6 +9,7 @@ use App\Modules\QuestionBank\Models\ExamType;
 use App\Modules\QuestionBank\Models\Question;
 use App\Modules\QuestionBank\Models\QuestionSource;
 use App\Modules\QuestionBank\Models\Subject;
+use App\Modules\QuestionBank\Models\Topic;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -262,6 +263,58 @@ class OfficialExamTest extends TestCase
         $this->asToken($this->createUser());
         $this->putJson($url, ['question_version_id' => $this->questions[2]->published_version_id])->assertForbidden();
         $this->assertSame($draft->latest_version_id, DB::table('official_exam_questions')->where('official_exam_id', $exam['id'])->where('question_id', $this->questions[2]->id)->value('question_version_id'));
+    }
+
+    public function test_exam_list_counts_draft_and_outdated_questions_for_tracking(): void
+    {
+        $published = $this->createExam(['exam_number' => 'A'], true);
+        $this->revise($this->questions[1], 'Yeni sürüm');
+        $draftQuestion = app(SaveQuestion::class)->execute($this->admin, ['source_id' => $this->source->id, 'subject_id' => $this->subject->id, 'stem' => 'Taslak', 'options' => ['A', 'B'], 'correct_option_position' => 1]);
+        $draft = $this->postJson('/api/v1/admin/official-exams', $this->payload(['exam_number' => 'B', 'question_version_ids' => [$this->questions[0]->published_version_id, $draftQuestion->latest_version_id]]))->assertCreated()->json('data');
+        $list = collect($this->getJson('/api/v1/admin/official-exams?per_page=100')->assertOk()->json('data'))->keyBy('id');
+        $this->assertSame([0, 1], [$list[$published['id']]['draft_question_count'], $list[$published['id']]['outdated_question_count']]);
+        $this->assertSame([1, 0], [$list[$draft['id']]['draft_question_count'], $list[$draft['id']]['outdated_question_count']]);
+        $detail = $this->getJson('/api/v1/admin/official-exams/'.$published['id'])->assertOk()->json('data');
+        // The first question sits in both exams, the others only in the published one.
+        $this->assertSame([2, 1, 1], array_column($detail['questions'], 'exam_count'));
+    }
+
+    public function test_a_corrected_question_can_be_applied_to_every_exam_that_uses_it(): void
+    {
+        $published = $this->createExam(['exam_number' => 'A'], true);
+        $draft = $this->postJson('/api/v1/admin/official-exams', $this->payload(['exam_number' => 'B']))->assertCreated()->json('data');
+        $question = $this->questions[1];
+        $revised = $this->revise($question, 'Düzeltilmiş soru');
+        $url = '/api/v1/admin/questions/'.$question->id.'/apply-to-exams';
+        $unpublished = $this->revise($revised->refresh(), 'Yalnız taslak', false);
+        $this->postJson($url, ['question_version_id' => $unpublished->latest_version_id])->assertUnprocessable()->assertJsonValidationErrors('question_version_id');
+        $this->postJson($url, ['question_version_id' => $this->questions[0]->published_version_id])->assertUnprocessable();
+
+        $changed = $this->postJson($url, ['question_version_id' => $revised->published_version_id])->assertOk()->json('data');
+        $this->assertEqualsCanonicalizing([$published['id'], $draft['id']], array_column($changed, 'id'));
+        $this->assertSame([], $this->postJson($url, ['question_version_id' => $revised->published_version_id])->assertOk()->json('data'));
+        foreach ([$published, $draft] as $exam) {
+            $this->assertSame($revised->published_version_id, DB::table('official_exam_questions')->where('official_exam_id', $exam['id'])->where('question_id', $question->id)->value('question_version_id'));
+        }
+        $this->assertDatabaseCount('official_exam_question_changes', 1 + 1);
+        $this->asToken($this->createUser());
+        $this->postJson($url, ['question_version_id' => $revised->published_version_id])->assertForbidden();
+    }
+
+    public function test_question_stats_and_topic_filter_support_subject_based_tracking(): void
+    {
+        $this->asToken($this->admin);
+        $topicModel = Topic::create(['subject_id' => $this->subject->id, 'name' => 'Sentetik konu', 'code' => 'konu-'.Str::lower(Str::random(6))]);
+        $inTopic = app(SaveQuestion::class)->execute($this->admin, ['source_id' => $this->source->id, 'subject_id' => $this->subject->id, 'topic_id' => $topicModel->id, 'stem' => 'Konulu taslak', 'options' => ['A', 'B'], 'correct_option_position' => 1]);
+        $this->revise($this->questions[0], 'Bekleyen değişiklik', false);
+        $stats = collect($this->getJson('/api/v1/admin/question-stats')->assertOk()->json('data'))->where('subject_id', $this->subject->id)->keyBy(fn ($row) => $row['topic_id'] ?? 'none');
+        $this->assertSame(['total' => 3, 'published' => 3, 'draft' => 0, 'pending' => 1], collect($stats['none'])->only(['total', 'published', 'draft', 'pending'])->all());
+        $this->assertSame(['total' => 1, 'published' => 0, 'draft' => 1, 'pending' => 0], collect($stats[$topicModel->id])->only(['total', 'published', 'draft', 'pending'])->all());
+        $this->getJson('/api/v1/admin/questions?subject_id='.$this->subject->id.'&topic_id=none')->assertOk()->assertJsonCount(3, 'data');
+        $this->getJson('/api/v1/admin/questions?subject_id='.$this->subject->id.'&topic_id='.$topicModel->id)->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $inTopic->id);
+        $this->getJson('/api/v1/admin/questions?topic_id=bogus')->assertUnprocessable();
+        $this->asToken($this->createUser());
+        $this->getJson('/api/v1/admin/question-stats')->assertForbidden();
     }
 
     public function test_database_only_allows_the_audited_version_correction_in_a_published_exam(): void

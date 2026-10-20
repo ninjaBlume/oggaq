@@ -4,8 +4,9 @@ import type { FormEvent } from 'react';
 import { ApiError } from '@oggaq/api-client';
 import type { Catalogs, components } from '@oggaq/shared-types';
 import { api } from '../api';
-import { ErrorNotice, Field, Icon, useNotify } from '../ui';
-import { initialEditor, publicationRequirements, removeOption, toQuestionInput } from '../questions/editor-state';
+import { ErrorNotice, Icon, useNotify } from '../ui';
+import { QuestionBody, QuestionFields } from '../content/QuestionParts';
+import { initialEditor, publicationRequirements, toQuestionInput } from '../questions/editor-state';
 import type { EditorState } from '../questions/editor-state';
 
 type OfficialExam = components['schemas']['AdminOfficialExam'];
@@ -29,6 +30,8 @@ export function ExamQuestionCard({ row, number, examId, examPublished, catalogs,
   const [revision, setRevision] = useState(row.question_revision);
   const [form, setForm] = useState<EditorState>(() => initialEditor(row.latest_version ?? row.question));
   const [note, setNote] = useState('');
+  // A corrected question is usually used by several exams (armed and unarmed share their general questions).
+  const [applyAll, setApplyAll] = useState(true);
   const notify = useNotify();
   const version = row.question;
   const subject = catalogs.subjects.find((item) => item.id === version.subject_id);
@@ -47,6 +50,10 @@ export function ExamQuestionCard({ row, number, examId, examPublished, catalogs,
       // Step 2: publish it, step 3: pin it to this exam.
       const published = (await api.request('post', '/api/v1/admin/questions/{question}/publish', { params: { question: row.question_id }, body: { base_version: saved.revision } })).data;
       setRevision(published.revision);
+      if (applyAll && row.exam_count > 1) {
+        await api.request('post', '/api/v1/admin/questions/{question}/apply-to-exams', { params: { question: row.question_id }, body: { question_version_id: published.published_version_id! } });
+        return { exam: (await api.request('get', '/api/v1/admin/official-exams/{officialExam}', { params: { officialExam: examId } })).data, applied: true };
+      }
       return { exam: await pinVersion(published.published_version_id!), applied: true };
     }
     // Draft only: a draft exam keeps the unfinished version pinned; a published exam cannot use it, so it is only reloaded.
@@ -56,7 +63,7 @@ export function ExamQuestionCard({ row, number, examId, examPublished, catalogs,
     return { exam, applied: false };
   }, onSuccess: ({ exam, applied }) => {
     onExamUpdated(exam);
-    if (applied || !examPublished) { setEditing(false); setNote(''); notify(applied ? `${number}. soru kaydedildi, yayımlandı ve sınavda güncellendi.` : `${number}. soru taslak olarak kaydedildi.`); return; }
+    if (applied || !examPublished) { setEditing(false); setNote(''); notify(applied ? (applyAll && row.exam_count > 1 ? `${number}. soru kaydedildi, yayımlandı ve kullanıldığı ${row.exam_count} sınavda güncellendi.` : `${number}. soru kaydedildi, yayımlandı ve sınavda güncellendi.`) : `${number}. soru taslak olarak kaydedildi.`); return; }
     setNote('Taslak kaydedildi; yayımlanana kadar bu sınavda kullanılmaz.');
   } });
 
@@ -67,9 +74,7 @@ export function ExamQuestionCard({ row, number, examId, examPublished, catalogs,
   const busy = save.isPending || pin.isPending;
   const mutationError = save.error ?? pin.error;
   const fieldError = (name: string) => mutationError instanceof ApiError ? mutationError.field(name) : undefined;
-  const topics = catalogs.topics.filter((item) => item.subject_id === form.subject_id);
   const dirty = JSON.stringify(toQuestionInput(form)) !== JSON.stringify(toQuestionInput(initialEditor(row.latest_version ?? row.question)));
-  function patch<K extends keyof EditorState>(key: K, value: EditorState[K]) { setForm((current) => ({ ...current, [key]: value })); }
   function start() { save.reset(); pin.reset(); setNote(''); setForm(initialEditor(row.latest_version ?? row.question)); setRevision(row.question_revision); setEditing(true); }
   function submit(event: FormEvent) { event.preventDefault(); if (!busy) save.mutate(true); }
 
@@ -92,9 +97,7 @@ export function ExamQuestionCard({ row, number, examId, examPublished, catalogs,
       </div>
     </header>
     {!editing ? <>
-      <p className="question-stem">{version.stem}</p>
-      <ol className="question-options">{version.options.map((option, index) => <li key={option.id} className={option.id === version.correct_option_id ? 'correct' : undefined}><span>{String.fromCharCode(65 + index)}</span><span>{option.text}</span>{option.id === version.correct_option_id && <small>Doğru cevap</small>}</li>)}</ol>
-      {version.explanation && <p className="muted small-text question-explanation"><strong>Açıklama:</strong> {version.explanation}</p>}
+      <QuestionBody version={version} />
       {mutationError && <ErrorNotice error={mutationError} />}
       <footer className="question-card-actions">
         <button type="button" className="button secondary small" disabled={busy} onClick={start}>Düzenle</button>
@@ -102,23 +105,12 @@ export function ExamQuestionCard({ row, number, examId, examPublished, catalogs,
       </footer>
     </> : <form onSubmit={submit} className="question-card-form">
       <fieldset disabled={busy}>
-        <div className="form-grid">
-          <Field label="Ders" name={`subject-${number}`} error={fieldError('subject_id')}>{(props) => <select {...props} required value={form.subject_id} onChange={(event) => setForm((current) => ({ ...current, subject_id: event.target.value, topic_id: '' }))}><option value="">Ders seçin</option>{catalogs.subjects.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select>}</Field>
-          <Field label="Konu / alt konu" name={`topic-${number}`} error={fieldError('topic_id')}>{(props) => <select {...props} value={form.topic_id} disabled={!form.subject_id} onChange={(event) => patch('topic_id', event.target.value)}><option value="">Konu seçilmedi</option>{topics.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select>}</Field>
-        </div>
-        <Field label="Soru metni" name={`stem-${number}`} error={fieldError('stem')}>{(props) => <textarea {...props} required rows={4} maxLength={20000} value={form.stem} onChange={(event) => patch('stem', event.target.value)} />}</Field>
-        <div className="option-editor">{form.options.map((option, index) => <div className="option-row" key={option.key}>
-          <label className="answer-radio" title="Doğru cevap"><input type="radio" name={`correct-${number}`} aria-label={`${String.fromCharCode(65 + index)} seçeneği doğru cevap`} checked={form.correct === index} onChange={() => patch('correct', index)} /><span>{String.fromCharCode(65 + index)}</span></label>
-          <Field label={`${String.fromCharCode(65 + index)} seçeneği`} name={`option-${number}-${index}`} error={fieldError(`options.${index}`)}>{(props) => <input {...props} required maxLength={4000} value={option.text} onChange={(event) => patch('options', form.options.map((value, position) => position === index ? { ...value, text: event.target.value } : value))} placeholder="Seçenek metni" />}</Field>
-          <button type="button" className="icon-button remove-option" aria-label={`${String.fromCharCode(65 + index)} seçeneğini sil`} onClick={() => setForm((current) => removeOption(current, index))}><Icon name="close" size={18} /></button>
-        </div>)}</div>
-        {(fieldError('options') || fieldError('correct_option_position')) && <p className="field-error">{fieldError('options') ?? fieldError('correct_option_position')}</p>}
-        <div className="option-footer"><button type="button" className="button secondary small" disabled={form.options.length >= 10} onClick={() => patch('options', [...form.options, { key: crypto.randomUUID(), text: '' }])}><Icon name="plus" size={16} />Seçenek ekle</button><span className="muted small-text">Doğru cevabı soldaki daireden seçin.</span></div>
-        <Field label="Cevap açıklaması" name={`explanation-${number}`} error={fieldError('explanation')}>{(props) => <textarea {...props} rows={2} maxLength={20000} value={form.explanation} onChange={(event) => patch('explanation', event.target.value)} />}</Field>
+        <QuestionFields form={form} setForm={setForm} catalogs={catalogs} idPrefix={`soru-${number}`} fieldError={fieldError} />
       </fieldset>
       {mutationError && <ErrorNotice error={mutationError} />}
       {note && <div className="notice info" role="status"><p>{note}</p></div>}
       {missing.length > 0 && <ul className="requirements">{missing.map((item) => <li key={item}>{item}</li>)}</ul>}
+      {row.exam_count > 1 && <label className="check-row"><input type="checkbox" checked={applyAll} onChange={(event) => setApplyAll(event.target.checked)} />Bu soruyu kullanan tüm sınavlarda güncelle ({row.exam_count} sınav)</label>}
       <footer className="question-card-actions">
         <button type="submit" className="button primary small" disabled={busy || !dirty || missing.length > 0}>{save.isPending ? 'Kaydediliyor…' : examPublished ? 'Kaydet, yayımla ve sınavda güncelle' : 'Kaydet ve yayımla'}</button>
         <button type="button" className="button secondary small" disabled={busy || !dirty} onClick={() => save.mutate(false)}>Yalnız taslak kaydet</button>

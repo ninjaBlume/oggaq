@@ -9,7 +9,7 @@ export const api = new ApiClient(apiUrl, {
   onSessionExpired: () => window.dispatchEvent(new Event('session-expired')),
 });
 
-async function collect<T>(fetchPage: (cursor?: string) => Promise<Page<T>>): Promise<T[]> {
+export async function collect<T>(fetchPage: (cursor?: string) => Promise<Page<T>>): Promise<T[]> {
   const result: T[] = [];
   const seen = new Set<string>();
   let cursor: string | undefined;

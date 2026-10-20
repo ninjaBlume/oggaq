@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
-import { Link, useBeforeUnload, useBlocker, useNavigate, useParams } from 'react-router-dom';
+import { Link, useBeforeUnload, useBlocker, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ApiError, cursorFromLink } from '@oggaq/api-client';
 import type { AdminQuestion, AdminQuestionVersion, Catalogs } from '@oggaq/shared-types';
 import { api, loadCatalogs } from '../api';
@@ -16,13 +16,15 @@ export function QuestionPage() {
   const question = useQuery({ queryKey: ['question', questionId], enabled: !!questionId, queryFn: ({ signal }) => api.request('get', '/api/v1/admin/questions/{question}', { params: { question: questionId! }, signal }) });
   if (catalogs.isPending || (questionId && question.isPending)) return <Loading text="Editör hazırlanıyor…" />;
   if (catalogs.isError) return <ErrorNotice error={catalogs.error} retry={() => { void catalogs.refetch(); }} />;
-  if (questionId && question.isError) return <><Link className="back-link" to="/questions"><Icon name="back" size={16} />Soru bankası</Link><ErrorNotice error={question.error} retry={() => { void question.refetch(); }} /></>;
+  if (questionId && question.isError) return <><Link className="back-link" to="/subjects"><Icon name="back" size={16} />Dersler</Link><ErrorNotice error={question.error} retry={() => { void question.refetch(); }} /></>;
   return <QuestionEditor key={questionId ?? 'new'} question={question.data?.data} catalogs={catalogs.data} />;
 }
 
 function QuestionEditor({ question, catalogs }: { question?: AdminQuestion; catalogs: Catalogs }) {
   const [snapshot, setSnapshot] = useState(question);
-  const [form, setForm] = useState(() => initialEditor(question?.latest_version));
+  const [params] = useSearchParams();
+  // A new question started from a subject page opens with that subject selected.
+  const [form, setForm] = useState(() => { const base = initialEditor(question?.latest_version); const subject = params.get('subject'); return !question && subject ? { ...base, subject_id: subject } : base; });
   const [baseline, setBaseline] = useState(() => JSON.stringify(toQuestionInput(form)));
   const [preview, setPreview] = useState<'preview' | 'publish' | null>(null);
   const [confirmReload, setConfirmReload] = useState(false);
@@ -74,7 +76,7 @@ function QuestionEditor({ question, catalogs }: { question?: AdminQuestion; cata
   function submit(event: FormEvent) { event.preventDefault(); if (!busy) { publish.reset(); reload.reset(); save.mutate(); } }
   const canPublish = !!snapshot && !dirty && snapshot.has_pending_changes && missing.length === 0;
 
-  return <><Link className="back-link" to="/questions"><Icon name="back" size={16} />Soru bankasına dön</Link><header className="page-heading editor-heading"><div><span className="eyebrow">SORU EDİTÖRÜ</span><h1>{snapshot ? 'Soruyu düzenle' : 'Yeni soru oluştur'}</h1><p className="muted">{snapshot ? `Son taslak: sürüm ${snapshot.latest_version.version} · ${dateLabel(snapshot.updated_at)}` : 'Bir taslak hazırlayın; hazır olduğunda ayrı olarak yayımlayın.'}</p></div>{snapshot && <Status published={snapshot.status === 'published'} pending={snapshot.has_pending_changes} />}</header>
+  return <><Link className="back-link" to={form.subject_id ? `/subjects/${form.subject_id}` : '/subjects'}><Icon name="back" size={16} />Derse dön</Link><header className="page-heading editor-heading"><div><span className="eyebrow">SORU EDİTÖRÜ</span><h1>{snapshot ? 'Soruyu düzenle' : 'Yeni soru oluştur'}</h1><p className="muted">{snapshot ? `Son taslak: sürüm ${snapshot.latest_version.version} · ${dateLabel(snapshot.updated_at)}` : 'Bir taslak hazırlayın; hazır olduğunda ayrı olarak yayımlayın.'}</p></div>{snapshot && <Status published={snapshot.status === 'published'} pending={snapshot.has_pending_changes} />}</header>
     {mutationError && <ErrorNotice error={mutationError} />}{conflict && <div className="notice conflict"><div><strong>Yazdıklarınız editörde korunuyor.</strong><p>Başka bir işlem bu soruyu güncelledi. Son sürümü yüklemek yerel değişikliklerinizi kaldırır.</p></div><button className="button secondary" onClick={() => setConfirmReload(true)}>Sunucudaki sürümü yükle</button></div>}
     {!catalogs.subjects.length && <div className="notice info"><p>Soru hazırlamak için önce bir ders oluşturun.</p><Link className="button secondary small" to="/catalogs">Kataloglara git</Link></div>}
     <form onSubmit={submit} className="editor-layout"><fieldset className="editor-main" disabled={busy}>
