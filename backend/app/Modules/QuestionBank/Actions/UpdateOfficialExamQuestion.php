@@ -50,7 +50,7 @@ class UpdateOfficialExamQuestion
                 'id' => Str::uuid(), 'actor_id' => $actor->id, 'tenant_id' => null, 'target_id' => $exam->id,
                 'action' => 'official_exam.question_version_updated', 'created_at' => $now,
             ]);
-            $exam->touch();
+            // The exam row itself is never written: a published exam is immutable at the database level; the change log is the trace.
 
             return $exam;
         });

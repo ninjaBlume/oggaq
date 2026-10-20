@@ -71,6 +71,12 @@ test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal s�
   // The published exam shows every question below each other and a question is corrected in place:
   // the new version is published and the exam moves to it without changing the question's position.
   await expect(adminPage.locator(".question-card")).toHaveCount(3);
+  // The number strip jumps to the question, focuses and highlights it; the floating button returns to the numbers.
+  await adminPage.getByRole("button", { name: "3. soruya git", exact: true }).click();
+  await expect(adminPage.locator("#soru-3")).toBeFocused();
+  await expect(adminPage.locator("#soru-3")).toBeInViewport();
+  await adminPage.getByRole("button", { name: "Numaralara dön", exact: true }).click();
+  await expect(adminPage.locator("#soru-numaralari")).toBeInViewport();
   const third = adminPage.locator("#soru-3");
   await expect(third.locator(".question-stem")).toHaveText("Sentetik ikinci soru");
   await third.getByRole("button", { name: "Düzenle", exact: true }).click();

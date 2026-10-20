@@ -82,6 +82,17 @@ function OfficialExamEditor({ exam, catalogs }: { exam?: OfficialExam; catalogs:
       return { ...current, entries };
     });
   }
+  // Plain button + scrollIntoView instead of a #hash link, so it behaves the same in every browser and the target is highlighted.
+  function goTo(id: string, flash = true) {
+    const target = document.getElementById(id);
+    if (!target) return;
+    // Instant on purpose: a smooth scroll over a 125-question page takes seconds and looks like nothing happened.
+    target.scrollIntoView({ behavior: 'auto', block: 'start' });
+    if (!flash) return;
+    target.focus({ preventScroll: true });
+    target.classList.remove('flash'); void target.offsetWidth; target.classList.add('flash');
+    window.setTimeout(() => target.classList.remove('flash'), 1800);
+  }
   function submit(event: FormEvent) { event.preventDefault(); if (!busy && complete) { publish.reset(); save.mutate(); } }
 
   return <><Link className="back-link" to="/official-exams"><Icon name="back" size={16} />Çıkmış sınavlara dön</Link>
@@ -103,11 +114,12 @@ function OfficialExamEditor({ exam, catalogs }: { exam?: OfficialExam; catalogs:
     <section className="exam-questions" aria-labelledby="exam-questions-title">
       <div className="exam-questions-heading"><div><h2 id="exam-questions-title">Sorular</h2><p className="muted small-text">{published ? 'Soruları burada düzenleyebilirsiniz. Kaydettiğiniz soru yeni sürümle yayımlanır ve sınavda aynı sırada güncellenir; önceki denemeler eski sürümüyle kalır.' : 'Sorular orijinal sınav sırasındadır. Her soru burada düzenlenebilir; yayımlanmış sürümler eklenebilir.'}</p></div><span className="muted small-text">{form.entries.length} / 200 soru</span></div>
       {fieldError('question_version_ids') && <p className="field-error">{fieldError('question_version_ids')}</p>}
-      {form.entries.length > 1 && <nav className="question-jump" aria-label="Soru numaraları">{form.entries.map((entry, index) => <a key={entry.questionId} href={`#soru-${index + 1}`} className={entry.published ? undefined : 'is-draft'} aria-label={`${index + 1}. soruya git`}>{index + 1}</a>)}</nav>}
+      {form.entries.length > 1 && <><nav className="question-jump" id="soru-numaralari" aria-label="Soru numaraları">{form.entries.map((entry, index) => <button type="button" key={entry.questionId} className={entry.published ? undefined : 'is-draft'} aria-label={`${index + 1}. soruya git`} onClick={() => goTo(`soru-${index + 1}`)}>{index + 1}</button>)}</nav>
+        <button type="button" className="button secondary small jump-top" onClick={() => goTo('soru-numaralari', false)}><Icon name="back" size={14} />Numaralara dön</button></>}
       {form.entries.length === 0 ? <p className="muted small-text">Henüz soru eklenmedi.</p> : <div className="question-stack">{form.entries.map((entry, index) => {
         const row = snapshot?.questions?.find((item) => item.question_id === entry.questionId);
         const actions = published ? undefined : { canMoveUp: index > 0, canMoveDown: index < form.entries.length - 1, onMove: (by: -1 | 1) => move(index, by), onRemove: () => patch('entries', form.entries.filter((_, position) => position !== index)) };
-        if (!row) return <article className="card question-card" id={`soru-${index + 1}`} key={entry.questionId}><header className="question-card-heading"><span className="step-number">{index + 1}</span><p className="question-stem">{entry.stem}</p>{actions && <div className="exam-entry-actions"><button type="button" className="icon-button" aria-label={`${index + 1}. soruyu yukarı taşı`} disabled={!actions.canMoveUp} onClick={() => actions.onMove(-1)}>↑</button><button type="button" className="icon-button" aria-label={`${index + 1}. soruyu aşağı taşı`} disabled={!actions.canMoveDown} onClick={() => actions.onMove(1)}>↓</button><button type="button" className="icon-button" aria-label={`${index + 1}. soruyu sınavdan çıkar`} onClick={actions.onRemove}><Icon name="close" size={16} /></button></div>}</header><p className="muted small-text">Eklendi; taslağı kaydedince tam metin görünür ve düzenlenebilir.</p></article>;
+        if (!row) return <article className="card question-card" id={`soru-${index + 1}`} tabIndex={-1} key={entry.questionId}><header className="question-card-heading"><span className="step-number">{index + 1}</span><p className="question-stem">{entry.stem}</p>{actions && <div className="exam-entry-actions"><button type="button" className="icon-button" aria-label={`${index + 1}. soruyu yukarı taşı`} disabled={!actions.canMoveUp} onClick={() => actions.onMove(-1)}>↑</button><button type="button" className="icon-button" aria-label={`${index + 1}. soruyu aşağı taşı`} disabled={!actions.canMoveDown} onClick={() => actions.onMove(1)}>↓</button><button type="button" className="icon-button" aria-label={`${index + 1}. soruyu sınavdan çıkar`} onClick={actions.onRemove}><Icon name="close" size={16} /></button></div>}</header><p className="muted small-text">Eklendi; taslağı kaydedince tam metin görünür ve düzenlenebilir.</p></article>;
         return <ExamQuestionCard key={entry.questionId} row={row} number={index + 1} examId={snapshot!.id} examPublished={published} catalogs={catalogs} onExamUpdated={acceptRow} actions={actions} />;
             })}</div>}
       {!published && <div className="option-footer"><button type="button" className="button secondary small" disabled={busy} onClick={() => setPicker(true)}><Icon name="plus" size={16} />Soru ekle</button></div>}

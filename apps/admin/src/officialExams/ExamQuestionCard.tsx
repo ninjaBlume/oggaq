@@ -73,7 +73,7 @@ export function ExamQuestionCard({ row, number, examId, examPublished, catalogs,
   function start() { save.reset(); pin.reset(); setNote(''); setForm(initialEditor(row.latest_version ?? row.question)); setRevision(row.question_revision); setEditing(true); }
   function submit(event: FormEvent) { event.preventDefault(); if (!busy) save.mutate(true); }
 
-  return <article className={`card question-card ${version.published_at === null ? 'is-draft' : ''}`} id={`soru-${number}`}>
+  return <article className={`card question-card ${version.published_at === null ? 'is-draft' : ''}`} id={`soru-${number}`} tabIndex={-1}>
     <header className="question-card-heading">
       <span className="step-number">{number}</span>
       <div className="question-card-meta">

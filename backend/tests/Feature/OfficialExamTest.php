@@ -225,6 +225,8 @@ class OfficialExamTest extends TestCase
         $exam = $this->createExam([], true);
         $student = $this->createUser();
         $before = $this->startOfficial($exam['id'], [], $student)->assertOk()->json('data');
+        // Real corrections happen long after publication; updated_at must not be touched on the immutable exam row.
+        $this->travel(5)->minutes();
         $this->asToken($this->admin);
         $url = '/api/v1/admin/official-exams/'.$exam['id'].'/questions/'.$this->questions[1]->id;
         $draftOnly = $this->revise($this->questions[1], 'Yalnız taslak', false);
