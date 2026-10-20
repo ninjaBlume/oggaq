@@ -42,10 +42,12 @@ export async function finish(page: Page) {
   await page.getByRole("button", { name: "Bitir ve değerlendir" }).click();
   await expect(page.getByRole("heading", { name: "Deneme sonucun" })).toBeVisible();
 }
-// Opens a question of a review list (Tekrar) as single-question practice.
-export async function openFromReview(page: Page, name = "Sentetik birinci soru", list = "Favorilerim") {
+// Tekrar is an exam too: sit a timed exam made of the questions of a review list.
+export async function enterReview(page: Page, list = "Favorilerim", minutes = "5") {
   await page.getByRole("link", { name: "Tekrar", exact: true }).click();
-  await page.getByRole("button", { name: list, exact: true }).click();
-  await page.locator("article").filter({ has: page.getByRole("heading", { name, exact: true }) }).getByRole("button", { name: "Soruyu çöz" }).click();
-  await expect(page.getByRole("heading", { name: "Bir soru, bir adım" })).toBeVisible();
+  const card = page.locator(".sinav-row").filter({ has: page.getByRole("heading", { name: list, exact: true }) });
+  await card.getByRole("button", { name: "Tekrar sınavına gir" }).click();
+  await card.getByLabel("Süre (dakika)", { exact: true }).fill(minutes);
+  await card.getByRole("button", { name: "Sınavı başlat" }).click();
+  await expect(page.getByRole("heading", { name: "Denemen devam ediyor" })).toBeVisible();
 }

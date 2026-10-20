@@ -1,172 +1,186 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
-import { ListChecks, Trophy } from "./icons";
-import type { StudyContext } from "@oggaq/shared-types";
+import * as Crypto from "expo-crypto";
+import { ApiError } from "@oggaq/api-client";
+import { Trophy } from "./icons";
+import type { ExamAttempt, StudyContext, components } from "@oggaq/shared-types";
 import { api } from "./api";
 import { useOnReturn, useResource, useTask } from "./hooks";
 import {
+  Button,
   Card,
   EmptyState,
   ErrorNotice,
+  Field,
   Loading,
   ScreenTitle,
   SectionTitle,
-  TextLink,
   palette,
   styles,
 } from "./ui";
-import { ChoiceGroup } from "./expressive";
-import { Pagination, QuestionCard } from "./study";
 
 type Kind = "incorrect" | "blank" | "favorite";
-const copy: Record<Kind, { empty: string; hint: string }> = {
-  incorrect: {
-    empty: "Şu an tekrar edeceğin yanlış soru yok.",
+type StartInput = components["schemas"]["StartExamInput"];
+const kinds: { id: Kind; label: string; hint: string; empty: string }[] = [
+  {
+    id: "incorrect",
+    label: "Yanlışlarım",
     hint: "Son cevabın yanlış olan sorular. Doğru çözdüğünde listeden çıkar.",
+    empty: "Şu an tekrar edeceğin yanlış soru yok.",
   },
-  blank: {
-    empty: "Boş bıraktığın soru yok.",
+  {
+    id: "blank",
+    label: "Boş bıraktıklarım",
     hint: "Son cevabın boş olan sorular. Çözdüğünde listeden çıkar.",
+    empty: "Boş bıraktığın soru yok.",
   },
-  favorite: {
+  {
+    id: "favorite",
+    label: "Favorilerim",
+    hint: "Sınav sonucunda favoriye eklediğin sorular.",
     empty: "Henüz favori soru eklemedin.",
-    hint: "Sınav sonucunda bir soruyu favoriye ekleyebilirsin.",
   },
-};
+];
 
+// Review is an exam too: the student picks a list (wrong, blank, favorite) and sits a timed exam made of those questions.
 export function Review({
   context,
-  open,
+  openExam,
 }: {
   context: StudyContext;
-  open: (id: string) => void;
+  openExam: (id: string) => void;
 }) {
-  const [kind, setKind] = useState<Kind>("incorrect");
-  const [cursor, setCursor] = useState<string>();
-  const subjects = useResource(
+  const summary = useResource(
     (signal) =>
-      api.request("get", "/api/v1/subjects", {
-        signal,
-        query: { per_page: 100 },
-      }),
-    [],
-  );
-  const query = useResource(
-    (signal) =>
-      api.request("get", "/api/v1/contexts/{context}/review-questions", {
+      api.request("get", "/api/v1/contexts/{context}/review-summary", {
         params: { context: context.id },
-        query: { kind, per_page: 10, cursor },
         signal,
       }),
-    [context.id, kind, cursor],
+    [context.id],
   );
   useOnReturn(() => {
-    void query.reload();
+    void summary.reload();
   });
   return (
     <>
       <ScreenTitle
-        title="Tekrar listelerim"
-        subtitle={copy[kind].hint}
-        eyebrow="TEKRAR ET"
+        title="Tekrar sınavı"
+        subtitle="Yanlış yaptığın, boş bıraktığın veya favoriye eklediğin sorulardan süreli bir sınav yap."
+        eyebrow="HATALARINDAN ÖĞREN"
       />
-      <ChoiceGroup
-        choices={[
-          {
-            value: "incorrect",
-            label: "Yanlışlarım",
-            accessibilityLabel: "Yanlışlarım",
-          },
-          {
-            value: "blank",
-            label: "Boşlarım",
-            accessibilityLabel: "Boş bıraktıklarım",
-          },
-          {
-            value: "favorite",
-            label: "Favorilerim",
-            accessibilityLabel: "Favorilerim",
-          },
-        ]}
-        value={kind}
-        onChange={(value) => {
-          setKind(value);
-          setCursor(undefined);
-        }}
-      />
-      {query.loading ? (
+      {summary.loading ? (
         <Loading />
-      ) : query.error ? (
+      ) : summary.error || !summary.data ? (
         <ErrorNotice
-          error={query.error}
+          error={summary.error}
           retry={() => {
-            void query.reload();
+            void summary.reload();
           }}
         />
-      ) : query.data?.data.length === 0 ? (
-        <EmptyState
-          icon={ListChecks}
-          title={copy[kind].empty}
-          message="Sınavlara girdikçe bu liste güncellenir."
-        />
       ) : (
-        query.data?.data.map((q) => (
-          <View key={`${kind}-${q.id}-${q.version.id}`} style={{ gap: 4 }}>
-            <QuestionCard
-              question={q}
-              context={context}
-              open={open}
-              subjectName={
-                subjects.data?.data.find((s) => s.id === q.version.subject_id)
-                  ?.name
-              }
-            />
-            {kind === "favorite" && (
-              <RemoveFavorite
-                context={context}
-                question={q.id}
-                done={() => {
-                  void query.reload();
-                }}
-              />
-            )}
-          </View>
+        kinds.map((kind) => (
+          <ReviewExam
+            key={kind.id}
+            context={context}
+            kind={kind}
+            count={summary.data!.data[kind.id]}
+            openExam={openExam}
+          />
         ))
       )}
-      {query.data && <Pagination page={query.data} change={setCursor} />}
     </>
   );
 }
 
-function RemoveFavorite({
+function ReviewExam({
   context,
-  question,
-  done,
+  kind,
+  count,
+  openExam,
 }: {
   context: StudyContext;
-  question: string;
-  done: () => void;
+  kind: (typeof kinds)[number];
+  count: number;
+  openExam: (id: string) => void;
 }) {
-  const task = useTask<unknown>();
+  const [expanded, setExpanded] = useState(false);
+  const [questions, setQuestions] = useState(String(Math.min(count, 20)));
+  const [minutes, setMinutes] = useState(
+    String(Math.max(5, Math.ceil(Math.min(count, 20) * 1.2))),
+  );
+  const submission = useRef<StartInput | null>(null);
+  const task = useTask<{ data: ExamAttempt }>();
+  function begin() {
+    submission.current ??= {
+      id: Crypto.randomUUID(),
+      review_kind: kind.id,
+      question_count: Number(questions),
+      duration_seconds: Math.round(Number(minutes)) * 60,
+    };
+    void task.run(
+      () =>
+        api.request("post", "/api/v1/contexts/{context}/exam-attempts", {
+          params: { context: context.id },
+          body: submission.current!,
+        }),
+      (response) => {
+        submission.current = null;
+        openExam(response.data.id);
+      },
+    );
+  }
+  // A rejected start (409/422) is not a lost response: the next try is a new attempt id.
+  useEffect(() => {
+    if (task.error instanceof ApiError && [409, 422].includes(task.error.status))
+      submission.current = null;
+  }, [task.error]);
+  const locked =
+    task.pending ||
+    (submission.current !== null &&
+      !(task.error instanceof ApiError && [409, 422].includes(task.error.status)));
+  const valid =
+    Number(questions) >= 1 &&
+    Number(questions) <= Math.min(count, 100) &&
+    Number(minutes) >= 1 &&
+    Number(minutes) <= 180;
   return (
-    <>
-      <TextLink
-        onPress={() => {
-          void task.run(
-            () =>
-              api.request(
-                "delete",
-                "/api/v1/contexts/{context}/favorites/{question}",
-                { params: { context: context.id, question } },
-              ),
-            done,
-          );
-        }}
-      >
-        {task.pending ? "Çıkarılıyor…" : "Favorilerden çıkar"}
-      </TextLink>
-      <ErrorNotice error={task.error} />
-    </>
+    <Card>
+      <Text style={styles.heading}>{kind.label}</Text>
+      <Text style={styles.muted}>
+        {count === 0 ? kind.empty : `${count} soru · ${kind.hint}`}
+      </Text>
+      {count > 0 &&
+        (!expanded ? (
+          <Button onPress={() => setExpanded(true)}>Tekrar sınavına gir</Button>
+        ) : (
+          <View style={{ gap: 12 }}>
+            <Field
+              label="Soru sayısı"
+              numeric
+              value={questions}
+              onChange={(value) => {
+                setQuestions(value);
+                setMinutes(String(Math.max(5, Math.ceil(Number(value) * 1.2))));
+              }}
+              editable={!locked}
+            />
+            <Field
+              label="Süre (dakika)"
+              numeric
+              value={minutes}
+              onChange={setMinutes}
+              editable={!locked}
+            />
+            <Button disabled={locked || !valid} onPress={begin}>
+              {task.pending ? "Sınav hazırlanıyor…" : "Sınavı başlat"}
+            </Button>
+            <Button secondary disabled={locked} onPress={() => setExpanded(false)}>
+              Vazgeç
+            </Button>
+            <ErrorNotice error={task.error} retry={begin} />
+          </View>
+        ))}
+    </Card>
   );
 }
 

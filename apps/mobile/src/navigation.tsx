@@ -47,7 +47,7 @@ export const extraDestinations = [
   {
     id: "review",
     label: "Tekrar",
-    menuLabel: "Tekrar listelerim",
+    menuLabel: "Tekrar sınavı",
     icon: ListChecks,
   },
   {

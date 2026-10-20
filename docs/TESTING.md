@@ -29,7 +29,7 @@ E2E `APP_ENV=local` ile gerçek CSRF middleware'ini kullanır; sentetik fixture'
 
 ## Altıncı teslim testleri
 
-`ExamTest` cevap bazlı çakışma ve salt okunur geçmişi, `StudyInsightsTest` tekrar listeleri/favori/istatistiği, `OfficialExamTest` çıkmış sınav yönetimi, yayım değişmezliği, orijinal sıralı deneme ve DB trigger'larını kapsar. Yerelde 154 PostgreSQL feature testi geçti. Tarayıcı: `insights.spec.ts` (web tekrar/favori/başarım, kişisel-kurum ayrımı), `official.spec.ts` (yönetici çıkmış sınavı oluşturup yayımlar, öğrenci orijinal sırayla çözer) ve `mobile.spec.ts` içindeki yeni senaryo; toplam 37 Chromium E2E geçti. `npm run test:e2e` öncesinde `npm run export:mobile:preview` gerekir.
+`ExamTest` cevap bazlı çakışma ve salt okunur geçmişi, `StudyInsightsTest` tekrar listeleri/favori/istatistiği, `OfficialExamTest` çıkmış sınav yönetimi, yayım değişmezliği, orijinal sıralı deneme ve DB trigger'larını kapsar. Yerelde 157 PostgreSQL feature testi geçti. Tarayıcı: `insights.spec.ts` (web tekrar/favori/başarım, kişisel-kurum ayrımı), `official.spec.ts` (yönetici çıkmış sınavı oluşturup yayımlar, öğrenci orijinal sırayla çözer) ve `mobile.spec.ts` içindeki yeni senaryo; toplam 37 Chromium E2E geçti. `npm run test:e2e` öncesinde `npm run export:mobile:preview` gerekir.
 
 ## Kritik kabul matrisi
 

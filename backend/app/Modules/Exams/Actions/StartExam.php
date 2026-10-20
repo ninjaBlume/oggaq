@@ -8,6 +8,7 @@ use App\Modules\Exams\Models\ExamAttempt;
 use App\Modules\QuestionBank\Models\OfficialExam;
 use App\Modules\QuestionBank\Models\Question;
 use App\Modules\Study\Actions\ResolveStudyContext;
+use App\Modules\Study\ReviewQuestionSet;
 use App\Support\ApiProblem;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
@@ -42,7 +43,7 @@ class StartExam
 
                     return $existing->load(['answers.questionVersion.options', 'answers.questionVersion.source']);
                 }
-                $picked = $template ?? $this->randomQuestions($settings);
+                $picked = $template ?? $this->randomQuestions($settings, $context->id, $input['review_kind'] ?? null);
                 if ($picked->count() !== $settings['question_count']) {
                     throw ValidationException::withMessages(['question_count' => ['Bu seçimde yeterli yayımlanmış soru yok. Daha az soru seçin.']]);
                 }
@@ -74,9 +75,10 @@ class StartExam
 
     // One statement picks questions and their published versions from the same snapshot.
     // Published versions are immutable, so no content lock is needed and publishing is never blocked.
-    private function randomQuestions(array $settings): Collection
+    // A review exam draws from the questions the student wants to go over again (wrong, blank or favorite).
+    private function randomQuestions(array $settings, string $contextId, ?string $reviewKind): Collection
     {
-        $eligible = Question::whereNotNull('published_version_id');
+        $eligible = $reviewKind === null ? Question::whereNotNull('published_version_id') : ReviewQuestionSet::query($contextId, $reviewKind);
         foreach (['subject_id', 'topic_id'] as $filter) {
             if ($settings[$filter] !== null) {
                 $eligible->whereHas('publishedVersion', fn ($query) => $query->where($filter, $settings[$filter]));

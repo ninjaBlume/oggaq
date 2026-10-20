@@ -39,7 +39,6 @@ import {
   palette,
   styles,
 } from "./ui";
-import { Practice } from "./study";
 import { Review, Stats } from "./review";
 import { Exam } from "./exams";
 import { ExamList, Results } from "./sinavlar";
@@ -56,7 +55,6 @@ import {
 
 type Routes = {
   Main: undefined;
-  Practice: { id: string };
   Exam: { id: string };
 };
 const Stack = createNativeStackNavigator<Routes>();
@@ -78,7 +76,6 @@ function MainTabs({
   choose,
   logout,
   pending,
-  practice,
   exam,
 }: {
   user: User;
@@ -87,7 +84,6 @@ function MainTabs({
   choose: (id: string) => void;
   logout: () => void;
   pending: boolean;
-  practice: (id: string) => void;
   exam: (id: string) => void;
 }) {
   const insets = useSafeAreaInsets();
@@ -172,7 +168,7 @@ function MainTabs({
           ) : tab === "history" ? (
             <Results context={context} openExam={exam} />
           ) : tab === "review" ? (
-            <Review context={context} open={practice} />
+            <Review context={context} openExam={exam} />
           ) : tab === "stats" ? (
             <Stats context={context} />
           ) : (
@@ -354,18 +350,7 @@ function Workspace({
               choose={setContextId}
               logout={logout}
               pending={pending}
-              practice={(id) => navigation.navigate("Practice", { id })}
               exam={(id) => navigation.navigate("Exam", { id })}
-            />
-          )}
-        </Stack.Screen>
-        <Stack.Screen name="Practice" options={{ title: "Soru çöz" }}>
-          {({ route, navigation }) => (
-            <Practice
-              key={route.params.id}
-              context={context}
-              id={route.params.id}
-              back={() => navigation.goBack()}
             />
           )}
         </Stack.Screen>

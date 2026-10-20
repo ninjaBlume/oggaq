@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
-import { answer, enterDeneme, enterDers, finish, fixture, login, openFromReview } from './student';
+import { answer, enterDeneme, enterDers, enterReview, finish, fixture, login } from './student';
 
 test.use({ baseURL: 'http://127.0.0.1:5183' });
 test.beforeEach(() => { fixture('setup-study'); fixture('official-exam'); fixture('subject-exam'); });
@@ -153,39 +153,56 @@ test('başlatma yanıtı kaybolduğunda aynı işlem kimliğiyle tekrar edilir',
   await expect(page.getByRole('region', { name: 'Sınav sonuçları' }).getByRole('link')).toHaveCount(1);
 });
 
-test('tekrar listesinden çözülen soruda kaybolan yanıt tek sonuç bırakır', async ({ page }) => {
-  fixture('favorite');
-  await login(page); await openFromReview(page);
-  let lost = false;
-  await page.route('**/practice-attempts/*/answer', async (route) => {
-    if (!lost) { lost = true; await route.fetch(); await route.abort('internetdisconnected'); }
-    else await route.continue();
-  });
-  await page.getByRole('radio', { name: /Sentetik A/ }).check();
-  await page.getByRole('button', { name: 'Cevabımı kontrol et' }).click();
-  await expect(page.getByRole('alert')).toContainText('Sunucuya ulaşılamıyor.');
-  await expect(page.getByRole('radio', { name: /Sentetik B/ })).toBeDisabled();
-  await page.getByRole('button', { name: 'Yeniden dene' }).click();
-  await expect(page.getByRole('status')).toContainText('Doğru');
-  await expect(page.getByLabel('Çıkmış sınavlar')).toContainText('1. Deneme · silahlı');
-  await expect(page.getByLabel('Çıkmış sınavlar')).toContainText('1. Ders · Sentetik çalışma dersi');
+test('tekrar sınavı hatalardan kurulur ve sonuçla listeleri günceller', async ({ page }) => {
+  await login(page);
+  // The Ders Sınavı leaves one wrong, one blank and one correct answer behind.
+  await enterDers(page);
+  await answer(page, 'B');
+  await page.getByRole('button', { name: 'Sonraki soru' }).click();
+  await page.getByRole('button', { name: 'Sonraki soru' }).click();
+  await answer(page, 'A');
+  await finish(page);
+  await page.getByRole('link', { name: 'Tekrar', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Tekrar sınavı' })).toBeVisible();
+  await expect(page.locator('.sinav-row').filter({ hasText: 'Yanlışlarım' })).toContainText('1 soru');
+  await expect(page.locator('.sinav-row').filter({ hasText: 'Boş bıraktıklarım' })).toContainText('1 soru');
+  await expect(page.locator('.sinav-row').filter({ hasText: 'Favorilerim' })).toContainText('Henüz favori soru eklemedin.');
+  await expect(page.locator('.sinav-row').filter({ hasText: 'Favorilerim' }).getByRole('button', { name: 'Tekrar sınavına gir' })).toBeDisabled();
+  // No question list to browse or solve one by one.
+  await expect(page.getByRole('button', { name: 'Soruyu çöz' })).toHaveCount(0);
+  // Timestamps have second precision; the corrected answer must come in a later second to be the latest one.
+  await page.waitForTimeout(1100);
+  await enterReview(page, 'Yanlışlarım');
+  await expect(page.getByRole('heading', { name: 'Sentetik birinci soru' })).toBeVisible();
+  await answer(page, 'A');
+  await finish(page);
+  await page.getByRole('link', { name: 'Tekrar', exact: true }).click();
+  await expect(page.locator('.sinav-row').filter({ hasText: 'Yanlışlarım' })).toContainText('Şu an tekrar edeceğin yanlış soru yok.');
 });
 
-test('iki sekmede farklı cevap gönderilirse ilk sonuç korunur ve ikinci sekme yenilenir', async ({ page }) => {
+test('tekrar sınavı başlatma yanıtı kaybolsa aynı işlem kimliğiyle tekrar edilir', async ({ page }) => {
   fixture('favorite');
-  await login(page); await openFromReview(page);
-  const other = await page.context().newPage();
-  await other.goto(page.url());
-  await expect(other.getByRole('heading', { name: 'Bir soru, bir adım' })).toBeVisible();
-  await page.getByRole('radio', { name: /Sentetik A/ }).check();
-  await page.getByRole('button', { name: 'Cevabımı kontrol et' }).click();
-  await expect(page.getByRole('status')).toContainText('Doğru');
-  await other.getByRole('radio', { name: /Sentetik B/ }).check();
-  await other.getByRole('button', { name: 'Cevabımı kontrol et' }).click();
-  await expect(other.getByRole('alert')).toContainText('Bu çözüm tamamlandı.');
-  await other.getByRole('button', { name: 'Kaydı yenile' }).click();
-  await expect(other.getByRole('status')).toContainText('Doğru');
-  await other.close();
+  await login(page);
+  const ids: string[] = [];
+  await page.route('**/contexts/*/exam-attempts', async (route) => {
+    if (route.request().method() !== 'POST') { await route.continue(); return; }
+    const body = route.request().postDataJSON();
+    expect(body.review_kind).toBe('favorite');
+    ids.push(body.id);
+    if (ids.length === 1) { await route.fetch(); await route.abort('internetdisconnected'); }
+    else await route.continue();
+  });
+  await page.getByRole('link', { name: 'Tekrar', exact: true }).click();
+  const card = page.locator('.sinav-row').filter({ has: page.getByRole('heading', { name: 'Favorilerim', exact: true }) });
+  await expect(card).toContainText('3 soru');
+  await card.getByRole('button', { name: 'Tekrar sınavına gir' }).click();
+  await card.getByLabel('Soru sayısı', { exact: true }).fill('2');
+  await card.getByRole('button', { name: 'Sınavı başlat' }).click();
+  await expect(card.getByRole('alert')).toContainText('Sunucuya ulaşılamıyor.');
+  await card.getByRole('button', { name: 'Yeniden dene' }).click();
+  await expect(page.getByRole('heading', { name: 'Denemen devam ediyor' })).toBeVisible();
+  expect(ids).toHaveLength(2); expect(ids[0]).toBe(ids[1]);
+  await expect(page.getByText('Soru 1 / 2', { exact: false })).toBeVisible();
 });
 
 test('telefon ve tablette sınav listeleri ve sınav ekranı taşmaz', async ({ page }) => {

@@ -1056,6 +1056,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/contexts/{context}/review-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Tekrar listelerinin soru sayıları
+         * @description Çalışma alanındaki yanlış, boş ve favori soru sayıları. Tekrar sınavı başlatmak için kullanılır (StartExamInput.review_kind).
+         */
+        get: operations["reviewSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1582,6 +1602,11 @@ export interface components {
              * @description Yayımlanmış çıkmış sınav. Soru sayısı, sırası ve sürümleri şablondan gelir; question_count/subject_id/topic_id gönderilemez.
              */
             official_exam_id?: string;
+            /**
+             * @description Tekrar sınavı: sorular öğrencinin o çalışma alanındaki yanlış, boş veya favori sorularından seçilir. official_exam_id ile birlikte gönderilemez; subject_id ile daraltılabilir. Yeterli soru yoksa 422.
+             * @enum {string}
+             */
+            review_kind?: "incorrect" | "blank" | "favorite";
         };
         SaveExamAnswerInput: {
             /** Format: uuid */
@@ -1850,6 +1875,14 @@ export interface components {
             data: components["schemas"]["SubjectExamStat"][];
             /** @description Dersin hiçbir sınavda yer almayan soru sayısı. */
             without_exam: number;
+        };
+        ReviewSummary: {
+            incorrect: number;
+            blank: number;
+            favorite: number;
+        };
+        ReviewSummaryResponse: {
+            data: components["schemas"]["ReviewSummary"];
         };
     };
     responses: {
@@ -3704,6 +3737,34 @@ export interface operations {
             };
             401: components["responses"]["Problem"];
             403: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    reviewSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewSummaryResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
             429: components["responses"]["Problem"];
         };
     };

@@ -157,7 +157,7 @@ export function Home({
         [
           {
             title: "Tekrar",
-            text: "Yanlış, boş ve favorilerin",
+            text: "Hatalarından sınav yap",
             icon: ListChecks,
             press: review,
             bg: palette.secondaryContainer,

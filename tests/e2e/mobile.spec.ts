@@ -521,7 +521,7 @@ test("mobil deneme ve ders sınavları ayrı listelenir", async ({ page }) => {
   await expect(page.getByText("1. Ders Sınavı", { exact: true })).toBeVisible();
   await expect(page.getByText("1. Deneme Sınavı", { exact: true })).toHaveCount(0);
 });
-test("mobil tekrar listeleri, favori, başarı durumu ve sınavlar gerçek API ile çalışır", async ({
+test("mobil tekrar sınavı hatalardan kurulur; başarı durumu ve sınavlar gerçek API ile çalışır", async ({
   page,
 }) => {
   const errors: string[] = [];
@@ -546,21 +546,29 @@ test("mobil tekrar listeleri, favori, başarı durumu ve sınavlar gerçek API i
 
   await page.getByRole("tab", { name: "Ana sayfa", exact: true }).click();
   await page.getByRole("button", { name: "Tekrar ekranını aç" }).click();
+  await expect(page.getByText("Tekrar sınavı", { exact: true })).toBeVisible();
+  // Review is an exam: counts per list and an exam to enter, no questions to browse.
+  await expect(page.getByText(/^1 soru · Son cevabın yanlış/)).toBeVisible();
+  await expect(page.getByText(/^2 soru · Son cevabın boş/)).toBeVisible();
+  await expect(page.getByText(/^1 soru · Sınav sonucunda/)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Soruyu çöz" })).toHaveCount(0);
+  await expect(
+    page.getByText("Sentetik birinci soru", { exact: true }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Tekrar sınavına gir" })
+    .first()
+    .click();
+  await page.getByLabel("Süre (dakika)", { exact: true }).fill("5");
+  await page.getByRole("button", { name: "Sınavı başlat" }).click();
+  await expect(
+    page.getByText("DENEMEN DEVAM EDİYOR", { exact: true }),
+  ).toBeVisible();
   await expect(
     page.getByText("Sentetik birinci soru", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Boş bıraktıklarım" }).click();
-  await expect(
-    page.getByText("Sentetik ikinci soru", { exact: true }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Favorilerim", exact: true }).click();
-  await expect(
-    page.getByText("Sentetik birinci soru", { exact: true }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Favorilerden çıkar" }).click();
-  await expect(
-    page.getByText("Henüz favori soru eklemedin.", { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByText("Soru 1 / 1", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Geri dön" }).click();
 
   await page.getByRole("tab", { name: "Ana sayfa", exact: true }).click();
   await expect(page.getByText("Doğruluk %0", { exact: true })).toBeVisible();
@@ -570,7 +578,7 @@ test("mobil tekrar listeleri, favori, başarı durumu ve sınavlar gerçek API i
   ).toBeVisible();
   await page.getByRole("button", { name: "Menüyü aç" }).click();
   await expect(
-    page.getByRole("button", { name: "Tekrar listelerim" }),
+    page.getByRole("button", { name: "Tekrar sınavı" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Başarı durumum" }).click();
 

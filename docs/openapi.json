@@ -3939,6 +3939,65 @@
           }
         }
       }
+    },
+    "/api/v1/contexts/{context}/review-summary": {
+      "get": {
+        "operationId": "reviewSummary",
+        "summary": "Tekrar listelerinin soru sayıları",
+        "description": "Çalışma alanındaki yanlış, boş ve favori soru sayıları. Tekrar sınavı başlatmak için kullanılır (StartExamInput.review_kind).",
+        "tags": [
+          "Study"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewSummaryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -5978,6 +6037,15 @@
             "type": "string",
             "format": "uuid",
             "description": "Yayımlanmış çıkmış sınav. Soru sayısı, sırası ve sürümleri şablondan gelir; question_count/subject_id/topic_id gönderilemez."
+          },
+          "review_kind": {
+            "type": "string",
+            "enum": [
+              "incorrect",
+              "blank",
+              "favorite"
+            ],
+            "description": "Tekrar sınavı: sorular öğrencinin o çalışma alanındaki yanlış, boş veya favori sorularından seçilir. official_exam_id ile birlikte gönderilemez; subject_id ile daraltılabilir. Yeterli soru yoksa 422."
           }
         },
         "required": [
@@ -7034,6 +7102,39 @@
         "required": [
           "data",
           "without_exam"
+        ]
+      },
+      "ReviewSummary": {
+        "type": "object",
+        "properties": {
+          "incorrect": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "blank": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "favorite": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "incorrect",
+          "blank",
+          "favorite"
+        ]
+      },
+      "ReviewSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ReviewSummary"
+          }
+        },
+        "required": [
+          "data"
         ]
       }
     },

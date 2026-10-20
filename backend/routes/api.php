@@ -66,6 +66,7 @@ Route::prefix('v1')->group(function () {
             Route::put('contexts/{context}/exam-attempts/{exam}/answers/{answer}', [ExamAttemptController::class, 'answer'])->whereUuid(['context', 'exam', 'answer']);
             Route::post('contexts/{context}/exam-attempts/{exam}/finish', [ExamAttemptController::class, 'finish'])->whereUuid(['context', 'exam']);
             Route::get('contexts/{context}/review-questions', [ReviewController::class, 'index'])->whereUuid('context');
+            Route::get('contexts/{context}/review-summary', [ReviewController::class, 'summary'])->whereUuid('context');
             Route::put('contexts/{context}/favorites/{question}', [ReviewController::class, 'favorite'])->whereUuid(['context', 'question']);
             Route::delete('contexts/{context}/favorites/{question}', [ReviewController::class, 'unfavorite'])->whereUuid(['context', 'question']);
             Route::get('contexts/{context}/stats', [StatsController::class, 'show'])->whereUuid('context');

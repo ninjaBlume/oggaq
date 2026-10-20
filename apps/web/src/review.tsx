@@ -1,40 +1,67 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { Question } from '@oggaq/shared-types';
-import { cursorFromLink } from '@oggaq/api-client';
+import { ApiError } from '@oggaq/api-client';
+import type { components } from '@oggaq/shared-types';
+import { randomId } from '@oggaq/study-core';
 import { api } from './api';
 import { PageIntro, useStudyContext } from './App';
-import { QuestionCard } from './study';
-import { ErrorNotice, Loading } from './ui';
+import { ErrorNotice, Field, Loading } from './ui';
 
 type Kind = 'incorrect' | 'blank' | 'favorite';
-const kinds: { id: Kind; label: string; empty: string; hint: string }[] = [
-  { id: 'incorrect', label: 'Yanlışlarım', empty: 'Şu an tekrar edeceğin yanlış soru yok.', hint: 'Son cevabın yanlış olan sorular. Doğru çözdüğün soru listeden çıkar.' },
-  { id: 'blank', label: 'Boş bıraktıklarım', empty: 'Boş bıraktığın soru yok.', hint: 'Son cevabın boş olan sorular. Çözdüğünde listeden çıkar.' },
-  { id: 'favorite', label: 'Favorilerim', empty: 'Henüz favori soru eklemedin.', hint: 'Sınav sonucunda bir soruyu favoriye ekleyebilirsin.' },
+type StartInput = components['schemas']['StartExamInput'];
+const kinds: { id: Kind; label: string; hint: string; empty: string }[] = [
+  { id: 'incorrect', label: 'Yanlışlarım', hint: 'Son cevabın yanlış olan sorular. Doğru çözdüğün soru listeden çıkar.', empty: 'Şu an tekrar edeceğin yanlış soru yok.' },
+  { id: 'blank', label: 'Boş bıraktıklarım', hint: 'Son cevabın boş olan sorular. Çözdüğünde listeden çıkar.', empty: 'Boş bıraktığın soru yok.' },
+  { id: 'favorite', label: 'Favorilerim', hint: 'Sınav sonucunda favoriye eklediğin sorular.', empty: 'Henüz favori soru eklemedin.' },
 ];
 
+// Review is an exam too: the student picks a list (wrong, blank, favorite) and sits a timed exam made of those questions.
 export function Review() {
   const context = useStudyContext();
-  const [kind, setKind] = useState<Kind>('incorrect');
-  const [cursor, setCursor] = useState<string>();
-  const current = kinds.find((item) => item.id === kind) ?? kinds[0]!;
-  const subjects = useQuery({ queryKey: ['subjects', undefined], queryFn: ({ signal }) => api.request('get', '/api/v1/subjects', { signal, query: { per_page: 100 } }) });
-  const list = useQuery({ queryKey: ['review', context.id, kind, cursor], queryFn: ({ signal }) => api.request('get', '/api/v1/contexts/{context}/review-questions', { params: { context: context.id }, query: { kind, per_page: 12, cursor }, signal }) });
+  const summary = useQuery({ queryKey: ['review', context.id, 'summary'], queryFn: ({ signal }) => api.request('get', '/api/v1/contexts/{context}/review-summary', { params: { context: context.id }, signal }) });
   return <>
-    <PageIntro eyebrow="TEKRAR ET" title="Tekrar listelerim"><p>{context.name} alanındaki cevaplarından oluşur. {current.hint}</p></PageIntro>
-    <nav className="tab-bar" aria-label="Tekrar listeleri">{kinds.map((item) => <button key={item.id} className={`tab-button${item.id === kind ? ' active' : ''}`} aria-pressed={item.id === kind} onClick={() => { setKind(item.id); setCursor(undefined); }}>{item.label}</button>)}</nav>
-    {list.isPending ? <Loading /> : list.isError ? <ErrorNotice error={list.error} retry={() => { void list.refetch(); }} /> : list.data.data.length === 0 ? <section className="card empty"><h2>{current.empty}</h2><p>Sınavlara girdikçe bu liste güncellenir.</p><Link className="button primary" to={`/study/${context.id}/deneme`}>Deneme sınavlarına git</Link></section> : <>
-      <div className="question-grid">{list.data.data.map((question) => <ReviewItem key={`${kind}-${question.id}-${question.version.id}`} question={question} kind={kind} subjectName={subjects.data?.data.find((item) => item.id === question.version.subject_id)?.name} refresh={() => { void list.refetch(); }} />)}</div>
-      <nav className="pagination" aria-label="Sayfalama"><button className="button secondary" disabled={!list.data.links.prev} onClick={() => setCursor(cursorFromLink(list.data.links.prev))}>← Önceki sayfa</button><button className="button secondary" disabled={!list.data.links.next} onClick={() => setCursor(cursorFromLink(list.data.links.next))}>Sonraki sayfa →</button></nav>
-    </>}
+    <PageIntro eyebrow="HATALARINDAN ÖĞREN" title="Tekrar sınavı"><p>{context.name} alanında yanlış yaptığın, boş bıraktığın veya favoriye eklediğin sorulardan süreli bir sınav yap. Sonuçların listeleri günceller.</p></PageIntro>
+    {summary.isPending ? <Loading /> : summary.isError ? <ErrorNotice error={summary.error} retry={() => { void summary.refetch(); }} /> : <div className="sinav-list">{kinds.map((kind) => <ReviewExam key={kind.id} kind={kind} count={summary.data.data[kind.id]} />)}</div>}
   </>;
 }
 
-function ReviewItem({ question, kind, subjectName, refresh }: { question: Question; kind: Kind; subjectName?: string; refresh: () => void }) {
+function ReviewExam({ kind, count }: { kind: (typeof kinds)[number]; count: number }) {
   const context = useStudyContext();
+  const navigate = useNavigate();
   const cache = useQueryClient();
-  const remove = useMutation({ mutationFn: () => api.request('delete', '/api/v1/contexts/{context}/favorites/{question}', { params: { context: context.id, question: question.id } }), onSuccess: () => { void cache.invalidateQueries({ queryKey: ['review', context.id] }); } });
-  return <div className="review-item"><QuestionCard question={question} subjectName={subjectName} refresh={refresh} />{kind === 'favorite' && <><button className="text-button" disabled={remove.isPending} onClick={() => remove.mutate()}>{remove.isPending ? 'Çıkarılıyor…' : '★ Favorilerden çıkar'}</button>{remove.isError && <ErrorNotice error={remove.error} retry={() => remove.mutate()} />}</>}</div>;
+  const [open, setOpen] = useState(false);
+  const [questions, setQuestions] = useState(() => Math.min(count, 20));
+  const [minutes, setMinutes] = useState(() => Math.max(5, Math.ceil(Math.min(count, 20) * 1.2)));
+  const submission = useRef<StartInput | null>(null);
+  const start = useMutation({
+    mutationFn: (body: StartInput) => api.request('post', '/api/v1/contexts/{context}/exam-attempts', { params: { context: context.id }, body }),
+    onSuccess: (response) => {
+      cache.setQueryData(['exam', context.id, response.data.id], response);
+      void cache.invalidateQueries({ queryKey: ['exams', context.id] });
+      navigate(`/study/${context.id}/exams/${response.data.id}`);
+    },
+    // A rejected start (409/422) is not a lost response: the next try is a new attempt id.
+    onError: (error) => { if (error instanceof ApiError && [409, 422].includes(error.status)) submission.current = null; },
+  });
+  function begin() {
+    submission.current ??= { id: randomId(), review_kind: kind.id, question_count: questions, duration_seconds: Math.round(minutes) * 60 };
+    start.mutate(submission.current);
+  }
+  const locked = start.isPending || submission.current !== null;
+  return <article className="card sinav-row">
+    <div className="sinav-main">
+      <h2>{kind.label}</h2>
+      <p>{count === 0 ? kind.empty : `${count} soru · ${kind.hint}`}</p>
+    </div>
+    <div className="sinav-action"><button type="button" className="button primary" disabled={count === 0} aria-expanded={open} onClick={() => setOpen(!open)}>Tekrar sınavına gir</button></div>
+    {open && count > 0 && <form className="start-panel" onSubmit={(event) => { event.preventDefault(); begin(); }}>
+      <fieldset disabled={locked}>
+        <Field label="Soru sayısı" hint={`En çok ${Math.min(count, 100)} soru.`}>{(props) => <input {...props} type="number" min={1} max={Math.min(count, 100)} required value={questions} onChange={(event) => { const next = Number(event.target.value); setQuestions(next); setMinutes(Math.max(5, Math.ceil(next * 1.2))); }} />}</Field>
+        <Field label="Süre (dakika)" hint="Soru başına 1,2 dakika önerilir.">{(props) => <input {...props} type="number" min={1} max={180} required value={minutes} onChange={(event) => setMinutes(Number(event.target.value))} />}</Field>
+        <div className="actions"><button className="button primary" type="submit">{start.isPending ? 'Sınav hazırlanıyor…' : 'Sınavı başlat'}</button><button className="button secondary" type="button" onClick={() => setOpen(false)}>Vazgeç</button></div>
+      </fieldset>
+      {start.isError && <ErrorNotice error={start.error} retry={() => begin()} />}
+    </form>}
+  </article>;
 }

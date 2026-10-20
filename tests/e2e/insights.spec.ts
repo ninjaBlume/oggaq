@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { answer, enterDers, finish, fixture, login, openFromReview } from "./student";
+import { answer, enterDers, enterReview, finish, fixture, login } from "./student";
 
 test.use({ baseURL: "http://127.0.0.1:5183" });
 test.beforeEach(() => { fixture("setup-study"); fixture("official-exam"); fixture("subject-exam"); });
@@ -32,21 +32,23 @@ test("yanlışlar, boşlar, favoriler ve başarı durumu son sonuca göre günce
   await expect(page.getByRole("button", { name: "★ Favorilerde" })).toBeVisible();
 
   await page.getByRole("link", { name: "Tekrar", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Tekrar listelerim" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Sentetik birinci soru", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Sentetik ikinci soru", exact: true })).toHaveCount(0);
-  await page.getByRole("button", { name: "Boş bıraktıklarım" }).click();
-  await expect(page.getByRole("heading", { name: "Sentetik ikinci soru", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Favorilerim" }).click();
-  await expect(page.getByRole("heading", { name: "Sentetik birinci soru", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "★ Favorilerden çıkar" }).click();
-  await expect(page.getByRole("heading", { name: "Henüz favori soru eklemedin." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Tekrar sınavı" })).toBeVisible();
+  const list = (name: string) => page.locator(".sinav-row").filter({ has: page.getByRole("heading", { name, exact: true }) });
+  await expect(list("Yanlışlarım")).toContainText("1 soru");
+  await expect(list("Boş bıraktıklarım")).toContainText("1 soru");
+  await expect(list("Favorilerim")).toContainText("1 soru");
+  // The favorite list yields an exam with exactly the favorite question.
+  await enterReview(page, "Favorilerim");
+  await expect(page.getByRole("heading", { name: "Sentetik birinci soru" })).toBeVisible();
+  await expect(page.getByText("Soru 1 / 1", { exact: false })).toBeVisible();
+  await page.getByRole("link", { name: "Tekrar", exact: true }).click();
+  await expect(list("Favorilerim")).toContainText("1 soru");
 
   // Timestamps have second precision; the corrected answer must be the latest one.
   await page.waitForTimeout(1100);
   await solveDers(page, "A");
   await page.getByRole("link", { name: "Tekrar", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Şu an tekrar edeceğin yanlış soru yok." })).toBeVisible();
+  await expect(page.getByText("Şu an tekrar edeceğin yanlış soru yok.")).toBeVisible();
 
   await page.getByRole("link", { name: "Başarım", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Başarı durumum" })).toBeVisible();
@@ -56,8 +58,7 @@ test("yanlışlar, boşlar, favoriler ve başarı durumu son sonuca göre günce
   expect(errors).toEqual([]);
 });
 
-test("soru dersi ve sınavları ayrı gösterir; tekrar sorusu hangi sınavlarda olduğunu söyler", async ({ page }) => {
-  fixture("favorite");
+test("deneme ve ders sınavları ayrı listelenir", async ({ page }) => {
   await login(page);
   // The Deneme list has the whole exam only, the Ders list has the subject exam only.
   await expect(page.locator(".sinav-row")).toHaveCount(1);
@@ -65,10 +66,6 @@ test("soru dersi ve sınavları ayrı gösterir; tekrar sorusu hangi sınavlarda
   await page.getByRole("link", { name: "Ders sınavları", exact: true }).click();
   await expect(page.locator(".sinav-row")).toHaveCount(1);
   await expect(page.locator(".sinav-row")).toContainText("1. Ders Sınavı");
-  await openFromReview(page, "Sentetik üçüncü soru");
-  await expect(page.locator(".question-meta")).toContainText("Ders: Sentetik çalışma dersi");
-  await expect(page.getByLabel("Çıkmış sınavlar")).toContainText("1. Deneme · silahlı");
-  await expect(page.getByLabel("Çıkmış sınavlar")).toContainText("1. Ders · Sentetik çalışma dersi");
 });
 
 test("kişisel ve kurum alanlarının tekrar listeleri ayrıdır", async ({ page }) => {
@@ -76,7 +73,7 @@ test("kişisel ve kurum alanlarının tekrar listeleri ayrıdır", async ({ page
   await solveDers(page, "B");
   await page.getByLabel("Çalışma alanı", { exact: true }).selectOption({ label: "Sentetik eğitim kurumu" });
   await page.getByRole("link", { name: "Tekrar", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Şu an tekrar edeceğin yanlış soru yok." })).toBeVisible();
+  await expect(page.getByText("Şu an tekrar edeceğin yanlış soru yok.")).toBeVisible();
   await page.getByRole("link", { name: "Başarım", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Henüz istatistik yok" })).toBeVisible();
 });

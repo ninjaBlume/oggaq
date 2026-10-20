@@ -2,14 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
 import * as Crypto from "expo-crypto";
 import { ApiError, cursorFromLink } from "@oggaq/api-client";
-import type { ExamAttempt, StudyContext, components } from "@oggaq/shared-types";
+import type { ExamAttempt, Page, StudyContext, components } from "@oggaq/shared-types";
 import { suggestedMinutes } from "@oggaq/study-core";
 import { api } from "./api";
 import { useOnReturn, useResource, useTask } from "./hooks";
 import { Badge, Button, Card, EmptyState, ErrorNotice, Field, Loading, ScreenTitle, styles } from "./ui";
 import { ChoiceGroup } from "./expressive";
 import { Clock3 } from "./icons";
-import { Pagination } from "./study";
 
 type OfficialExam = components["schemas"]["OfficialExam"];
 type Summary = components["schemas"]["ExamSummary"];
@@ -278,5 +277,33 @@ export function Results({ context, openExam }: { context: StudyContext; openExam
       )}
       {exams.data && <Pagination page={exams.data} change={setCursor} />}
     </>
+  );
+}
+
+export function Pagination({
+  page,
+  change,
+}: {
+  page: Page<unknown>;
+  change: (cursor: string | undefined) => void;
+}) {
+  if (!page.links.prev && !page.links.next) return null;
+  return (
+    <View style={styles.row}>
+      <Button
+        secondary
+        disabled={!page.links.prev}
+        onPress={() => change(cursorFromLink(page.links.prev))}
+      >
+        Önceki sayfa
+      </Button>
+      <Button
+        secondary
+        disabled={!page.links.next}
+        onPress={() => change(cursorFromLink(page.links.next))}
+      >
+        Sonraki sayfa
+      </Button>
+    </View>
   );
 }

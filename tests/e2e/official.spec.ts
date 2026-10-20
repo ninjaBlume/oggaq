@@ -126,8 +126,7 @@ test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal s�
   await student.getByRole("button", { name: "☆ Favoriye ekle" }).first().click();
   await expect(student.getByRole("button", { name: "★ Favorilerde" })).toBeVisible();
   await student.getByRole("link", { name: "Tekrar", exact: true }).click();
-  await student.getByRole("button", { name: "Favorilerim" }).click();
-  await expect(student.locator(".question-card")).toHaveCount(1);
+  await expect(student.locator(".sinav-row").filter({ hasText: "Favorilerim" })).toContainText("1 soru");
   await student.getByRole("link", { name: "Sonuçlarım", exact: true }).click();
   await expect(student.getByRole("heading", { name: title })).toBeVisible();
   expect(errors).toEqual([]);

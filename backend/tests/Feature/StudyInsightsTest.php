@@ -73,6 +73,60 @@ class StudyInsightsTest extends TestCase
         $this->review('blank')->assertOk()->assertJsonCount(0, 'data');
     }
 
+    private function startReviewExam(string $kind, int $count, ?string $context = null, array $extra = [])
+    {
+        $context ??= $this->context();
+
+        return $this->postJson('/api/v1/contexts/'.$context.'/exam-attempts', array_merge(['id' => (string) Str::uuid(), 'review_kind' => $kind, 'question_count' => $count, 'duration_seconds' => 600], $extra));
+    }
+
+    public function test_review_summary_counts_each_list_and_a_review_exam_draws_only_from_its_list(): void
+    {
+        [$a, $b, $c] = $this->pool();
+        $this->asToken($this->createUser());
+        $this->getJson('/api/v1/contexts/'.$this->context().'/review-summary')->assertOk()->assertExactJson(['data' => ['incorrect' => 0, 'blank' => 0, 'favorite' => 0]]);
+        $this->practice($a, 1);
+        $this->practice($b, null);
+        $this->practice($c, 1);
+        $this->putJson('/api/v1/contexts/'.$this->context().'/favorites/'.$c->id)->assertOk();
+        $this->getJson('/api/v1/contexts/'.$this->context().'/review-summary')->assertOk()->assertExactJson(['data' => ['incorrect' => 2, 'blank' => 1, 'favorite' => 1]]);
+
+        $wrong = $this->startReviewExam('incorrect', 2)->assertOk()->json('data');
+        $this->assertEqualsCanonicalizing([$a->id, $c->id], array_column($wrong['questions'], 'question_id'));
+        $this->assertNull($wrong['official_exam']);
+        $blank = $this->startReviewExam('blank', 1)->assertOk()->json('data');
+        $this->assertSame([$b->id], array_column($blank['questions'], 'question_id'));
+        $favorite = $this->startReviewExam('favorite', 1)->assertOk()->json('data');
+        $this->assertSame([$c->id], array_column($favorite['questions'], 'question_id'));
+        // A subject filter narrows the review list too.
+        $this->startReviewExam('incorrect', 1, null, ['subject_id' => $this->second->id])->assertOk()->assertJsonPath('data.questions.0.question_id', $c->id);
+    }
+
+    public function test_review_exam_needs_enough_questions_and_cannot_mix_with_a_past_exam_or_unknown_kinds(): void
+    {
+        [$a] = $this->pool();
+        $this->asToken($this->createUser());
+        $this->practice($a, 1);
+        $this->startReviewExam('incorrect', 2)->assertUnprocessable()->assertJsonValidationErrors('question_count');
+        $this->startReviewExam('blank', 1)->assertUnprocessable();
+        $this->startReviewExam('everything', 1)->assertUnprocessable()->assertJsonValidationErrors('review_kind');
+        $this->postJson('/api/v1/contexts/'.$this->context().'/exam-attempts', ['id' => (string) Str::uuid(), 'review_kind' => 'incorrect', 'official_exam_id' => (string) Str::uuid(), 'duration_seconds' => 600])->assertUnprocessable();
+        $this->assertDatabaseCount('exam_attempts', 0);
+    }
+
+    public function test_review_lists_of_another_context_are_not_visible_in_the_summary_or_a_review_exam(): void
+    {
+        [$a] = $this->pool();
+        $this->asToken($this->createUser());
+        $personal = $this->context();
+        $this->practice($a, 1, $personal);
+        $other = $this->createUser();
+        $this->asToken($other);
+        $this->getJson('/api/v1/contexts/'.$this->context().'/review-summary')->assertOk()->assertJsonPath('data.incorrect', 0);
+        $this->startReviewExam('incorrect', 1)->assertUnprocessable();
+        $this->getJson('/api/v1/contexts/'.$personal.'/review-summary')->assertNotFound();
+    }
+
     public function test_exam_answers_feed_review_lists_only_after_the_exam_is_finished(): void
     {
         $this->pool();
