@@ -160,9 +160,9 @@ test("ders sınavı dersine göre bulunur ve çözülür; çalışma alanı değ
     .getByRole("button", { name: "Sentetik çalışma dersi dersini aç" })
     .click();
   await expect(page.getByText("Ders sınavları", { exact: true })).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Sentetik çalışma dersi dersi sınavları" }),
-  ).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("button", { name: "Ders seçimi" })).toContainText(
+    "Sentetik çalışma dersi",
+  );
   await expect(page.getByText("1. Ders Sınavı", { exact: true })).toBeVisible();
   await expect(page.getByText(/3 soru · önerilen süre 5 dk/)).toBeVisible();
   await page.getByRole("button", { name: "Sınava gir", exact: true }).click();
@@ -186,6 +186,39 @@ test("ders sınavı dersine göre bulunur ve çözülür; çalışma alanı değ
   await expect(
     page.getByRole("button", { name: "Sınava dön" }),
   ).not.toBeVisible();
+});
+test("ders sınavlarında çok sayıda uzun ders adı okunur kalır: ders listeden seçilir", async ({
+  page,
+}) => {
+  fixture("more-subject-exams");
+  await login(page);
+  for (const width of [320, 390, 834]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.getByRole("tab", { name: "Ders", exact: true }).click();
+    const picker = page.getByRole("button", { name: "Ders seçimi" });
+    await expect(picker).toBeVisible();
+    // One tidy row, not eleven names squeezed side by side.
+    const box = (await picker.boundingBox())!;
+    expect(box.height).toBeLessThan(90);
+    expect(box.x + box.width).toBeLessThanOrEqual(width);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await picker.click();
+    const sheet = page.getByRole("button", {
+      name: "Sentetik Yangın güvenliği ve tabii felaketlerde müdahale tarzı",
+      exact: true,
+    });
+    await sheet.scrollIntoViewIfNeeded();
+    await expect(sheet).toBeInViewport();
+    expect((await sheet.boundingBox())!.width).toBeGreaterThan(width / 2);
+    await screenshot(page, `ders-picker-${width}`);
+    await sheet.click();
+    await expect(picker).toContainText("Sentetik Yangın güvenliği");
+    await expect(page.getByText("1. Ders Sınavı", { exact: true })).toBeVisible();
+  }
 });
 test("mobil gezinme küçük telefon ve tablette içerikten bağımsız görünür kalır", async ({
   page,

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
-import * as Crypto from "expo-crypto";
+import { newId } from "./ids";
 import { ApiError } from "@oggaq/api-client";
 import { Trophy } from "./icons";
 import type { ExamAttempt, StudyContext, components } from "@oggaq/shared-types";
@@ -112,7 +112,7 @@ function ReviewExam({
   const task = useTask<{ data: ExamAttempt }>();
   function begin() {
     submission.current ??= {
-      id: Crypto.randomUUID(),
+      id: newId(),
       review_kind: kind.id,
       question_count: Number(questions),
       duration_seconds: Math.round(Number(minutes)) * 60,

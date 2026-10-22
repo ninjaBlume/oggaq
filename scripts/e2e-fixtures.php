@@ -32,7 +32,7 @@ if (config('database.default') !== 'pgsql' || config('database.connections.pgsql
     throw new RuntimeException('Browser fixtures require the isolated oggaq_test PostgreSQL database.');
 }
 $operation = $argv[1] ?? '';
-if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'official-exam', 'subject-exam', 'favorite', 'cleanup'], true)) {
+if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'official-exam', 'subject-exam', 'more-subject-exams', 'favorite', 'cleanup'], true)) {
     throw new InvalidArgumentException('Expected setup or cleanup.');
 }
 if (in_array($operation, ['verification-link', 'reset-link'], true)) {
@@ -86,6 +86,20 @@ if ($operation === 'subject-exam') {
     ]);
     app(PublishOfficialExam::class)->execute($admin, $exam);
     echo $exam->id;
+    exit;
+}
+if ($operation === 'more-subject-exams') {
+    // Ten more subjects with long names (as in the real catalog), each with a published Ders Sınavı over the same questions.
+    $admin = User::where('email', 'e2e-admin@example.test')->firstOrFail();
+    $versions = Question::whereHas('latestVersion', fn ($version) => $version->where('stem', 'like', 'Sentetik % soru'))->orderBy('id')->pluck('published_version_id')->all();
+    foreach (['Özel güvenlik hukuku ve kişi hakları', 'Güvenlik tedbirleri', 'Güvenlik sistem ve cihazları', 'Temel ilk yardım', 'Genel kollukla ilişkiler', 'Yangın güvenliği ve tabii felaketlerde müdahale tarzı', 'Etkili iletişim', 'Kalabalık yönetimi', 'Kişi koruma', 'Uyuşturucu madde bilgileri'] as $index => $name) {
+        $subject = Subject::create(['name' => 'Sentetik '.$name, 'code' => 'synthetic-more-'.$index]);
+        $exam = app(SaveOfficialExam::class)->execute($admin, [
+            'exam_type_id' => ExamType::where('code', 'synthetic-subject')->firstOrFail()->id, 'subject_id' => $subject->id, 'title' => 'Sentetik ders sınavı '.$name, 'year' => 2023,
+            'term' => '1. dönem', 'exam_number' => '1', 'question_version_ids' => $versions,
+        ]);
+        app(PublishOfficialExam::class)->execute($admin, $exam);
+    }
     exit;
 }
 if ($operation === 'favorite') {

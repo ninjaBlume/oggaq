@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { Text, View } from "react-native";
-import * as Crypto from "expo-crypto";
+import { Pressable, Text, View } from "react-native";
+import { newId } from "./ids";
 import { ApiError, cursorFromLink } from "@oggaq/api-client";
 import type { ExamAttempt, Page, StudyContext, components } from "@oggaq/shared-types";
 import { suggestedMinutes } from "@oggaq/study-core";
 import { api } from "./api";
 import { useOnReturn, useResource, useTask } from "./hooks";
-import { Badge, Button, Card, EmptyState, ErrorNotice, Field, Loading, ScreenTitle, styles } from "./ui";
+import { Badge, Button, Card, EmptyState, ErrorNotice, Field, Loading, ScreenTitle, Sheet, palette, styles } from "./ui";
 import { ChoiceGroup } from "./expressive";
-import { Clock3 } from "./icons";
+import { BookOpen, ChevronDown, Clock3 } from "./icons";
 
 type OfficialExam = components["schemas"]["OfficialExam"];
 type Summary = components["schemas"]["ExamSummary"];
@@ -62,7 +62,7 @@ function ExamEntry({
   const expired = progress.open && Date.parse(progress.open.deadline_at) <= Date.parse(progress.open.server_time);
   function begin() {
     submission.current ??= {
-      id: Crypto.randomUUID(),
+      id: newId(),
       official_exam_id: exam.id,
       duration_seconds: Math.round(Number(minutes)) * 60,
     };
@@ -144,6 +144,7 @@ export function ExamList({
 }) {
   const [weapon, setWeapon] = useState<"armed" | "unarmed">("armed");
   const [subject, setSubject] = useState<string | undefined>(initialSubject);
+  const [picking, setPicking] = useState(false);
   const exams = useResource(
     (signal) => collect((cursor) => api.request("get", "/api/v1/official-exams", { signal, query: { per_page: 100, cursor } })),
     [],
@@ -194,11 +195,44 @@ export function ExamList({
         />
       )}
       {kind === "ders" && withExams.length > 0 && (
-        <ChoiceGroup
-          choices={withExams.map((item) => ({ value: item.id, label: item.name, accessibilityLabel: `${item.name} dersi sınavları` }))}
-          value={selected?.id ?? ""}
-          onChange={setSubject}
-        />
+        <>
+          {/* Eleven long subject names do not fit a one-row segmented control: the subject is picked from a list. */}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Ders seçimi"
+            onPress={() => setPicking(true)}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 10,
+              backgroundColor: palette.white,
+              padding: 15,
+              borderRadius: 16,
+              borderWidth: 1,
+              borderColor: palette.primary,
+            }}
+          >
+            <BookOpen size={18} color={palette.primary} />
+            <Text style={{ flex: 1, fontSize: 13, fontWeight: "700", color: palette.ink }}>
+              {selected?.name}
+            </Text>
+            <ChevronDown size={16} color={palette.muted} />
+          </Pressable>
+          <Sheet visible={picking} title="Hangi dersin sınavları?" close={() => setPicking(false)}>
+            {withExams.map((item) => (
+              <Button
+                key={item.id}
+                secondary={item.id !== selected?.id}
+                onPress={() => {
+                  setSubject(item.id);
+                  setPicking(false);
+                }}
+              >
+                {item.name}
+              </Button>
+            ))}
+          </Sheet>
+        </>
       )}
       {loading ? (
         <Loading />

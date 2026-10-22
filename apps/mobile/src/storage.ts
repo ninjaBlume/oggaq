@@ -1,6 +1,6 @@
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
-import * as Crypto from "expo-crypto";
+import { newId } from "./ids";
 import { SessionStore } from "./session";
 // Expo web is a disposable preview. Tokens never enter browser localStorage.
 let previewSession: string | null = null;
@@ -23,10 +23,10 @@ export const session = new SessionStore({
 });
 let previewDevice: string | null = null;
 export async function deviceId(): Promise<string> {
-  if (Platform.OS === "web") return (previewDevice ??= Crypto.randomUUID());
+  if (Platform.OS === "web") return (previewDevice ??= newId());
   const existing = await SecureStore.getItemAsync("oggaq.device");
   if (existing) return existing;
-  const id = Crypto.randomUUID();
+  const id = newId();
   await SecureStore.setItemAsync("oggaq.device", id);
   return id;
 }
@@ -36,7 +36,7 @@ export async function verifyPreviewStorage(): Promise<void> {
   if (Platform.OS === "web" || process.env.EXPO_PUBLIC_LOCAL_PREVIEW !== "1")
     return;
   const key = "oggaq.preview-probe";
-  const value = Crypto.randomUUID();
+  const value = newId();
   try {
     await SecureStore.setItemAsync(key, value);
     if ((await SecureStore.getItemAsync(key)) !== value)
