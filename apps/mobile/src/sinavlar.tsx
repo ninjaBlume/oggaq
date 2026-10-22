@@ -223,6 +223,7 @@ export function ExamList({
               <Button
                 key={item.id}
                 secondary={item.id !== selected?.id}
+                alignStart
                 onPress={() => {
                   setSubject(item.id);
                   setPicking(false);

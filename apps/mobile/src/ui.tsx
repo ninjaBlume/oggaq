@@ -162,6 +162,7 @@ export function Button({
   secondary = false,
   icon: Icon,
   danger = false,
+  alignStart = false,
 }: {
   children: string;
   onPress: () => void;
@@ -169,6 +170,7 @@ export function Button({
   secondary?: boolean;
   icon?: LucideIcon;
   danger?: boolean;
+  alignStart?: boolean;
 }) {
   const color = danger
     ? palette.red
@@ -186,6 +188,7 @@ export function Button({
         styles.button,
         secondary && styles.secondary,
         danger && { backgroundColor: palette.softRed },
+        alignStart && { justifyContent: "flex-start" },
         disabled && styles.disabled,
       ]}
     >
