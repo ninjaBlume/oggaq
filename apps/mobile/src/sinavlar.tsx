@@ -301,11 +301,11 @@ export function Results({ context, openExam }: { context: StudyContext; openExam
             <Text style={styles.muted}>{new Date(e.started_at).toLocaleDateString("tr-TR")} · {e.duration_seconds / 60} dakika</Text>
             <View style={{ alignSelf: "flex-start" }}>
               <Badge tone={e.status === "completed" ? "success" : "primary"}>
-                {e.status === "active" ? "Devam ediyor" : e.result ? `%${e.result.score_percent} doğru` : "Sonuç bekleniyor"}
+                {e.status === "active" ? (Date.parse(e.deadline_at) > Date.parse(e.server_time) ? "Devam ediyor" : "Süresi doldu") : e.result ? `%${e.result.score_percent} doğru` : "Sonuç bekleniyor"}
               </Badge>
             </View>
             <Button secondary onPress={() => openExam(e.id)}>
-              {e.status === "active" ? "Sınava dön" : "Sonucu incele"}
+              {e.status === "active" && Date.parse(e.deadline_at) > Date.parse(e.server_time) ? "Sınava dön" : "Sonucu incele"}
             </Button>
           </Card>
         ))

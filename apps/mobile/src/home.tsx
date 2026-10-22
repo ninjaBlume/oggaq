@@ -80,7 +80,7 @@ export function Home({
   useOnReturn(() => {
     void recentExams.reload();
   });
-  const activeExam = recentExams.data?.data.find((e) => e.status === "active");
+  const activeExam = recentExams.data?.data.find((e) => e.status === "active" && Date.parse(e.deadline_at) > Date.parse(e.server_time));
   return (
     <>
       <ScreenTitle
@@ -317,7 +317,7 @@ export function Home({
             badge={
               <Badge tone={e.status === "completed" ? "success" : "primary"}>
                 {e.status === "active"
-                  ? "Devam ediyor"
+                  ? Date.parse(e.deadline_at) > Date.parse(e.server_time) ? "Devam ediyor" : "Süresi doldu"
                   : e.result
                     ? `%${e.result.score_percent} doğru`
                     : "Sonuç bekleniyor"}
