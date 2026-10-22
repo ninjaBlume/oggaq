@@ -816,7 +816,7 @@ small {
   .site-header {
     height:auto;
     flex-wrap:wrap;
-    padding:17px 20px 0;
+    padding:17px 14px 0;
     gap:14px
   }
   .site-header .brand {
@@ -834,7 +834,7 @@ small {
     padding:12px 0
   }
   .context-inner {
-    padding:13px 20px;
+    padding:13px 14px;
     gap:0
   }
   .context-inner>span {
@@ -848,7 +848,7 @@ small {
     width:190px
   }
   .content {
-    padding:32px 20px 45px
+    padding:28px 14px 45px
   }
   .page-intro {
     margin-bottom:24px

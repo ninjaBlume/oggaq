@@ -246,7 +246,7 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
       </Sheet>
       <View
         style={{
-          paddingHorizontal: 24,
+          paddingHorizontal: 14,
           paddingTop: 6,
           paddingBottom: 14,
           gap: 12,
@@ -558,7 +558,7 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
       </ScrollView>
       <View
         style={{
-          paddingHorizontal: 24,
+          paddingHorizontal: 14,
           paddingTop: 12,
           paddingBottom: Math.max(insets.bottom, 14),
           backgroundColor: palette.white,

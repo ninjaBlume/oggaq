@@ -38,7 +38,7 @@ export const styles = StyleSheet.create({
     width: "100%",
     maxWidth: 680,
     alignSelf: "center",
-    padding: 24,
+    padding: 14,
     gap: 20,
     paddingBottom: 32,
   },
@@ -132,7 +132,7 @@ export const styles = StyleSheet.create({
     borderColor: palette.success,
   },
   header: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 14,
     paddingVertical: 14,
     backgroundColor: palette.paper,
     gap: 12,
@@ -533,7 +533,7 @@ export function Sheet({
               marginTop: 12,
             }}
           />
-          <View style={{ paddingHorizontal: 24, paddingTop: 10 }}>
+          <View style={{ paddingHorizontal: 14, paddingTop: 10 }}>
             <View style={styles.between}>
               <Text style={styles.heading}>{title}</Text>
               <IconButton icon={X} label="Kapat" onPress={close} />
@@ -541,7 +541,7 @@ export function Sheet({
           </View>
           <ScrollView
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ padding: 24, paddingTop: 12, gap: 12 }}
+            contentContainerStyle={{ padding: 14, paddingTop: 12, gap: 12 }}
           >
             {children}
           </ScrollView>

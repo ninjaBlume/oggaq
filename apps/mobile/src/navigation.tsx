@@ -392,7 +392,7 @@ const navStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: 14,
     paddingVertical: 10,
   },
   headerButton: {
