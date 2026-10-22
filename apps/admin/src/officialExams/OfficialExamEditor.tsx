@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ApiError, cursorFromLink } from '@oggaq/api-client';
 import type { Catalogs, components } from '@oggaq/shared-types';
 import { api, loadCatalogs } from '../api';
 import { ErrorNotice, Field, Icon, Loading, Modal, dateLabel, useNotify } from '../ui';
 import { ExamQuestionCard } from './ExamQuestionCard';
+import { NewQuestionCard } from './NewQuestionCard';
+import type { NewEntry } from './NewQuestionCard';
 
 type OfficialExam = components['schemas']['AdminOfficialExam'];
 type Entry = { questionId: string; versionId: string; stem: string; published: boolean; latestPublished: string | null };
@@ -33,19 +35,27 @@ export function OfficialExamPage() {
   const exam = useQuery({ queryKey: ['official-exam', examId], enabled: !!examId, queryFn: ({ signal }) => api.request('get', '/api/v1/admin/official-exams/{officialExam}', { params: { officialExam: examId! }, signal }) });
   if (catalogs.isPending || (examId && exam.isPending)) return <Loading text="Editör hazırlanıyor…" />;
   if (catalogs.isError) return <ErrorNotice error={catalogs.error} retry={() => { void catalogs.refetch(); }} />;
-  if (examId && exam.isError) return <><Link className="back-link" to="/official-exams"><Icon name="back" size={16} />Çıkmış sınavlar</Link><ErrorNotice error={exam.error} retry={() => { void exam.refetch(); }} /></>;
+  if (examId && exam.isError) return <><Link className="back-link" to="/deneme-sinavlari"><Icon name="back" size={16} />Deneme sınavları</Link><ErrorNotice error={exam.error} retry={() => { void exam.refetch(); }} /></>;
   return <OfficialExamEditor key={examId ?? 'new'} exam={exam.data?.data} catalogs={catalogs.data} />;
 }
 
 function OfficialExamEditor({ exam, catalogs }: { exam?: OfficialExam; catalogs: Catalogs }) {
+  const [params] = useSearchParams();
   const [snapshot, setSnapshot] = useState(exam);
-  const [form, setForm] = useState(() => toForm(exam));
+  // A new exam opens as a Deneme or Ders Sınavı (?tur=deneme|ders&ders=<subject>): the matching exam type and subject are preselected.
+  const [form, setForm] = useState(() => {
+    if (exam) return toForm(exam);
+    const wanted = params.get('tur') === 'ders' ? /^ders/i : /^deneme/i;
+    return { ...emptyForm, exam_type_id: catalogs['exam-types'].find((type) => wanted.test(type.name))?.id ?? '', subject_id: params.get('tur') === 'ders' ? params.get('ders') ?? '' : '' };
+  });
   const [picker, setPicker] = useState(false);
+  const [writing, setWriting] = useState(false);
   const [confirmPublish, setConfirmPublish] = useState(false);
   const cache = useQueryClient();
   const navigate = useNavigate();
   const notify = useNotify();
   const published = snapshot?.status === 'published';
+  const isSubjectExam = snapshot ? !!snapshot.subject : form.subject_id !== '' || params.get('tur') === 'ders';
   function accept(record: OfficialExam) {
     setSnapshot(record); setForm(toForm(record));
     cache.setQueryData(['official-exam', record.id], { data: record });
@@ -61,10 +71,13 @@ function OfficialExamEditor({ exam, catalogs }: { exam?: OfficialExam; catalogs:
       return row ? { ...entry, versionId: row.question.id, stem: row.question.stem, published: row.question.published_at !== null, latestPublished: row.published_version_id } : entry;
     }) }));
   }
-  const save = useMutation({ mutationFn: async () => snapshot
-    ? (await api.request('put', '/api/v1/admin/official-exams/{officialExam}', { params: { officialExam: snapshot.id }, body: toInput(form) })).data
-    : (await api.request('post', '/api/v1/admin/official-exams', { body: toInput(form) })).data,
-  onSuccess: (record) => { accept(record); notify(snapshot ? 'Taslak güncellendi.' : 'Çıkmış sınav taslağı oluşturuldu.'); if (!snapshot) void navigate(`/official-exams/${record.id}`, { replace: true }); } });
+  const save = useMutation({ mutationFn: async (entries?: Entry[]) => {
+    const body = toInput(entries ? { ...form, entries } : form);
+    return snapshot
+      ? (await api.request('put', '/api/v1/admin/official-exams/{officialExam}', { params: { officialExam: snapshot.id }, body })).data
+      : (await api.request('post', '/api/v1/admin/official-exams', { body })).data;
+  },
+  onSuccess: (record) => { accept(record); notify(snapshot ? 'Taslak güncellendi.' : 'Sınav taslağı oluşturuldu.'); if (!snapshot) void navigate(`/official-exams/${record.id}`, { replace: true }); } });
   const publish = useMutation({ mutationFn: async () => (await api.request('post', '/api/v1/admin/official-exams/{officialExam}/publish', { params: { officialExam: snapshot!.id } })).data,
     onSuccess: (record) => { accept(record); setConfirmPublish(false); notify('Çıkmış sınav yayımlandı.'); }, onError: () => setConfirmPublish(false) });
   const busy = save.isPending || publish.isPending;
@@ -93,10 +106,17 @@ function OfficialExamEditor({ exam, catalogs }: { exam?: OfficialExam; catalogs:
     target.classList.remove('flash'); void target.offsetWidth; target.classList.add('flash');
     window.setTimeout(() => target.classList.remove('flash'), 1800);
   }
-  function submit(event: FormEvent) { event.preventDefault(); if (!busy && complete) { publish.reset(); save.mutate(); } }
+  // A question written inside a saved draft exam is added and the draft is saved at once, so it shows up as a card.
+  function added(entry: NewEntry) {
+    const next = [...form.entries, { ...entry, published: true, latestPublished: entry.versionId }].slice(0, 200);
+    patch('entries', next);
+    setWriting(false);
+    if (snapshot) save.mutate(next);
+  }
+  function submit(event: FormEvent) { event.preventDefault(); if (!busy && complete) { publish.reset(); save.mutate(undefined); } }
 
-  return <><Link className="back-link" to="/official-exams"><Icon name="back" size={16} />Sınavlara dön</Link>
-    <header className="page-heading editor-heading"><div><span className="eyebrow">SINAV</span><h1>{snapshot ? snapshot.title : 'Yeni sınav'}</h1><p className="muted">{published ? `Yayımlandı: ${dateLabel(snapshot?.published_at)}. Künye, sıra ve soru listesi sabittir; soruları aşağıda düzenleyebilirsiniz.` : 'Soru sırası orijinal sınav sırasıdır. Kaydetmek sınavı öğrencilere açmaz.'}</p></div>{snapshot && <span className={`badge ${published ? 'green' : 'amber'}`}><span />{published ? 'Yayında' : 'Taslak'}</span>}</header>
+  return <><Link className="back-link" to={isSubjectExam ? '/ders-sinavlari' : '/deneme-sinavlari'}><Icon name="back" size={16} />{isSubjectExam ? 'Ders sınavlarına dön' : 'Deneme sınavlarına dön'}</Link>
+    <header className="page-heading editor-heading"><div><span className="eyebrow">{isSubjectExam ? 'DERS SINAVI' : 'DENEME SINAVI'}</span><h1>{snapshot ? snapshot.title : isSubjectExam ? 'Yeni ders sınavı' : 'Yeni deneme sınavı'}</h1><p className="muted">{published ? `Yayımlandı: ${dateLabel(snapshot?.published_at)}. Künye, sıra ve soru listesi sabittir; soruları aşağıda düzenleyebilirsiniz.` : 'Soru sırası orijinal sınav sırasıdır. Kaydetmek sınavı öğrencilere açmaz.'}</p></div>{snapshot && <span className={`badge ${published ? 'green' : 'amber'}`}><span />{published ? 'Yayında' : 'Taslak'}</span>}</header>
     {mutationError && <ErrorNotice error={mutationError} />}
     <form onSubmit={submit} className="editor-layout"><fieldset className="editor-main" disabled={busy || published}>
       <details className="card editor-card info-card" open={!published}><summary className="section-title"><span className="step-number">1</span><div><h2>Sınav bilgileri</h2><p className="muted small-text">{published ? 'Yayımlanmış künye değiştirilemez; görmek için açın.' : 'Sınav türü, yıl, dönem ve numara birlikte tekil olmalıdır.'}</p></div></summary><div className="form-grid">
@@ -123,7 +143,7 @@ function OfficialExamEditor({ exam, catalogs }: { exam?: OfficialExam; catalogs:
         if (!row) return <article className="card question-card" id={`soru-${index + 1}`} tabIndex={-1} key={entry.questionId}><header className="question-card-heading"><span className="step-number">{index + 1}</span><p className="question-stem">{entry.stem}</p>{actions && <div className="exam-entry-actions"><button type="button" className="icon-button" aria-label={`${index + 1}. soruyu yukarı taşı`} disabled={!actions.canMoveUp} onClick={() => actions.onMove(-1)}>↑</button><button type="button" className="icon-button" aria-label={`${index + 1}. soruyu aşağı taşı`} disabled={!actions.canMoveDown} onClick={() => actions.onMove(1)}>↓</button><button type="button" className="icon-button" aria-label={`${index + 1}. soruyu sınavdan çıkar`} onClick={actions.onRemove}><Icon name="close" size={16} /></button></div>}</header><p className="muted small-text">Eklendi; taslağı kaydedince tam metin görünür ve düzenlenebilir.</p></article>;
         return <ExamQuestionCard key={entry.questionId} row={row} number={index + 1} examId={snapshot!.id} examPublished={published} catalogs={catalogs} onExamUpdated={acceptRow} actions={actions} />;
             })}</div>}
-      {!published && <div className="option-footer"><button type="button" className="button secondary small" disabled={busy} onClick={() => setPicker(true)}><Icon name="plus" size={16} />Soru ekle</button></div>}
+      {!published && <>{writing && <NewQuestionCard catalogs={catalogs} defaultSubject={form.subject_id} defaultSource={form.source_id} onCreated={added} onCancel={() => setWriting(false)} />}<div className="option-footer"><button type="button" className="button primary small" disabled={busy || writing} onClick={() => setWriting(true)}><Icon name="plus" size={16} />Yeni soru yaz</button><button type="button" className="button secondary small" disabled={busy} onClick={() => setPicker(true)}><Icon name="plus" size={16} />Mevcut soruyu ekle</button></div></>}
     </section>
     {picker && <QuestionPicker catalogs={catalogs} selected={new Set(form.entries.map((entry) => entry.questionId))} onAdd={(entry) => patch('entries', [...form.entries, entry].slice(0, 200))} onClose={() => setPicker(false)} />}
     {confirmPublish && <Modal title="Çıkmış sınavı yayımla?" onClose={() => { if (!publish.isPending) setConfirmPublish(false); }}><div className="modal-body"><p>Yayımlandıktan sonra bu sınavın künyesi, soru sırası ve soru sürümleri değiştirilemez. Öğrenciler sınavı çözebilir.</p></div><div className="modal-actions"><button className="button secondary" disabled={publish.isPending} onClick={() => setConfirmPublish(false)}>Vazgeç</button><button className="button primary" disabled={publish.isPending} onClick={() => publish.mutate()}>{publish.isPending ? 'Yayımlanıyor…' : 'Yayımla'}</button></div></Modal>}

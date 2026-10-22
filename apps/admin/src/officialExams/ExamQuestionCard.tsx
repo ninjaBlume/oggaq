@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { ApiError } from '@oggaq/api-client';
+import { Link } from 'react-router-dom';
 import type { Catalogs, components } from '@oggaq/shared-types';
 import { api } from '../api';
 import { ErrorNotice, Icon, useNotify } from '../ui';
@@ -101,6 +102,7 @@ export function ExamQuestionCard({ row, number, examId, examPublished, catalogs,
       {mutationError && <ErrorNotice error={mutationError} />}
       <footer className="question-card-actions">
         <button type="button" className="button secondary small" disabled={busy} onClick={start}>Düzenle</button>
+        <Link className="button secondary small" to={`/questions/${row.question_id}`}>Sürüm geçmişi</Link>
         {newerPublished && <button type="button" className="button secondary small" disabled={busy} onClick={() => { pin.reset(); pin.mutate(row.published_version_id!); }}>{pin.isPending ? 'Uygulanıyor…' : 'Güncel yayımlanmış sürümü sınavda kullan'}</button>}
       </footer>
     </> : <form onSubmit={submit} className="question-card-form">
