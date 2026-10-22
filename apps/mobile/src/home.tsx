@@ -90,7 +90,7 @@ export function Home({
       <Enter
         style={{
           backgroundColor: palette.navy,
-          padding: 22,
+          padding: 16,
           borderRadius: shape.extraLarge,
           borderTopRightRadius: shape.medium,
           overflow: "hidden",
@@ -188,7 +188,7 @@ export function Home({
               flex: 1,
               backgroundColor: bg,
               borderRadius: shape.large,
-              padding: 18,
+              padding: 14,
               gap: 8,
             }}
           >
@@ -262,7 +262,7 @@ export function Home({
                   flexGrow: 1,
                   backgroundColor: palette.white,
                   borderRadius: 20,
-                  padding: 17,
+                  padding: 14,
                   gap: 14,
                   borderWidth: 1,
                   borderColor: palette.line,

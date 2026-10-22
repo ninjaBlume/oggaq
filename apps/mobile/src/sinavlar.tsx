@@ -206,7 +206,7 @@ export function ExamList({
               alignItems: "center",
               gap: 10,
               backgroundColor: palette.white,
-              padding: 15,
+              padding: 14,
               borderRadius: 16,
               borderWidth: 1,
               borderColor: palette.primary,

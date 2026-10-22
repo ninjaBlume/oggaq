@@ -96,7 +96,7 @@ export function Profile({
               borderColor: c.id === context.id ? palette.primary : palette.line,
               backgroundColor:
                 c.id === context.id ? palette.softPrimary : palette.white,
-              padding: 18,
+              padding: 14,
               flexDirection: "row",
               alignItems: "center",
               gap: 14,

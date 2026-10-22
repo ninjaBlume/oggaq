@@ -1092,3 +1092,5 @@ small {
 .start-panel .field { max-width: 360px; }
 .tab-button small { opacity: .75; font-weight: 400; }
 @media (max-width: 600px) { .sinav-row { grid-template-columns: 1fr; } .sinav-action .button { width: 100%; } }
+
+@media (max-width: 700px) { .card { padding: 16px; } .history-row { padding: 16px; } .sinav-row { padding: 14px 16px; } }
