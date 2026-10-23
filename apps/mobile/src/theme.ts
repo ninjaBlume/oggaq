@@ -22,7 +22,7 @@ export const shape = { ...tokenShape, connected: 6 } as const;
 
 export const typography = typeScale;
 
-// A score is tinted by its band (60-point mark and 80, see scoreBand): green strong, teal steady, red weak. Colour and
+// A score is tinted by its band (60-point mark and 80, see scoreBand): green strong, blue steady, red weak. Colour and
 // tone only; nothing says passed or failed.
 export function scoreTone(score: number, palette: AppPalette) {
   const band = scoreBand(score);

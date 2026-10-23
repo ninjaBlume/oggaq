@@ -13,23 +13,23 @@ export type ColorRole = (typeof colorRoles)[number];
 export type Palette = Record<ColorRole, string>;
 
 export const lightPalette: Palette = {
-  paper: '#F7F8F6', surface: '#FFFFFF', surfaceContainer: '#EFF3EF', neutralSurface: '#ECEFEC', line: '#E2E7E5',
-  ink: '#202B38', muted: '#5F6B7A',
-  primary: '#0F766E', onPrimary: '#FFFFFF', primaryContainer: '#CDE8DF', onPrimaryContainer: '#123D38', softPrimary: '#E7F2EF',
-  secondaryContainer: '#DCE4EF', onSecondaryContainer: '#182B45',
+  paper: '#F5F7FC', surface: '#FFFFFF', surfaceContainer: '#EDF2FA', neutralSurface: '#E7EDF7', line: '#D7E0ED',
+  ink: '#1C2D47', muted: '#52647E',
+  primary: '#2459A6', onPrimary: '#FFFFFF', primaryContainer: '#DEE9FC', onPrimaryContainer: '#173968', softPrimary: '#E9F0FD',
+  secondaryContainer: '#E8EDF7', onSecondaryContainer: '#2E4262',
   success: '#237A4B', onSuccess: '#FFFFFF', softSuccess: '#EDF5EF', red: '#B9384A', onRed: '#FFFFFF', softRed: '#FBEDEF', warning: '#8A5A00', softWarning: '#FBF1DC',
-  navy: '#182B45', onNavy: '#FFFFFF', onNavyMuted: '#C6D2DF', accent: '#D6A64F', scrim: 'rgba(24, 43, 69, 0.48)',
+  navy: '#142D50', onNavy: '#FFFFFF', onNavyMuted: '#C8D9F1', accent: '#D6A64F', scrim: 'rgba(20, 45, 80, 0.48)',
 };
 
 // Dark is not an inversion: tinted dark grey instead of black, lighter surfaces for higher elevation,
 // desaturated accents that still pass AA on those surfaces, and dark text on the light primary.
 export const darkPalette: Palette = {
-  paper: '#0F1412', surface: '#171E1C', surfaceContainer: '#1E2725', neutralSurface: '#232D2A', line: '#2E3A37',
-  ink: '#E4EAE8', muted: '#9FADA8',
-  primary: '#4DC6B8', onPrimary: '#00201C', primaryContainer: '#1B4A44', onPrimaryContainer: '#BDEBE3', softPrimary: '#15332F',
-  secondaryContainer: '#2A3A52', onSecondaryContainer: '#D5E2F5',
+  paper: '#0C1422', surface: '#141E2E', surfaceContainer: '#1C293D', neutralSurface: '#24324A', line: '#34445E',
+  ink: '#E7EEF9', muted: '#A8B7CE',
+  primary: '#9EC5FF', onPrimary: '#102E54', primaryContainer: '#213F6B', onPrimaryContainer: '#D4E5FF', softPrimary: '#192F4E',
+  secondaryContainer: '#2B3A52', onSecondaryContainer: '#DEE7F6',
   success: '#6FD39A', onSuccess: '#00210F', softSuccess: '#17301F', red: '#F2808F', onRed: '#3A0010', softRed: '#3A1D22', warning: '#E9B84F', softWarning: '#3A2E12',
-  navy: '#1C3355', onNavy: '#FFFFFF', onNavyMuted: '#C6D2DF', accent: '#D6A64F', scrim: 'rgba(0, 0, 0, 0.6)',
+  navy: '#173763', onNavy: '#FFFFFF', onNavyMuted: '#C8D9F1', accent: '#D6A64F', scrim: 'rgba(0, 0, 0, 0.6)',
 };
 
 export type ColorScheme = 'light' | 'dark';

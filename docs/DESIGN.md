@@ -37,7 +37,7 @@ Sayfa başlığı ve menü girişi `title`, alt sekme gibi dar yerler `short` ku
 ## 3. Renk
 
 - **Rol temelli:** bileşen renk adını değil rolü kullanır (`surface`, `ink`, `primary`, `onPrimary`, `softRed` …). Koddaki sabit renk kodu hatadır; yeni renk önce rol olarak eklenir.
-- **Üç ailenin işi:** lacivert (`navy`) marka ve ana sayfa başlığı, petrol (`primary`) eylem ve seçim, mat altın (`accent`) yalnız lacivert üstünde küçük vurgu. Doğru/başarı yeşil, yanlış/hata kırmızı, uyarı kehribardır.
+- **Üç ailenin işi:** lacivert (`navy`) marka ve ana sayfa başlığı, güven mavisi (`primary`) eylem ve seçim, mat altın (`accent`) yalnız lacivert üstünde küçük vurgu. Yüzeyler açık temada soğuk beyaz/mavi-gri, koyu temada lacivert-gri tonlarındadır; ana arayüzde mavi baskındır. Doğru/başarı yeşil, yanlış/hata kırmızı, uyarı kehribardır.
 - **Anlam yalnız renkle verilmez:** doğru, yanlış, boş her yerde metin ve ikon/nokta ile birlikte gösterilir.
 - **Kontrast (WCAG 2.2 AA):** metin 4,5:1, büyük metin/ikon/grafik 3:1. Her rol çifti açık ve koyu temada otomatik test edilir (`npm run test:tokens`); bu testin geçmediği palet birleştirilmez.
 - **Skor bantları:** %60 altı `red`, %60–79 `primary`, %80 ve üstü `success` tonu. Referans, yazılı ÖGG sınavının 60 puanlık eşiğidir (silahsız: en az 60; silahlı: bölümlerin ortalaması en az 60 — EGM sınav talimatı). Bantlar yalnız renk ve tonu belirler; kullanıcıya başarılı/başarısız denmez. Kaynak: `scoreBand` ([study-core](../packages/study-core/src/index.ts)).
@@ -45,7 +45,7 @@ Sayfa başlığı ve menü girişi `title`, alt sekme gibi dar yerler `short` ku
 ## 4. Koyu mod
 
 - **Üç seçenek:** Cihaz ayarı (varsayılan), Açık, Koyu. Seçim her uygulamada profil/kullanıcı menüsünden yapılır ve o cihazda saklanır (hassas veri değildir; sunucuya gönderilmez).
-- **Tersine çevirme değil, ayrı palet:** saf siyah yerine yeşilimsi koyu gri; yükseklik arttıkça yüzey açılır (`paper` < `surface` < `surfaceContainer`); vurgu renkleri koyu zeminde AA geçecek biçimde açılır ve doygunluğu azaltılır; açık petrol üzerindeki yazı koyudur (`onPrimary`).
+- **Tersine çevirme değil, ayrı palet:** saf siyah yerine lacivert-gri; yükseklik arttıkça yüzey açılır (`paper` < `surface` < `surfaceContainer`); vurgu renkleri koyu zeminde AA geçecek biçimde açılır ve doygunluğu azaltılır; açık mavi üzerindeki yazı koyudur (`onPrimary`).
 - **Web ve yönetim paneli:** `tokens.css` CSS değişkenlerini üretir; cihazın koyu tercihi `prefers-color-scheme` ile, kullanıcının zorlaması `data-theme` ile uygulanır. Sayfa açılışında tema, ilk boyamadan önce uygulanır (parlama olmaz).
 - **Mobil:** sistem teması dinlenir; tema değişince açık ekranların durumu (sınav, form) kaybolmaz.
 - Resimler ve ikonlar rolden renk alır; koyu modda ayrı görsel gerekmez.

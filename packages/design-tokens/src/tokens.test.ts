@@ -11,6 +11,7 @@ const pairs: [ColorRole, ColorRole, number][] = [
   ['ink', 'paper', 4.5], ['ink', 'surface', 4.5], ['ink', 'surfaceContainer', 4.5], ['ink', 'softPrimary', 4.5],
   ['muted', 'paper', 4.5], ['muted', 'surface', 4.5], ['muted', 'surfaceContainer', 4.5], ['muted', 'neutralSurface', 4.5],
   ['primary', 'paper', 4.5], ['primary', 'surface', 4.5], ['primary', 'softPrimary', 4.5],
+  ['primary', 'surfaceContainer', 4.5], ['primary', 'primaryContainer', 3],
   ['onPrimary', 'primary', 4.5], ['onPrimaryContainer', 'primaryContainer', 4.5], ['onSecondaryContainer', 'secondaryContainer', 4.5],
   ['success', 'surface', 4.5], ['success', 'softSuccess', 4.5], ['red', 'surface', 4.5], ['red', 'softRed', 4.5],
   ['warning', 'surface', 4.5], ['warning', 'softWarning', 4.5],

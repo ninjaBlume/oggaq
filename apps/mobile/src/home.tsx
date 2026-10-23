@@ -278,7 +278,7 @@ export function Home({
                 {index % 2 === 0 ? (
                   <BookOpen size={22} color={palette.primary} />
                 ) : (
-                  <Layers3 size={22} color={palette.success} />
+                  <Layers3 size={22} color={palette.primary} />
                 )}
                 <ChevronRight size={15} color={palette.muted} />
               </View>
