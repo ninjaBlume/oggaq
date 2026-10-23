@@ -16,6 +16,12 @@ npx expo start --go --tunnel ngrok --port 8082
 
 SDK 58'in varsayılan Expo tüneli Expo hesabıyla giriş ister; bu oturumda mevcut `@expo/ngrok` aracıyla `--tunnel ngrok` kullanıldı ([sürüm notları](https://expo.dev/changelog/sdk-58#a-faster-more-reliable-expo-cli-tunnel)). API sunucudadır; Mac yalnızca Metro/tünel süreçlerini çalıştırır. Tünel adresi geçicidir; Metro kapanırsa telefon paketi alamaz. QR'ı yeniden tararken Expo Go'daki önceki hata ekranını kapatın. Önceki SDK 57 süreci durduruldu; yeni süreç ayrı `oggaq-mobile-expo58` çalışma ağacını kullanır.
 
+Telefondaki Expo Go bir Expo hesabına giriş yaptıysa CLI da aynı hesapla açık olmalıdır. `npx expo login --browser` resmî tarayıcı girişini başlatır; parolalar dosyaya veya komuta yazılmaz. `npx expo whoami` sonucunu telefondaki hesapla karşılaştırın. QR'ı teslim etmeden önce kökten aşağıdaki salt okunur kontrolü çalıştırın; anonim/yanlış CLI hesabı, eski SDK, yanlış API/web adresi ve tünel dışına yönlenen paket adresleri reddedilir. Manifestin tek başına `200` dönmesi bu şartların karşılandığını göstermez.
+
+```sh
+node scripts/check-mobile-preview.mjs https://EXPO_TUNEL_ADRESI EXPO_KULLANICI_ADI
+```
+
 Doğrulananlar: tüm workspace'lerde strict tip kontrolü; 23 mobil, 11 admin, 4 web testi; Expo Doctor 20/20; iOS/Android Hermes ve web export; admin/web derlemeleri; iOS/Android `prebuild --no-install`. Gerçek HTTPS tünelinden alınan iOS manifesti `sdkVersion=58.0.0` ve sunucudaki API adresini döndürdü; indirilen iOS JavaScript paketi de doğru HTTPS API adresini içerdi. Sunucuda sentetik öğrenci hesabıyla mobil Bearer giriş/okuma/çıkış akışı ayrıca doğrulanmıştı. Bu geçiş için fiziksel cihazda SDK 58 uygulamasının açılışı/girişinin kullanıcı teyidi, yeni native APK/Simulator derlemesi ve tam backend/E2E koşumu henüz yoktur.
 
 Başarısız kalan kontrol: `npm run audit`, Expo CLI 58.1.14'ün `zod@3.25.76` bağımlılığı için yeni [GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5) bulgusunu bildirerek çıkış kodu 1 döndürür. Düzeltilmiş sürüm 4.6.6'dır; CLI'nin `^3.25.76` aralığı bu ana sürümü kabul etmez. Üretim uygulamasındaki doğrulama kütüphanesi değildir; geliştirme CLI'sinin devtools/MCP şema kodundadır. SDK yükseltmesi bu bulguyu kapatmış sayılmaz; mevcut audit kapısı yeni bulguyu reddetmektedir. Önceden belgelenmiş `node-forge` build aracı uyarısı da devam eder. Bu yeni audit bulgusu upstream uyumlu düzeltme/ayrı değerlendirme gerektirir.
