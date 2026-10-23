@@ -7,14 +7,13 @@ import {
   Clock3,
   GraduationCap,
   History,
-  Layers3,
   ListChecks,
   Play,
 } from "./icons";
 import type { StudyContext, User } from "@oggaq/shared-types";
-import { Enter, ExpressiveEmblem, ExpressivePressable } from "./expressive";
+import { Enter, ExpressivePressable } from "./expressive";
 import { vocabulary } from "@oggaq/study-core";
-import { scoreTone, shape, typography } from "./theme";
+import { scoreTone, shape } from "./theme";
 import { api } from "./api";
 import { useResource, useOnReturn } from "./hooks";
 import {
@@ -27,6 +26,7 @@ import {
   Loading,
   ScreenTitle,
   SectionTitle,
+  TextLink,
 } from "./ui";
 import { useLayout, useTheme } from "./themeContext";
 import brand from "../brand.json";
@@ -87,22 +87,6 @@ export function Home({
   const activeExam = recentExams.data?.data.find((e) => e.status === "active" && Date.parse(e.deadline_at) > Date.parse(e.server_time));
   const quick = [
     {
-      title: vocabulary.deneme.title,
-      text: "Tam sınav, gerçek süre",
-      icon: Clock3,
-      press: deneme,
-      bg: palette.primaryContainer,
-      color: palette.onPrimaryContainer,
-    },
-    {
-      title: vocabulary.ders.title,
-      text: "Ders ders çalış",
-      icon: BookOpen,
-      press: () => ders(),
-      bg: palette.secondaryContainer,
-      color: palette.onSecondaryContainer,
-    },
-    {
       title: vocabulary.review.title,
       text: "Hatalarından sınav yap",
       icon: ListChecks,
@@ -122,69 +106,37 @@ export function Home({
       color: palette.onPrimaryContainer,
     },
   ];
-  // Two quick actions per row on a phone, all four on an expanded window.
-  const perRow = layout.columns === 2 ? 4 : 2;
-  const tiles = [quick.slice(0, perRow), ...(perRow === 2 ? [quick.slice(2)] : [])];
   return (
     <>
       <ScreenTitle
         title={`Merhaba, ${user.name.trim().split(/\s+/)[0]}.`}
         subtitle="Bir sınav seç, kaldığın yerden devam et."
       />
-      <Enter
-        style={{
-          backgroundColor: palette.navy,
-          padding: 16,
-          borderRadius: shape.extraLarge,
-          borderTopRightRadius: shape.medium,
-          overflow: "hidden",
-          gap: 16,
-        }}
-      >
-        <View style={styles.between}>
-          <Text
-            style={{
-              color: palette.accent,
-              fontSize: 10,
-              fontWeight: "800",
-              letterSpacing: 1.5,
-            }}
-          >
-            {brand.subtitle.toLocaleUpperCase("tr-TR")}
-          </Text>
-          <ExpressiveEmblem size={48} color={palette.accent}>
-            <BookOpen size={22} color={palette.navy} strokeWidth={1.8} />
-          </ExpressiveEmblem>
-        </View>
-        <Text
-          style={{
-            color: palette.onNavy,
-            ...typography.display,
-          }}
-        >
-          Özel güvenlik{"\n"}sınavlarına hazırlan.
-        </Text>
-        <Text
-          style={{
-            color: palette.onNavyMuted,
-            fontSize: 12,
-            lineHeight: 19,
-          }}
-        >
-          Deneme ve ders sınavlarını gerçek süreyle çöz, eksiklerini gör, tekrar et.
-        </Text>
-        <View style={{ alignSelf: "flex-start" }}>
-          <Button secondary icon={ArrowRight} onPress={deneme}>
-            Sınava gir
-          </Button>
-        </View>
-      </Enter>
-      {tiles.map((row) => (
-        <View key={row[0]!.title} style={{ flexDirection: "row", gap: 12 }}>
-          {row.map(({ title, text, icon: Icon, press, bg, color }) => (
+      {recentExams.loading && !recentExams.data ? (
+        <Loading layout="list" count={1} label="Devam eden sınavların yükleniyor" />
+      ) : activeExam ? (
+        <Enter style={{ backgroundColor: palette.surface, borderRadius: shape.large, padding: layout.cardPadding, gap: 12, borderWidth: 1, borderColor: palette.primary }}>
+          <Badge>Devam ediyor</Badge>
+          <Text accessibilityRole="header" style={styles.heading}>Kaldığın yerden devam et</Text>
+          <Text style={styles.text}>{activeExam.official_exam?.title ?? `${activeExam.question_count} soruluk deneme`}</Text>
+          <Text style={styles.muted}>{activeExam.question_count} soru · Süren işlemeye devam ediyor</Text>
+          <Button icon={Play} onPress={() => exam(activeExam.id)}>Denemene devam et</Button>
+          <TextLink onPress={deneme}>Diğer sınavları gör</TextLink>
+        </Enter>
+      ) : (
+        <Enter style={{ backgroundColor: palette.navy, padding: layout.cardPadding, borderRadius: shape.large, gap: 12 }}>
+          <Text accessibilityRole="header" style={[styles.heading, { color: palette.onNavy }]}>{brand.tagline}.</Text>
+          <Text style={[styles.muted, { color: palette.onNavyMuted }]}>Deneme veya ders sınavı seç, sonuçlarını incele.</Text>
+          <View style={{ alignSelf: "flex-start" }}>
+            <Button secondary icon={ArrowRight} onPress={deneme}>Sınava gir</Button>
+          </View>
+        </Enter>
+      )}
+      <View style={{ flexDirection: "row", gap: 12 }}>
+          {quick.map(({ title, text, icon: Icon, press, bg, color }) => (
             <ExpressivePressable
               key={title}
-              radius={title === vocabulary.deneme.title ? shape.large : shape.extraLarge}
+              radius={shape.large}
               accessibilityRole="button"
               accessibilityLabel={title + " ekranını aç"}
               onPress={press}
@@ -198,13 +150,13 @@ export function Home({
             >
               <View
                 style={{
-                  width: 42,
-                  height: 42,
+                  width: 36,
+                  height: 36,
                   backgroundColor: palette.surface,
-                  borderRadius: shape.full,
+                  borderRadius: shape.medium,
                   alignItems: "center",
                   justifyContent: "center",
-                  marginBottom: 6,
+                  marginBottom: 0,
                 }}
               >
                 <Icon size={21} color={color} strokeWidth={1.8} />
@@ -212,35 +164,18 @@ export function Home({
               <Text style={{ color, fontSize: 17, fontWeight: "700" }}>
                 {title}
               </Text>
-              <Text style={{ fontSize: 12, color, lineHeight: 18 }}>{text}</Text>
+              <Text style={{ fontSize: 14, color, lineHeight: 21 }}>{text}</Text>
             </ExpressivePressable>
           ))}
-        </View>
-      ))}
-      {recentExams.error && (
-        <ErrorNotice
-          error={recentExams.error}
-          retry={() => {
-            void recentExams.reload();
-          }}
-        />
-      )}
-      {activeExam && (
-        <ListRow
-          icon={Play}
-          title="Denemene devam et"
-          subtitle={`${activeExam.question_count} soru · Süre devam ediyor`}
-          onPress={() => exam(activeExam.id)}
-          badge={<Badge>Devam ediyor</Badge>}
-        />
-      )}
+      </View>
       <SectionTitle action="Tüm dersler" onPress={() => ders()}>
         Derslerini keşfet
       </SectionTitle>
       {subjects.loading ? (
-        <Loading />
+        <Loading layout="tiles" label="Dersler yükleniyor" />
       ) : subjects.error ? (
         <ErrorNotice
+          title="Dersler yüklenemedi"
           error={subjects.error}
           retry={() => {
             void subjects.reload();
@@ -254,7 +189,7 @@ export function Home({
         />
       ) : (
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
-          {subjects.data?.data.map((s, index) => (
+          {subjects.data?.data.map((s) => (
             <Pressable
               key={s.id}
               accessibilityRole="button"
@@ -265,7 +200,7 @@ export function Home({
                   width: layout.columns === 2 ? "23.7%" : "47.8%",
                   flexGrow: 1,
                   backgroundColor: palette.surface,
-                  borderRadius: 20,
+                  borderRadius: shape.large,
                   padding: 14,
                   gap: 14,
                   borderWidth: 1,
@@ -275,18 +210,14 @@ export function Home({
               ]}
             >
               <View style={styles.between}>
-                {index % 2 === 0 ? (
-                  <BookOpen size={22} color={palette.primary} />
-                ) : (
-                  <Layers3 size={22} color={palette.primary} />
-                )}
+                <BookOpen size={22} color={palette.primary} />
                 <ChevronRight size={15} color={palette.muted} />
               </View>
               <Text
-                numberOfLines={2}
+                numberOfLines={3}
                 style={{
-                  fontSize: 13,
-                  lineHeight: 20,
+                  fontSize: 14,
+                  lineHeight: 21,
                   fontWeight: "700",
                   color: palette.ink,
                 }}
@@ -301,7 +232,9 @@ export function Home({
         Son sınavların
       </SectionTitle>
       {recentExams.loading ? (
-        <Loading />
+        <Loading layout="list" label="Son sınavların yükleniyor" />
+      ) : recentExams.error ? (
+        <ErrorNotice title="Son sınavların yüklenemedi" error={recentExams.error} retry={() => void recentExams.reload()} />
       ) : recentExams.data?.data.length === 0 ? (
         <EmptyState
           icon={History}
@@ -332,7 +265,7 @@ export function Home({
         ))}
         </Columns>
       )}
-      <Text style={[styles.muted, { textAlign: "center", fontSize: 11 }]}>
+      <Text style={[styles.muted, { textAlign: "center", fontSize: 13 }]}>
         {context.kind === "personal" ? "Kişisel çalışma alanın" : context.name}
       </Text>
     </>

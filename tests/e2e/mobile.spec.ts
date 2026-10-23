@@ -174,7 +174,7 @@ test("ders sınavı dersine göre bulunur ve çözülür; çalışma alanı değ
   ).toBeVisible();
   await page.getByRole("radio", { name: "Sentetik A", exact: true }).click();
   await page.getByRole("button", { name: "Geri dön" }).click();
-  await expect(page.getByText(/Devam eden denemen var/)).toBeVisible();
+  await expect(page.getByText("Devam ediyor", { exact: true })).toBeVisible();
   await page.getByRole("tab", { name: "Profil", exact: true }).click();
   await page
     .getByRole("button", { name: "Sentetik eğitim kurumu çalışma alanını seç" })
@@ -280,37 +280,26 @@ test("yan menü gerçek ekranlara gider, seçimi gösterir ve odağı içinde tu
   page,
 }) => {
   await login(page);
-  const destinations = [
-    { menu: "Deneme sınavları", title: "Deneme sınavları", tab: "Deneme" },
-    { menu: "Ders sınavları", title: "Ders sınavları", tab: "Ders" },
-    { menu: "Sonuçlarım", title: "Sonuçlarım", tab: "Sonuçlar" },
-    { menu: "Profil", title: "Profil", tab: "Profil" },
-    { menu: "Ana sayfa", title: "Merhaba, E2E.", tab: "Ana sayfa" },
-  ];
-  for (const target of destinations) {
+  for (const target of [
+    { menu: "Tekrar sınavı", title: "Tekrar sınavı" },
+    { menu: "Başarı durumum", title: "Başarı durumum" },
+  ]) {
     await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
     const menu = page.getByRole("dialog");
     await expect(menu).toBeVisible();
     await expect(page.getByRole("tab", { name: "Ana sayfa" })).toHaveCount(0);
     await menu.getByRole("button", { name: target.menu, exact: true }).click();
     await expect(menu).not.toBeVisible();
-    // The tab bar says "Profil" too, so the page title is matched by its heading role.
-    await expect(
-      page.getByRole("heading", { name: target.title, exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("tab", { name: target.tab, exact: true }),
-    ).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByRole("heading", { name: target.title, exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
+    await expect(page.getByRole("dialog").getByRole("button", { name: target.menu, exact: true })).toHaveAttribute("aria-selected", "true");
+    await page.keyboard.press("Escape");
   }
+  await page.getByRole("tab", { name: "Ana sayfa", exact: true }).click();
   await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
   const menu = page.getByRole("dialog");
-  await expect(
-    menu.getByRole("button", { name: "Ana sayfa", exact: true }),
-  ).toHaveAttribute("aria-selected", "true");
-  // The question bank is gone from the menu too.
-  await expect(
-    menu.getByRole("button", { name: "Soru bankası", exact: true }),
-  ).toHaveCount(0);
+  for (const name of ["Ana sayfa", "Deneme sınavları", "Ders sınavları", "Sonuçlarım", "Profil", "Soru bankası"])
+    await expect(menu.getByRole("button", { name, exact: true })).toHaveCount(0);
   await screenshot(page, "sidebar");
   for (let i = 0; i < 16; i++) {
     await page.keyboard.press("Tab");
@@ -442,7 +431,7 @@ test("yan menü küçük telefon, tablet ve yatay ekranda kapanır ve sola sür�
   await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
   const menu = page.getByRole("dialog");
   await expect(
-    menu.getByRole("button", { name: "Ana sayfa", exact: true }),
+    menu.getByRole("button", { name: "Tekrar sınavı", exact: true }),
   ).toBeInViewport();
   await expect
     .poll(
@@ -624,4 +613,44 @@ test("mobil tekrar sınavı hatalardan kurulur; başarı durumu ve sınavlar ger
     page.getByText("Sentetik üçüncü soru", { exact: true }),
   ).toBeVisible();
   expect(errors).toEqual([]);
+});
+
+
+test("ana sayfa devam eden sınavı önce gösterir ve tekrar başlatmadan açar", async ({ page }) => {
+  await login(page);
+  await enter(page, "Deneme");
+  await page.getByRole("radio", { name: "Sentetik A", exact: true }).click();
+  await expect(page.getByText("Cevaplar sunucuda kayıtlı", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Geri dön", exact: true }).click();
+  await page.getByRole("tab", { name: "Ana sayfa", exact: true }).click();
+  const resume = page.getByRole("button", { name: "Denemene devam et", exact: true });
+  await expect(resume).toBeInViewport();
+  const resumeBox = await resume.boundingBox();
+  const toolsBox = await page.getByRole("button", { name: "Tekrar sınavı ekranını aç", exact: true }).boundingBox();
+  expect(resumeBox!.y).toBeLessThan(toolsBox!.y);
+  await expect(page.getByText("Özel güvenlik sınavlarına hazırlan.", { exact: true })).toHaveCount(0);
+  await resume.click();
+  await expect(page.getByRole("radio", { name: "Sentetik A", exact: true })).toHaveAttribute("aria-checked", "true");
+});
+
+test("liste beklerken iskelet gösterir, hata sonrası yeniden deneme gerçek listeyi yükler", async ({ page }) => {
+  await login(page);
+  let fail = true;
+  let release!: () => void;
+  const gate = new Promise<void>((resolve) => { release = resolve; });
+  await page.route("**/api/v1/official-exams**", async (route) => {
+    if (fail) {
+      await gate;
+      await route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ detail: "Sınav hizmeti geçici olarak kullanılamıyor." }) });
+    } else await route.continue();
+  });
+  await page.getByRole("tab", { name: "Deneme", exact: true }).click();
+  await expect(page.getByRole("progressbar", { name: "Sınavlar yükleniyor", exact: true })).toBeVisible();
+  release();
+  await expect(page.getByRole("alert")).toContainText("Sınavlar yüklenemedi");
+  await expect(page.getByRole("alert")).toContainText("Sınav hizmeti geçici olarak kullanılamıyor.");
+  fail = false;
+  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await expect(page.getByText("1. Deneme Sınavı", { exact: true })).toBeVisible();
+  await expect(page.getByRole("alert")).toHaveCount(0);
 });

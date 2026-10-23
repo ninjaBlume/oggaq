@@ -32,6 +32,17 @@ Ortak renk tokenları açık temada mavi ve soğuk beyaz, koyu temada açık mav
 
 Doğrulama: 63 token/kontrast kontrolü, tüm workspace'lerde strict tip kontrolü, 23 mobil / 11 admin / 4 web testi, web/admin derlemeleri ve iOS/Android Hermes + web export geçti. Ana düğmenin yazı kontrastı açık temada 6.87:1, koyu temada 7.71:1'dir. Device Hub'daki iPhone 18 Pro / iOS 27.0 üzerinde Expo Go 58.0.5 ile ana sayfa ve profil açık/koyu temada görsel olarak kontrol edildi; önceki koyu tercih geri yüklendi. Görüntüler `artifacts/blue-palette/` içinde git dışındadır. Fiziksel telefon ve Android üzerinde bu palet ayrıca denenmedi. Mobil Metro önizlemesi günceldir; sunucudaki web/admin yayını bu değişiklikte güncellenmedi. Yukarıdaki mevcut audit bulgusu devam eder.
 
+## 24 Ekim 2026: Ana sayfa, liste ve geri bildirim düzeni
+
+- Ana sayfada son sınavlar içindeki süresi devam eden deneme karşılama satırından hemen sonra gelir; aynı deneme açılır, yeni kayıt başlatılmaz. Böyle bir deneme yoksa marka yapılandırmasındaki slogan ve küçük sınav giriş kartı görünür. Tekrar ve başarı iki yardımcı kısayoldur; deneme/ders hedefleri alt sekmelerde kalır.
+- Sayfa başlığı 26/33px, yardımcı metin 14/21px; soru gövdesi 17/27px olarak korunur. Ders adları üç satıra kadar gösterilir. Mobil ölçekler ve kontrol biçimleri `src/theme.ts` içindedir.
+- Sınav kartlarında başlık ve kısa meta üstte, durum ile en az 44px yüksekliğinde eylem alttadır. Devam eden sınav mavi kenar/ana düğme, yeni sınav ikincil düğme kullanır. Süre seçimi, başlatma kilidi, tekrar giriş ve süresi dolmuş denemenin sonucunu açma davranışları korunur.
+- Yan menü beş ana sekmeyi tekrarlamaz; Tekrar sınavı, Başarı durumum, çalışma alanları ve çıkış içerir. Alt sekmeler/tablet rayı, odak kapanı, Escape/geri, sürükleyerek kapatma ve kurum izolasyonu korunur.
+- Ortak düğmeler 16px köşe, basışta 12px; içerik kartları 24px köşe kullanır. Seçim gruplarının kapsül biçimi seçim durumuna ayrılmıştır. Normal düğmeler en az 54px, kompakt liste düğmeleri en az 44px yüksekliktedir; metin büyürse alan da büyür.
+- Ana sayfa, sınav ve sonuç listeleri yerleşimi koruyan statik iskeletler gösterir; tek erişilebilir yükleniyor durumu sunulur, dekoratif bloklar okunmaz. Hatalar bölüm başlığı ve yeniden deneme içerir; sunucu doğrulaması korunur, erişim/hız sınırı/ağ sorunları ayrı açıklanır. Beklenmeyen exception ayrıntıları arayüze yazılmaz.
+
+Doğrulama: strict TypeScript, 25 mobil birim testi, 63 ortak token/kontrast kontrolü ve yalnız `oggaq_test` PostgreSQL üzerinde 16 mobil Chromium E2E geçti. E2E; mevcut sınav/sonuç/kurum/çıkış akışlarına ek olarak devam kartının önceliğini ve aynı cevabı koruyarak açılmasını, yükleme iskeletini, sunucu hatasından gerçek listeye yeniden denemeyi, sade menüyü ve 320/390/834px ile yatay görünümü kapsar. iOS/Android Hermes ve web export başarılıdır. Device Hub iPhone 18 Pro / iOS 27.0 / Expo Go 58.0.5 üzerinde ana sayfa ve kompakt liste açık/koyu temada, menü ve yükleme durumu native olarak incelendi; koyu tercih geri yüklendi. Görüntüler `artifacts/mobile-polish/` içinde git dışındadır. Fiziksel iPhone/Android ve Android emülatörü bu değişiklik için denenmedi. Web/admin ekranları ve sunucu yayını bu mobil düzenlemede değiştirilmedi; önceki audit bulgusu devam eder.
+
 ## Mobil tasarım ve gezinme
 
 10 Ekim 2026 mobil arayüzü telefon uygulaması olarak yenilendi. `apps/web` ve `apps/admin` masaüstü arayüzlerinden bağımsızdır; ortak API istemcisi ve iş kuralları korunur. Renkler `src/theme.ts`, bileşenler `src/ui.tsx`, marka başlığı `brand.json` içindedir.

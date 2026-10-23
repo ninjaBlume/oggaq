@@ -25,7 +25,7 @@ import {
   X,
 } from "./icons";
 import type { LucideIcon } from "lucide-react-native";
-import { ApiError } from "@oggaq/api-client";
+import { errorMessage } from "./feedback";
 import { shape } from "./theme";
 import { useLayout, useTheme } from "./themeContext";
 import { ExpressivePressable } from "./expressive";
@@ -43,6 +43,7 @@ export function Button({
   icon: Icon,
   danger = false,
   alignStart = false,
+  compact = false,
 }: {
   children: string;
   onPress: () => void;
@@ -51,6 +52,7 @@ export function Button({
   icon?: LucideIcon;
   danger?: boolean;
   alignStart?: boolean;
+  compact?: boolean;
 }) {
   const { palette, styles } = useTheme();
   const color = danger
@@ -60,6 +62,8 @@ export function Button({
       : palette.onPrimary;
   return (
     <ExpressivePressable
+      radius={shape.control}
+      pressedRadius={shape.controlPressed}
       accessibilityRole="button"
       accessibilityLabel={children}
       accessibilityState={{ disabled }}
@@ -67,6 +71,7 @@ export function Button({
       onPress={onPress}
       style={[
         styles.button,
+        compact && { minHeight: 44, paddingVertical: 10, paddingHorizontal: 14 },
         secondary && styles.secondary,
         danger && { backgroundColor: palette.softRed },
         alignStart && { justifyContent: "flex-start" },
@@ -224,7 +229,7 @@ export function Badge({
         backgroundColor,
       }}
     >
-      <Text style={{ fontSize: 11, fontWeight: "700", color }}>{children}</Text>
+      <Text style={{ fontSize: 12, lineHeight: 18, fontWeight: "700", color }}>{children}</Text>
     </View>
   );
 }
@@ -276,44 +281,48 @@ export function EmptyState({
     </View>
   );
 }
-export function Loading() {
+// Static skeletons preserve layout without motion; one status is exposed to screen readers.
+export function Loading({ layout = "inline", count = 3, label = "Yükleniyor" }: {
+  layout?: "inline" | "list" | "tiles";
+  count?: number;
+  label?: string;
+}) {
   const { palette } = useTheme();
+  if (layout === "inline") return (
+    <View accessible accessibilityRole="progressbar" accessibilityLabel={label} accessibilityState={{ busy: true }} style={{ padding: 24, alignItems: "center", gap: 10 }}>
+      <ActivityIndicator color={palette.primary} size="small" />
+      <Text style={{ color: palette.muted, fontSize: 14 }}>{label}</Text>
+    </View>
+  );
   return (
-    <View style={{ padding: 32, alignItems: "center" }}>
-      <ActivityIndicator
-        accessibilityLabel="Yükleniyor"
-        color={palette.primary}
-        size="large"
-      />
+    <View accessible accessibilityRole="progressbar" accessibilityLabel={label} accessibilityState={{ busy: true }}>
+      <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" aria-hidden style={{ flexDirection: layout === "tiles" ? "row" : "column", flexWrap: "wrap", gap: 12 }}>
+        {Array.from({ length: layout === "tiles" ? 2 : count }, (_, index) => (
+          <View key={index} style={{ ...(layout === "tiles" ? { flex: 1 } : { width: "100%" as const }), padding: 16, gap: 12, backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.line, borderRadius: shape.large }}>
+            <View style={{ height: 20, width: "65%", borderRadius: shape.small, backgroundColor: palette.neutralSurface }} />
+            <View style={{ height: 14, width: "90%", borderRadius: shape.small, backgroundColor: palette.neutralSurface }} />
+            <View style={{ height: 36, width: layout === "tiles" ? 36 : "38%", borderRadius: shape.small, backgroundColor: palette.surfaceContainer }} />
+          </View>
+        ))}
+      </View>
     </View>
   );
 }
-export function ErrorNotice({
-  error,
-  retry,
-}: {
+export function ErrorNotice({ error, retry, title = "İşlem tamamlanamadı" }: {
   error: unknown;
   retry?: () => void;
+  title?: string;
 }) {
   const { palette, styles } = useTheme();
   if (!error) return null;
-  let message =
-    error instanceof ApiError
-      ? error.message
-      : "İşlem tamamlanamadı. Yeniden deneyin.";
-  if (error instanceof ApiError && error.status === 422)
-    message = Object.values(error.problem.errors ?? {}).flat()[0] ?? message;
   return (
     <View accessibilityRole="alert" style={styles.error}>
-      <View
-        style={[styles.row, { flexWrap: "nowrap", alignItems: "flex-start" }]}
-      >
+      <View style={[styles.row, { flexWrap: "nowrap", alignItems: "flex-start" }]}>
         <CircleHelp size={20} color={palette.red} />
-        <Text
-          style={[styles.text, { flex: 1, fontSize: 14, color: palette.red }]}
-        >
-          {message}
-        </Text>
+        <View style={{ flex: 1, gap: 5 }}>
+          <Text style={[styles.buttonText, { color: palette.red }]}>{title}</Text>
+          <Text style={[styles.muted, { color: palette.red }]}>{errorMessage(error)}</Text>
+        </View>
       </View>
       {retry && <TextLink onPress={retry}>Yeniden dene</TextLink>}
     </View>
@@ -346,7 +355,7 @@ export function Field({
   const Icon = email ? Mail : password ? LockKeyhole : null;
   return (
     <View style={{ gap: 8 }}>
-      <Text style={{ fontSize: 12, fontWeight: "700", color: palette.ink }}>
+      <Text style={{ fontSize: 14, fontWeight: "700", color: palette.ink }}>
         {label}
       </Text>
       <View
@@ -638,7 +647,7 @@ export function ListRow({
           flexDirection: "row",
           alignItems: "center",
           gap: 14,
-          borderRadius: 20,
+          borderRadius: shape.large,
           padding: 14,
           backgroundColor: palette.surface,
           borderWidth: 1,
@@ -663,8 +672,8 @@ export function ListRow({
         <Text
           numberOfLines={2}
           style={{
-            fontSize: 14,
-            lineHeight: 21,
+            fontSize: 15,
+            lineHeight: 22,
             fontWeight: "600",
             color: palette.ink,
           }}

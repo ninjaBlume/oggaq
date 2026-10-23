@@ -9,7 +9,6 @@ import { useOnReturn, useResource, useTask } from "./hooks";
 import {
   Badge,
   Button,
-  Card,
   Columns,
   EmptyState,
   ErrorNotice,
@@ -23,7 +22,7 @@ import {
 } from "./ui";
 import { ChoiceGroup } from "./expressive";
 import { BookOpen, ChevronDown, ChevronRight, Clock3 } from "./icons";
-import { scoreTone } from "./theme";
+import { scoreTone, shape } from "./theme";
 import { useLayout, useTheme } from "./themeContext";
 
 type OfficialExam = components["schemas"]["OfficialExam"];
@@ -70,7 +69,7 @@ function ExamEntry({
   attempts: Summary[];
   open: (id: string) => void;
 }) {
-  const { styles } = useTheme();
+  const { styles, palette } = useTheme();
   const [expanded, setExpanded] = useState(false);
   const [minutes, setMinutes] = useState(String(suggestedMinutes(exam)));
   const submission = useRef<StartInput | null>(null);
@@ -102,32 +101,24 @@ function ExamEntry({
   const locked = task.pending || (submission.current !== null && !(task.error instanceof ApiError && [409, 422].includes(task.error.status)));
   const valid = Number(minutes) >= 1 && Number(minutes) <= 180;
   return (
-    <Card>
-      <Text style={styles.heading}>{title}</Text>
+    <View style={{ padding: 14, gap: 10, borderRadius: shape.large, backgroundColor: palette.surface, borderWidth: 1, borderColor: progress.open && !expired ? palette.primary : palette.line }}>
+      <Text accessibilityRole="header" style={[styles.heading, { fontSize: 17, lineHeight: 24 }]}>{title}</Text>
       <Text style={styles.muted}>
-        {[
-          exam.term ? `${exam.term} ${exam.year}` : String(exam.year),
-          `${exam.question_count} soru`,
-          `önerilen süre ${suggestedMinutes(exam)} dk`,
-        ].join(" · ")}
+        {[exam.term ? `${exam.term} ${exam.year}` : String(exam.year), `${exam.question_count} soru`, `önerilen süre ${suggestedMinutes(exam)} dk`].join(" · ")}
       </Text>
-      <View style={{ alignSelf: "flex-start" }}>
-        <Badge tone={progress.runs > 0 ? "success" : "neutral"}>
-          {progress.runs === 0 && !progress.open
-            ? "Henüz girmedin"
-            : [
-                progress.open ? (expired ? "Süresi dolmuş deneme var" : "Devam eden denemen var") : null,
-                progress.runs > 0 ? `${progress.runs} kez · en iyi %${progress.best}` : null,
-              ]
-                .filter(Boolean)
-                .join(" · ")}
-        </Badge>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
+        <View style={{ flexGrow: 1, flexBasis: 100 }}>
+          <Text style={[styles.muted, progress.open && !expired && { color: palette.primary, fontWeight: "700" }]}>
+            {progress.open ? (expired ? "Süresi doldu" : "Devam ediyor") : progress.runs > 0 ? `${progress.runs} kez · en iyi %${progress.best}` : "Henüz girmedin"}
+          </Text>
+        </View>
+        {progress.open ? (
+          <Button compact secondary={!!expired} onPress={() => open(progress.open!.id)}>{expired ? "Sonucu gör" : "Devam et"}</Button>
+        ) : !expanded ? (
+          <Button compact secondary onPress={() => setExpanded(true)}>{progress.runs > 0 ? "Tekrar gir" : "Sınava gir"}</Button>
+        ) : null}
       </View>
-      {progress.open ? (
-        <Button onPress={() => open(progress.open!.id)}>{expired ? "Sonucu gör" : "Devam et"}</Button>
-      ) : !expanded ? (
-        <Button onPress={() => setExpanded(true)}>{progress.runs > 0 ? "Tekrar gir" : "Sınava gir"}</Button>
-      ) : (
+      {expanded && !progress.open && (
         <View style={{ gap: 12 }}>
           <Field label="Süre (dakika)" numeric value={minutes} onChange={setMinutes} editable={!locked} />
           <Text style={styles.muted}>Sınav başlayınca süre işler; süre dolunca sınav kendiliğinden biter.</Text>
@@ -140,7 +131,7 @@ function ExamEntry({
           <ErrorNotice error={task.error} retry={begin} />
         </View>
       )}
-    </Card>
+    </View>
   );
 }
 
@@ -190,7 +181,7 @@ export function ExamList({
   const withExams = (subjects.data ?? []).filter((item) => subjectExams.some((exam) => exam.subject?.id === item.id));
   const selected = withExams.find((item) => item.id === subject) ?? withExams[0];
   const list = kind === "deneme" ? wholeExams : subjectExams.filter((exam) => exam.subject?.id === selected?.id).sort(byNewest);
-  const loading = exams.loading || (kind === "ders" && subjects.loading);
+  const loading = exams.loading || attempts.loading || (kind === "ders" && subjects.loading);
   const failure = exams.error ?? (kind === "ders" ? subjects.error : null);
   return (
     <>
@@ -198,8 +189,8 @@ export function ExamList({
         title={kind === "deneme" ? vocabulary.deneme.title : vocabulary.ders.title}
         subtitle={
           kind === "deneme"
-            ? "Geçmiş sınavın tamamını gerçek düzende ve süreyle çöz. Silahlı sınav 125, silahsız sınav 100 sorudur."
-            : "Bir ders seç ve o dersin geçmiş sınavlardaki sorularını sınav olarak çöz."
+            ? "Geçmiş sınavları özgün soru sırasıyla çöz."
+            : "Dersini seç, geçmiş sınavlarla çalış."
         }
       />
       {kind === "deneme" && (
@@ -231,7 +222,7 @@ export function ExamList({
             }}
           >
             <BookOpen size={18} color={palette.primary} />
-            <Text style={{ flex: 1, fontSize: 13, fontWeight: "700", color: palette.ink }}>
+            <Text style={{ flex: 1, fontSize: 14, lineHeight: 21, fontWeight: "700", color: palette.ink }}>
               {selected?.name}
             </Text>
             <ChevronDown size={16} color={palette.muted} />
@@ -254,9 +245,10 @@ export function ExamList({
         </>
       )}
       {loading ? (
-        <Loading />
+        <Loading layout="list" label="Sınavlar yükleniyor" />
       ) : failure ? (
         <ErrorNotice
+          title="Sınavlar yüklenemedi"
           error={failure}
           retry={() => {
             void exams.reload();
@@ -271,7 +263,7 @@ export function ExamList({
         />
       ) : (
         <>
-          <ErrorNotice error={attempts.error} retry={() => void attempts.reload()} />
+          <ErrorNotice title="Önceki sınav bilgilerin yüklenemedi" error={attempts.error} retry={() => void attempts.reload()} />
           <Columns>
             {list.map((exam) => (
               <ExamEntry
@@ -358,9 +350,9 @@ export function Results({ context, openExam }: { context: StudyContext; openExam
     <>
       <ScreenTitle title={vocabulary.results.title} subtitle="Girdiğin deneme ve ders sınavları. Bir sınavı açıp cevaplarını tek tek incele." />
       {exams.loading ? (
-        <Loading />
+        <Loading layout="list" label="Sonuçların yükleniyor" />
       ) : exams.error ? (
-        <ErrorNotice error={exams.error} retry={() => void exams.reload()} />
+        <ErrorNotice title="Sonuçların yüklenemedi" error={exams.error} retry={() => void exams.reload()} />
       ) : exams.data?.data.length === 0 ? (
         <EmptyState icon={Clock3} title="Henüz bir sınava girmedin" message="Girdiğin sınavlar ve sonuçların burada görünür." />
       ) : (

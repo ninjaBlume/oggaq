@@ -48,6 +48,7 @@ Sayfa başlığı ve menü girişi `title`, alt sekme gibi dar yerler `short` ku
 - **Tersine çevirme değil, ayrı palet:** saf siyah yerine lacivert-gri; yükseklik arttıkça yüzey açılır (`paper` < `surface` < `surfaceContainer`); vurgu renkleri koyu zeminde AA geçecek biçimde açılır ve doygunluğu azaltılır; açık mavi üzerindeki yazı koyudur (`onPrimary`).
 - **Web ve yönetim paneli:** `tokens.css` CSS değişkenlerini üretir; cihazın koyu tercihi `prefers-color-scheme` ile, kullanıcının zorlaması `data-theme` ile uygulanır. Sayfa açılışında tema, ilk boyamadan önce uygulanır (parlama olmaz).
 - **Mobil:** sistem teması dinlenir; tema değişince açık ekranların durumu (sınav, form) kaybolmaz.
+- **Mobil okunabilirlik:** sayfa başlığı 26/33px, yardımcı metin 14/21px, soru gövdesi 17/27px. Ölçekler mobil tema yapılandırmasından alınır; sistem yazı büyütmesi kapatılmaz.
 - Resimler ve ikonlar rolden renk alır; koyu modda ayrı görsel gerekmez.
 
 ## 5. Pencere sınıfları ve tablet
@@ -72,6 +73,9 @@ Web ve yönetim paneli aynı sınıfları kullanır: telefonda üst gezinme kayd
 - **Skor kutusu:** skor büyük ve ilk okunan şeydir; altında doğru/yanlış/boş oranı çubuğu ve nokta + sayı + ad açıklaması.
 - **Seçim listesi (örn. ders seçimi):** alt panel, sola hizalı tam genişlik düğmeler.
 - **Kart:** `surface` zemin, `line` kenar, iç boşluk 14 (geniş pencerede 20), kart içi aralık 12.
+- **Mobil öncelik:** devam eden sınav ana sayfada kısayollardan önce gelir. Alt sekmeler günlük hedefleri taşır; yan menü tekrar/başarı araçları, çalışma alanı seçimi ve çıkış içindir.
+- **Mobil eylem:** kart köşesi 24px, düğme köşesi 16px (basışta 12px); kapsül seçim gruplarına ayrılır. Liste eylemleri en az 44px, normal düğmeler en az 54px yüksekliğindedir. Devam eylemi ana dolgu, yeni sınav ikincil dolgu kullanır.
+- **Bekleme ve hata:** listeler statik iskeletle yerini korur; erişilebilir tek yükleme açıklaması bulunur. Hata ilgili bölümün neyi yükleyemediğini ve uygulanabilir yeniden deneme yolunu gösterir.
 
 ## 7. Reklam yuvası (ileride)
 

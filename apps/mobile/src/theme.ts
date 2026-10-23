@@ -18,9 +18,13 @@ export const palettes: Record<ColorScheme, AppPalette> = {
 };
 export { darkPalette, lightPalette };
 
-export const shape = { ...tokenShape, connected: 6 } as const;
+export const shape = { ...tokenShape, connected: 6, control: 16, controlPressed: 12 } as const;
 
-export const typography = typeScale;
+export const typography = {
+  ...typeScale,
+  headline: { ...typeScale.headline, fontSize: 26, lineHeight: 33, letterSpacing: -0.5 },
+  caption: { fontSize: 14, lineHeight: 21 },
+} as const;
 
 // A score is tinted by its band (60-point mark and 80, see scoreBand): green strong, blue steady, red weak. Colour and
 // tone only; nothing says passed or failed.

@@ -83,7 +83,7 @@ export function MainHeader({
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Menüyü aç"
-        accessibilityHint="Gezinme ve çalışma alanı seçeneklerini gösterir"
+        accessibilityHint="Tekrar, başarı ve çalışma alanı seçeneklerini gösterir"
         accessibilityState={{ expanded }}
         aria-expanded={expanded}
         onPress={() => {
@@ -286,8 +286,8 @@ export function SideMenu({
             showsVerticalScrollIndicator={false}
             contentContainerStyle={navStyles.menuBody}
           >
-            <Text style={navStyles.sectionLabel}>ÇALIŞMALARIM</Text>
-            {[...destinations, ...extraDestinations].map(
+            <Text style={navStyles.sectionLabel}>ÇALIŞMA ARAÇLARI</Text>
+            {extraDestinations.map(
               ({ id, menuLabel, icon: Icon }) => (
               <Pressable
                 key={id}
@@ -510,7 +510,7 @@ function makeNavStyles(palette: AppPalette) {
     backgroundColor: palette.softPrimary,
   },
   avatarLetter: { fontSize: 16, fontWeight: "700", color: palette.primary },
-  contextLabel: { fontSize: 11, lineHeight: 16, color: palette.muted },
+  contextLabel: { fontSize: 12, lineHeight: 18, color: palette.muted },
   panel: {
     height: "100%",
     backgroundColor: palette.surface,
@@ -541,7 +541,7 @@ function makeNavStyles(palette: AppPalette) {
   menuBody: { padding: 16, gap: 6 },
   sectionLabel: {
     color: palette.muted,
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: "700",
     letterSpacing: 1.4,
     paddingHorizontal: 12,
@@ -554,7 +554,7 @@ function makeNavStyles(palette: AppPalette) {
     gap: 12,
     paddingHorizontal: 12,
     paddingVertical: 14,
-    borderRadius: shape.full,
+    borderRadius: shape.medium,
   },
   menuText: {
     flex: 1,

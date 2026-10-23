@@ -36,7 +36,7 @@ export function makeStyles(palette: AppPalette) {
       color: palette.ink,
     },
     text: { ...typography.body, color: palette.ink },
-    muted: { fontSize: 13, color: palette.muted, lineHeight: 20 },
+    muted: { ...typography.caption, color: palette.muted },
     eyebrow: {
       fontSize: 11,
       fontWeight: "800",
@@ -45,7 +45,7 @@ export function makeStyles(palette: AppPalette) {
     },
     button: {
       minHeight: 54,
-      borderRadius: 28,
+      borderRadius: shape.control,
       paddingVertical: 15,
       paddingHorizontal: 20,
       backgroundColor: palette.primary,
@@ -118,7 +118,7 @@ export function makeStyles(palette: AppPalette) {
       borderRadius: 16,
       backgroundColor: palette.surface,
     },
-    link: { color: palette.primary, fontSize: 13, fontWeight: "700" },
+    link: { color: palette.primary, fontSize: 14, fontWeight: "700" },
   });
 }
 export type Styles = ReturnType<typeof makeStyles>;
