@@ -1,0 +1,11 @@
+[Unit]
+Description=OGGAQ gece yedeği zamanlayıcısı
+
+[Timer]
+# Türkiye saatiyle gece 03:30 (sunucu saati UTC ise 00:30). Rastgele gecikme yok: tatbikat saatleri sabit kalsın.
+OnCalendar=*-*-* 00:30:00 UTC
+Persistent=true
+Unit=oggaq-backup.service
+
+[Install]
+WantedBy=timers.target

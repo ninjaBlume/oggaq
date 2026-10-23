@@ -1,0 +1,23 @@
+# /etc/cloudflared/config.yml — SEÇENEK A (Cloudflare Tunnel). Bu dosya yalnızca yapıdır; tünel kimlik bilgisi
+# (<TUNEL-KIMLIGI>.json) ve token ASLA depoya girmez, yalnızca sunucuda /etc/cloudflared altında durur (izin 0600).
+#
+# Tüneli oluşturmak, Cloudflare hesabınızı ve alan adınızın Cloudflare bölgesinde (zone) olmasını gerektirir:
+#   cloudflared tunnel login                      # tarayıcıda hesabınızla yetkilendirir
+#   cloudflared tunnel create oggaq               # kimlik bilgisi dosyasını ve tünel kimliğini üretir
+#   cloudflared tunnel route dns oggaq app.example.com
+#   cloudflared tunnel route dns oggaq admin.example.com
+#   cloudflared tunnel route dns oggaq api.example.com
+# (Komutları kullanıcı kendi hesabıyla çalıştırır; hazırlayan taraf Cloudflare API'sini çağırmaz.)
+tunnel: <TUNEL-KIMLIGI>
+credentials-file: /etc/cloudflared/<TUNEL-KIMLIGI>.json
+
+# Üç ana makine adı da aynı yerel nginx girişine gider; nginx Host başlığına göre ayırır.
+ingress:
+  - hostname: app.example.com
+    service: http://127.0.0.1:8080
+  - hostname: admin.example.com
+    service: http://127.0.0.1:8080
+  - hostname: api.example.com
+    service: http://127.0.0.1:8080
+  # Eşleşmeyen her şey için zorunlu son kural.
+  - service: http_status:404

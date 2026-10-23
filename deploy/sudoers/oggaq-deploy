@@ -1,0 +1,6 @@
+# /etc/sudoers.d/oggaq-deploy (visudo -c -f ile denetleyin, izin 0440). Dağıtım kullanıcısı `oggaq`
+# yalnızca şu komutları parolasız çalıştırabilir; başka hiçbir şeyi değil.
+oggaq ALL=(root) NOPASSWD: /usr/bin/systemctl reload php8.4-fpm
+oggaq ALL=(root) NOPASSWD: /usr/bin/systemctl restart oggaq-horizon
+oggaq ALL=(root) NOPASSWD: /usr/bin/systemctl restart oggaq-scheduler
+oggaq ALL=(root) NOPASSWD: /usr/bin/systemctl start oggaq-backup.service

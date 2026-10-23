@@ -1,0 +1,11 @@
+# /etc/logrotate.d/oggaq — Laravel günlükleri LOG_STACK=daily ile kendi kendine döner (14 gün); bu dosya
+# yedek, nginx ve dışa aktarma günlüklerini sınırlar. Günlükler kişisel veri taşımaz ama yine de kısa tutulur.
+/var/log/oggaq/*.log {
+    weekly
+    rotate 8
+    missingok
+    notifempty
+    compress
+    delaycompress
+    create 0640 oggaq oggaq
+}

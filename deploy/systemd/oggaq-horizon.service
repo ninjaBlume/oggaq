@@ -1,0 +1,24 @@
+[Unit]
+Description=OGGAQ Horizon (kuyruk işleyicisi)
+After=network.target postgresql.service redis-server.service
+Requires=redis-server.service
+
+[Service]
+User=oggaq
+Group=oggaq
+WorkingDirectory=/srv/oggaq/current/backend
+ExecStart=/usr/bin/php artisan horizon
+# deploy.sh "php artisan horizon:terminate" çağırır: Horizon düzgünce kapanır, systemd yeni sürümle başlatır.
+Restart=always
+RestartSec=5
+# Çalışan işlere kapanmak için zaman tanı (Horizon'un `timeout` ayarından uzun olmalı).
+TimeoutStopSec=60
+KillSignal=SIGTERM
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

@@ -3,6 +3,7 @@
 namespace App\Modules\Identity\Actions;
 
 use App\Models\User;
+use App\Modules\Identity\AccountErasureLedger;
 use App\Modules\Identity\Notifications\AccountDeletedNotification;
 use App\Support\ApiProblem;
 use Illuminate\Support\Facades\DB;
@@ -21,12 +22,9 @@ class DeleteAccount
         DB::transaction(function () use ($actor) {
             $user = User::whereKey($actor->id)->lockForUpdate()->firstOrFail();
             $this->assertDeletable($user);
-            DB::statement("select set_config('oggaq.account_erasure', 'on', true)");
-            try {
-                $this->erase($user);
-            } finally {
-                DB::statement("select set_config('oggaq.account_erasure', 'off', true)");
-            }
+            // Written in the same transaction: either the person is erased and on the list, or nothing happened.
+            AccountErasureLedger::record($user->id, now());
+            $this->erasePersonalData($user);
         });
         // Only the old address is left to say goodbye to; the queue payload is encrypted and sent after commit.
         Notification::route('mail', $email)->notify(new AccountDeletedNotification);
@@ -42,6 +40,18 @@ class DeleteAccount
                 ->where('o.role', 'company_admin')->where('o.status', 'active')->whereColumn('o.user_id', '!=', 'm.user_id'))->exists();
         if ($onlyAdminOf) {
             throw new ApiProblem(409, 'last_company_admin', 'Bir kurumun tek yöneticisi hesabını silemez. Önce başka bir kurum yöneticisi atanmalı.');
+        }
+    }
+
+    // The one place that lifts the database's refusal to delete finished answers, for the length of the caller's transaction.
+    // Also used after a restore to remove accounts that had been erased before the backup was taken.
+    public function erasePersonalData(User $user): void
+    {
+        DB::statement("select set_config('oggaq.account_erasure', 'on', true)");
+        try {
+            $this->erase($user);
+        } finally {
+            DB::statement("select set_config('oggaq.account_erasure', 'off', true)");
         }
     }
 
