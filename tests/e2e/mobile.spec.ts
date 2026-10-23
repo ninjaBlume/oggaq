@@ -654,3 +654,21 @@ test("liste beklerken iskelet gösterir, hata sonrası yeniden deneme gerçek li
   await expect(page.getByText("1. Deneme Sınavı", { exact: true })).toBeVisible();
   await expect(page.getByRole("alert")).toHaveCount(0);
 });
+
+
+test("kuruma bağlı olmayan öğrenciye kişisel çalışma alanı veya gereksiz seçim gösterilmez", async ({ page }) => {
+  fixture("setup");
+  await login(page);
+  await expect(page.getByText("Kişisel çalışma alanın", { exact: true })).toHaveCount(0);
+  await page.getByRole("tab", { name: "Profil", exact: true }).click();
+  await expect(page.getByText("Hesabın ve uygulama tercihlerin.", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Çalışma alanın", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /çalışma alanını seç/ })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Görünüm: Cihaz ayarı", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
+  const menu = page.getByRole("dialog");
+  await expect(menu.getByText("ÇALIŞMA ALANIM", { exact: true })).toHaveCount(0);
+  await expect(menu.getByRole("button", { name: /çalışma alanını seç/ })).toHaveCount(0);
+  await expect(menu.getByRole("button", { name: "Tekrar sınavı", exact: true })).toBeVisible();
+  await expect(menu.getByRole("button", { name: "Çıkış yap", exact: true })).toBeVisible();
+});

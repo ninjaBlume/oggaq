@@ -32,7 +32,7 @@ Sayfa başlığı ve menü girişi `title`, alt sekme gibi dar yerler `short` ku
 
 - **Slogan somut bilgi verir:** “Özel güvenlik sınavlarına hazırlan.” Genel motivasyon cümleleri (“bir adım daha”, “kendi hızında”) kullanılmaz; her metin kullanıcıya ne yapabileceğini veya ne olduğunu söyler.
 - **Marka metni tek yerde:** ad, alt başlık (“ÖGG Soru Cevap Platformu”) ve slogan mobilde `apps/mobile/brand.json`, webde ve yönetimde `src/config.ts` içindedir. Ekranlar bu değerleri okur; metni ekrana yazmak yerine yapılandırmadan alın.
-- **Başlık altı etiketi:** kişisel çalışma alanında logonun altında platform alt başlığı görünür; kurum alanında kurumun adı görünür. “Kişisel çalışma” yalnız çalışma alanı seçicide kalır.
+- **Başlık altı etiketi:** bireysel kullanımda logonun altında platform alt başlığı görünür; kurumda kurumun adı görünür. Tek erişim alanı olan mobil öğrenciye “kişisel çalışma alanı” etiketi veya seçici gösterilmez. Alan seçimi yalnız birden fazla seçenek olduğunda sunulur.
 
 ## 3. Renk
 
@@ -73,7 +73,7 @@ Web ve yönetim paneli aynı sınıfları kullanır: telefonda üst gezinme kayd
 - **Skor kutusu:** skor büyük ve ilk okunan şeydir; altında doğru/yanlış/boş oranı çubuğu ve nokta + sayı + ad açıklaması.
 - **Seçim listesi (örn. ders seçimi):** alt panel, sola hizalı tam genişlik düğmeler.
 - **Kart:** `surface` zemin, `line` kenar, iç boşluk 14 (geniş pencerede 20), kart içi aralık 12.
-- **Mobil öncelik:** devam eden sınav ana sayfada kısayollardan önce gelir. Alt sekmeler günlük hedefleri taşır; yan menü tekrar/başarı araçları, çalışma alanı seçimi ve çıkış içindir.
+- **Mobil öncelik:** devam eden sınav ana sayfada kısayollardan önce gelir. Alt sekmeler günlük hedefleri taşır; yan menü tekrar/başarı araçları ve çıkış içindir. Birden fazla erişim alanı varsa menü/profil alan seçimini de gösterir.
 - **Mobil eylem:** kart köşesi 24px, düğme köşesi 16px (basışta 12px); kapsül seçim gruplarına ayrılır. Liste eylemleri en az 44px, normal düğmeler en az 54px yüksekliğindedir. Devam eylemi ana dolgu, yeni sınav ikincil dolgu kullanır.
 - **Bekleme ve hata:** listeler statik iskeletle yerini korur; erişilebilir tek yükleme açıklaması bulunur. Hata ilgili bölümün neyi yükleyemediğini ve uygulanabilir yeniden deneme yolunu gösterir.
 

@@ -5,7 +5,7 @@ import { ApiError } from "@oggaq/api-client";
 export function errorMessage(error: unknown): string {
   if (error instanceof ApiError) {
     if (error.status === 422) return Object.values(error.problem.errors ?? {}).flat()[0] ?? error.message;
-    if (error.status === 403) return "Bu işlem için erişim iznin yok. Seçili çalışma alanını kontrol et.";
+    if (error.status === 403) return "Bu işlem için erişim iznin yok. Hesabının erişim yetkilerini kontrol et.";
     if (error.status === 429) return "Kısa sürede çok fazla istek gönderildi. Biraz bekleyip yeniden dene.";
     return error.message;
   }

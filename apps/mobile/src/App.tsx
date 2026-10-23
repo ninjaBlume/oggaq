@@ -263,13 +263,13 @@ function Workspace({
             />
           ) : (
             <Card>
-              <Heading>Çalışma alanına erişilemiyor</Heading>
+              <Heading>Sınavlarına erişilemiyor</Heading>
               <Text style={styles.text}>
-                Üyeliğin sona ermiş olabilir. Başka çalışma alanını seç.
+                Kurum üyeliğin sona ermiş olabilir. Erişebildiğin sınavlara dönebilirsin.
               </Text>
               {query.data?.map((c) => (
                 <Button key={c.id} onPress={() => setContextId(c.id)}>
-                  {c.name}
+                  {c.kind === "personal" ? "Sınavlarıma dön" : c.name}
                 </Button>
               ))}
             </Card>

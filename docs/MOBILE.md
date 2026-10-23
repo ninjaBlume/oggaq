@@ -43,6 +43,12 @@ Doğrulama: 63 token/kontrast kontrolü, tüm workspace'lerde strict tip kontrol
 
 Doğrulama: strict TypeScript, 25 mobil birim testi, 63 ortak token/kontrast kontrolü ve yalnız `oggaq_test` PostgreSQL üzerinde 16 mobil Chromium E2E geçti. E2E; mevcut sınav/sonuç/kurum/çıkış akışlarına ek olarak devam kartının önceliğini ve aynı cevabı koruyarak açılmasını, yükleme iskeletini, sunucu hatasından gerçek listeye yeniden denemeyi, sade menüyü ve 320/390/834px ile yatay görünümü kapsar. iOS/Android Hermes ve web export başarılıdır. Device Hub iPhone 18 Pro / iOS 27.0 / Expo Go 58.0.5 üzerinde ana sayfa ve kompakt liste açık/koyu temada, menü ve yükleme durumu native olarak incelendi; koyu tercih geri yüklendi. Görüntüler `artifacts/mobile-polish/` içinde git dışındadır. Fiziksel iPhone/Android ve Android emülatörü bu değişiklik için denenmedi. Web/admin ekranları ve sunucu yayını bu mobil düzenlemede değiştirilmedi; önceki audit bulgusu devam eder.
 
+## 24 Ekim 2026: Bireysel öğrencide gereksiz alan seçimini gizleme
+
+Tek erişim alanı olan öğrenci için profil ve yan menüdeki “Çalışma alanın / ÇALIŞMA ALANIM” bölümleri gösterilmez. Profil açıklaması “Hesabın ve uygulama tercihlerin.” olarak sadeleştirildi; ana sayfanın kişisel alan dipnotu kaldırıldı. Erişim hataları normal öğrenciye alan seçmesini söylemez; iptal edilmiş kurum erişiminden bireysel sınavlarına dönüş düğmesi “Sınavlarıma dön” yazar. Sunucudan dönen birden fazla alanı olan kullanıcı menü/profil üzerinden geçiş yapabilir; aynı API bağlamı ve kişisel/kurum geçmişi izolasyonu kullanılır.
+
+Doğrulama: strict TypeScript, 25 mobil birim testi ve `oggaq_test` PostgreSQL üzerinde 17 mobil Chromium E2E geçti. Yeni senaryo kurumsuz sentetik öğrencinin ana sayfa, profil ve menüsünde gereksiz metin/seçim bulunmadığını; mevcut senaryolar kurum seçimi, geçmiş ayrımı ve çıkışı doğrular. iOS/Android Hermes ve web export başarılıdır. Device Hub Expo Go üzerinde kurumsuz öğrenci profili ve menüsü incelendi. Fiziksel cihazlar bu değişiklik için denenmedi; web arayüzü bu mobil değişikliğin kapsamında değildir.
+
 ## Mobil tasarım ve gezinme
 
 10 Ekim 2026 mobil arayüzü telefon uygulaması olarak yenilendi. `apps/web` ve `apps/admin` masaüstü arayüzlerinden bağımsızdır; ortak API istemcisi ve iş kuralları korunur. Renkler `src/theme.ts`, bileşenler `src/ui.tsx`, marka başlığı `brand.json` içindedir.

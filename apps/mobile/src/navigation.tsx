@@ -83,7 +83,7 @@ export function MainHeader({
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Menüyü aç"
-        accessibilityHint="Tekrar, başarı ve çalışma alanı seçeneklerini gösterir"
+        accessibilityHint="Tekrar ve başarı seçeneklerini gösterir"
         accessibilityState={{ expanded }}
         aria-expanded={expanded}
         onPress={() => {
@@ -323,42 +323,46 @@ export function SideMenu({
               </Pressable>
               ),
             )}
-            <View style={navStyles.separator} />
-            <Text style={navStyles.sectionLabel}>ÇALIŞMA ALANIM</Text>
-            {contexts.map((c) => {
-              const Icon = c.kind === "personal" ? UserRound : Building2;
-              return (
-                <Pressable
-                  key={c.id}
-                  accessibilityRole="button"
-                  accessibilityLabel={`${c.name} çalışma alanını seç`}
-                  accessibilityState={{ selected: c.id === context.id }}
-                  aria-selected={c.id === context.id}
-                  onPress={() =>
-                    dismiss(() => {
-                      if (c.id !== context.id) choose(c.id);
-                    })
-                  }
-                  style={({ pressed }) => [
-                    navStyles.menuRow,
-                    pressed && navStyles.pressed,
-                  ]}
-                >
-                  <Icon size={21} color={palette.muted} />
-                  <View style={{ flex: 1, gap: 3 }}>
-                    <Text style={navStyles.contextName}>{c.name}</Text>
-                    <Text style={navStyles.contextLabel}>
-                      {c.kind === "personal"
-                        ? "Kişisel çalışma"
-                        : "Kurum çalışma alanı"}
-                    </Text>
-                  </View>
-                  {c.id === context.id && (
-                    <Check size={19} color={palette.primary} />
-                  )}
-                </Pressable>
-              );
-            })}
+            {contexts.length > 1 && (
+              <>
+                <View style={navStyles.separator} />
+                <Text style={navStyles.sectionLabel}>ÇALIŞMA ALANIM</Text>
+                {contexts.map((c) => {
+                  const Icon = c.kind === "personal" ? UserRound : Building2;
+                  return (
+                    <Pressable
+                      key={c.id}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${c.name} çalışma alanını seç`}
+                      accessibilityState={{ selected: c.id === context.id }}
+                      aria-selected={c.id === context.id}
+                      onPress={() =>
+                        dismiss(() => {
+                          if (c.id !== context.id) choose(c.id);
+                        })
+                      }
+                      style={({ pressed }) => [
+                        navStyles.menuRow,
+                        pressed && navStyles.pressed,
+                      ]}
+                    >
+                      <Icon size={21} color={palette.muted} />
+                      <View style={{ flex: 1, gap: 3 }}>
+                        <Text style={navStyles.contextName}>{c.name}</Text>
+                        <Text style={navStyles.contextLabel}>
+                          {c.kind === "personal"
+                            ? "Kişisel çalışma"
+                            : "Kurum çalışma alanı"}
+                        </Text>
+                      </View>
+                      {c.id === context.id && (
+                        <Check size={19} color={palette.primary} />
+                      )}
+                    </Pressable>
+                  );
+                })}
+              </>
+            )}
           </ScrollView>
           <View
             style={[

@@ -265,9 +265,6 @@ export function Home({
         ))}
         </Columns>
       )}
-      <Text style={[styles.muted, { textAlign: "center", fontSize: 13 }]}>
-        {context.kind === "personal" ? "Kişisel çalışma alanın" : context.name}
-      </Text>
     </>
   );
 }

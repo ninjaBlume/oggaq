@@ -43,7 +43,7 @@ export function Profile({
     <>
       <ScreenTitle
         title={vocabulary.profile.title}
-        subtitle="Hesabın, görünümün ve çalışma alanların."
+        subtitle="Hesabın ve uygulama tercihlerin."
       />
       <View style={{ alignItems: "center", paddingVertical: 20, gap: 12 }}>
         <View
@@ -130,52 +130,56 @@ export function Profile({
         value={preference}
         onChange={setPreference}
       />
-      <SectionTitle>Çalışma alanın</SectionTitle>
-      <Text style={styles.muted}>
-        Seçtiğin alandaki sorular ve geçmişin gösterilir.
-      </Text>
-      {contexts.map((c) => (
-        <Pressable
-          key={c.id}
-          accessibilityRole="button"
-          accessibilityLabel={`${c.name} çalışma alanını seç`}
-          accessibilityState={{ selected: c.id === context.id }}
-          onPress={() => choose(c.id)}
-          style={({ pressed }) => [
-            {
-              borderRadius: 20,
-              borderWidth: 1.5,
-              borderColor: c.id === context.id ? palette.primary : palette.line,
-              backgroundColor:
-                c.id === context.id ? palette.softPrimary : palette.surface,
-              padding: 14,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 14,
-            },
-            pressed && { opacity: 0.8 },
-          ]}
-        >
-          {c.kind === "personal" ? (
-            <UserRound size={22} color={palette.primary} />
-          ) : (
-            <Building2 size={22} color={palette.primary} />
-          )}
-          <View style={{ flex: 1, gap: 4 }}>
-            <Text
-              style={{ color: palette.ink, fontSize: 14, fontWeight: "700" }}
+      {contexts.length > 1 && (
+        <>
+          <SectionTitle>Çalışma alanın</SectionTitle>
+          <Text style={styles.muted}>
+            Seçtiğin alandaki sorular ve geçmişin gösterilir.
+          </Text>
+          {contexts.map((c) => (
+            <Pressable
+              key={c.id}
+              accessibilityRole="button"
+              accessibilityLabel={`${c.name} çalışma alanını seç`}
+              accessibilityState={{ selected: c.id === context.id }}
+              onPress={() => choose(c.id)}
+              style={({ pressed }) => [
+                {
+                  borderRadius: 20,
+                  borderWidth: 1.5,
+                  borderColor: c.id === context.id ? palette.primary : palette.line,
+                  backgroundColor:
+                    c.id === context.id ? palette.softPrimary : palette.surface,
+                  padding: 14,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 14,
+                },
+                pressed && { opacity: 0.8 },
+              ]}
             >
-              {c.name}
-            </Text>
-            <Text style={styles.muted}>
-              {c.kind === "personal"
-                ? "Sadece sana ait"
-                : "Kurum çalışma alanı"}
-            </Text>
-          </View>
-          {c.id === context.id && <Check size={20} color={palette.primary} />}
-        </Pressable>
-      ))}
+              {c.kind === "personal" ? (
+                <UserRound size={22} color={palette.primary} />
+              ) : (
+                <Building2 size={22} color={palette.primary} />
+              )}
+              <View style={{ flex: 1, gap: 4 }}>
+                <Text
+                  style={{ color: palette.ink, fontSize: 14, fontWeight: "700" }}
+                >
+                  {c.name}
+                </Text>
+                <Text style={styles.muted}>
+                  {c.kind === "personal"
+                    ? "Sadece sana ait"
+                    : "Kurum çalışma alanı"}
+                </Text>
+              </View>
+              {c.id === context.id && <Check size={20} color={palette.primary} />}
+            </Pressable>
+          ))}
+        </>
+      )}
       <View style={{ paddingTop: 12 }}>
         <Button danger icon={LogOut} disabled={pending} onPress={logout}>
           {pending ? "Oturum kapatılıyor…" : "Çıkış yap"}
