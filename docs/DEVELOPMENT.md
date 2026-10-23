@@ -1,5 +1,7 @@
 # Geliştirme ortamı ve doğrulama
 
+Sunucuda geliştirme kurulumu için [ayrı Docker ortamı](../deploy/server-development/README.md) kullanılır: hedef `oggsorubankasi.codentum.net`, yönetim paneli `/yonetim/`, API `/api/v1/`. Yerel geliştirme komutları aşağıda korunur. Sunucuya kaynak gönderimi gerçek soru/kullanıcı verisinin taşınması anlamına gelmez; veri aktarımı ayrıca onaylanır.
+
 9 Ekim 2026: macOS üzerinde PHP 8.4.26, Laravel 13.35.0, PostgreSQL 18.6, Redis 8.10.2, Node 24.21.0 ve Mailpit 1.31.4 ile yerel backend doğrulandı. Servisler sadece `127.0.0.1` adresine bağlanır. Mevcut PHP 8.5/Node 23/PostgreSQL 14 global bağlantıları değiştirilmedi; proje komutlarında hedef sürümler açıkça seçilir.
 
 ## Kurulum

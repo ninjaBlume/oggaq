@@ -1,0 +1,26 @@
+# Ana compose.yaml ile birlikte, yalnızca Cloudflare yayını onaylandıktan sonra kullanılır.
+services:
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    # Compose file-secret'in 0600 dosyasını okuyabilmek için; host veya Docker socket erişimi verilmez.
+    user: '0:0'
+    command: [tunnel, --no-autoupdate, run, --token-file, /run/secrets/cloudflare_tunnel_token]
+    secrets:
+      - cloudflare_tunnel_token
+    depends_on:
+      - web
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 256m
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+
+secrets:
+  cloudflare_tunnel_token:
+    file: ${OGGAQ_TUNNEL_TOKEN_FILE:?Tünel token dosyası gerekli}

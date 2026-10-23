@@ -11,3 +11,4 @@
 | `php-fpm/`, `systemd/`, `logrotate/`, `sudoers/` | PHP-FPM havuzu, Horizon/zamanlayıcı/yedek/silme listesi birimleri, günlük döndürme, dar sudo izni |
 | `backup/` | Şifreli yedek (`backup.sh`), saklama (`prune.sh`, `test-prune.sh`), geri yükleme (`restore.sh`), doğrulama (`verify.sh`) |
 | `export-content.sh`, `import-content.sh` | Soru bankası içeriğinin kullanıcı verisi olmadan dışa/içe aktarımı |
+| [`server-development/`](server-development/README.md) | Mevcut sitelerle aynı sunucuda, ayrı Docker servisleri ve tek alan adı altında geliştirme ortamı |

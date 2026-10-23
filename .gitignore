@@ -10,6 +10,8 @@ coverage/
 .phpunit.cache/
 .phpunit.result.cache
 .env
+**/.postgres-password
+**/.tunnel-token
 .env.*
 !.env.example
 !.env.*.example
