@@ -45,7 +45,7 @@ Sınav sonuçları PostgreSQL tetikleyicileriyle değiştirilemez. Silme işlemi
 
 ## Açık kalanlar
 
-- **Hukuki metinler:** aydınlatma metni, kullanım koşulları, veri sorumlusu (Codentum / kurum) ve işleyen rolleri, VERBİS uygulanabilirliği, saklama sürelerinin hukuki dayanağı ve yurt dışı aktarım koşulları kararlaştırılmadı; hukukçu gerekir. Bu belge o kararların yerine geçmez.
+- **Hukuki metinler:** aydınlatma metni, kullanım koşulları, veri sorumlusu (henüz belirlenmedi) ve işleyen rolleri, VERBİS uygulanabilirliği, saklama sürelerinin hukuki dayanağı ve yurt dışı aktarım koşulları kararlaştırılmadı; hukukçu gerekir. Bu belge o kararların yerine geçmez.
 - **Yedekten dönüşte imha:** silinen hesap yedekten geri yüklenirse yeniden ortaya çıkar. Bunu önlemek için kişiye bağlanabilen ama kişi bilgisi taşımayan bir imha kaydı (silinen kullanıcı kimliği + tarih) ve geri yükleme sonrası yeniden uygulama adımı gerekir. Henüz uygulanmadı; barındırma ve yedek planıyla birlikte tasarlanacak (yedek dönemi ve tatbikat dahil).
 - **Gerçek e-posta sağlayıcısı:** hesap e-postaları yerelde Mailpit'e gider; üretim SMTP sağlayıcısı ve verinin konumu seçilmedi.
 - **Günlük saklama:** uygulama ve erişim günlüklerinin süresi, konumu ve maskeleme denetimi barındırma planında belirlenecek.
