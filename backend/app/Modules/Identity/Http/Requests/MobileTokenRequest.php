@@ -8,6 +8,8 @@ class MobileTokenRequest extends LoginRequest
     {
         return array_merge(parent::rules(), [
             'device_id' => ['required', 'uuid'],
+            // What kind of device this is; only shown in the user's own device list.
+            'device_platform' => ['sometimes', 'in:ios,android,web'],
         ]);
     }
 }

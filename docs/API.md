@@ -62,10 +62,16 @@ Study: `/contexts/{context}/practice-attempts` GET/POST; `/contexts/{context}/pr
 | `GET /api/v1/auth/verify-email/{id}/{hash}` | Süreli imzalı doğrulama; kullanıcı kontrolü |
 | `GET /api/v1/me`, `PATCH /api/v1/me` | İzin verilen profil alanları |
 | `GET /api/v1/me/contexts` | Kişisel ve aktif üyelik bağlamları |
-| `POST /api/v1/me/data-exports` | Yetkili kişisel veri dışa aktarma işi |
-| `POST /api/v1/me/deletion-requests` | Yakın kimlik doğrulama ile silme talebi |
+| `GET /api/v1/me/sessions` | Açık oturumlar (mobil tokenlar, tarayıcı oturumları; opak kimlik, `current` işareti) |
+| `DELETE /api/v1/me/sessions/{session}` | Bir oturumu kapatma; yalnız kendi oturumu, aksi 404 |
+| `POST /api/v1/me/sessions/revoke-others` | Mevcut parola ile kullanılan dışındaki bütün oturumları kapatma |
+| `POST /api/v1/me/password` | Parola değiştirme; diğer oturumları kapatır |
+| `POST /api/v1/me/email` | E-posta değiştirme talebi (her zaman 202; adres bağlantı açılana kadar değişmez) |
+| `GET /api/v1/auth/confirm-email-change/{id}/{hash}` | Yeni adrese giden imzalı bağlantıyla değişikliği onaylama |
+| `POST /api/v1/me/export` | Kendi verisini JSON dosyası olarak indirme; parola gerekir, günde 3 başarılı indirme |
+| `DELETE /api/v1/me` | Hesabı silme; parola ve “HESABIMI SİL” onayı; 409 `admin_account`, `last_company_admin` |
 
-İleride veri export/silme durum sorguları gerçek iş akışının parçası olarak tanımlanacak. Platform rolü ve membership rolü profil mutation'ından değiştirilemez.
+Hesap uçları e-posta doğrulaması beklemez (yanlış yazılmış adres düzeltilebilmeli), mevcut parolayı yeniden ister ve dakikada 10 çağrıyla sınırlıdır; ayrıntı [PRIVACY](PRIVACY.md). `POST /auth/mobile-tokens` isteğe bağlı `device_platform` (`ios|android|web`) alır; yalnız kullanıcının kendi cihaz listesinde etiket olarak görünür. Platform rolü ve membership rolü profil mutation'ından değiştirilemez.
 
 ## Öğrenci ve içerik
 

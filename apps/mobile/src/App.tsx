@@ -41,6 +41,8 @@ import { Exam } from "./exams";
 import { ExamList, Results } from "./sinavlar";
 import { Home } from "./home";
 import { MotionProvider } from "./motion";
+import { vocabulary } from "@oggaq/study-core";
+import { AccountScreen } from "./account";
 import { Profile } from "./profile";
 import {
   MainHeader,
@@ -53,6 +55,7 @@ import { ThemeProvider, useBody, useLayout, useTheme } from "./themeContext";
 type Routes = {
   Main: undefined;
   Exam: { id: string };
+  Account: undefined;
 };
 const Stack = createNativeStackNavigator<Routes>();
 function MainTabs({
@@ -63,6 +66,7 @@ function MainTabs({
   logout,
   pending,
   exam,
+  account,
 }: {
   user: User;
   context: StudyContext;
@@ -71,6 +75,7 @@ function MainTabs({
   logout: () => void;
   pending: boolean;
   exam: (id: string) => void;
+  account: () => void;
 }) {
   const { styles } = useTheme();
   const layout = useLayout();
@@ -173,6 +178,7 @@ function MainTabs({
                   choose={choose}
                   logout={logout}
                   pending={pending}
+                  account={account}
                 />
               )}
             </ScrollView>
@@ -202,10 +208,14 @@ function Workspace({
   user,
   logout,
   pending,
+  refresh,
+  signedOut,
 }: {
   user: User;
   logout: () => void;
   pending: boolean;
+  refresh: () => void;
+  signedOut: () => void;
 }) {
   const { palette, styles, scheme } = useTheme();
   const body = useBody();
@@ -317,8 +327,12 @@ function Workspace({
               logout={logout}
               pending={pending}
               exam={(id) => navigation.navigate("Exam", { id })}
+              account={() => navigation.navigate("Account")}
             />
           )}
+        </Stack.Screen>
+        <Stack.Screen name="Account" options={{ title: vocabulary.account.title }}>
+          {() => <AccountScreen user={user} refresh={refresh} finished={signedOut} />}
         </Stack.Screen>
         <Stack.Screen name="Exam" options={{ title: "Sınav" }}>
           {({ route }) => <ExamDetail context={context} id={route.params.id} />}
@@ -427,6 +441,8 @@ function Application() {
           user={user}
           logout={logout}
           pending={task.pending}
+          refresh={() => void refresh()}
+          signedOut={() => void clear()}
         />
       ) : (
         <SafeAreaView style={styles.shell} edges={["top", "bottom"]}>

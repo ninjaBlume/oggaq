@@ -15,7 +15,7 @@ Türkiye'deki özel güvenlik görevlisi adayları Türkçe bir uygulamayla ders
 
 ## İlk ürün kapsamı
 
-- E-posta/parola kaydı, giriş/çıkış, e-posta doğrulama, parola sıfırlama, profil, veri erişimi ve hesap silme.
+- E-posta/parola kaydı, giriş/çıkış, e-posta doğrulama, parola sıfırlama, profil, veri erişimi (dışa aktarma), hesap silme, e-posta/parola değiştirme ve cihaz yönetimi.
 - Merkezi dersler, konular ve tek doğru cevaplı çoktan seçmeli sorular; değişken seçenek sayısı, açıklama, görsel, kaynak ve yayın durumu.
 - Ders/konu çalışması, çıkmış sınav ve şablona dayanan deneme sınavı.
 - Sonuçta toplam/doğru/yanlış/boş sayıları, başarı oranı, puan, süre ve ders dağılımı.

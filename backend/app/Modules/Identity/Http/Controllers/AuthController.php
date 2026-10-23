@@ -53,7 +53,13 @@ class AuthController extends Controller
             $name = 'device:'.$request->validated('device_id');
             $locked->tokens()->where('name', $name)->delete();
 
-            return $locked->createToken($name, ['api:access'], $expiresAt)->plainTextToken;
+            $created = $locked->createToken($name, ['api:access'], $expiresAt);
+            $label = ['ios' => 'iOS cihaz', 'android' => 'Android cihaz', 'web' => 'Web önizleme'][$request->validated('device_platform')] ?? null;
+            if ($label !== null) {
+                $created->accessToken->forceFill(['device_label' => $label])->save();
+            }
+
+            return $created->plainTextToken;
         });
 
         return response()->json(['data' => [

@@ -31,6 +31,8 @@ Kullanıcı kayıt formuyla kurum üyeliği olmadan hesap açabilir. Parola kura
 - Türkçe yükleniyor/boş/hata/retry, alan etiketleri, klavye seçenekleri, telefon/tablet/masaüstü düzeni.
 - Biten denemenin sonucunda her sorunun altında **Soruyu bildir**: neden (radyo) ve en çok 500 karakterlik isteğe bağlı not; gönderince “Bildirimin alındı, teşekkürler.” ve düğme “Bildirdin” olur, sayfa yenilense de kalır. Süre işlerken bildirim yoktur. Cevap açıklaması yalnız doluysa gösterilir.
 
+- **Hesabım** (`/account`, üst menüde *Hesabım*; çalışma alanından bağımsız sayfa): e-posta adresini değiştir (yeni adrese imzalı bağlantı; `/confirm-email-change` sayfası bağlantıyı onaylar), parolayı değiştir (diğer cihazların oturumunu kapatır), cihazlar ve oturumlar (tek tek veya diğer hepsinden çıkış; liste ilk 5 ile sınırlı, “Tümünü göster”), **Verilerimi indir** (JSON dosyası, günde 3 kez), **Hesabı sil** (tehlike bölgesi: parola + “HESABIMI SİL”; silinince herkese açık `/account-deleted` onay ekranı). Her işlem mevcut parolayı ister; yönetici paneli hesabı silme ekranı taşımaz. Ayrıntı [PRIVACY](../../docs/PRIVACY.md).
+
 Gerçek SQL/PDF içeriği eklenmedi; normal veritabanı boşsa soru listesi boş görünür. Sorular yönetim panelinde kaynakları incelenerek oluşturulup yayımlanır. Sentetik sorular yalnız izole test veritabanındadır. Süreli sınav, resmî puanlama, favori, istatistik, import ve offline bu teslimde yoktur.
 
 ## Doğrulama

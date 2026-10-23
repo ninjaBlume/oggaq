@@ -10,6 +10,8 @@ Mobilde cihaz bazlı, sonlu süreli Sanctum token SecureStore içinde tutulur. �
 
 Web oturumu için başlangıç idle hedefi 120 dakika; güvenlik ayarları merkezi ve ortam bazlıdır. Parola sıfırlama/silme gibi hassas işlemler yakın tarihli kimlik doğrulama ister. Parolalar varsayılan olarak Argon2id ile saklanır; üretim varsayılanı 65536 KiB bellek ve dört tur, test ortamı düşük maliyetlidir. Gerçek üretim yükünde maliyet ölçümü ayrıca yapılacaktır. E-posta doğrulaması hassas işlemler için zorunludur; tenant daveti doğrulanmış e-posta hesabıyla eşleştirilir.
 
+Hesap ekranı güvenliği: parola değişimi, e-posta değişimi, dışa aktarma, oturum kapatma ve silme mevcut parolayı yeniden ister (çalınmış oturum tek başına yetmez) ve dakikada 10 çağrıyla sınırlıdır; dışa aktarma günde 3 başarılı indirmeyle sınırlıdır ve yanlış parola bu hakkı harcamaz. Oturum listesi gerçek oturum kimliğini ve token'ı vermez (opak HMAC kimlik). E-posta değişiminde yeni adresin başka hesapta kullanılıp kullanılmadığı yanıttan anlaşılmaz; değişiklik yeni adrese giden imzalı bağlantı açılana kadar yapılmaz, eski adrese bildirim gider. Parola değişince diğer cihazlar kapanır; kullanılan web oturumu Sanctum'un oturum parola özeti güncellenerek açık kalır.
+
 ## Tehditler ve teknik kontroller
 
 | Risk | Uygulanacak kontrol |
@@ -35,9 +37,9 @@ Soru bildirimleri: öğrenci yalnız kendi biten denemesindeki sorunun bildirimi
 
 - İşleme amaçları/veri kategorileri/minimum alanlar kayıt altına alınır; aydınlatma metni sürümlenir. Aydınlatma kaydı ile açık rıza aynı şey sayılmaz.
 - Rıza gereken amaçlar ayrı ve geri çekilebilir kayıtlardır; reklama/analitiğe rıza çekirdek uygulama giriş şartına otomatik bağlanmaz.
-- Kullanıcı kendi verisini görüntüleyip dışa aktarabilir; şirket raporları sadece yetkili bağlamı ve belirlenen alanları içerir.
+- Kullanıcı kendi verisini indirir (`POST /me/export`, parola ve günlük sınırla; yalnız kendi verisi, doğru şık yalnız biten denemede); şirket raporları sadece yetkili bağlamı ve belirlenen alanları içerir.
 - Saklama/imha matrisi veri türü, amaç, hukuki dayanak, süre, yedek ve sorumluyu tanımlar. Süreler hukuki/operasyonel değerlendirme olmadan sabit resmî değer gibi yazılmaz.
-- Hesap silmede yeniden kimlik doğrulama, talep durumu, token/session iptali, yeni yazmaların engellenmesi, transaction/purge işleri ve bağlı cihazların temizlenmesi tasarlanır.
+- Hesap silme uygulandı ([PRIVACY](PRIVACY.md)): mevcut parola ve yazılı onay, tek transaction, token/session iptali, bağlı bütün geçmişin silinmesi, denetim kayıtlarının aktörsüzleştirilmesi, sonuç korumasının yalnız bu işlem için kaldırılması. Yedekten dönüşte imha kaydının yeniden uygulanması henüz yoktur.
 - Yasal saklama gereken kayıtlar ayrıştırılır; soft delete tek başına imha sayılmaz. Yedek dönüşünde silinen hesap/verinin yeniden etkinleşmesini engelleyen imha kaydı uygulanır.
 - Erişim ve yönetici değişiklikleri audit edilir; olay müdahale/ihlal tespiti ve bildirim sorumluluğu ayrıca belirlenir.
 - Hosting, e-posta, hata izleme, Expo build/push ve analitik sağlayıcılarının veri konumu/aktarımı envantere alınır; değerlendirilmemiş entegrasyon aktive edilmez.

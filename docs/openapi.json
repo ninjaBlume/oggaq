@@ -550,6 +550,59 @@
             }
           }
         }
+      },
+      "delete": {
+        "operationId": "deleteAccount",
+        "summary": "Hesabı silme",
+        "description": "Mevcut parola ve “HESABIMI SİL” onayı gerekir. Tek işlemde çalışma geçmişi, üyelikler, oturumlar ve hesap silinir; denetim kayıtları aktörsüz, soru bildirimleri bildireninden ve notundan arındırılmış kalır. 409: admin_account (platform yöneticisi), last_company_admin (kurumun tek yöneticisi).",
+        "tags": [
+          "Identity"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountDeleteInput"
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/me/contexts": {
@@ -4278,6 +4331,396 @@
           }
         }
       }
+    },
+    "/api/v1/me/sessions": {
+      "get": {
+        "operationId": "listSessions",
+        "summary": "Açık oturumlar ve cihazlar",
+        "description": "Mobil tokenlar ve (veritabanı oturum sürücüsünde) tarayıcı oturumları. Kimlikler opak; gerçek oturum kimliği ve token verilmez.",
+        "tags": [
+          "Identity"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/api/v1/me/sessions/{session}": {
+      "delete": {
+        "operationId": "revokeSession",
+        "summary": "Bir oturumu kapatma",
+        "description": "Yalnızca kendi oturumu; başkasınınki veya olmayan için 404.",
+        "tags": [
+          "Identity"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^(mobile-[0-9]+|web-[0-9a-f]{32})$"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/me/sessions/revoke-others": {
+      "post": {
+        "operationId": "revokeOtherSessions",
+        "summary": "Diğer tüm cihazlardan çıkış",
+        "description": "Mevcut parola gerekir. Kullanılan oturum dışındaki bütün token ve tarayıcı oturumlarını kapatır.",
+        "tags": [
+          "Identity"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevokedResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordConfirmInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/password": {
+      "post": {
+        "operationId": "changePassword",
+        "summary": "Parolayı değiştirme",
+        "description": "Mevcut parola ve yeni parola gerekir; diğer cihazlardaki oturumlar kapatılır ve “parolan değişti” e-postası gönderilir.",
+        "tags": [
+          "Identity"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChangeInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/email": {
+      "post": {
+        "operationId": "changeEmail",
+        "summary": "E-posta adresi değiştirme talebi",
+        "description": "Mevcut parola gerekir. Yeni adrese imzalı doğrulama bağlantısı, eski adrese bildirim gider; adres bağlantı açılana kadar değişmez. Adresin başka hesapta kullanılıp kullanılmadığı yanıtta belli olmaz (her zaman 202).",
+        "tags": [
+          "Identity"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailChangeInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/confirm-email-change/{id}/{hash}": {
+      "get": {
+        "operationId": "confirmEmailChange",
+        "summary": "İmzalı bağlantıyla e-posta değişikliğini onaylama",
+        "description": "Giriş yapmış aynı kullanıcı, geçerli signature ve expires gerektirir; bekleyen adres doğrulanmış olarak hesabın adresi olur. Adres bu arada alındıysa 409 email_taken.",
+        "tags": [
+          "Identity"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "hash",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{40}$"
+            }
+          },
+          {
+            "in": "query",
+            "name": "expires",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "signature",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/me/export": {
+      "post": {
+        "operationId": "exportAccountData",
+        "summary": "Verilerimi indirme",
+        "description": "Mevcut parola gerekir; günde en fazla 3 başarılı indirme (aşılırsa 429 export_limit). Yanıt akıtılan bir JSON dosyasıdır (Content-Disposition: attachment).",
+        "tags": [
+          "Identity"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountExport"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordConfirmInput"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4322,6 +4765,13 @@
               "student",
               "platform_admin"
             ]
+          },
+          "pending_email": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "email"
           }
         },
         "required": [
@@ -4329,7 +4779,8 @@
           "name",
           "email",
           "email_verified_at",
-          "platform_role"
+          "platform_role",
+          "pending_email"
         ]
       },
       "Tenant": {
@@ -4601,6 +5052,14 @@
               "device_id": {
                 "type": "string",
                 "format": "uuid"
+              },
+              "device_platform": {
+                "type": "string",
+                "enum": [
+                  "ios",
+                  "android",
+                  "web"
+                ]
               }
             },
             "required": [
@@ -7816,6 +8275,242 @@
         },
         "required": [
           "data"
+        ]
+      },
+      "Session": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^(mobile-[0-9]+|web-[0-9a-f]{32})$"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "mobile",
+              "web"
+            ]
+          },
+          "label": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "last_used_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "current": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "label",
+          "created_at",
+          "last_used_at",
+          "expires_at",
+          "current"
+        ]
+      },
+      "SessionList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Session"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "PasswordConfirmInput": {
+        "type": "object",
+        "properties": {
+          "current_password": {
+            "type": "string",
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "current_password"
+        ],
+        "additionalProperties": false
+      },
+      "PasswordChangeInput": {
+        "type": "object",
+        "properties": {
+          "current_password": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "password": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 128
+          },
+          "password_confirmation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "current_password",
+          "password",
+          "password_confirmation"
+        ],
+        "additionalProperties": false
+      },
+      "EmailChangeInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "current_password": {
+            "type": "string",
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "email",
+          "current_password"
+        ],
+        "additionalProperties": false
+      },
+      "AccountDeleteInput": {
+        "type": "object",
+        "properties": {
+          "current_password": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "confirmation": {
+            "type": "string",
+            "const": "HESABIMI SİL"
+          }
+        },
+        "required": [
+          "current_password",
+          "confirmation"
+        ],
+        "additionalProperties": false
+      },
+      "RevokedResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "revoked": {
+                "type": "integer"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "revoked",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "AccountExport": {
+        "type": "object",
+        "description": "Yalnızca isteyen kullanıcının kendi verisi: profil, üyelikler, çalışma alanları, sınav denemeleri (soru metni, seçenekler, seçimi, doğru şık yalnızca biten denemede), eski alıştırmalar, favoriler, soru bildirimleri ve oturum özeti (token yok).",
+        "properties": {
+          "exported_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "profile": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "memberships": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "study_contexts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "exam_attempts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "practice_attempts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "favorites": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "question_reports": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "sessions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        },
+        "required": [
+          "exported_at",
+          "profile",
+          "memberships",
+          "study_contexts",
+          "exam_attempts",
+          "practice_attempts",
+          "favorites",
+          "question_reports",
+          "sessions"
         ]
       }
     },

@@ -15,6 +15,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'email_verified_at' => $this->email_verified_at?->toISOString(),
             'platform_role' => $this->platform_role,
+            'pending_email' => $this->pending_email,
         ];
     }
 }

@@ -101,7 +101,7 @@ React 19/TypeScript yönetim paneli merkezi içerik API'sine bağlandı; kurum y
 
 Web ve Expo mobil kullanıcı uygulamalarında Türkçe kayıt/giriş, ders/konu/çıkmış sınav/karma deneme, sonuç, yanlış/boş/favori ve başarı akışları; yükleniyor/boş/hata, erişilebilirlik ve tablet/masaüstü düzeni geliştirilir. Platform sürümleri, native build ve gerçek API akışları ayrı doğrulanır.
 
-Hesap silme, veri export, e-posta değiştirme, tüm cihaz oturum yönetimi ve silme/imha süreçleri henüz geliştirilmedi; üretim kapısından önce tamamlanacak.
+Hesap silme, veri dışa aktarma, e-posta/parola değiştirme, cihaz ve oturum yönetimi uygulandı (web `/account`, mobil Profil → Hesabım; [PRIVACY](PRIVACY.md)). Kalanlar: hukuki metinler (aydınlatma, kullanım koşulları), KVKK veri sorumlusu/aktarım kararı, yedekten dönüşte imha kaydının yeniden uygulanması, gerçek e-posta sağlayıcısı ve günlük saklama; üretim kapısından önce tamamlanacak.
 
 Soru bildirimi (öğrenci sonuç ekranı, web/mobil) ve yönetici inceleme kuyruğu (Bildirimler) uygulandı: [QUESTION_BANK](QUESTION_BANK.md#soru-bildirimleri). Tek tek cevap açıklaması yazılmayacağı karara bağlandı. Üretim barındırma ve yedekleme sunucusu hazır; henüz yerelde geliştirilmektedir, yayın ve yedek geri yükleme tatbikatı yapılmadı.
 

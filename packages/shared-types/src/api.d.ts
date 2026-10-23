@@ -198,7 +198,11 @@ export interface paths {
         get: operations["profile"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Hesabı silme
+         * @description Mevcut parola ve “HESABIMI SİL” onayı gerekir. Tek işlemde çalışma geçmişi, üyelikler, oturumlar ve hesap silinir; denetim kayıtları aktörsüz, soru bildirimleri bildireninden ve notundan arındırılmış kalır. 409: admin_account (platform yöneticisi), last_company_admin (kurumun tek yöneticisi).
+         */
+        delete: operations["deleteAccount"];
         options?: never;
         head?: never;
         /**
@@ -1156,6 +1160,146 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Açık oturumlar ve cihazlar
+         * @description Mobil tokenlar ve (veritabanı oturum sürücüsünde) tarayıcı oturumları. Kimlikler opak; gerçek oturum kimliği ve token verilmez.
+         */
+        get: operations["listSessions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/sessions/{session}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Bir oturumu kapatma
+         * @description Yalnızca kendi oturumu; başkasınınki veya olmayan için 404.
+         */
+        delete: operations["revokeSession"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/sessions/revoke-others": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Diğer tüm cihazlardan çıkış
+         * @description Mevcut parola gerekir. Kullanılan oturum dışındaki bütün token ve tarayıcı oturumlarını kapatır.
+         */
+        post: operations["revokeOtherSessions"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Parolayı değiştirme
+         * @description Mevcut parola ve yeni parola gerekir; diğer cihazlardaki oturumlar kapatılır ve “parolan değişti” e-postası gönderilir.
+         */
+        post: operations["changePassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * E-posta adresi değiştirme talebi
+         * @description Mevcut parola gerekir. Yeni adrese imzalı doğrulama bağlantısı, eski adrese bildirim gider; adres bağlantı açılana kadar değişmez. Adresin başka hesapta kullanılıp kullanılmadığı yanıtta belli olmaz (her zaman 202).
+         */
+        post: operations["changeEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/confirm-email-change/{id}/{hash}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * İmzalı bağlantıyla e-posta değişikliğini onaylama
+         * @description Giriş yapmış aynı kullanıcı, geçerli signature ve expires gerektirir; bekleyen adres doğrulanmış olarak hesabın adresi olur. Adres bu arada alındıysa 409 email_taken.
+         */
+        get: operations["confirmEmailChange"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Verilerimi indirme
+         * @description Mevcut parola gerekir; günde en fazla 3 başarılı indirme (aşılırsa 429 export_limit). Yanıt akıtılan bir JSON dosyasıdır (Content-Disposition: attachment).
+         */
+        post: operations["exportAccountData"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1170,6 +1314,8 @@ export interface components {
             email_verified_at: string | null;
             /** @enum {string} */
             platform_role: "student" | "platform_admin";
+            /** Format: email */
+            pending_email: string | null;
         };
         Tenant: {
             /** Format: uuid */
@@ -1248,6 +1394,8 @@ export interface components {
         MobileTokenInput: components["schemas"]["LoginInput"] & {
             /** Format: uuid */
             device_id: string;
+            /** @enum {string} */
+            device_platform?: "ios" | "android" | "web";
         };
         ForgotInput: {
             /** Format: email */
@@ -2077,6 +2225,75 @@ export interface components {
         ResolveQuestionReportsResponse: {
             data: components["schemas"]["ResolveQuestionReportsResult"];
         };
+        Session: {
+            id: string;
+            /** @enum {string} */
+            kind: "mobile" | "web";
+            label: string;
+            /** Format: date-time */
+            created_at: string | null;
+            /** Format: date-time */
+            last_used_at: string | null;
+            /** Format: date-time */
+            expires_at: string | null;
+            current: boolean;
+        };
+        SessionList: {
+            data: components["schemas"]["Session"][];
+        };
+        PasswordConfirmInput: {
+            current_password: string;
+        };
+        PasswordChangeInput: {
+            current_password: string;
+            password: string;
+            password_confirmation: string;
+        };
+        EmailChangeInput: {
+            /** Format: email */
+            email: string;
+            current_password: string;
+        };
+        AccountDeleteInput: {
+            current_password: string;
+            /** @constant */
+            confirmation: "HESABIMI SİL";
+        };
+        RevokedResponse: {
+            data: {
+                revoked: number;
+                message: string;
+            };
+        };
+        /** @description Yalnızca isteyen kullanıcının kendi verisi: profil, üyelikler, çalışma alanları, sınav denemeleri (soru metni, seçenekler, seçimi, doğru şık yalnızca biten denemede), eski alıştırmalar, favoriler, soru bildirimleri ve oturum özeti (token yok). */
+        AccountExport: {
+            /** Format: date-time */
+            exported_at: string;
+            profile: {
+                [key: string]: unknown;
+            };
+            memberships: {
+                [key: string]: unknown;
+            }[];
+            study_contexts: {
+                [key: string]: unknown;
+            }[];
+            exam_attempts: {
+                [key: string]: unknown;
+            }[];
+            practice_attempts: {
+                [key: string]: unknown;
+            }[];
+            favorites: {
+                [key: string]: unknown;
+            }[];
+            question_reports: {
+                [key: string]: unknown;
+            }[];
+            sessions: {
+                [key: string]: unknown;
+            }[];
+        };
     };
     responses: {
         /** @description Türkçe problem ayrıntısı. 429 yanıtında Retry-After bulunur. */
@@ -2357,6 +2574,35 @@ export interface operations {
             };
             401: components["responses"]["Problem"];
             403: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    deleteAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccountDeleteInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
             422: components["responses"]["Problem"];
             429: components["responses"]["Problem"];
         };
@@ -4083,6 +4329,201 @@ export interface operations {
             403: components["responses"]["Problem"];
             404: components["responses"]["Problem"];
             409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    listSessions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionList"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    revokeSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    revokeOtherSessions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordConfirmInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RevokedResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    changePassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordChangeInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    changeEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailChangeInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    confirmEmailChange: {
+        parameters: {
+            query: {
+                expires: number;
+                signature: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+                hash: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    exportAccountData: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordConfirmInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountExport"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
             422: components["responses"]["Problem"];
             429: components["responses"]["Problem"];
         };

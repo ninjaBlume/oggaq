@@ -1,7 +1,10 @@
 <?php
 
 use App\Models\User;
+use App\Modules\Exams\Actions\FinalizeExam;
 use App\Modules\Exams\Actions\StartExam;
+use App\Modules\Exams\Models\ExamAttempt;
+use App\Modules\Identity\Notifications\ConfirmEmailChangeNotification;
 use App\Modules\Identity\Notifications\ResetPasswordNotification;
 use App\Modules\Identity\Notifications\VerifyEmailNotification;
 use App\Modules\QuestionBank\Actions\PublishOfficialExam;
@@ -32,7 +35,7 @@ if (config('database.default') !== 'pgsql' || config('database.connections.pgsql
     throw new RuntimeException('Browser fixtures require the isolated oggaq_test PostgreSQL database.');
 }
 $operation = $argv[1] ?? '';
-if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'official-exam', 'subject-exam', 'more-subject-exams', 'favorite', 'cleanup'], true)) {
+if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'subject-exam', 'more-subject-exams', 'favorite', 'cleanup'], true)) {
     throw new InvalidArgumentException('Expected setup or cleanup.');
 }
 if (in_array($operation, ['verification-link', 'reset-link'], true)) {
@@ -48,6 +51,32 @@ if (in_array($operation, ['verification-link', 'reset-link'], true)) {
         $message = (new ResetPasswordNotification($token))->toMail($user);
     }
     echo $message->actionUrl;
+    exit;
+}
+if (in_array($operation, ['disposable-user', 'user-exists', 'email-change-link'], true)) {
+    // Throw-away accounts for destructive account flows (deletion, e-mail change); they always end in @example.test.
+    $email = $argv[2] ?? '';
+    if (! str_ends_with($email, '@example.test')) {
+        throw new RuntimeException('Account fixtures require synthetic accounts.');
+    }
+    if ($operation === 'user-exists') {
+        echo User::where('email', $email)->exists() ? '1' : '0';
+        exit;
+    }
+    if ($operation === 'email-change-link') {
+        $user = User::where('email', $email)->firstOrFail();
+        echo (new ConfirmEmailChangeNotification($user->id, (string) $user->pending_email))->toMail($user)->actionUrl;
+        exit;
+    }
+    // A verified student with one finished exam (first question answered), so deletion and export have something to act on.
+    $user = User::factory()->create(['name' => 'E2E hesap kullanıcısı', 'email' => $email, 'password' => 'Synthetic-Browser-42!', 'platform_role' => 'student', 'email_verified_at' => now()]);
+    $context = StudyContext::create(['user_id' => $user->id]);
+    $exam = app(StartExam::class)->execute($user, $context->id, ['id' => (string) Str::uuid(), 'question_count' => 3, 'duration_seconds' => 300]);
+    $answer = DB::table('exam_answers')->where('exam_attempt_id', $exam->id)->orderBy('position')->first();
+    $option = DB::table('question_options')->where('question_version_id', $answer->question_version_id)->orderBy('position')->first();
+    DB::table('exam_answers')->where('id', $answer->id)->update(['selected_option_id' => $option->id]);
+    DB::transaction(fn () => app(FinalizeExam::class)->execute(ExamAttempt::whereKey($exam->id)->lockForUpdate()->firstOrFail()));
+    echo $user->id;
     exit;
 }
 if ($operation === 'near-deadline') {

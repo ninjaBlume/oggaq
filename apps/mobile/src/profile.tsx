@@ -2,6 +2,7 @@ import { Pressable, Text, View } from "react-native";
 import {
   Building2,
   Check,
+  ChevronRight,
   LogOut,
   Mail,
   ShieldCheck,
@@ -27,6 +28,7 @@ export function Profile({
   choose,
   logout,
   pending,
+  account,
 }: {
   user: User;
   context: StudyContext;
@@ -34,6 +36,7 @@ export function Profile({
   choose: (id: string) => void;
   logout: () => void;
   pending: boolean;
+  account: () => void;
 }) {
   const { palette, styles, preference, setPreference } = useTheme();
   return (
@@ -84,6 +87,36 @@ export function Profile({
         </View>
         <Text style={[styles.text, { fontSize: 14 }]}>{user.email}</Text>
       </Card>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${vocabulary.account.title}: e-posta, parola, cihazlar, verilerin, hesabı sil`}
+        onPress={account}
+        style={({ pressed }) => [
+          {
+            borderRadius: 20,
+            borderWidth: 1.5,
+            borderColor: palette.line,
+            backgroundColor: palette.surface,
+            padding: 14,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 14,
+            minHeight: 64,
+          },
+          pressed && { opacity: 0.8 },
+        ]}
+      >
+        <ShieldCheck size={22} color={palette.primary} />
+        <View style={{ flex: 1, gap: 4 }}>
+          <Text style={{ color: palette.ink, fontSize: 14, fontWeight: "700" }}>
+            {vocabulary.account.title}
+          </Text>
+          <Text style={styles.muted}>
+            E-posta, parola, cihazlar, verilerini indir, hesabı sil.
+          </Text>
+        </View>
+        <ChevronRight size={20} color={palette.muted} />
+      </Pressable>
       <SectionTitle>Görünüm</SectionTitle>
       <Text style={styles.muted}>
         Uygulama cihazının açık veya koyu ayarını izler; istersen sabitle.

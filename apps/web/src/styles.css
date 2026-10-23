@@ -1304,3 +1304,22 @@ small {
 .report-form textarea { width: 100%; border: 1px solid var(--edge); background: var(--c-surface); color: var(--c-ink); border-radius: 9px; padding: 11px 13px; font: inherit; line-height: 1.5; resize: vertical; min-height: 84px }
 .report-form textarea:disabled { background: var(--c-surface-container); color: var(--c-muted) }
 .report-form .notice { margin-top: 12px }
+
+/* Hesabım: one card per task, a quiet danger zone at the end. */
+.user-link { font-weight: 600; color: var(--c-primary); }
+.account-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; max-width: 720px; }
+.account-section h2 { margin: 0 0 4px; font-size: 1.15rem; }
+.account-section > .muted { margin: 0 0 14px; }
+.account-section fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.account-section .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.session-list { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 10px; }
+.session-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--c-line); }
+.session-row:first-child { border-top: 0; }
+.session-row p { margin: 2px 0 0; font-size: 13px; }
+.session-row .chip { margin-left: 8px; font-size: 12px; }
+.plain-list { margin: 0 0 14px; padding-left: 20px; font-size: 14px; display: grid; gap: 6px; }
+.danger-zone { border-color: color-mix(in srgb, var(--c-red) 45%, var(--c-surface)); }
+.danger-zone h2 { color: var(--c-red); }
+.button.danger { background: var(--c-red); color: var(--c-on-red); }
+.button.danger:hover:not(:disabled) { background: color-mix(in srgb, var(--c-red) 88%, var(--c-ink)); }
+@media (min-width: 840px) { .account-grid { grid-template-columns: minmax(0, 720px); } }

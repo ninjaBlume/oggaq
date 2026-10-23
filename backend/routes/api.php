@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Exams\Http\Controllers\ExamAttemptController;
+use App\Modules\Identity\Http\Controllers\AccountController;
 use App\Modules\Identity\Http\Controllers\AuthController;
 use App\Modules\Identity\Http\Controllers\ProfileController;
 use App\Modules\QuestionBank\Http\Controllers\AdminOfficialExamController;
@@ -28,6 +29,14 @@ Route::prefix('v1')->group(function () {
         Route::post('auth/email-verification-notification', [AuthController::class, 'resendVerification'])->middleware('throttle:verification');
         Route::get('me', [ProfileController::class, 'show']);
         Route::patch('me', [ProfileController::class, 'update']);
+        // Account lifecycle: reachable without a verified e-mail (a mistyped address must be fixable).
+        Route::get('me/sessions', [AccountController::class, 'sessions']);
+        Route::delete('me/sessions/{session}', [AccountController::class, 'revokeSession'])->middleware('throttle:account');
+        Route::post('me/sessions/revoke-others', [AccountController::class, 'revokeOthers'])->middleware('throttle:account');
+        Route::post('me/password', [AccountController::class, 'password'])->middleware('throttle:account');
+        Route::post('me/email', [AccountController::class, 'email'])->middleware('throttle:account');
+        Route::post('me/export', [AccountController::class, 'export'])->middleware('throttle:account');
+        Route::delete('me', [AccountController::class, 'destroy'])->middleware('throttle:account');
 
         Route::middleware('email.verified')->group(function () {
             foreach (['subjects', 'exam-types'] as $catalog) {

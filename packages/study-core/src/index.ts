@@ -72,6 +72,9 @@ export function scoreBand(percent: number): ScoreBand {
   return percent >= 80 ? 'strong' : percent >= 60 ? 'steady' : 'weak';
 }
 
+// The sentence that must be typed to delete an account; the server checks the same text (DeleteAccountRequest).
+export const deleteAccountConfirmation = 'HESABIMI SİL';
+
 // One vocabulary for all three apps. `title` heads a page and names a menu entry; `short` is for tab bars and other
 // tight places. Nothing else names these places.
 export const vocabulary = {
@@ -83,6 +86,7 @@ export const vocabulary = {
   stats: { title: 'Başarı durumum', short: 'Başarım' },
   profile: { title: 'Profil', short: 'Profil' },
   reports: { title: 'Bildirimler', short: 'Bildirimler' },
+  account: { title: 'Hesabım', short: 'Hesabım' },
 } as const;
 
 // crypto.randomUUID exists only in secure contexts (HTTPS or localhost); a development server opened over the LAN

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Linking, Text, View } from "react-native";
+import { Linking, Platform, Text, View } from "react-native";
 import { ArrowLeft, ArrowRight, ShieldCheck, CheckCircle2 } from "./icons";
 import brand from "../brand.json";
 import { ChoiceGroup } from "./expressive";
@@ -18,6 +18,8 @@ import {
   TextLink,
 } from "./ui";
 import { useTheme } from "./themeContext";
+
+const devicePlatform = Platform.OS === "ios" || Platform.OS === "android" ? Platform.OS : "web";
 export function Login({ signedIn }: { signedIn: (user: User) => void }) {
   const { palette, styles } = useTheme();
   const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
@@ -57,7 +59,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
         const response = await api.request(
           "post",
           "/api/v1/auth/mobile-tokens",
-          { body: { email, password, device_id: await deviceId() } },
+          { body: { email, password, device_id: await deviceId(), device_platform: devicePlatform } },
         );
         try {
           await session.save({
