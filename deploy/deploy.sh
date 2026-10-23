@@ -173,7 +173,7 @@ deploy() {
   fi
   log "Migration (veritabanı bir önceki kodla da uyumlu kalmalıdır)"
   (cd "$dir/backend" && php artisan migrate --force --no-interaction)
-  (cd "$dir/backend" && php artisan config:cache && php artisan route:cache && php artisan event:cache && php artisan view:cache)
+  (cd "$dir/backend" && php artisan config:cache && php artisan route:cache && php artisan event:cache)
 
   log "Yayına alınıyor"
   switch_to "$id"
