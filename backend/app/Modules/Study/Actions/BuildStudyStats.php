@@ -27,7 +27,7 @@ class BuildStudyStats
         );
         $subjects = array_map(fn ($row) => ['subject_id' => $row->subject_id, 'name' => $row->name] + $this->counts((int) $row->correct, (int) $row->incorrect, (int) $row->blank), $rows);
         $sum = fn (string $key) => array_sum(array_column($subjects, $key));
-        $exams = DB::selectOne('SELECT count(*) AS completed, avg(score_percent) AS average, max(score_percent) AS best FROM exam_attempts WHERE study_context_id = ? AND finished_at IS NOT NULL', [$context->id]);
+        $exams = DB::selectOne('SELECT count(*) AS completed, avg(score_percent) AS average, max(score_percent) AS best FROM exam_attempts WHERE study_context_id = ? AND finished_at IS NOT NULL AND correct_count + incorrect_count > 0', [$context->id]);
 
         return [
             'answers' => $this->counts($sum('correct'), $sum('incorrect'), $sum('blank')),

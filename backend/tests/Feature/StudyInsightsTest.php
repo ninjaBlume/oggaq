@@ -227,11 +227,31 @@ class StudyInsightsTest extends TestCase
         $this->assertEquals(100.0, $stats['subjects'][1]['accuracy_percent']);
         $this->assertEquals(['completed' => 0, 'average_score_percent' => null, 'best_score_percent' => null], $stats['exams']);
         $exam = $this->postJson('/api/v1/contexts/'.$context.'/exam-attempts', ['id' => (string) Str::uuid(), 'question_count' => 2, 'duration_seconds' => 60, 'subject_id' => $this->first->id])->assertOk()->json('data');
-        $this->postJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$exam['id'].'/finish', ['base_version' => 1])->assertOk();
+        $row = $exam['questions'][0];
+        $this->putJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$exam['id'].'/answers/'.$row['id'], ['base_version' => 1, 'selected_option_id' => $row['question']['options'][1]['id']])->assertOk();
+        $this->postJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$exam['id'].'/finish', ['base_version' => 2])->assertOk();
         $stats = $this->getJson('/api/v1/contexts/'.$context.'/stats')->assertOk()->json('data');
         $this->assertEquals(['completed' => 1, 'average_score_percent' => 0.0, 'best_score_percent' => 0.0], $stats['exams']);
         $this->assertSame(6, $stats['answers']['total']);
-        $this->assertSame(3, $stats['answers']['blank']);
+        $this->assertSame(2, $stats['answers']['incorrect']);
+        $this->assertSame(2, $stats['answers']['blank']);
+    }
+
+    public function test_an_exam_finished_without_a_single_answer_is_abandoned_and_counts_for_nothing(): void
+    {
+        $this->pool();
+        $this->asToken($this->createUser());
+        $context = $this->context();
+        $exam = $this->postJson('/api/v1/contexts/'.$context.'/exam-attempts', ['id' => (string) Str::uuid(), 'question_count' => 3, 'duration_seconds' => 60])->assertOk()->json('data');
+        $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts')->assertOk()->assertJsonCount(1, 'data');
+        $this->postJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$exam['id'].'/finish', ['base_version' => 1])->assertOk();
+        // The attempt itself stays readable, but it is no result: not listed, not in the stats, not in the review lists.
+        $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$exam['id'])->assertOk()->assertJsonPath('data.status', 'completed');
+        $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts')->assertOk()->assertJsonCount(0, 'data');
+        $stats = $this->getJson('/api/v1/contexts/'.$context.'/stats')->assertOk()->json('data');
+        $this->assertEquals(['completed' => 0, 'average_score_percent' => null, 'best_score_percent' => null], $stats['exams']);
+        $this->assertSame(0, $stats['answers']['total']);
+        $this->review('blank', $context)->assertOk()->assertJsonCount(0, 'data');
     }
 
     public function test_new_endpoints_require_a_verified_active_user_and_valid_input(): void

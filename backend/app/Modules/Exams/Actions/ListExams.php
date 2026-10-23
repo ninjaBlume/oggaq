@@ -16,6 +16,6 @@ class ListExams
     {
         $context = $this->contexts->execute($actor, $contextId);
 
-        return ExamAttempt::where('study_context_id', $context->id)->orderByDesc('started_at')->orderByDesc('id')->cursorPaginate($perPage)->withQueryString();
+        return ExamAttempt::notAbandoned()->where('study_context_id', $context->id)->orderByDesc('started_at')->orderByDesc('id')->cursorPaginate($perPage)->withQueryString();
     }
 }

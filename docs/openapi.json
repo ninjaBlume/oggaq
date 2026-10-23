@@ -2516,7 +2516,7 @@
       "get": {
         "operationId": "listExams",
         "summary": "Bağlama ait süreli deneme geçmişi",
-        "description": "Salt okunur: süresi dolmuş ama henüz kapatılmamış kayıtlar status=active döner (deadline_at < server_time); kayıt zamanlanmış exams:expire komutuyla veya açıldığında tamamlanır. started_at/id ile cursor sırası; yalnız sahibi ve aktif üyelik.",
+        "description": "Salt okunur: süresi dolmuş ama henüz kapatılmamış kayıtlar status=active döner (deadline_at < server_time); kayıt zamanlanmış exams:expire komutuyla veya açıldığında tamamlanır. Hiçbir soru cevaplanmadan biten (terk edilmiş) denemeler listelenmez. started_at/id ile cursor sırası; yalnız sahibi ve aktif üyelik.",
         "tags": [
           "Exams"
         ],

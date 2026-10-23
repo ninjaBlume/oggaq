@@ -177,7 +177,10 @@ class ExamTest extends TestCase
         $this->pool();
         $this->asToken($this->createUser());
         $exam = $this->start();
-        $this->start();
+        $other = $this->start();
+        // An attempt without any answer would be abandoned and drop out of the history once it expires.
+        $this->answer($exam, 0, 0);
+        $this->answer($other, 0, 0);
         $this->travel(60)->seconds();
         $list = '/api/v1/contexts/'.$exam['context_id'].'/exam-attempts';
         $this->getJson($list)->assertOk()->assertJsonCount(2, 'data')->assertJsonPath('data.0.status', 'active')->assertJsonPath('data.1.status', 'active')->assertJsonMissingPath('data.0.questions');

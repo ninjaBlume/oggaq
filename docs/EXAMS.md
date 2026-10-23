@@ -16,6 +16,8 @@ Cevap PUT gövdesi `base_version` (revision) ve `selected_option_id` (UUID veya 
 
 Süreyi backend `started_at`/`deadline_at` belirler. Tek denemeyi okuma ve yazma dolan kaydı tamamlar. Geçmiş listesi **salt okunurdur**: süresi dolmuş ama henüz kapatılmamış kayıt `status=active` ve `deadline_at < server_time` ile görünür (istemciler "Sonucu gör" gösterir); kayıt `exams:expire` komutuyla veya açıldığında tamamlanır. `exams:expire` scheduler tarafından her dakika çalıştırılır; üretimde Laravel scheduler'ın çalışması zorunludur, aksi halde listelerde süresi dolmuş kayıtlar açılana kadar `active` kalır. Yerelde `php artisan schedule:work` kullanılabilir. Süre dolan sonuç tam olarak deadline zamanına kaydedilir; cron gecikmesi süreyi uzatmaz.
 
+**Terk edilmiş deneme:** hiçbir soru cevaplanmadan biten (elle bitirilen veya süresi dolan) deneme sonuç sayılmaz: geçmiş listesinde görünmez, istatistiklere (tamamlanan sınav, ortalama, en iyi) ve tekrar listelerine (boş bıraktıklarım dahil) girmez. Kayıt silinmez; kimliğiyle okunabilir. Böylece açılıp bırakılan sınav "%0 doğru" sonucu gibi görünmez.
+
 Web ve mobil sayaç `server_time`/`deadline_at` farkından monotonik saatle çizilir; cihazın duvar saati değerlendirmeyi değiştirmez. Aktif kayıt 15 saniyede yenilenir; mobil ön plana dönüşte de yüklenir. Sayaç sıfıra gelince API'den sonuç istenir. Ağ yokken yerel puan üretilmez. Belirsiz cevabın tekrarında gönderilmiş seçim/revision korunur; başka cevap yazılmadan aynı istek tekrarlanır veya sunucu kaydı yüklenir. Offline outbox yoktur.
 
 ## Veri ve erişim

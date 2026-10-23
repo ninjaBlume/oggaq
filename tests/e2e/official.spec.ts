@@ -106,6 +106,8 @@ test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal s�
   await row.getByRole("button", { name: "Sınavı başlat" }).click();
   await expect(student.getByRole("heading", { name: "Denemen devam ediyor" })).toBeVisible();
   await expect(student.getByRole("heading", { name: "Sentetik üçüncü soru" })).toBeVisible();
+  // A finished exam without a single answer is abandoned and never becomes a result, so one question is answered.
+  await student.getByRole("radio", { name: /Sentetik A/ }).check();
   await student.getByRole("button", { name: "Sonraki soru" }).click();
   await expect(student.getByRole("heading", { name: "Sentetik birinci soru" })).toBeVisible();
   await student.getByRole("button", { name: "Denemeyi bitir", exact: true }).click();

@@ -3,6 +3,7 @@
 namespace App\Modules\Exams\Models;
 
 use App\Modules\QuestionBank\Models\OfficialExam;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,6 +21,12 @@ class ExamAttempt extends Model
     protected function casts(): array
     {
         return ['started_at' => 'immutable_datetime', 'deadline_at' => 'immutable_datetime', 'finished_at' => 'immutable_datetime', 'score_percent' => 'float'];
+    }
+
+    // A finished attempt in which no question was answered is abandoned: it is neither a result nor part of the statistics.
+    public function scopeNotAbandoned(Builder $query): void
+    {
+        $query->where(fn (Builder $inner) => $inner->whereNull('finished_at')->orWhereRaw('correct_count + incorrect_count > 0'));
     }
 
     public function officialExam(): BelongsTo
