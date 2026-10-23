@@ -337,7 +337,7 @@ Tablo aynı veritabanında olduğu için yedekle birlikte geri gelir; ama **yede
 
 ## 19. İçerik aktarımı (soru bankası)
 
-Gerçek içerik (≈2.765 soru, 273 yayımlanmış çıkmış sınav, katalog) şu an yalnızca yerel geliştirme veritabanındadır. Üretime iki yoldan aktarılabilir. **Gerçek içeriğin gerçek sunucuya aktarımı kullanıcının açık onayını gerektirir** (içerik kaynak dosyalardan doğrulanmış verilerdir; yanlış aktarım geri alınamaz çünkü yayımlanmış sürümler değişmezdir). Bu belgeyi hazırlayan taraf içeriği hiçbir sunucuya göndermemiştir.
+Gerçek içerik (2.765 soru, 286 sınav; 2.759 soru ve 273 sınav yayımlanmış) yerel geliştirme veritabanında bulunur ve 23 Ekim 2026'da kullanıcı onayıyla `oggsorubankasi.codentum.net` geliştirme sunucusuna aktarılmıştır; [aktarım ve doğrulama kaydı](../deploy/server-development/README.md#23-ekim-2026-içerik-aktarımı). Üretime aktarım ayrı adımdır ve aşağıdaki iki yoldan yapılabilir. **Gerçek içeriğin gerçek sunucuya aktarımı kullanıcının açık onayını gerektirir**; yayımlanmış sürümler değişmez olduğundan aktarım öncesi önizleme ve hedef/yedek doğrulaması yapılmalıdır.
 
 **Yol 1 — içerik dışa/içe aktarımı (önerilen):** geliştirme veritabanından yalnızca içerik tabloları (katalog, kaynak, soru, sürüm, şık, çıkmış sınav ve sabitlemeleri, içe aktarım kayıtları) çıkarılır; **kullanıcı, çalışma alanı, deneme, cevap, favori, bildirim, token, oturum ve denetim kayıtları hiç girmez**; soru/sınav satırlarındaki kullanıcı bağları (`created_by`, `actor_id`) boşaltılır.
 
@@ -384,4 +384,4 @@ shred -u /tmp/icerik.tar.gz 2>/dev/null || rm -f /tmp/icerik.tar.gz
 3. E-posta sağlayıcısı ve gönderen alan adı.
 4. Yedek hedefi (rclone uzak türü ya da rsync makinesi) ve özel anahtarın kimde, nerede saklanacağı.
 5. Veri sorumlusu ve hukuki metinler (aydınlatma, kullanım koşulları); günlük ve yedek saklama sürelerinin hukuki teyidi.
-6. Gerçek içeriğin sunucuya aktarımı için açık onay.
+6. Gerçek içeriğin üretim sunucusuna aktarımı için açık onay (ayrı geliştirme sunucusuna aktarım 23 Ekim 2026'da onaylanıp tamamlandı).
