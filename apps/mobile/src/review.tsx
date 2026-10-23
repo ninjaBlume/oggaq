@@ -244,35 +244,42 @@ export function Stats({ context }: { context: StudyContext }) {
           <SectionTitle>Derslere göre</SectionTitle>
           {stats.subjects.map((subject) => (
             <Card key={subject.subject_id}>
-              <View style={styles.between}>
-                <Text style={styles.heading}>{subject.name}</Text>
-                <Text style={styles.muted}>
+              <Text style={styles.heading}>{subject.name}</Text>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                <View
+                  accessibilityRole="image"
+                  accessibilityLabel={`${subject.name}: ${subject.correct} doğru, ${subject.incorrect} yanlış, ${subject.blank} boş`}
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    height: 10,
+                    borderRadius: 5,
+                    overflow: "hidden",
+                    backgroundColor: palette.line,
+                  }}
+                >
+                  <View style={{ flex: subject.correct, backgroundColor: palette.primary }} />
+                  <View style={{ flex: subject.incorrect, backgroundColor: "#c4574b" }} />
+                  <View style={{ flex: subject.blank }} />
+                </View>
+                <Text
+                  style={{ minWidth: 56, textAlign: "right", fontSize: 18, fontWeight: "800", color: palette.ink }}
+                >
                   {percent(subject.accuracy_percent)}
                 </Text>
               </View>
-              <View
-                accessibilityRole="image"
-                accessibilityLabel={`${subject.name}: ${subject.correct} doğru, ${subject.incorrect} yanlış, ${subject.blank} boş`}
-                style={{
-                  flexDirection: "row",
-                  height: 10,
-                  borderRadius: 5,
-                  overflow: "hidden",
-                  backgroundColor: palette.line,
-                }}
-              >
-                <View
-                  style={{
-                    flex: subject.correct,
-                    backgroundColor: palette.primary,
-                  }}
-                />
-                <View style={{ flex: subject.incorrect, backgroundColor: "#c4574b" }} />
-                <View style={{ flex: subject.blank }} />
+              <View style={{ flexDirection: "row", flexWrap: "wrap", columnGap: 16, rowGap: 6 }}>
+                {[
+                  [palette.primary, subject.correct, "doğru"],
+                  ["#c4574b", subject.incorrect, "yanlış"],
+                  [palette.line, subject.blank, "boş"],
+                ].map(([color, count, label]) => (
+                  <View key={String(label)} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                    <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: String(color) }} />
+                    <Text style={styles.muted}>{`${count} ${label}`}</Text>
+                  </View>
+                ))}
               </View>
-              <Text style={styles.muted}>
-                {`${subject.correct} doğru · ${subject.incorrect} yanlış · ${subject.blank} boş`}
-              </Text>
             </Card>
           ))}
         </>
