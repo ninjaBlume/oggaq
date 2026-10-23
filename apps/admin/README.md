@@ -30,6 +30,7 @@ Parola gizli istemde belirlenir. Komut güvenilir operasyon yöneticisinin hesab
 - Yeni sürümle düzenleme, önizleme, ayrı yayımlama onayı, salt okunur eski sürüm görüntüleme.
 - Soru editöründe gezinme/sekme kapatma uyarısı; 409 hatasında yerel değişikliklerin korunması ve kullanıcı onayıyla sunucudaki son sürümü yükleme.
 - Türkçe alan hatası, loading/empty/error/retry, bildirimler, klavye etiketleri, dialog focus dönüşü, telefon/tablet/masaüstü düzeni.
+- **Bildirimler** (`/bildirimler`): öğrencilerin sonuç ekranından gönderdiği soru bildirimleri soruya göre gruplu; Açık/Çözüldü/Geçersiz sekmeleri, açık sayısı rozeti, neden dağılımı, en yeni notlar, sorunun kullanıldığı sınavlara `#soru-N` bağlantıları, “Düzeltildi” / “Geçersiz say” (isteğe bağlı çözüm notu) ve sürüm geçmişi bağlantısı. Bildirenin kimliği görünmez. Soruyu düzenlemek bildirimi kendiliğinden kapatmaz.
 
 Katalog düzenleme/silme backend'de bulunmadığından panelde yoktur. Dosya/görsel/import, kurum yönetimi, öğrenci soru çözme akışı ayrı [web uygulamasında](../web/README.md) sunulur; sınav akışları bu panelin kapsamına eklenmedi. Kaynak kaydı kullanım hakkı/resmîlik incelemesinin yerine geçmez. POST yanıtının kaybolması kalıcı idempotency ile çözülmedi; otomatik mutation retry yapılmaz.
 

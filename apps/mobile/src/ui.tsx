@@ -327,6 +327,8 @@ export function Field({
   numeric = false,
   email = false,
   editable = true,
+  multiline = false,
+  maxLength,
 }: {
   label: string;
   value: string;
@@ -335,6 +337,8 @@ export function Field({
   numeric?: boolean;
   email?: boolean;
   editable?: boolean;
+  multiline?: boolean;
+  maxLength?: number;
 }) {
   const { palette, styles, scheme } = useTheme();
   const [focused, setFocused] = useState(false);
@@ -376,7 +380,17 @@ export function Field({
           keyboardAppearance={scheme}
           placeholderTextColor={palette.muted}
           selectionColor={palette.primary}
-          style={styles.input}
+          multiline={multiline}
+          maxLength={maxLength}
+          style={
+            multiline
+              ? [
+                  styles.input,
+                  // A multiline input is a textarea on the web preview, which draws its own focus outline.
+                  { minHeight: 96, textAlignVertical: "top", paddingTop: 14, outlineStyle: "none" } as object,
+                ]
+              : styles.input
+          }
           textContentType={
             email ? "emailAddress" : password ? "password" : undefined
           }

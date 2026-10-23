@@ -29,6 +29,7 @@ Kullanıcı kayıt formuyla kurum üyeliği olmadan hesap açabilir. Parola kura
 - Kalıcı çözüm geçmişi, sonuç ve eski soru sürümünü inceleme. Yeni yayın eski çalışmayı değiştirmez.
 - Çalışma açmada istemci UUID'si, cevapta çalışma kimliğiyle tekrar güvenliği. Yanıt kaybında aynı istek yeniden gönderilir. Farklı ikinci cevap 409'dur; ilk sonuç korunur.
 - Türkçe yükleniyor/boş/hata/retry, alan etiketleri, klavye seçenekleri, telefon/tablet/masaüstü düzeni.
+- Biten denemenin sonucunda her sorunun altında **Soruyu bildir**: neden (radyo) ve en çok 500 karakterlik isteğe bağlı not; gönderince “Bildirimin alındı, teşekkürler.” ve düğme “Bildirdin” olur, sayfa yenilense de kalır. Süre işlerken bildirim yoktur. Cevap açıklaması yalnız doluysa gösterilir.
 
 Gerçek SQL/PDF içeriği eklenmedi; normal veritabanı boşsa soru listesi boş görünür. Sorular yönetim panelinde kaynakları incelenerek oluşturulup yayımlanır. Sentetik sorular yalnız izole test veritabanındadır. Süreli sınav, resmî puanlama, favori, istatistik, import ve offline bu teslimde yoktur.
 

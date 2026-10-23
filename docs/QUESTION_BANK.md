@@ -71,6 +71,15 @@ Merkezi `official_exams` (künye: sınav türü, yıl, dönem, numara, başlık,
 
 Soruların `exam_type_id` alanı sınıflandırma içindir; çıkmış sınav aidiyeti `official_exam_questions` ile tutulur. Gerçek çıkmış sınav verisi bu teslimde içe aktarılmadı; import ayrıca onay ister. Resmî sınav süresi/geçme kuralı modellenmez.
 
+## Soru bildirimleri
+
+Kaynak veri eski bir veritabanından geldi ve 19 düzeltme kuralı gerekti; kalan hataları öğrenciler bildirir, platform yöneticisi inceler. Soru bankası gezintisi veya tek soru çözme yoktur: bildirim yalnız **biten bir denemenin sonucundan** yapılır.
+
+- **Öğrenci:** sonuç ekranında her sorunun altında “Soruyu bildir”: neden (Cevap anahtarı yanlış, Yazım veya dil hatası, Soru anlaşılmıyor, Güncelliğini yitirmiş, Diğer) ve en çok 500 karakterlik isteğe bağlı not. Süre işlerken bildirim yoktur (409 `attempt_active`). Bildirim, öğrencinin gördüğü soru sürümüne sabitlenir. Öğrenci ve soru başına tek açık bildirim vardır; tekrar gönderim 200 ile ilk kaydı döndürür (yeni neden/not eklenmez). Saatte 20 çağrı sınırı vardır. Deneme kaynağı `reported` alanıyla açık bildirimi bildirir, sayfa yenilense de “Bildirdin” görünür. Yönetici bildirimi kapatınca öğrenci aynı soruyu yeniden bildirebilir.
+- **Yönetici (Bildirimler):** bildirimler soruya göre gruplanır: soru kökü, ders, bildirim sayısı, neden dağılımı, en yeni beş not, sorunun kullanıldığı sınavlar ve sıraları (panelde `/official-exams/{id}#soru-{sıra}` ile o soruya açılır), bildirilen sürüm ve güncel sürüm. “Düzeltildi” veya “Geçersiz say” bir sorunun bütün açık bildirimlerini tek işlemde kapatır; isteğe bağlı çözüm notu vardır. Kapanan bildirimler Çözüldü/Geçersiz sekmelerinde geçmiş olarak okunur. Soruyu düzenlemek bildirimi kendiliğinden kapatmaz; “bildirimden sonra düzenlendi” etiketi yalnız hatırlatır.
+- **Gizlilik:** bildirenin kimliği (kullanıcı, e-posta, ad) hiçbir yönetim yanıtında veya ekranında yoktur. Not kişisel veri içerebileceğinden yalnız platform yöneticisi okur ve loglara/audit kayıtlarına yazılmaz. Hesap silme bildirimi silmez, yalnız kullanıcı bağını koparır ([DATABASE](DATABASE.md)).
+- **Açıklama:** her soru için tek tek cevap açıklaması yazılmayacaktır. Yayım açıklama istemez; web ve mobil sonuç ekranı açıklamayı yalnız doluysa gösterir, boşsa blok çizmez.
+
 ## Doğrulama
 
 23 QuestionBank testi PostgreSQL üzerinde çalışır: yetkiler, taslak/cevap gizliliği, katalog/alt konu doğrulaması, yayın şartları, sürüm koruma, stale revision, transaction rollback, filtre/pagination, composite FK ve yayın değişmezliği. Toplam backend sonucu 75 test, 329 assertion'dır. Ayrı yerel API sürecinde `oggaq_test` üzerinde gerçek HTTP oluşturma/yayımlama/düzenleme/409 ve öğrenci/admin erişimi doğrulandı; sentetik veriler temizlendi.

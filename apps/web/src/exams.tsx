@@ -10,6 +10,7 @@ import {
 import type { ExamAttempt } from "@oggaq/shared-types";
 import { api } from "./api";
 import { PageIntro, useStudyContext } from "./App";
+import { ReportQuestion } from "./report";
 import { ErrorNotice, Loading } from "./ui";
 
 export function Exam() {
@@ -359,6 +360,7 @@ function ExamContent({
                   retry={() => favorite.mutate(!row.is_favorite)}
                 />
               )}
+              <ReportQuestion key={row.id} contextId={context.id} examId={exam.id} row={row} />
             </section>
           )}
           <div className="answer-actions">

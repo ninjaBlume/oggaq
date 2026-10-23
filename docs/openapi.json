@@ -3998,6 +3998,286 @@
           }
         ]
       }
+    },
+    "/api/v1/contexts/{context}/exam-attempts/{exam}/answers/{answer}/report": {
+      "post": {
+        "operationId": "reportExamQuestion",
+        "summary": "Biten denemedeki bir soruyu bildirme",
+        "description": "Öğrenci, kendi biten denemesinin sonucundan bir soruyu bildirir; süre işlerken 409 attempt_active döner. Bildirim öğrencinin gördüğü soru sürümüne sabitlenir. Öğrenci ve soru başına tek açık bildirim vardır: açık bildirim varken tekrar çağrı yeni kayıt açmaz, ilk bildirimi 200 ile döner; yeni bildirim 201 döner. Saatte 20 çağrı sınırı vardır (429). Not yalnız platform yöneticisine gösterilir; bildirenin kimliği yönetim yanıtlarında yoktur.",
+        "tags": [
+          "Exams"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "exam",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "answer",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionReportInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Soru için açık bildirim zaten vardı.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionReportResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Bildirim alındı.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionReportResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/question-reports": {
+      "get": {
+        "operationId": "listQuestionReports",
+        "summary": "Soru bildirimleri inceleme kuyruğu",
+        "description": "Yalnız platform yöneticisi. Bildirimler soruya göre gruplanır; her grup soru başına bir kayıttır. status=open (varsayılan), fixed veya dismissed. En son bildirilen önce; last_reported_at/question_id ile cursor sırası. Bildirenin kimliği dönmez.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "open",
+                "fixed",
+                "dismissed"
+              ],
+              "default": "open"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionReportGroupList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/question-reports/summary": {
+      "get": {
+        "operationId": "questionReportSummary",
+        "summary": "Açık soru bildirimi sayıları",
+        "description": "Yalnız platform yöneticisi. Açık bildirimi olan soru sayısı ve toplam açık bildirim sayısı (menü rozeti için).",
+        "tags": [
+          "QuestionBank"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionReportSummaryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/question-reports/{question}/resolve": {
+      "post": {
+        "operationId": "resolveQuestionReports",
+        "summary": "Sorunun açık bildirimlerini kapatma",
+        "description": "Yalnız platform yöneticisi. Sorunun tüm açık bildirimlerini tek işlemde fixed (düzeltildi) veya dismissed (geçersiz) olarak kapatır; kapanan bildirimler geçmiş olarak okunur kalır ve yeniden açılmaz. Açık bildirim yoksa 409 no_open_reports. Soruyu düzenlemek bildirimleri kendiliğinden kapatmaz.",
+        "tags": [
+          "QuestionBank"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "question",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveQuestionReportsInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResolveQuestionReportsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5832,6 +6112,10 @@
           "is_favorite": {
             "type": "boolean",
             "description": "Soru bu bağlamın favorilerinde mi; favoriler PUT/DELETE /contexts/{context}/favorites/{question} ile değişir."
+          },
+          "reported": {
+            "type": "boolean",
+            "description": "Öğrencinin bu soru için açık bir bildirimi var mı; yalnız biten denemede true olabilir. Bildirim POST .../answers/{answer}/report ile yapılır."
           }
         },
         "required": [
@@ -5841,7 +6125,8 @@
           "question",
           "selected_option_id",
           "feedback",
-          "is_favorite"
+          "is_favorite",
+          "reported"
         ]
       },
       "ExamAttempt": {
@@ -7131,6 +7416,402 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/ReviewSummary"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "QuestionReportReason": {
+        "type": "string",
+        "enum": [
+          "wrong_answer_key",
+          "typo",
+          "unclear",
+          "outdated",
+          "other"
+        ],
+        "description": "wrong_answer_key: cevap anahtarı yanlış; typo: yazım veya dil hatası; unclear: soru anlaşılmıyor; outdated: güncelliğini yitirmiş; other: diğer."
+      },
+      "QuestionReportInput": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "$ref": "#/components/schemas/QuestionReportReason"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 500,
+            "description": "İsteğe bağlı açıklama. Baş/son boşluklar atılır, boş metin null sayılır. Kişisel veri içerebilir; yalnız platform yöneticisi okur."
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "QuestionReport": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "question_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "$ref": "#/components/schemas/QuestionReportReason"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open"
+            ],
+            "description": "Öğrenciye yalnız açık bildirim döner."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "question_id",
+          "reason",
+          "status",
+          "created_at"
+        ]
+      },
+      "QuestionReportResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/QuestionReport"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "ReportedQuestionExam": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "exam_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "exam_type_name": {
+            "type": "string"
+          },
+          "subject_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "weapon_status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "armed",
+              "unarmed",
+              null
+            ]
+          },
+          "position": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Sorunun bu sınavdaki sırası; yönetim panelinde /official-exams/{id}#soru-{position} adresine bağlanır."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "exam_number",
+          "exam_type_name",
+          "subject_name",
+          "weapon_status",
+          "position",
+          "status"
+        ]
+      },
+      "QuestionReportNote": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "$ref": "#/components/schemas/QuestionReportReason"
+          },
+          "note": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "reason",
+          "note",
+          "created_at"
+        ]
+      },
+      "QuestionReportResolution": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "fixed",
+              "dismissed"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resolved_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "status",
+          "note",
+          "resolved_at"
+        ]
+      },
+      "QuestionReportGroup": {
+        "type": "object",
+        "description": "Bir sorunun seçili durumdaki bildirimleri. Bildirenin kimliği hiçbir alanda yoktur.",
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "stem_excerpt": {
+            "type": "string",
+            "description": "Sorunun son sürümünün kökünden en çok 180 karakter."
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "report_count": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reasons": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Neden başına bildirim sayısı."
+          },
+          "notes": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "$ref": "#/components/schemas/QuestionReportNote"
+            },
+            "description": "Yazılı notlardan en yeni en çok beş tanesi."
+          },
+          "first_reported_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "last_reported_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reported_version": {
+            "type": "integer",
+            "description": "En son bildirimin yazıldığı sürüm numarası."
+          },
+          "current_version": {
+            "type": "integer",
+            "description": "Sorunun şu anki son sürüm numarası; reported_version'dan büyükse soru bildirimden sonra düzenlenmiştir."
+          },
+          "exams": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportedQuestionExam"
+            }
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuestionReportResolution"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Açık sekmede null."
+          }
+        },
+        "required": [
+          "question_id",
+          "stem_excerpt",
+          "subject",
+          "report_count",
+          "reasons",
+          "notes",
+          "first_reported_at",
+          "last_reported_at",
+          "reported_version",
+          "current_version",
+          "exams",
+          "resolution"
+        ]
+      },
+      "QuestionReportGroupList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionReportGroup"
+            }
+          },
+          "links": {
+            "$ref": "#/components/schemas/CursorLinks"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/CursorMeta"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "QuestionReportSummary": {
+        "type": "object",
+        "properties": {
+          "open_questions": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "open_reports": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "open_questions",
+          "open_reports"
+        ]
+      },
+      "QuestionReportSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/QuestionReportSummary"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "ResolveQuestionReportsInput": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "fixed",
+              "dismissed"
+            ]
+          },
+          "resolution_note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "ResolveQuestionReportsResult": {
+        "type": "object",
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "fixed",
+              "dismissed"
+            ]
+          },
+          "closed_reports": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "question_id",
+          "status",
+          "closed_reports"
+        ]
+      },
+      "ResolveQuestionReportsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ResolveQuestionReportsResult"
           }
         },
         "required": [

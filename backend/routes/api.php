@@ -5,6 +5,7 @@ use App\Modules\Identity\Http\Controllers\AuthController;
 use App\Modules\Identity\Http\Controllers\ProfileController;
 use App\Modules\QuestionBank\Http\Controllers\AdminOfficialExamController;
 use App\Modules\QuestionBank\Http\Controllers\AdminQuestionController;
+use App\Modules\QuestionBank\Http\Controllers\AdminQuestionReportController;
 use App\Modules\QuestionBank\Http\Controllers\CatalogController;
 use App\Modules\QuestionBank\Http\Controllers\OfficialExamController;
 use App\Modules\QuestionBank\Http\Controllers\QuestionController;
@@ -46,6 +47,9 @@ Route::prefix('v1')->group(function () {
             Route::post('admin/questions/{question}/publish', [AdminQuestionController::class, 'publish'])->whereUuid('question');
             Route::post('admin/questions/{question}/apply-to-exams', [AdminQuestionController::class, 'applyToExams'])->whereUuid('question');
             Route::get('admin/questions/{question}/versions', [AdminQuestionController::class, 'versions'])->whereUuid('question');
+            Route::get('admin/question-reports', [AdminQuestionReportController::class, 'index']);
+            Route::get('admin/question-reports/summary', [AdminQuestionReportController::class, 'summary']);
+            Route::post('admin/question-reports/{question}/resolve', [AdminQuestionReportController::class, 'resolve'])->whereUuid('question');
             Route::get('admin/official-exams', [AdminOfficialExamController::class, 'index']);
             Route::post('admin/official-exams', [AdminOfficialExamController::class, 'store']);
             Route::get('admin/official-exams/{officialExam}', [AdminOfficialExamController::class, 'show'])->whereUuid('officialExam');
@@ -64,6 +68,7 @@ Route::prefix('v1')->group(function () {
             Route::post('contexts/{context}/exam-attempts', [ExamAttemptController::class, 'store'])->whereUuid('context');
             Route::get('contexts/{context}/exam-attempts/{exam}', [ExamAttemptController::class, 'show'])->whereUuid(['context', 'exam']);
             Route::put('contexts/{context}/exam-attempts/{exam}/answers/{answer}', [ExamAttemptController::class, 'answer'])->whereUuid(['context', 'exam', 'answer']);
+            Route::post('contexts/{context}/exam-attempts/{exam}/answers/{answer}/report', [ExamAttemptController::class, 'report'])->whereUuid(['context', 'exam', 'answer'])->middleware('throttle:reports');
             Route::post('contexts/{context}/exam-attempts/{exam}/finish', [ExamAttemptController::class, 'finish'])->whereUuid(['context', 'exam']);
             Route::get('contexts/{context}/review-questions', [ReviewController::class, 'index'])->whereUuid('context');
             Route::get('contexts/{context}/review-summary', [ReviewController::class, 'summary'])->whereUuid('context');

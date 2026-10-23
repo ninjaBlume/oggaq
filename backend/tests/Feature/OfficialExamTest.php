@@ -455,4 +455,21 @@ class OfficialExamTest extends TestCase
         DB::table('exam_answers')->insert($answer(1, 2));
         $this->assertRejectedByDatabase(fn () => DB::table('exam_attempts')->where('id', $row['id'])->update(['official_exam_id' => null, 'revision' => 2]));
     }
+
+    public function test_a_report_on_an_official_exam_question_tells_the_queue_which_exam_and_position_to_open(): void
+    {
+        $exam = $this->createExam(['question_version_ids' => $this->versionIds([2, 0, 1])], publish: true);
+        $student = $this->createUser();
+        $attempt = $this->startOfficial($exam['id'], student: $student)->assertOk()->json('data');
+        $base = '/api/v1/contexts/'.$attempt['context_id'].'/exam-attempts/'.$attempt['id'];
+        $this->postJson($base.'/finish', ['base_version' => $attempt['revision']])->assertOk();
+        // The original order of the exam is kept: the report below is about position 1 (the question written third).
+        $row = $attempt['questions'][0];
+        $this->assertSame($this->questions[2]->id, $row['question_id']);
+        $this->postJson($base.'/answers/'.$row['id'].'/report', ['reason' => 'wrong_answer_key'])->assertCreated();
+
+        $this->asToken($this->admin);
+        $group = $this->getJson('/api/v1/admin/question-reports')->assertOk()->assertJsonCount(1, 'data')->json('data.0');
+        $this->assertSame([['id' => $exam['id'], 'title' => 'Sentetik çıkmış sınav', 'exam_number' => '1', 'exam_type_name' => 'Sentetik sınav türü', 'subject_name' => null, 'weapon_status' => null, 'position' => 1, 'status' => 'published']], $group['exams']);
+    }
 }

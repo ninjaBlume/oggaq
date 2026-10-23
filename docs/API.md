@@ -14,6 +14,8 @@ Study tekrar ve istatistik: `GET /contexts/{context}/review-questions?kind=incor
 
 Çıkmış sınav: öğrenci yalnız yayımlanmış künyeyi listeler/görür; sorular `POST /contexts/{context}/exam-attempts` gövdesindeki `official_exam_id` ile sabit sırada ve sürümde gelir. Yönetim [QUESTION_BANK](QUESTION_BANK.md#çıkmış-sınavlar) içindedir.
 
+Soru bildirimi: öğrenci biten denemesinin sonucundan `POST /contexts/{context}/exam-attempts/{exam}/answers/{answer}/report` ile bir soruyu bildirir (süre işlerken 409, saatte 20 çağrı; açık bildirim varken tekrar 200 ile aynı kaydı döner). Platform yöneticisi `GET /admin/question-reports` (soruya göre gruplu kuyruk; `status=open|fixed|dismissed`), `GET /admin/question-reports/summary` ve `POST /admin/question-reports/{question}/resolve` kullanır. Bildirenin kimliği hiçbir yönetim yanıtında yoktur. Ayrıntı [QUESTION_BANK](QUESTION_BANK.md#soru-bildirimleri) içindedir.
+
 Study: `/contexts/{context}/practice-attempts` GET/POST; `/contexts/{context}/practice-attempts/{attempt}` GET; `/contexts/{context}/practice-attempts/{attempt}/answer` POST. Tek soru alıştırması, tekrar semantiği ve gizlilik [STUDY](STUDY.md) içindedir.
 
 ## Genel kurallar

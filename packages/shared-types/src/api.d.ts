@@ -729,7 +729,7 @@ export interface paths {
         };
         /**
          * Bağlama ait süreli deneme geçmişi
-         * @description Salt okunur: süresi dolmuş ama henüz kapatılmamış kayıtlar status=active döner (deadline_at < server_time); kayıt zamanlanmış exams:expire komutuyla veya açıldığında tamamlanır. started_at/id ile cursor sırası; yalnız sahibi ve aktif üyelik.
+         * @description Salt okunur: süresi dolmuş ama henüz kapatılmamış kayıtlar status=active döner (deadline_at < server_time); kayıt zamanlanmış exams:expire komutuyla veya açıldığında tamamlanır. Hiçbir soru cevaplanmadan biten (terk edilmiş) denemeler listelenmez. started_at/id ile cursor sırası; yalnız sahibi ve aktif üyelik.
          */
         get: operations["listExams"];
         put?: never;
@@ -1070,6 +1070,86 @@ export interface paths {
         get: operations["reviewSummary"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contexts/{context}/exam-attempts/{exam}/answers/{answer}/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Biten denemedeki bir soruyu bildirme
+         * @description Öğrenci, kendi biten denemesinin sonucundan bir soruyu bildirir; süre işlerken 409 attempt_active döner. Bildirim öğrencinin gördüğü soru sürümüne sabitlenir. Öğrenci ve soru başına tek açık bildirim vardır: açık bildirim varken tekrar çağrı yeni kayıt açmaz, ilk bildirimi 200 ile döner; yeni bildirim 201 döner. Saatte 20 çağrı sınırı vardır (429). Not yalnız platform yöneticisine gösterilir; bildirenin kimliği yönetim yanıtlarında yoktur.
+         */
+        post: operations["reportExamQuestion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/question-reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Soru bildirimleri inceleme kuyruğu
+         * @description Yalnız platform yöneticisi. Bildirimler soruya göre gruplanır; her grup soru başına bir kayıttır. status=open (varsayılan), fixed veya dismissed. En son bildirilen önce; last_reported_at/question_id ile cursor sırası. Bildirenin kimliği dönmez.
+         */
+        get: operations["listQuestionReports"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/question-reports/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Açık soru bildirimi sayıları
+         * @description Yalnız platform yöneticisi. Açık bildirimi olan soru sayısı ve toplam açık bildirim sayısı (menü rozeti için).
+         */
+        get: operations["questionReportSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/question-reports/{question}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sorunun açık bildirimlerini kapatma
+         * @description Yalnız platform yöneticisi. Sorunun tüm açık bildirimlerini tek işlemde fixed (düzeltildi) veya dismissed (geçersiz) olarak kapatır; kapanan bildirimler geçmiş olarak okunur kalır ve yeniden açılmaz. Açık bildirim yoksa 409 no_open_reports. Soruyu düzenlemek bildirimleri kendiliğinden kapatmaz.
+         */
+        post: operations["resolveQuestionReports"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1548,6 +1628,8 @@ export interface components {
             feedback: components["schemas"]["ExamFeedback"] | null;
             /** @description Soru bu bağlamın favorilerinde mi; favoriler PUT/DELETE /contexts/{context}/favorites/{question} ile değişir. */
             is_favorite: boolean;
+            /** @description Öğrencinin bu soru için açık bir bildirimi var mı; yalnız biten denemede true olabilir. Bildirim POST .../answers/{answer}/report ile yapılır. */
+            reported: boolean;
         };
         ExamAttempt: {
             /** Format: uuid */
@@ -1883,6 +1965,117 @@ export interface components {
         };
         ReviewSummaryResponse: {
             data: components["schemas"]["ReviewSummary"];
+        };
+        /**
+         * @description wrong_answer_key: cevap anahtarı yanlış; typo: yazım veya dil hatası; unclear: soru anlaşılmıyor; outdated: güncelliğini yitirmiş; other: diğer.
+         * @enum {string}
+         */
+        QuestionReportReason: "wrong_answer_key" | "typo" | "unclear" | "outdated" | "other";
+        QuestionReportInput: {
+            reason: components["schemas"]["QuestionReportReason"];
+            /** @description İsteğe bağlı açıklama. Baş/son boşluklar atılır, boş metin null sayılır. Kişisel veri içerebilir; yalnız platform yöneticisi okur. */
+            note?: string | null;
+        };
+        QuestionReport: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            question_id: string;
+            reason: components["schemas"]["QuestionReportReason"];
+            /**
+             * @description Öğrenciye yalnız açık bildirim döner.
+             * @enum {string}
+             */
+            status: "open";
+            /** Format: date-time */
+            created_at: string;
+        };
+        QuestionReportResponse: {
+            data: components["schemas"]["QuestionReport"];
+        };
+        ReportedQuestionExam: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            exam_number: string | null;
+            exam_type_name: string;
+            subject_name: string | null;
+            /** @enum {string|null} */
+            weapon_status: "armed" | "unarmed" | null;
+            /** @description Sorunun bu sınavdaki sırası; yönetim panelinde /official-exams/{id}#soru-{position} adresine bağlanır. */
+            position: number;
+            /** @enum {string} */
+            status: "draft" | "published";
+        };
+        QuestionReportNote: {
+            reason: components["schemas"]["QuestionReportReason"];
+            note: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        QuestionReportResolution: {
+            /** @enum {string} */
+            status: "fixed" | "dismissed";
+            note: string | null;
+            /** Format: date-time */
+            resolved_at: string;
+        };
+        /** @description Bir sorunun seçili durumdaki bildirimleri. Bildirenin kimliği hiçbir alanda yoktur. */
+        QuestionReportGroup: {
+            /** Format: uuid */
+            question_id: string;
+            /** @description Sorunun son sürümünün kökünden en çok 180 karakter. */
+            stem_excerpt: string;
+            subject: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            } | null;
+            report_count: number;
+            /** @description Neden başına bildirim sayısı. */
+            reasons: {
+                [key: string]: number;
+            };
+            /** @description Yazılı notlardan en yeni en çok beş tanesi. */
+            notes: components["schemas"]["QuestionReportNote"][];
+            /** Format: date-time */
+            first_reported_at: string;
+            /** Format: date-time */
+            last_reported_at: string;
+            /** @description En son bildirimin yazıldığı sürüm numarası. */
+            reported_version: number;
+            /** @description Sorunun şu anki son sürüm numarası; reported_version'dan büyükse soru bildirimden sonra düzenlenmiştir. */
+            current_version: number;
+            exams: components["schemas"]["ReportedQuestionExam"][];
+            /** @description Açık sekmede null. */
+            resolution: components["schemas"]["QuestionReportResolution"] | null;
+        };
+        QuestionReportGroupList: {
+            data: components["schemas"]["QuestionReportGroup"][];
+            links: components["schemas"]["CursorLinks"];
+            meta: components["schemas"]["CursorMeta"];
+        };
+        QuestionReportSummary: {
+            open_questions: number;
+            open_reports: number;
+        };
+        QuestionReportSummaryResponse: {
+            data: components["schemas"]["QuestionReportSummary"];
+        };
+        ResolveQuestionReportsInput: {
+            /** @enum {string} */
+            status: "fixed" | "dismissed";
+            resolution_note?: string | null;
+        };
+        ResolveQuestionReportsResult: {
+            /** Format: uuid */
+            question_id: string;
+            /** @enum {string} */
+            status: "fixed" | "dismissed";
+            closed_reports: number;
+        };
+        ResolveQuestionReportsResponse: {
+            data: components["schemas"]["ResolveQuestionReportsResult"];
         };
     };
     responses: {
@@ -3758,6 +3951,132 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReviewSummaryResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    reportExamQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+                exam: string;
+                answer: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionReportInput"];
+            };
+        };
+        responses: {
+            /** @description Soru için açık bildirim zaten vardı. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionReportResponse"];
+                };
+            };
+            /** @description Bildirim alındı. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionReportResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    listQuestionReports: {
+        parameters: {
+            query?: {
+                status?: "open" | "fixed" | "dismissed";
+                per_page?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionReportGroupList"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    questionReportSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuestionReportSummaryResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    resolveQuestionReports: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                question: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResolveQuestionReportsInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResolveQuestionReportsResponse"];
                 };
             };
             401: components["responses"]["Problem"];

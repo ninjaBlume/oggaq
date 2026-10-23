@@ -82,6 +82,7 @@ export const vocabulary = {
   review: { title: 'Tekrar sınavı', short: 'Tekrar' },
   stats: { title: 'Başarı durumum', short: 'Başarım' },
   profile: { title: 'Profil', short: 'Profil' },
+  reports: { title: 'Bildirimler', short: 'Bildirimler' },
 } as const;
 
 // crypto.randomUUID exists only in secure contexts (HTTPS or localhost); a development server opened over the LAN
@@ -96,3 +97,15 @@ export function randomId(): string {
   const hex = [...bytes].map((byte) => byte.toString(16).padStart(2, '0')).join('');
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
+
+// Why a student can report a question (QuestionReportReason of the API), in the order the form lists them.
+export const reportReasons = [
+  { value: 'wrong_answer_key', label: 'Cevap anahtarı yanlış' },
+  { value: 'typo', label: 'Yazım veya dil hatası' },
+  { value: 'unclear', label: 'Soru anlaşılmıyor' },
+  { value: 'outdated', label: 'Güncelliğini yitirmiş' },
+  { value: 'other', label: 'Diğer' },
+] as const;
+export type ReportReason = (typeof reportReasons)[number]['value'];
+export const reportNoteLimit = 500;
+export const reportReasonLabel = (reason: string) => reportReasons.find((item) => item.value === reason)?.label ?? reason;

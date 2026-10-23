@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PaginationRequest;
 use App\Modules\Exams\Actions\AccessExam;
 use App\Modules\Exams\Actions\ListExams;
+use App\Modules\Exams\Actions\ReportExamQuestion;
 use App\Modules\Exams\Actions\StartExam;
 use App\Modules\Exams\Http\Requests\FinishExamRequest;
+use App\Modules\Exams\Http\Requests\ReportQuestionRequest;
 use App\Modules\Exams\Http\Requests\SaveExamAnswerRequest;
 use App\Modules\Exams\Http\Requests\StartExamRequest;
 use App\Modules\Exams\Http\Resources\ExamAttemptResource;
@@ -41,5 +43,13 @@ class ExamAttemptController extends Controller
     public function finish(FinishExamRequest $request, string $context, string $exam, AccessExam $action): ExamAttemptResource
     {
         return new ExamAttemptResource($action->execute($request->user(), $context, $exam, finishRevision: $request->integer('base_version')));
+    }
+
+    // 201 when the report is new, 200 with the same report when the student had already reported this question.
+    public function report(ReportQuestionRequest $request, string $context, string $exam, string $answer, ReportExamQuestion $action): JsonResponse
+    {
+        [$report, $created] = $action->execute($request->user(), $context, $exam, $answer, $request->validated());
+
+        return response()->json(['data' => ['id' => $report->id, 'question_id' => $report->question_id, 'reason' => $report->reason, 'status' => $report->status, 'created_at' => $report->created_at->toISOString()]], $created ? 201 : 200);
     }
 }

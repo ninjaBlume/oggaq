@@ -25,6 +25,7 @@ Sayfa başlığı ve menü girişi `title`, alt sekme gibi dar yerler `short` ku
 | Tekrar | Tekrar sınavı | Tekrar |
 | Başarı | Başarı durumum | Başarım |
 | Profil | Profil | Profil |
+| Bildirimler (yalnız yönetim) | Bildirimler | Bildirimler |
 
 ## 2a. Metin tonu
 

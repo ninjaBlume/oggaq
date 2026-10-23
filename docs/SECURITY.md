@@ -29,6 +29,8 @@ Web oturumu için başlangıç idle hedefi 120 dakika; güvenlik ayarları merke
 
 Offline kapsamı henüz onaylanmadı. Geliştirildiğinde offline verinin cihazdan okunamayacağı veya üyelik iptalinin bağlantısız cihazda anında uygulanacağı söylenemez. Offline erişim yetkisi başlangıçta son doğrulanan oturum/paket yetkisine bağlı ve yapılandırılabilir süreyle sınırlanır; yeniden bağlantıda hesap/üyelik kontrolü önceliklidir. SQLite/IndexedDB'nin varsayılan olarak uygulama seviyesinde şifreli olduğu varsayılmaz. Sağlık, kimlik numarası ve gereksiz kişisel alanlar toplanmaz.
 
+Soru bildirimleri: öğrenci yalnız kendi biten denemesindeki sorunun bildirimini oluşturabilir (bağlam sahipliği ve deneme/cevap bağı sunucuda doğrulanır; süre işlerken yazılamaz). Uç `throttle:reports` ile kullanıcı başına saatte 20 çağrıya sınırlıdır; öğrenci ve soru başına tek açık bildirim kısmi unique indeksle korunur. Yönetim uçları yalnız doğrulanmış platform yöneticisine açıktır (`manage` policy). Bildirenin kimliği yönetim yanıtlarında bulunmaz; serbest not kişisel veri içerebileceğinden yalnız yönetici okur, loglara ve audit kayıtlarına yazılmaz ve en çok 500 karakterdir. Bildirim içeriği trigger ile değişmezdir.
+
 ## KVKK için teknik tasarım
 
 - İşleme amaçları/veri kategorileri/minimum alanlar kayıt altına alınır; aydınlatma metni sürümlenir. Aydınlatma kaydı ile açık rıza aynı şey sayılmaz.

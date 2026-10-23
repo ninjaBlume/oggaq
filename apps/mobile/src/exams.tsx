@@ -12,6 +12,7 @@ import type { ExamAttempt, StudyContext } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
 import { anchorClock, remainingSeconds, timeLabel } from "@oggaq/study-core";
 import { api } from "./api";
+import { ReportQuestion } from "./report";
 import { useResource, useResume, useTask } from "./hooks";
 import {
   Button,
@@ -215,6 +216,19 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
           current ? { data: mark(current.data) } : current,
         );
       },
+    );
+  }
+  // A report does not change the attempt either: only the loaded row is flagged.
+  function markReported(questionId: string) {
+    const mark = (value: ExamAttempt): ExamAttempt => ({
+      ...value,
+      questions: value.questions.map((item) =>
+        item.question_id === questionId ? { ...item, reported: true } : item,
+      ),
+    });
+    if (latest.current) latest.current = mark(latest.current);
+    query.setData((current) =>
+      current ? { data: mark(current.data) } : current,
     );
   }
   function accept(r: { data: ExamAttempt }) {
@@ -602,6 +616,13 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
                         : "☆ Favoriye ekle"}
                   </TextLink>
                   <ErrorNotice error={favorite.error} />
+                  <ReportQuestion
+                    key={row.id}
+                    contextId={context.id}
+                    examId={exam.id}
+                    row={row}
+                    reported={markReported}
+                  />
                 </View>
               )}
               <ErrorNotice

@@ -305,3 +305,24 @@ tbody tr:hover { background: var(--c-surface-container); }
 .type-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
 .ders-cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
 .ders-cells .exam-cell-link { min-width: 0; }
+
+/* Question reports (Bildirimler) */
+.nav-badge { margin-left: auto; min-width: 20px; padding: 1px 7px; border-radius: 999px; background: var(--c-red); color: var(--c-on-red); font-size: 11px; font-weight: 700; text-align: center; }
+.report-list { display: grid; gap: 14px; max-width: 920px; }
+.report-card { display: flex; flex-direction: column; gap: 12px; padding: 20px 22px; }
+@media (max-width: 700px) { .report-card { padding: 16px; } }
+.report-card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; }
+.report-card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.report-stem { font-size: 15px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.report-reasons, .report-notes, .report-used ul { list-style: none; margin: 0; padding: 0; }
+.report-reasons { display: flex; flex-wrap: wrap; gap: 6px; }
+.report-notes { display: grid; gap: 10px; }
+.report-notes blockquote { margin: 0 0 3px; padding: 8px 12px; border-left: 3px solid var(--c-line); background: var(--c-surface-container); border-radius: 0 8px 8px 0; font-size: 13px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+.report-used { display: grid; gap: 6px; }
+.report-used ul { display: grid; gap: 4px; font-size: 13px; }
+.report-used li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.report-used a { color: var(--c-primary); text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
+.report-resolution { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; }
+.report-resolution-note { flex-basis: 100%; font-size: 13px; }
+.report-dialog-stem { margin-top: 10px; padding: 10px 12px; background: var(--c-surface-container); border-radius: 8px; font-size: 13px; overflow-wrap: anywhere; }
+.report-more { display: flex; justify-content: center; padding: 6px 0; }

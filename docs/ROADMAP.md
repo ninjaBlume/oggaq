@@ -103,6 +103,8 @@ Web ve Expo mobil kullanıcı uygulamalarında Türkçe kayıt/giriş, ders/konu
 
 Hesap silme, veri export, e-posta değiştirme, tüm cihaz oturum yönetimi ve silme/imha süreçleri henüz geliştirilmedi; üretim kapısından önce tamamlanacak.
 
+Soru bildirimi (öğrenci sonuç ekranı, web/mobil) ve yönetici inceleme kuyruğu (Bildirimler) uygulandı: [QUESTION_BANK](QUESTION_BANK.md#soru-bildirimleri). Tek tek cevap açıklaması yazılmayacağı karara bağlandı. Üretim barındırma ve yedekleme sunucusu hazır; henüz yerelde geliştirilmektedir, yayın ve yedek geri yükleme tatbikatı yapılmadı.
+
 ## Ayrıca kapsamlandırılacak işler
 
 Çevrimdışı sınav güncel yönergede otomatik zorunlu değildir. [OFFLINE_SYNC](OFFLINE_SYNC.md) hazır bir protokol önerisidir; kullanıcı kapsamını netleştirmeden SQLite/IndexedDB/PWA/outbox uygulaması başlatılmaz. Günlük hedef, tema ve soru bildirme gibi eski plandaki ekler de kesin MVP kapsamı kabul edilmez.

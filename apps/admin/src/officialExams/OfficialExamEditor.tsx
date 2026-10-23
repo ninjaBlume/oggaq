@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ApiError, cursorFromLink } from '@oggaq/api-client';
 import { vocabulary } from '@oggaq/study-core';
 import type { Catalogs, components } from '@oggaq/shared-types';
@@ -42,6 +42,7 @@ export function OfficialExamPage() {
 
 function OfficialExamEditor({ exam, catalogs }: { exam?: OfficialExam; catalogs: Catalogs }) {
   const [params] = useSearchParams();
+  const { hash } = useLocation();
   const [snapshot, setSnapshot] = useState(exam);
   // A new exam opens as a Deneme or Ders Sınavı (?tur=deneme|ders&ders=<subject>): the matching exam type and subject are preselected.
   const [form, setForm] = useState(() => {
@@ -107,6 +108,11 @@ function OfficialExamEditor({ exam, catalogs }: { exam?: OfficialExam; catalogs:
     target.classList.remove('flash'); void target.offsetWidth; target.classList.add('flash');
     window.setTimeout(() => target.classList.remove('flash'), 1800);
   }
+  // A link such as /official-exams/<id>#soru-14 (from the report queue) opens the exam at that question.
+  useEffect(() => {
+    const match = /^#soru-(\d+)$/.exec(hash);
+    if (match) goTo(`soru-${match[1]}`);
+  }, [hash]);
   // A question written inside a saved draft exam is added and the draft is saved at once, so it shows up as a card.
   function added(entry: NewEntry) {
     const next = [...form.entries, { ...entry, published: true, latestPublished: entry.versionId }].slice(0, 200);

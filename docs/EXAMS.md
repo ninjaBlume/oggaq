@@ -8,7 +8,7 @@ Exams modülü, web `Deneme` ekranı ve Expo mobil uygulaması gerçek PostgreSQ
 
 ## İşlemler
 
-`/api/v1/contexts/{context}/exam-attempts` GET/POST; `/{exam}` GET; `/{exam}/answers/{answer}` PUT; `/{exam}/finish` POST. Tipler [OpenAPI](openapi.json) içinde üretilir.
+`/api/v1/contexts/{context}/exam-attempts` GET/POST; `/{exam}` GET; `/{exam}/answers/{answer}` PUT; `/{exam}/finish` POST.  Biten denemedeki bir soru `/{exam}/answers/{answer}/report` POST ile bildirilir ([QUESTION_BANK](QUESTION_BANK.md#soru-bildirimleri)); cevap kaynağı `questions[].reported` açık bildirimi gösterir. Tipler [OpenAPI](openapi.json) içinde üretilir.
 
 Başlatma gövdesi `id` UUID, `question_count`, `duration_seconds` ve isteğe bağlı `subject_id`/`topic_id` içerir. Aynı id/ayarlar aynı kaydı döndürür; farklı ayarlar veya bağlam 409. Açılan soru sırası ve sürümleri değişmez; yeni yayın mevcut denemeyi etkilemez.
 

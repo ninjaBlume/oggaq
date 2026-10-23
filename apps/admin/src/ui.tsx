@@ -9,6 +9,7 @@ const icons = {
   check: 'm5 12 4 4L19 6', logout: 'M9 4H4v16h5m5-4 4-4-4-4m-5 4h9',
   history: 'M3 11a9 9 0 1 1 2 7M3 4v7h7m2-4v5l3 2',
   eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Zm13 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
+  flag: 'M5 21V4m0 0h11l-2 4 2 4H5',
   close: 'm6 6 12 12M6 18 18 6', shield: 'M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Zm-4 9 3 3 5-6',
 } satisfies Record<string, string>;
 
