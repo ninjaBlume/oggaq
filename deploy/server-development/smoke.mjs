@@ -28,9 +28,17 @@ try {
   await context.addInitScript(() => localStorage.setItem('oggaq-theme', 'dark'));
   const page = await context.newPage();
   const errors = [];
+  const sessionReferrers = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.goto(publicUrl.origin);
+  page.on('request', request => {
+    if (new URL(request.url()).pathname === '/api/v1/me') sessionReferrers.push(request.headers().referer);
+  });
+  // Sanctum needs Origin or Referer for cookie authentication on same-origin GETs.
+  // The query probe must never be included in Referer (reset/verification URLs can contain secrets).
+  await page.goto(`${publicUrl.origin}/?referrer_probe=smoke`);
   await page.getByRole('heading', { name: 'Hoş geldin', exact: true }).waitFor();
+  assert.equal(sessionReferrers.length, 1);
+  assert.equal(sessionReferrers[0], `${publicUrl.origin}/`, 'Same-origin session GET must carry only the origin as Referer.');
   // schedule:work ilk kalp atışını bir sonraki dakika başında yazar.
   let health;
   for (let attempt = 0; attempt < 16; attempt++) {
@@ -46,6 +54,7 @@ try {
 
   await page.goto(`${publicUrl.origin}/yonetim/catalogs`);
   await page.getByRole('heading', { name: 'Tekrar hoş geldiniz' }).waitFor();
+  assert.equal(sessionReferrers.at(-1), `${publicUrl.origin}/`, 'Admin session GET must carry only the origin as Referer.');
   assert.equal(new URL(page.url()).pathname, '/yonetim/catalogs');
   assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
   assert(await page.locator('script[src="/yonetim/theme-init.js"]').count());
@@ -66,7 +75,7 @@ try {
   assert.deepEqual(errors, []);
   await mkdir('artifacts/server-development', { recursive: true });
   await page.screenshot({ path: 'artifacts/server-development/admin.png', fullPage: true });
-  console.log('PASS: web, yönetim alt yolu/yenileme, tema/CSS, hazırlık, CSRF, host-only secure çerez, başarısız giriş, API yetkisi ve gizli dosya koruması.');
+  console.log('PASS: web, yönetim alt yolu/yenileme, tema/CSS, hazırlık, origin ile oturum tanıma, CSRF, host-only secure çerez, başarısız giriş, API yetkisi ve gizli dosya koruması.');
 } finally {
   await browser.close();
 }
