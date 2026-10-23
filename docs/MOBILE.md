@@ -49,6 +49,21 @@ Tek erişim alanı olan öğrenci için profil ve yan menüdeki “Çalışma al
 
 Doğrulama: strict TypeScript, 25 mobil birim testi ve `oggaq_test` PostgreSQL üzerinde 17 mobil Chromium E2E geçti. Yeni senaryo kurumsuz sentetik öğrencinin ana sayfa, profil ve menüsünde gereksiz metin/seçim bulunmadığını; mevcut senaryolar kurum seçimi, geçmiş ayrımı ve çıkışı doğrular. iOS/Android Hermes ve web export başarılıdır. Device Hub Expo Go üzerinde kurumsuz öğrenci profili ve menüsü incelendi. Fiziksel cihazlar bu değişiklik için denenmedi; web arayüzü bu mobil değişikliğin kapsamında değildir.
 
+## 24 Ekim 2026: Mac üzerinde Android 16 Expo Go önizlemesi
+
+Kullanıcı Android SDK lisansını onayladıktan sonra OpenJDK 21, Android komut satırı araçları, Emulator 37.2.12, platform-tools 37.0.1 ve Google APIs Android 16 / API 36 ARM64 sistem imajı (revizyon 7) kuruldu. SDK yolu `~/Library/Android/sdk`; Java yolu `/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home`. Pixel 7 profiliyle `OGGAQ_Android_16` AVD'si oluşturuldu; Hypervisor.Framework kontrolü başarılıdır. Bu kurulum Expo Go önizlemesi içindir; yerel APK derlemesi için gereken platform/build-tools ayrıca kurulmalıdır.
+
+Yeniden açmak için Mac Terminal'inde:
+
+```sh
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+"$ANDROID_HOME/emulator/emulator" -avd OGGAQ_Android_16 -no-boot-anim -no-snapshot
+```
+
+Ardından mevcut Expo Metro terminalinde `a` tuşuna basın. Expo Go 58.0.5 resmi Expo indirme mekanizmasıyla alındı ve emülatöre kuruldu. ADB `sys.boot_completed=1`, çalışan Expo Go süreci, öndeki `ExperienceActivity`, Metro'nun başarılı Android paket üretimi ve React Native `main` başlangıç kaydı doğrulandı. Başlangıç manifesti SDK 58 ve sunucudaki HTTPS API adresini içerir; filtrelenmiş React Native hata günlüğünde hata bulunmadı.
+
+Emülatörün Qt penceresi bilgisayar kullanım aracının uygulama listesine alınamadı. Bu nedenle Android'de görsel ekran kontrolü, öğrenci girişi ve sınav çözme akışı bu oturumda doğrulanmış sayılmaz. Mac'teki Metro/tünel açık kalmalıdır; bu bir mağaza dağıtımı değildir.
+
 ## Mobil tasarım ve gezinme
 
 10 Ekim 2026 mobil arayüzü telefon uygulaması olarak yenilendi. `apps/web` ve `apps/admin` masaüstü arayüzlerinden bağımsızdır; ortak API istemcisi ve iş kuralları korunur. Renkler `src/theme.ts`, bileşenler `src/ui.tsx`, marka başlığı `brand.json` içindedir.
