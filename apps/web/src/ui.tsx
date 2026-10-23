@@ -12,3 +12,5 @@ export function Field({ label, error, hint, children }: { label: string; error?:
 }
 export function dateLabel(value: string) { return new Intl.DateTimeFormat('tr-TR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)); }
 export const outcomeLabel = { pending: 'Devam ediyor', correct: 'Doğru', incorrect: 'Yanlış', skipped: 'Boş bırakıldı' } as const;
+
+export const percent = (value: number | null) => (value === null ? '—' : `%${value.toLocaleString('tr-TR', { maximumFractionDigits: 1 })}`);

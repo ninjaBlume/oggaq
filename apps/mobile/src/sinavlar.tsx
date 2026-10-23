@@ -6,9 +6,9 @@ import type { ExamAttempt, Page, StudyContext, components } from "@oggaq/shared-
 import { suggestedMinutes } from "@oggaq/study-core";
 import { api } from "./api";
 import { useOnReturn, useResource, useTask } from "./hooks";
-import { Badge, Button, Card, EmptyState, ErrorNotice, Field, Loading, ScreenTitle, Sheet, palette, styles } from "./ui";
+import { Badge, Button, Card, EmptyState, ErrorNotice, Field, Loading, ScreenTitle, Sheet, palette, percent, styles } from "./ui";
 import { ChoiceGroup } from "./expressive";
-import { BookOpen, ChevronDown, Clock3 } from "./icons";
+import { BookOpen, ChevronDown, ChevronRight, Clock3 } from "./icons";
 
 type OfficialExam = components["schemas"]["OfficialExam"];
 type Summary = components["schemas"]["ExamSummary"];
@@ -271,6 +271,78 @@ export function ExamList({
 }
 
 // Every exam the student entered, newest first; an open attempt continues, a finished one shows its result.
+// Score colour: strong results read green, weak ones red, the middle stays neutral teal.
+function scoreTone(score: number) {
+  return score >= 70
+    ? { backgroundColor: palette.softSuccess, color: palette.success }
+    : score >= 40
+      ? { backgroundColor: palette.softPrimary, color: palette.primary }
+      : { backgroundColor: palette.softRed, color: palette.red };
+}
+
+// One attempt of the history: the score first, then what the exam was, then how the answers split.
+function ResultCard({ attempt: e, open }: { attempt: Summary; open: () => void }) {
+  const live = e.status === "active" && Date.parse(e.deadline_at) > Date.parse(e.server_time);
+  const result = e.result;
+  const title = e.official_exam?.title ?? `${e.question_count} soruluk deneme`;
+  const kind = e.official_exam ? (/Ders Sınavı/.test(e.official_exam.title) ? "DERS SINAVI" : "DENEME SINAVI") : "DENEME";
+  const tone = result ? scoreTone(result.score_percent) : { backgroundColor: palette.softPrimary, color: palette.primary };
+  const date = new Date(e.started_at).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" });
+  const minutes = Math.round((result ? result.elapsed_seconds : e.duration_seconds) / 60);
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={live ? "Sınava dön" : `${title} sonucunu incele`}
+      onPress={open}
+      style={({ pressed }) => [
+        { backgroundColor: palette.white, borderWidth: 1, borderColor: palette.line, borderRadius: 24, padding: 14, gap: 14 },
+        pressed && { backgroundColor: palette.softPrimary },
+      ]}
+    >
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
+        <View style={{ width: 68, height: 68, borderRadius: 20, alignItems: "center", justifyContent: "center", backgroundColor: tone.backgroundColor }}>
+          {result ? (
+            <Text style={{ fontSize: 21, lineHeight: 26, fontWeight: "800", color: tone.color }}>{percent(result.score_percent)}</Text>
+          ) : (
+            <Clock3 size={26} color={tone.color} />
+          )}
+        </View>
+        <View style={{ flex: 1, gap: 3 }}>
+          <Text style={[styles.eyebrow, { fontSize: 10 }]}>{kind}</Text>
+          <Text numberOfLines={3} style={{ fontSize: 15, lineHeight: 21, fontWeight: "700", color: palette.ink }}>{title}</Text>
+          <Text style={styles.muted}>{`${date} · ${minutes} dk · ${e.question_count} soru`}</Text>
+        </View>
+        <ChevronRight size={20} color={palette.muted} />
+      </View>
+      {result ? (
+        <View style={{ gap: 8 }}>
+          <View style={{ flexDirection: "row", height: 8, borderRadius: 4, overflow: "hidden", backgroundColor: palette.line }}>
+            <View style={{ flex: result.correct, backgroundColor: palette.primary }} />
+            <View style={{ flex: result.incorrect, backgroundColor: "#c4574b" }} />
+            <View style={{ flex: result.blank }} />
+          </View>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", columnGap: 16, rowGap: 6 }}>
+            {[
+              [palette.primary, result.correct, "doğru"],
+              ["#c4574b", result.incorrect, "yanlış"],
+              [palette.line, result.blank, "boş"],
+            ].map(([color, count, label]) => (
+              <View key={String(label)} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: String(color) }} />
+                <Text style={styles.muted}>{`${count} ${label}`}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      ) : (
+        <View style={{ alignSelf: "flex-start" }}>
+          <Badge>{live ? "Devam ediyor" : e.status === "active" ? "Süresi doldu" : "Sonuç bekleniyor"}</Badge>
+        </View>
+      )}
+    </Pressable>
+  );
+}
+
 export function Results({ context, openExam }: { context: StudyContext; openExam: (id: string) => void }) {
   const [cursor, setCursor] = useState<string>();
   const exams = useResource(
@@ -295,20 +367,7 @@ export function Results({ context, openExam }: { context: StudyContext; openExam
       ) : exams.data?.data.length === 0 ? (
         <EmptyState icon={Clock3} title="Henüz bir sınava girmedin" message="Girdiğin sınavlar ve sonuçların burada görünür." />
       ) : (
-        exams.data?.data.map((e) => (
-          <Card key={e.id}>
-            <Text style={styles.heading}>{e.official_exam?.title ?? `${e.question_count} soruluk deneme`}</Text>
-            <Text style={styles.muted}>{new Date(e.started_at).toLocaleDateString("tr-TR")} · {e.duration_seconds / 60} dakika</Text>
-            <View style={{ alignSelf: "flex-start" }}>
-              <Badge tone={e.status === "completed" ? "success" : "primary"}>
-                {e.status === "active" ? (Date.parse(e.deadline_at) > Date.parse(e.server_time) ? "Devam ediyor" : "Süresi doldu") : e.result ? `%${e.result.score_percent} doğru` : "Sonuç bekleniyor"}
-              </Badge>
-            </View>
-            <Button secondary onPress={() => openExam(e.id)}>
-              {e.status === "active" && Date.parse(e.deadline_at) > Date.parse(e.server_time) ? "Sınava dön" : "Sonucu incele"}
-            </Button>
-          </Card>
-        ))
+        exams.data?.data.map((e) => <ResultCard key={e.id} attempt={e} open={() => openExam(e.id)} />)
       )}
       {exams.data && <Pagination page={exams.data} change={setCursor} />}
     </>

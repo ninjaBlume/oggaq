@@ -3,9 +3,7 @@ import type { components } from '@oggaq/shared-types';
 import { Link } from 'react-router-dom';
 import { api } from './api';
 import { PageIntro, useStudyContext } from './App';
-import { ErrorNotice, Loading } from './ui';
-
-const percent = (value: number | null) => (value === null ? '—' : `%${value.toLocaleString('tr-TR', { maximumFractionDigits: 1 })}`);
+import { ErrorNotice, Loading, percent } from './ui';
 
 export function Stats() {
   const context = useStudyContext();
@@ -26,6 +24,6 @@ function Summary({ stats }: { stats: components['schemas']['StudyStats'] }) {
       <div className="card stat"><span className="eyebrow">EN İYİ DENEME</span><strong>{percent(exams.best_score_percent)}</strong><small>Doğru cevap yüzdesi</small></div>
     </section>
     <h2 className="section-title">Derslere göre</h2>
-    <section className="subject-stats" aria-label="Ders bazlı başarı">{subjects.map((subject) => <div key={subject.subject_id} className="card subject-stat"><h3>{subject.name}</h3><div className="subject-stat-meter"><div className="bar" role="img" aria-label={`${subject.name}: ${subject.correct} doğru, ${subject.incorrect} yanlış, ${subject.blank} boş`}><span className="bar-correct" style={{ width: `${(subject.correct / Math.max(subject.total, 1)) * 100}%` }} /><span className="bar-incorrect" style={{ width: `${(subject.incorrect / Math.max(subject.total, 1)) * 100}%` }} /></div><strong>{percent(subject.accuracy_percent)}</strong></div><ul className="subject-stat-legend"><li className="correct">{subject.correct} doğru</li><li className="incorrect">{subject.incorrect} yanlış</li><li className="blank">{subject.blank} boş</li></ul></div>)}</section>
+    <section className="subject-stats" aria-label="Ders bazlı başarı">{subjects.map((subject) => <div key={subject.subject_id} className="card subject-stat"><h3>{subject.name}</h3><div className="subject-stat-meter"><div className="bar" role="img" aria-label={`${subject.name}: ${subject.correct} doğru, ${subject.incorrect} yanlış, ${subject.blank} boş`}><span className="bar-correct" style={{ width: `${(subject.correct / Math.max(subject.total, 1)) * 100}%` }} /><span className="bar-incorrect" style={{ width: `${(subject.incorrect / Math.max(subject.total, 1)) * 100}%` }} /></div><strong>{percent(subject.accuracy_percent)}</strong></div><ul className="legend"><li className="correct">{subject.correct} doğru</li><li className="incorrect">{subject.incorrect} yanlış</li><li className="blank">{subject.blank} boş</li></ul></div>)}</section>
   </>;
 }

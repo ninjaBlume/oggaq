@@ -6,7 +6,7 @@ import type { components } from '@oggaq/shared-types';
 import { randomId, suggestedMinutes } from '@oggaq/study-core';
 import { api } from './api';
 import { PageIntro, useStudyContext } from './App';
-import { dateLabel, ErrorNotice, Field, Loading } from './ui';
+import { dateLabel, ErrorNotice, Field, Loading, percent } from './ui';
 
 type OfficialExam = components['schemas']['OfficialExam'];
 type Summary = components['schemas']['ExamSummary'];
@@ -127,6 +127,25 @@ export function DersSinavlari() {
   </>;
 }
 
+// One attempt of the history: the score first, then what the exam was, then how the answers split.
+function ResultRow({ exam, to }: { exam: Summary; to: string }) {
+  const result = exam.result;
+  const expired = Date.parse(exam.deadline_at) <= Date.parse(exam.server_time);
+  const title = exam.official_exam ? exam.official_exam.title : `${exam.question_count} soruluk deneme`;
+  const kind = exam.official_exam ? (/Ders Sınavı/.test(exam.official_exam.title) ? 'DERS SINAVI' : 'DENEME SINAVI') : 'DENEME';
+  const tone = !result ? 'pending' : result.score_percent >= 70 ? 'strong' : result.score_percent < 40 ? 'weak' : '';
+  const minutes = Math.round((result ? result.elapsed_seconds : exam.duration_seconds) / 60);
+  return <Link className="history-row" to={to}>
+    <span className={`result-score ${tone}`}>{result ? percent(result.score_percent) : expired ? 'Sonucu gör' : 'Devam et'}</span>
+    <div className="history-main"><span className="eyebrow">{kind}</span><h3>{title}</h3><p>{dateLabel(exam.started_at)} · {minutes} dk · {exam.question_count} soru</p></div>
+    <span className="history-arrow" aria-hidden="true">→</span>
+    {result && <div className="history-split">
+      <div className="bar" role="img" aria-label={`${result.correct} doğru, ${result.incorrect} yanlış, ${result.blank} boş`}><span className="bar-correct" style={{ width: `${(result.correct / exam.question_count) * 100}%` }} /><span className="bar-incorrect" style={{ width: `${(result.incorrect / exam.question_count) * 100}%` }} /></div>
+      <ul className="legend"><li className="correct">{result.correct} doğru</li><li className="incorrect">{result.incorrect} yanlış</li><li className="blank">{result.blank} boş</li></ul>
+    </div>}
+  </Link>;
+}
+
 // Every exam the student entered, newest first; an open attempt continues, a finished one shows its result.
 export function Sonuclarim() {
   const context = useStudyContext();
@@ -136,10 +155,7 @@ export function Sonuclarim() {
     <PageIntro eyebrow="GİRDİĞİN SINAVLAR" title="Sonuçlarım"><p>{context.name} alanında girdiğin deneme ve ders sınavları. Bir sınavı açıp cevaplarını tek tek inceleyebilirsin.</p></PageIntro>
     {history.isPending ? <Loading /> : history.isError ? <ErrorNotice error={history.error} retry={() => { void history.refetch(); }} /> : history.data.data.length === 0 ? <section className="card empty"><h2>Henüz bir sınava girmedin</h2><p>Girdiğin sınavlar ve sonuçların burada saklanır.</p><Link className="button primary" to={`/study/${context.id}/deneme`}>Deneme sınavlarına git</Link></section>
       : <>
-        <section className="history-list" aria-label="Sınav sonuçları">{history.data.data.map((exam) => <Link key={exam.id} className="history-row" to={`/study/${context.id}/exams/${exam.id}`}>
-          <span className={`result-pill ${exam.status === 'completed' ? 'correct' : 'pending'}`}>{exam.status === 'completed' ? `%${exam.result?.score_percent}` : Date.parse(exam.deadline_at) <= Date.parse(exam.server_time) ? 'Sonucu gör' : 'Devam et'}</span>
-          <div><h3>{exam.official_exam ? exam.official_exam.title : `${exam.question_count} soruluk deneme`}</h3><p>{dateLabel(exam.started_at)} · {exam.duration_seconds / 60} dakika</p></div><span>→</span>
-        </Link>)}</section>
+        <section className="history-list" aria-label="Sınav sonuçları">{history.data.data.map((exam) => <ResultRow key={exam.id} exam={exam} to={`/study/${context.id}/exams/${exam.id}`} />)}</section>
         <div className="pagination"><button className="button secondary" disabled={!history.data.links.prev} onClick={() => setCursor(cursorFromLink(history.data.links.prev))}>Önceki</button><button className="button secondary" disabled={!history.data.links.next} onClick={() => setCursor(cursorFromLink(history.data.links.next))}>Sonraki</button></div>
       </>}
   </>;

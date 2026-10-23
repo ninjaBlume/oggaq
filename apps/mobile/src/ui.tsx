@@ -32,6 +32,10 @@ import { ExpressivePressable } from "./expressive";
 import { useSpringValue } from "./motion";
 import { Animated } from "react-native";
 export { palette } from "./theme";
+export const percent = (value: number | null) =>
+  value === null
+    ? "—"
+    : `%${value.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}`;
 export const styles = StyleSheet.create({
   shell: { flex: 1, backgroundColor: palette.paper },
   body: {

@@ -144,7 +144,8 @@ test("mobil sekmeler gerçek Bearer API ile deneme sınavı, sonuçlar ve çık�
   await expect(page.getByText(/1 kez · en iyi %33.33/)).toBeVisible();
   await page.getByRole("tab", { name: "Sonuçlar", exact: true }).click();
   await expect(page.getByText("Sonuçlarım", { exact: true })).toBeVisible();
-  await expect(page.getByText("%33.33 doğru", { exact: true })).toBeVisible();
+  await expect(page.getByText("%33,3", { exact: true })).toBeVisible();
+  await expect(page.getByText("1 doğru", { exact: true })).toBeVisible();
   await screenshot(page, "results");
   await page.getByRole("tab", { name: "Profil", exact: true }).click();
   await screenshot(page, "profile");

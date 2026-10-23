@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
+import { typography } from "./theme";
 import { newId } from "./ids";
 import { ApiError } from "@oggaq/api-client";
 import { Trophy } from "./icons";
@@ -16,6 +17,7 @@ import {
   ScreenTitle,
   SectionTitle,
   palette,
+  percent,
   styles,
 } from "./ui";
 
@@ -184,11 +186,6 @@ function ReviewExam({
   );
 }
 
-const percent = (value: number | null) =>
-  value === null
-    ? "—"
-    : `%${value.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}`;
-
 export function Stats({ context }: { context: StudyContext }) {
   const query = useResource(
     (signal) =>
@@ -228,7 +225,7 @@ export function Stats({ context }: { context: StudyContext }) {
         <>
           <Card>
             <Text style={styles.muted}>DOĞRULUK</Text>
-            <Text style={[styles.heading, { fontSize: 34 }]}>
+            <Text style={[styles.heading, typography.display]}>
               {percent(stats.answers.accuracy_percent)}
             </Text>
             <Text style={styles.muted}>
