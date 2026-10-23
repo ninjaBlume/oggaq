@@ -64,6 +64,26 @@ export function suggestedMinutes(exam: { subject: unknown; weapon_status: 'armed
   return Math.max(5, Math.ceil(exam.question_count * 1.2));
 }
 
+// Result bands for colouring a score. The reference is the 60-point mark the written ÖGG exam asks for (silahsız: at
+// least 60 of 100; silahlı: the average of the parts at least 60, EGM sınav talimatı); at 80 and above a result is
+// strong. Only colour and tone follow the bands: the app never says "geçti" or "kaldı", the official result is not ours.
+export type ScoreBand = 'strong' | 'steady' | 'weak';
+export function scoreBand(percent: number): ScoreBand {
+  return percent >= 80 ? 'strong' : percent >= 60 ? 'steady' : 'weak';
+}
+
+// One vocabulary for all three apps. `title` heads a page and names a menu entry; `short` is for tab bars and other
+// tight places. Nothing else names these places.
+export const vocabulary = {
+  home: { title: 'Ana sayfa', short: 'Ana sayfa' },
+  deneme: { title: 'Deneme sınavları', short: 'Deneme' },
+  ders: { title: 'Ders sınavları', short: 'Ders' },
+  results: { title: 'Sonuçlarım', short: 'Sonuçlar' },
+  review: { title: 'Tekrar sınavı', short: 'Tekrar' },
+  stats: { title: 'Başarı durumum', short: 'Başarım' },
+  profile: { title: 'Profil', short: 'Profil' },
+} as const;
+
 // crypto.randomUUID exists only in secure contexts (HTTPS or localhost); a development server opened over the LAN
 // (http://192.168.x.x) has none. getRandomValues works everywhere, so this builds a v4 UUID from it when needed.
 export function randomId(): string {
