@@ -53,6 +53,7 @@ Study: `/contexts/{context}/practice-attempts` GET/POST; `/contexts/{context}/pr
 | --- | --- |
 | `GET /sanctum/csrf-cookie` | Web/admin CSRF başlangıcı; Laravel framework yolu |
 | `POST /api/v1/auth/register` | Kayıt; duplicate e-posta/validation/rate limit |
+| `GET /api/v1/health/ready` | Oturumsuz hazırlık durumu: yalnızca `ok`/`degraded`/`unavailable` ve beş mantıksal denetim; 503 yalnızca örnek istek karşılayamıyorsa; IP başına dakikada 30 ([DEPLOYMENT](DEPLOYMENT.md) §15) |
 | `POST /api/v1/auth/login` | Web cookie session; sunucuda oturum yenileme |
 | `POST /api/v1/auth/mobile-tokens` | Mobil cihaz token'ı; süre ve cihaz kaydı |
 | `POST /api/v1/auth/logout` | Geçerli web session veya mobil token iptali |

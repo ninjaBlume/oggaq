@@ -1,0 +1,10 @@
+[Unit]
+Description=OGGAQ silme listesi dışa aktarımı (saatlik)
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+Unit=oggaq-erasures.service
+
+[Install]
+WantedBy=timers.target

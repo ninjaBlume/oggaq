@@ -1,0 +1,21 @@
+[Unit]
+Description=OGGAQ Cloudflare Tunnel (cloudflared)
+After=network-online.target nginx.service
+Wants=network-online.target
+
+[Service]
+# cloudflared ikilisini Cloudflare'in resmî kurulum belgesine göre kurun; yol farklıysa ExecStart'ı düzeltin.
+User=cloudflared
+Group=cloudflared
+ExecStart=/usr/bin/cloudflared --no-autoupdate --config /etc/cloudflared/config.yml tunnel run
+Restart=always
+RestartSec=5
+# Yalnızca yapılandırmayı okur; başka bir şeye yazmaz.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/etc/cloudflared
+
+[Install]
+WantedBy=multi-user.target

@@ -108,3 +108,7 @@ Veriler silinmez. `.env`, uygulama anahtarı ve veri dizini kaybolursa mevcut ş
 ## Deneme ve mobil
 
 Yeni tablolar için yalnız forward `php artisan migrate`; normal DB üzerinde `migrate:fresh` çalıştırmayın. Terk edilen süreli denemeler için `php artisan schedule:work` veya üretim cron scheduler gerekir. Mobil kurulum ve toolchain [MOBILE](MOBILE.md) içinde. E2E öncesi `npm run export:mobile:preview`; native/web QA ayrı. `npm run audit` yeni advisory’leri reddeder, belgelenmiş iki Expo build uyarısı açık kalır.
+
+## Üretim hazırlığı
+
+Üretime dağıtım, yedek ve içerik aktarımı betikleri `deploy/` altındadır; kurulum ve işletim anlatımı [DEPLOYMENT](DEPLOYMENT.md) içindedir. Yerelde ek olarak: `ERASURE_LEDGER_KEY` boşsa `APP_KEY`'den türetilir (üretimde zorunludur); `GET /api/v1/health/ready` zamanlayıcı kalp atışı gelmediği sürece `degraded` döner, bu yüzden yerelde `php artisan schedule:work` çalışırken `ok` olur; silinmiş hesap listesi komutları `php artisan accounts:export-erasures` ve `accounts:reapply-erasures` (kuru çalıştırma varsayılan).

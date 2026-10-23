@@ -37,16 +37,22 @@ Kalanlar ve nedeni:
 
 - **Soru bildirimleri:** bildirimin nedeni, sorusu ve sürümü kalır (içerik kalitesi için); bildirenle bağı ve yazılan not silinir. *Bu karar hukuki değerlendirmeyle teyit edilmelidir.*
 - **Denetim kayıtları:** kayıtlar kalır, aktör alanı boşaltılır, hesabı hedef alan kayıtların hedef kimliği rastgele bir kimlikle değiştirilir; “hesap silindi” sayaç kaydı kişiye bağlı değildir.
-- **Yedekler:** silinen hesabın verisi, yedek dönemi dolana kadar yedeklerde bulunabilir.
+- **Yedekler:** silinen hesabın verisi, yedek dönemi dolana kadar yedek dosyalarında bulunabilir. Böyle bir yedek geri yüklenirse hesabın yeniden ortaya çıkmaması için silme listesi uygulanır (aşağıda).
 
 Engeller (409): platform yöneticisi hesabı kendi kendine silinemez (`admin_account`; başka bir yönetici yetkiyi önce kaldırmalı); bir kurumun tek aktif yöneticisi silemez (`last_company_admin`). Yönetici panelinde hesap silme ekranı yoktur.
 
 Sınav sonuçları PostgreSQL tetikleyicileriyle değiştirilemez. Silme işlemi bu korumayı yalnızca kendi veritabanı işlemi süresince `oggaq.account_erasure` ayarıyla kaldırır ve her koşulda geri kapatır; başka hiçbir kod yolu bitmiş cevapları silemez. Yeni bir tablo kişiye bağlandığında silme işlemine eklenmeden test geçmez (`AccountLifecycleTest`).
 
+## Silme listesi ve yedekten dönüş
+
+Silme işlemi aynı veritabanı işleminde `account_erasures` tablosuna yalnızca kullanıcı kimliğinin **anahtarlı özetini** (HMAC-SHA256, anahtar `ERASURE_LEDGER_KEY`) ve tarihi yazar. Kimlik, e-posta veya başka bir bilgi yazılmaz; özetten kişi geri okunamaz. Tablo yalnızca ekleme kabul eder (güncelleme ve silme veritabanı tarafından reddedilir). Aynı e-posta ile yeniden kayıt olan kişi yeni bir kimlik alır ve bu listeden etkilenmez.
+
+Eski bir yedek geri yüklenirse silinmiş hesaplar yeniden ortaya çıkar. `php artisan accounts:reapply-erasures` listedeki özetlerle eşleşen kullanıcıları mevcut silme yoluyla (tüm bağlı veriyle) siler; varsayılan olarak yalnızca sayar, `--force` ile siler, platform yöneticisi hesaplarını otomatik silmez. Yedekten **daha yeni** silmeler için liste yedekten ayrı saklanır (`accounts:export-erasures`, saatlik) ve `--from` ile verilir. Prosedür ve sınırlar [DEPLOYMENT](DEPLOYMENT.md) §17.4 içindedir. `ERASURE_LEDGER_KEY` veritabanı yedeğiyle aynı yerde saklanmamalı, kaybolursa eski kayıtlar eşleşmez. Bu mekanizma yerelde geri yüklenmiş bir veritabanı kopyasında denendi; gerçek bir geri yükleme felaketi yaşanmadı.
+
 ## Açık kalanlar
 
 - **Hukuki metinler:** aydınlatma metni, kullanım koşulları, veri sorumlusu (henüz belirlenmedi) ve işleyen rolleri, VERBİS uygulanabilirliği, saklama sürelerinin hukuki dayanağı ve yurt dışı aktarım koşulları kararlaştırılmadı; hukukçu gerekir. Bu belge o kararların yerine geçmez.
-- **Yedekten dönüşte imha:** silinen hesap yedekten geri yüklenirse yeniden ortaya çıkar. Bunu önlemek için kişiye bağlanabilen ama kişi bilgisi taşımayan bir imha kaydı (silinen kullanıcı kimliği + tarih) ve geri yükleme sonrası yeniden uygulama adımı gerekir. Henüz uygulanmadı; barındırma ve yedek planıyla birlikte tasarlanacak (yedek dönemi ve tatbikat dahil).
+- **Yedek dönemi:** silinmiş hesabın verisinin yedek dosyalarında ne kadar kalacağı (yedek saklama süresi: şu an 7 gün / 4 hafta / 6 ay önerisi) hukuki teyitle belirlenir; sunucu dışı kopyalar da aynı döneme tabidir.
 - **Gerçek e-posta sağlayıcısı:** hesap e-postaları yerelde Mailpit'e gider; üretim SMTP sağlayıcısı ve verinin konumu seçilmedi.
 - **Günlük saklama:** uygulama ve erişim günlüklerinin süresi, konumu ve maskeleme denetimi barındırma planında belirlenecek.
 - **Soru bildirim notları** kişisel veri içerebilir; yalnızca platform yöneticisi görür.

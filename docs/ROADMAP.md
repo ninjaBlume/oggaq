@@ -101,9 +101,9 @@ React 19/TypeScript yönetim paneli merkezi içerik API'sine bağlandı; kurum y
 
 Web ve Expo mobil kullanıcı uygulamalarında Türkçe kayıt/giriş, ders/konu/çıkmış sınav/karma deneme, sonuç, yanlış/boş/favori ve başarı akışları; yükleniyor/boş/hata, erişilebilirlik ve tablet/masaüstü düzeni geliştirilir. Platform sürümleri, native build ve gerçek API akışları ayrı doğrulanır.
 
-Hesap silme, veri dışa aktarma, e-posta/parola değiştirme, cihaz ve oturum yönetimi uygulandı (web `/account`, mobil Profil → Hesabım; [PRIVACY](PRIVACY.md)). Kalanlar: hukuki metinler (aydınlatma, kullanım koşulları), KVKK veri sorumlusu/aktarım kararı, yedekten dönüşte imha kaydının yeniden uygulanması, gerçek e-posta sağlayıcısı ve günlük saklama; üretim kapısından önce tamamlanacak.
+Hesap silme, veri dışa aktarma, e-posta/parola değiştirme, cihaz ve oturum yönetimi uygulandı (web `/account`, mobil Profil → Hesabım; [PRIVACY](PRIVACY.md)). Kalanlar: hukuki metinler (aydınlatma, kullanım koşulları), KVKK veri sorumlusu/aktarım kararı, gerçek e-posta sağlayıcısı ve günlük saklama; üretim kapısından önce tamamlanacak. Yedekten dönüşte imha kaydı uygulandı ([DEPLOYMENT](DEPLOYMENT.md) §17.4).
 
-Soru bildirimi (öğrenci sonuç ekranı, web/mobil) ve yönetici inceleme kuyruğu (Bildirimler) uygulandı: [QUESTION_BANK](QUESTION_BANK.md#soru-bildirimleri). Tek tek cevap açıklaması yazılmayacağı karara bağlandı. Üretim barındırma ve yedekleme sunucusu hazır; henüz yerelde geliştirilmektedir, yayın ve yedek geri yükleme tatbikatı yapılmadı.
+Soru bildirimi (öğrenci sonuç ekranı, web/mobil) ve yönetici inceleme kuyruğu (Bildirimler) uygulandı: [QUESTION_BANK](QUESTION_BANK.md#soru-bildirimleri). Tek tek cevap açıklaması yazılmayacağı karara bağlandı. Üretim barındırma: sunucu kullanıcıda mevcut (ayrıntıları bilinmiyor); henüz yerelde geliştirilmektedir. Dağıtım, yedek ve içerik aktarımı hazırlığı yapıldı ([DEPLOYMENT](DEPLOYMENT.md)): sürüm dizinli dağıtım betiği ve geri alma, readiness ucu, şifreli yedek/geri yükleme/doğrulama betikleri, saklama kuralı, içerik dışa/içe aktarımı, Cloudflare Tunnel (önerilen) ve klasik proxy seçenekleri; hepsi yalnızca yerelde denendi. Gerçek sunucuda, Cloudflare'de, gerçek SMTP'de ve `age` ile denenmedi; yayın ve üç aylık yedek geri yükleme tatbikatı henüz yapılmadı.
 
 ## Ayrıca kapsamlandırılacak işler
 

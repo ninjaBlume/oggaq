@@ -1,0 +1,13 @@
+[Unit]
+Description=OGGAQ silinmiş hesap listesinin (kişi bilgisi içermez) ayrı dışa aktarımı
+After=postgresql.service
+
+[Service]
+Type=oneshot
+User=oggaq
+Group=oggaq
+SupplementaryGroups=oggaq-backup
+WorkingDirectory=/srv/oggaq/current/backend
+# Dizin oggaq:oggaq-backup 2770 (setgid): oggaq yazar, yedek kullanıcısı okur. Dosya yedekten bağımsız saklanır: backup.sh bunu da şifreleyip uzak kopyaya gönderir (docs/DEPLOYMENT.md "Silinen hesaplar").
+ExecStart=/usr/bin/php artisan accounts:export-erasures --to=/var/backups/oggaq/erasures/erasures-latest.ndjson
+UMask=0027

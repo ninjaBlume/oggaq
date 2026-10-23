@@ -35,6 +35,8 @@ erDiagram
 | `study_contexts` | `id`, `user_id`, nullable `tenant_id`, nullable `membership_id`; kişisel veya şirket bağlamı |
 | Oturum tabloları | Laravel oturum, parola sıfırlama ve Sanctum token tabloları; UUID kullanıcıya uyarlanacak |
 
+`account_erasures(id, user_hash char(64) unique hex, erased_at)` silinmiş hesapların anahtarlı özetidir (HMAC-SHA256 ile kullanıcı kimliği; kimlik/e-posta yazılmaz); yalnızca ekleme kabul eder (`guard_account_erasure` tetikleyicisi güncelleme ve silmeyi reddeder) ve silme işlemiyle aynı transaction'da yazılır. Yedekten dönüşte `accounts:reapply-erasures` bu özetlerle eşleşen geri gelmiş kullanıcıları siler ([DEPLOYMENT](DEPLOYMENT.md) §17.4).
+
 Hesap yaşam döngüsü ([PRIVACY](PRIVACY.md)): `users.pending_email` / `pending_email_requested_at` doğrulanmamış yeni adresi tutar (e-posta yalnızca imzalı bağlantı açılınca değişir); `personal_access_tokens.device_label` cihaz türü etiketidir. Hesap silme tek işlemde bağlı bütün satırları siler ve `exam_answers` DELETE ile `question_reports.note` temizleme korumalarını yalnızca işlem boyunca `oggaq.account_erasure = 'on'` ayarıyla (işlem sonunda `'off'`) kaldırır; `guard_exam_answer` ve `guard_question_report` aksi halde eskisi gibi çalışır. Kişiye bağlanan her yeni FK/kolon `AccountLifecycleTest` içindeki envantere eklenmeden test geçmez.
 
 `study_contexts` CHECK kuralı: kişisel bağlamda `tenant_id` ve `membership_id` birlikte NULL; şirket bağlamında ikisi birlikte dolu. Şirket bağlamındaki `(membership_id,tenant_id,user_id)` üçlüsü `memberships` üzerinde composite FK taşır. Böylece farklı kullanıcının veya şirketin üyeliği bağlama atanamaz. Aktiflik FK ile garanti edilemez; transaction içinde üyelik yetkisi ayrıca kontrol edilir.

@@ -60,7 +60,7 @@ PostgreSQL sorguları sayfalı, gerekli ilişkiler eager-loaded ve indeksli olur
 
 Başlangıç dağıtım hedefi: HTTPS reverse proxy, PHP 8.4 API, ayrı Horizon worker, scheduler, PostgreSQL, Redis ve özel dosya deposu. Web/admin statik dağıtımı API ile aynı site alanı altında yapılandırılır. Sağlayıcı ve ülke seçilmedi; kişisel veri/aktarımı değerlendirmesi öncesinde üçüncü taraf servise veri gönderilmez.
 
-Dağıtım aşamasında health/readiness, migrations, queue drain, cache yenileme, geriye uyumlu API, şifreli yedek ve geri yükleme tatbikatı hazırlanır. Üretim anahtarları secret store'da tutulur. İzleme kullanıcı/token verisini maskeleyecek; RPO/RTO ve saklama süreleri operasyon kararları olarak belirlenir. Yerel API ve worker çalışmaktadır; üretim deploy yapılmadı. Kurumlara özel gelecekteki soru/sınav içeriği ayrı tenant sahipliğiyle tasarlanacak; merkezi soru yayın yetkisi kurum yöneticisine verilmez.
+Dağıtım, yedek ve geri yükleme [DEPLOYMENT](DEPLOYMENT.md) belgesinde ve `deploy/` altında hazırlandı: `GET /api/v1/health/ready` (veritabanı, Redis, bekleyen migration, kuyruk, zamanlayıcı kalp atışı), sürüm dizinli atomik dağıtım ve otomatik geri alma, şifreli yedek ve geri yükleme tatbikatı. Üretim anahtarları secret store'da tutulur. İzleme kullanıcı/token verisini maskeleyecek; RPO/RTO ve saklama süreleri operasyon kararları olarak belirlenir. Yerel API ve worker çalışmaktadır; üretim deploy yapılmadı. Kurumlara özel gelecekteki soru/sınav içeriği ayrı tenant sahipliğiyle tasarlanacak; merkezi soru yayın yetkisi kurum yöneticisine verilmez.
 
 ## Uygulanan süreli deneme ve mobil
 

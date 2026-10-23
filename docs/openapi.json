@@ -31,6 +31,10 @@
     {
       "name": "Exams",
       "description": "Sunucu süreli, sürümü sabit kişisel veya kurum denemeleri."
+    },
+    {
+      "name": "Operations",
+      "description": "İşletim: örnek hazırlık durumu (izleme ve dağıtım betiği için)."
     }
   ],
   "security": [
@@ -4721,6 +4725,42 @@
           }
         }
       }
+    },
+    "/api/v1/health/ready": {
+      "get": {
+        "operationId": "readiness",
+        "summary": "Örnek hazırlık durumu",
+        "description": "Oturum gerektirmez; yalnızca mantıksal değerler döner (sürüm, adres, yol veya hata metni yoktur), önbelleğe alınmaz, IP başına dakikada 30 istekle sınırlıdır. veritabanı, Redis, bekleyen migration yokluğu ve kuyruk bağlantısı başarısızsa 503 `unavailable` döner (örnek trafik almamalı). Zamanlayıcı kalp atışı (dakikada bir yazılır) 3 dakikadan eskiyse 200 ile `degraded` döner: süresi dolan denemeler zamanında kapanmaz, izleme uyarı vermelidir. `/up` yalnızca uygulamanın ayağa kalktığını söyler.",
+        "tags": [
+          "Operations"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Hazır (`ok`) ya da zamanlayıcı durmuş (`degraded`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Örnek istek karşılayamaz (`unavailable`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -8512,6 +8552,58 @@
           "question_reports",
           "sessions"
         ]
+      },
+      "ReadinessResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": [
+              "status",
+              "checks"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ok",
+                  "degraded",
+                  "unavailable"
+                ]
+              },
+              "checks": {
+                "type": "object",
+                "required": [
+                  "database",
+                  "redis",
+                  "migrations",
+                  "queue",
+                  "scheduler"
+                ],
+                "properties": {
+                  "database": {
+                    "type": "boolean"
+                  },
+                  "redis": {
+                    "type": "boolean"
+                  },
+                  "migrations": {
+                    "type": "boolean"
+                  },
+                  "queue": {
+                    "type": "boolean"
+                  },
+                  "scheduler": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "responses": {

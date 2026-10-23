@@ -1,0 +1,15 @@
+[Unit]
+Description=OGGAQ gece yedeği (pg_dump, şifreli)
+After=postgresql.service
+
+[Service]
+Type=oneshot
+User=oggaq-backup
+Group=oggaq-backup
+EnvironmentFile=/etc/oggaq/backup.env
+# Root sahipli kopya (docs/DEPLOYMENT.md §17.2): uygulama kullanıcısı betiği değiştiremez.
+ExecStart=/usr/local/lib/oggaq-backup/backup.sh
+UMask=0077
+Nice=10
+IOSchedulingClass=idle
+# Başarısızlıkta systemd birimi "failed" olur; backup.sh ayrıca ALERT_WEBHOOK_URL tanımlıysa bildirir.

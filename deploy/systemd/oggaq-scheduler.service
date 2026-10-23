@@ -1,0 +1,21 @@
+[Unit]
+Description=OGGAQ zamanlayıcı (schedule:work)
+After=network.target postgresql.service redis-server.service
+
+[Service]
+User=oggaq
+Group=oggaq
+WorkingDirectory=/srv/oggaq/current/backend
+# Her dakika zamanlanmış görevleri çalıştırır: süresi dolan denemeleri kapatır (exams:expire), kalp atışı yazar,
+# eski token/şifre sıfırlama/başarısız iş kayıtlarını temizler. Durursa /api/v1/health/ready "degraded" döner.
+ExecStart=/usr/bin/php artisan schedule:work
+Restart=always
+RestartSec=5
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

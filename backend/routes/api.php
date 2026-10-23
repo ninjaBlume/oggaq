@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ReadinessController;
 use App\Modules\Exams\Http\Controllers\ExamAttemptController;
 use App\Modules\Identity\Http\Controllers\AccountController;
 use App\Modules\Identity\Http\Controllers\AuthController;
@@ -19,6 +20,8 @@ use App\Modules\Tenancy\Http\Controllers\TenantController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
+    // Instance readiness for monitors and the deploy script; booleans only (docs/DEPLOYMENT.md).
+    Route::get('health/ready', ReadinessController::class)->middleware('throttle:health');
     Route::post('auth/register', [AuthController::class, 'register'])->middleware('throttle:registration');
     Route::post('auth/mobile-tokens', [AuthController::class, 'mobileToken'])->middleware('throttle:login');
     Route::post('auth/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:password');

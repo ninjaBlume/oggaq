@@ -40,7 +40,7 @@ Soru bildirimleri: öğrenci yalnız kendi biten denemesindeki sorunun bildirimi
 - Kullanıcı kendi verisini indirir (`POST /me/export`, parola ve günlük sınırla; yalnız kendi verisi, doğru şık yalnız biten denemede); şirket raporları sadece yetkili bağlamı ve belirlenen alanları içerir.
 - Saklama/imha matrisi veri türü, amaç, hukuki dayanak, süre, yedek ve sorumluyu tanımlar. Süreler hukuki/operasyonel değerlendirme olmadan sabit resmî değer gibi yazılmaz.
 - Hesap silme uygulandı ([PRIVACY](PRIVACY.md)): mevcut parola ve yazılı onay, tek transaction, token/session iptali, bağlı bütün geçmişin silinmesi, denetim kayıtlarının aktörsüzleştirilmesi, sonuç korumasının yalnız bu işlem için kaldırılması. Yedekten dönüşte imha kaydının yeniden uygulanması henüz yoktur.
-- Yasal saklama gereken kayıtlar ayrıştırılır; soft delete tek başına imha sayılmaz. Yedek dönüşünde silinen hesap/verinin yeniden etkinleşmesini engelleyen imha kaydı uygulanır.
+- Yasal saklama gereken kayıtlar ayrıştırılır; soft delete tek başına imha sayılmaz. Yedek dönüşünde silinen hesabın yeniden etkinleşmesini engelleyen imha kaydı uygulandı: kişi bilgisi taşımayan, anahtarlı özetli, yalnızca ekleme kabul eden `account_erasures` ve `accounts:reapply-erasures` ([PRIVACY](PRIVACY.md#silme-listesi-ve-yedekten-dönüş), [DEPLOYMENT](DEPLOYMENT.md) §17.4). Yedekler şifreli yazılır (özel anahtar sunucuda değildir); hazırlık ucu `/api/v1/health/ready` yalnızca mantıksal değer döner ve hız sınırlıdır.
 - Erişim ve yönetici değişiklikleri audit edilir; olay müdahale/ihlal tespiti ve bildirim sorumluluğu ayrıca belirlenir.
 - Hosting, e-posta, hata izleme, Expo build/push ve analitik sağlayıcılarının veri konumu/aktarımı envantere alınır; değerlendirilmemiş entegrasyon aktive edilmez.
 
