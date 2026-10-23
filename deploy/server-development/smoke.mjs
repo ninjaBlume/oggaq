@@ -3,11 +3,16 @@
 import assert from 'node:assert/strict';
 import { mkdir } from 'node:fs/promises';
 import { setTimeout } from 'node:timers/promises';
+import { isIP } from 'node:net';
 import { chromium } from '@playwright/test';
 
 const publicUrl = new URL('https://oggsorubankasi.codentum.net');
 const origin = process.env.OGGAQ_ORIGIN ?? 'http://127.0.0.1:18080';
-const browser = await chromium.launch({ headless: true });
+// Yeni DNS kaydı sistemin negatif önbelleğindeyse, yayımlanmış Cloudflare IP'si test için verilebilir.
+// Bu seçenek TLS doğrulamasını kapatmaz; sertifika gerçek public hostname için doğrulanır.
+const resolveIp = process.env.OGGAQ_RESOLVE_IP;
+if (resolveIp && !isIP(resolveIp)) throw new Error('OGGAQ_RESOLVE_IP geçerli bir IP adresi olmalı.');
+const browser = await chromium.launch({ headless: true, args: resolveIp ? [`--host-resolver-rules=MAP ${publicUrl.hostname} ${resolveIp}`] : [] });
 try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 } });
   // DNS kaydı oluşturulmadan gerçek HTTPS origin davranışını, yerel SSH yönlendirmesi üzerinden doğrular.

@@ -2,8 +2,8 @@
 services:
   tunnel:
     image: cloudflare/cloudflared:latest
-    # Compose file-secret'in 0600 dosyasını okuyabilmek için; host veya Docker socket erişimi verilmez.
-    user: '0:0'
+    # File-secret'in sahibi olan dağıtım kullanıcısıyla çalışır (bu sunucuda harun: 1000:1000).
+    user: '${OGGAQ_UID:-1000}:${OGGAQ_GID:-1000}'
     command: [tunnel, --no-autoupdate, run, --token-file, /run/secrets/cloudflare_tunnel_token]
     secrets:
       - cloudflare_tunnel_token

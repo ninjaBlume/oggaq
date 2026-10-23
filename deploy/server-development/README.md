@@ -50,7 +50,7 @@ docker compose --env-file "$OGGAQ_ENV_FILE" \
   -f deploy/server-development/tunnel.compose.yaml up -d tunnel
 ```
 
-Tünel konteyneri yalnızca proje ağına ve kendi token dosyasına erişir; host ağı veya Docker socket'i bağlanmaz. [Cloudflare token-file belgesi](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/run-parameters/).
+Tünel konteyneri token dosyasının sahibi olan dağıtım kullanıcısının UID/GID'siyle çalışır (bu sunucuda `1000:1000`; başka sunucu için `OGGAQ_UID`/`OGGAQ_GID` ayarlanır). Yalnızca proje ağına ve kendi token dosyasına erişir; host ağı veya Docker socket'i bağlanmaz. [Cloudflare token-file belgesi](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/run-parameters/).
 
 ## Kontroller
 
@@ -66,6 +66,8 @@ node deploy/server-development/smoke.mjs
 
 Smoke kontrolü HTTPS origin'ini Playwright yönlendirmesiyle taklit eder; gerçek DNS/TLS doğrulaması ayrıca yapılır. Hesap/veri oluşturmaz. Öğrenci giriş sayfası, admin alt yolu ve yenilemesi, tema/CSS, CSRF, secure/host-only çerez, geçersiz giriş, yetkisiz API ve gizli dosya erişimi kontrol edilir.
 
+Yayından sonra `OGGAQ_DIRECT=1 node deploy/server-development/smoke.mjs` doğrudan gerçek HTTPS adresini kontrol eder. Yeni kayıt yerel DNS'in olumsuz önbelleğindeyse yalnızca test için `OGGAQ_RESOLVE_IP=<yetkili-DNS-yanıtındaki-IP>` verilebilir; TLS/sertifika kontrolü kapatılmaz. Bu tanılama sistemin DNS ayarlarını veya hosts dosyasını değiştirmez.
+
 ## Veri kalıcılığı ve sınırlar
 
 PostgreSQL, Redis AOF ve Laravel storage ayrı named volume'lardadır. `docker compose down` bu verileri silmez; `down --volumes` veri kaybına yol açar. Gerçek veri eklenmeden önce sunucu dışı yedek ve geri yükleme planı ayrıca uygulanmalıdır; Compose'un çalışması yedek alındığı anlamına gelmez.
@@ -78,4 +80,8 @@ Ubuntu 22.04 üzerinde ayrı `/home/harun/oggaq-development` dizini ve `oggaq-de
 
 Yerel strict tip kontrolü, 11 admin/4 web testi ve iki derleme geçti. Sunucuda Composer manifest/platform/audit ve gerçek tarayıcı smoke kontrolü geçti; kalp atışı dahil hazırlık yanıtı `ok`. Horizon üzerinden gönderilen tek sentetik bildirim yalnızca Mailpit'e ulaştı. Başlangıç kaynak dosyalarının kısıtlı izinleri ilk veritabanı betiğini ve tema betiğini engellemişti; imajdaki okuma izinleri ile başlangıç betiği düzeltildi ve tekrar doğrulandı. Gerçek soru/kullanıcı verisi taşınmadı.
 
-Bu doğrulama tam backend PHPUnit veya native iOS/Android kontrolü değildir. Gerçek HTTPS/DNS kontrolü, Cloudflare bağlantısı tamamlandıktan sonra ayrıca kaydedilir.
+Cloudflare `oggaq-development` tüneli sağlıklı olarak bağlandı (dört edge bağlantısı). `oggsorubankasi.codentum.net` için proxy'li CNAME ve `http://web:8080` uygulama yönlendirmesi oluşturuldu. Yetkili DNS/1.1.1.1 sorguları kaydı döndürdü. Sunucudan normal DNS çözümlemesiyle HTTPS sağlık kontrolü `200 / ok`; bu Mac'te geçerli sertifikayla gerçek Cloudflare IP'sine yöneltilmiş doğrudan Playwright kontrolü de geçti. Safari'de normal HTTPS adresi açılıp öğrenci giriş ekranı ayrıca görüldü. HTTP istekleri yol ve sorgu parametreleri korunarak `308` ile HTTPS'e yönlenir; nginx yapılandırması `nginx -t` ile geçti. Alan adına özgü bu kural diğer projelerin ayarlarını değiştirmez.
+
+İlk tünel denemesinde 0600 token dosyası yetenekleri kaldırılmış root süreci tarafından okunamadı; konteyner, dosyanın sahibi olan dağıtım kullanıcısının UID/GID'siyle çalıştırılarak düzeltildi. Token değeri ekrana, günlüklere veya depoya yazılmadı.
+
+Bu doğrulama tam backend PHPUnit veya native iOS/Android kontrolü değildir. İlk yönetici hesabı, gerçek içerik aktarımı, gerçek SMTP ve sunucu dışı yedek ayrı adımlardır; hazır oldukları ileri sürülmez.
