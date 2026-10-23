@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { ScrollViewInstance } from "react-native";
 import {
   KeyboardAvoidingView,
   BackHandler,
@@ -82,7 +83,7 @@ function MainTabs({
   const [tab, setTab] = useState<MainTab>("home");
   const [menuOpen, setMenuOpen] = useState(false);
   const [subject, setSubject] = useState<string>();
-  const content = useRef<ScrollView>(null);
+  const content = useRef<ScrollViewInstance>(null);
   const focused = useIsFocused();
   const [keyboardOpen, setKeyboardOpen] = useState(false);
   useEffect(() => {

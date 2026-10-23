@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import type { ScrollViewInstance } from "react-native";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
@@ -119,7 +120,7 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
   // Expanded windows keep the question map and the clock in a side panel next to the question.
   const wide = layout.cls === "expanded";
   const latest = useRef<ExamAttempt | null>(null);
-  const scroll = useRef<ScrollView>(null);
+  const scroll = useRef<ScrollViewInstance>(null);
   const insets = useSafeAreaInsets();
   const [overview, setOverview] = useState(false);
   const query = useResource(

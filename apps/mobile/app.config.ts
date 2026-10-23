@@ -10,7 +10,7 @@ const config: ExpoConfig = {
   userInterfaceStyle: "automatic",
   ios: { supportsTablet: true, bundleIdentifier: "net.harunaltay.oggaq" },
   android: { package: "net.harunaltay.oggaq" },
-  plugins: ["expo-secure-store", "./plugins/local-preview.cjs"],
+  plugins: ["expo-secure-store", "expo-status-bar", "./plugins/local-preview.cjs"],
   extra: {
     localPreview,
     apiUrl: process.env.EXPO_PUBLIC_API_URL ?? "http://127.0.0.1:8000",
