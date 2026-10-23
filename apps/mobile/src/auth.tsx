@@ -229,7 +229,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
             </Text>
           </>
         )}
-        {notice && (
+        {notice !== "" && (
           <View
             accessibilityRole="alert"
             style={{
@@ -329,7 +329,7 @@ export function Verify({
         >
           Web girişini aç
         </Button>
-        {notice && <Text style={styles.text}>{notice}</Text>}
+        {notice !== "" && <Text style={styles.text}>{notice}</Text>}
         <ErrorNotice error={task.error} />
         <Button secondary onPress={logout}>
           Çıkış yap

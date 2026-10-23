@@ -165,9 +165,9 @@ export function ScreenTitle({
   const { styles } = useTheme();
   return (
     <View style={{ gap: 7 }}>
-      {eyebrow && <Text style={styles.eyebrow}>{eyebrow}</Text>}
+      {!!eyebrow && <Text style={styles.eyebrow}>{eyebrow}</Text>}
       <Heading>{title}</Heading>
-      {subtitle && <Text style={styles.muted}>{subtitle}</Text>}
+      {!!subtitle && <Text style={styles.muted}>{subtitle}</Text>}
     </View>
   );
 }
@@ -657,7 +657,7 @@ export function ListRow({
         >
           {title}
         </Text>
-        {subtitle && <Text style={styles.muted}>{subtitle}</Text>}
+        {!!subtitle && <Text style={styles.muted}>{subtitle}</Text>}
         {badge}
       </View>
       <ChevronRight size={18} color={palette.muted} />
