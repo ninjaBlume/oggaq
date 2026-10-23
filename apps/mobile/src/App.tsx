@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   BackHandler,
   Keyboard,
   Platform,
-  Pressable,
   ScrollView,
   Text,
   View,
@@ -15,13 +14,13 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import {
+  DarkTheme,
   DefaultTheme,
   NavigationContainer,
   useIsFocused,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ArrowLeft, ShieldCheck } from "./icons";
-import { StatusBar } from "expo-status-bar";
 import type { StudyContext, User } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
 import brand from "../brand.json";
@@ -36,39 +35,26 @@ import {
   Heading,
   IconButton,
   Loading,
-  palette,
-  styles,
 } from "./ui";
 import { Review, Stats } from "./review";
 import { Exam } from "./exams";
 import { ExamList, Results } from "./sinavlar";
 import { Home } from "./home";
 import { MotionProvider } from "./motion";
-import { TabIndicator } from "./expressive";
 import { Profile } from "./profile";
 import {
-  destinations as tabs,
   MainHeader,
+  PrimaryNavigation,
   SideMenu,
   type MainTab,
 } from "./navigation";
+import { ThemeProvider, useBody, useLayout, useTheme } from "./themeContext";
 
 type Routes = {
   Main: undefined;
   Exam: { id: string };
 };
 const Stack = createNativeStackNavigator<Routes>();
-const navigationTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: palette.primary,
-    background: palette.paper,
-    card: palette.paper,
-    text: palette.ink,
-    border: palette.line,
-  },
-};
 function MainTabs({
   user,
   context,
@@ -86,7 +72,8 @@ function MainTabs({
   pending: boolean;
   exam: (id: string) => void;
 }) {
-  const insets = useSafeAreaInsets();
+  const { styles } = useTheme();
+  const layout = useLayout();
   const [tab, setTab] = useState<MainTab>("home");
   const [menuOpen, setMenuOpen] = useState(false);
   const [subject, setSubject] = useState<string>();
@@ -122,115 +109,78 @@ function MainTabs({
     if (tab === id) content.current?.scrollTo({ y: 0, animated: true });
     else setTab(id);
   }
+  // Lists and grids use the whole content area; forms (profile, review) stay a reading column.
+  const body = useBody(["home", "deneme", "ders", "history", "stats"].includes(tab));
   return (
     <>
       <SafeAreaView
         style={styles.shell}
-        edges={["top"]}
+        edges={["top", "left", "right"]}
         accessibilityElementsHidden={menuOpen}
         aria-hidden={menuOpen}
         importantForAccessibility={menuOpen ? "no-hide-descendants" : "auto"}
       >
-        <MainHeader
-          user={user}
-          context={context}
-          expanded={menuOpen}
-          menu={() => setMenuOpen(true)}
-          profile={() => selectTab("profile")}
-        />
-        <ScrollView
-          ref={content}
-          key={tab}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.body}
+        <View
+          style={{ flex: 1, flexDirection: layout.railed ? "row" : "column" }}
         >
-          {tab === "home" ? (
-            <Home
+          {layout.railed && <PrimaryNavigation tab={tab} select={selectTab} placement="rail" />}
+          <View style={{ flex: 1 }}>
+            <MainHeader
               user={user}
               context={context}
-              deneme={() => setTab("deneme")}
-              ders={ders}
-              history={() => setTab("history")}
-              review={() => setTab("review")}
-              stats={() => setTab("stats")}
-              exam={exam}
+              expanded={menuOpen}
+              menu={() => setMenuOpen(true)}
+              profile={() => selectTab("profile")}
             />
-          ) : tab === "deneme" ? (
-            <ExamList context={context} kind="deneme" open={exam} />
-          ) : tab === "ders" ? (
-            <ExamList
-              context={context}
-              kind="ders"
-              open={exam}
-              initialSubject={subject}
-            />
-          ) : tab === "history" ? (
-            <Results context={context} openExam={exam} />
-          ) : tab === "review" ? (
-            <Review context={context} openExam={exam} />
-          ) : tab === "stats" ? (
-            <Stats context={context} />
-          ) : (
-            <Profile
-              user={user}
-              context={context}
-              contexts={contexts}
-              choose={choose}
-              logout={logout}
-              pending={pending}
-            />
-          )}
-        </ScrollView>
-        {!keyboardOpen && (
-          <View
-            accessibilityLabel="Ana gezinme"
-            style={{
-              flexDirection: "row",
-              paddingTop: 10,
-              paddingBottom: Math.max(insets.bottom, 12),
-              paddingHorizontal: 8,
-              backgroundColor: palette.white,
-              borderTopWidth: 1,
-              borderColor: palette.line,
-            }}
-          >
-            {tabs.map(({ id, label, icon: Icon }) => (
-              <Pressable
-                key={id}
-                accessibilityRole="tab"
-                accessibilityLabel={label}
-                accessibilityState={{ selected: tab === id }}
-                aria-selected={tab === id}
-                onPress={() => selectTab(id)}
-                style={{
-                  flex: 1,
-                  minHeight: 52,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 5,
-                }}
-              >
-                <TabIndicator selected={tab === id}>
-                  <Icon
-                    size={22}
-                    strokeWidth={tab === id ? 2.3 : 1.7}
-                    color={tab === id ? palette.primary : palette.muted}
-                  />
-                </TabIndicator>
-                <Text
-                  style={{
-                    fontSize: 11,
-                    fontWeight: tab === id ? "700" : "500",
-                    color: tab === id ? palette.primary : palette.muted,
-                  }}
-                >
-                  {label}
-                </Text>
-              </Pressable>
-            ))}
+            <ScrollView
+              ref={content}
+              key={tab}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={body}
+            >
+              {tab === "home" ? (
+                <Home
+                  user={user}
+                  context={context}
+                  deneme={() => setTab("deneme")}
+                  ders={ders}
+                  history={() => setTab("history")}
+                  review={() => setTab("review")}
+                  stats={() => setTab("stats")}
+                  exam={exam}
+                />
+              ) : tab === "deneme" ? (
+                <ExamList context={context} kind="deneme" open={exam} />
+              ) : tab === "ders" ? (
+                <ExamList
+                  context={context}
+                  kind="ders"
+                  open={exam}
+                  initialSubject={subject}
+                />
+              ) : tab === "history" ? (
+                <Results context={context} openExam={exam} />
+              ) : tab === "review" ? (
+                <Review context={context} openExam={exam} />
+              ) : tab === "stats" ? (
+                <Stats context={context} />
+              ) : (
+                <Profile
+                  user={user}
+                  context={context}
+                  contexts={contexts}
+                  choose={choose}
+                  logout={logout}
+                  pending={pending}
+                />
+              )}
+            </ScrollView>
+            {!layout.railed && !keyboardOpen && (
+              <PrimaryNavigation tab={tab} select={selectTab} placement="bottom" />
+            )}
           </View>
-        )}
+        </View>
       </SafeAreaView>
       {menuOpen && (
         <SideMenu
@@ -257,6 +207,22 @@ function Workspace({
   logout: () => void;
   pending: boolean;
 }) {
+  const { palette, styles, scheme } = useTheme();
+  const body = useBody();
+  const navigationTheme = useMemo(
+    () => ({
+      ...(scheme === "dark" ? DarkTheme : DefaultTheme),
+      colors: {
+        ...(scheme === "dark" ? DarkTheme : DefaultTheme).colors,
+        primary: palette.primary,
+        background: palette.paper,
+        card: palette.paper,
+        text: palette.ink,
+        border: palette.line,
+      },
+    }),
+    [scheme, palette],
+  );
   const query = useResource(
     async (signal) =>
       (await api.request("get", "/api/v1/me/contexts", { signal })).data,
@@ -274,7 +240,7 @@ function Workspace({
   if (!context)
     return (
       <SafeAreaView style={styles.shell}>
-        <ScrollView contentContainerStyle={styles.body}>
+        <ScrollView contentContainerStyle={body}>
           {query.loading ? (
             <Loading />
           ) : query.error ? (
@@ -306,7 +272,7 @@ function Workspace({
   if (query.error)
     return (
       <SafeAreaView style={styles.shell}>
-        <View style={styles.body}>
+        <View style={body}>
           <ErrorNotice
             error={query.error}
             retry={() => {
@@ -365,6 +331,8 @@ function ExamDetail({ context, id }: { context: StudyContext; id: string }) {
   return <Exam key={id} context={context} id={id} />;
 }
 function Application() {
+  const { palette, styles } = useTheme();
+  const body = useBody();
   const [user, setUser] = useState<User | null>(null);
   const [restoring, setRestoring] = useState(true);
   const [error, setError] = useState<unknown>(null);
@@ -420,7 +388,6 @@ function Application() {
   }
   return (
     <View style={styles.shell}>
-      <StatusBar style="dark" />
       {error || task.error ? (
         <View
           style={{
@@ -465,7 +432,7 @@ function Application() {
         <SafeAreaView style={styles.shell} edges={["top", "bottom"]}>
           <ScrollView
             keyboardShouldPersistTaps="handled"
-            contentContainerStyle={styles.body}
+            contentContainerStyle={body}
           >
             {user ? (
               <Verify
@@ -483,17 +450,25 @@ function Application() {
     </View>
   );
 }
+function Root() {
+  const { styles } = useTheme();
+  return (
+    <MotionProvider>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={styles.shell}
+      >
+        <Application />
+      </KeyboardAvoidingView>
+    </MotionProvider>
+  );
+}
 export default function App() {
   return (
     <SafeAreaProvider>
-      <MotionProvider>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={styles.shell}
-        >
-          <Application />
-        </KeyboardAvoidingView>
-      </MotionProvider>
+      <ThemeProvider>
+        <Root />
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@oggaq/api-client": "*",
+    "@oggaq/design-tokens": "*",
     "@oggaq/shared-types": "*",
     "@oggaq/study-core": "*",
     "@tanstack/react-query": "5.104.1",

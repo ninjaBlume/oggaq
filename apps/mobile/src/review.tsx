@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
+import { vocabulary } from "@oggaq/study-core";
 import { typography } from "./theme";
 import { newId } from "./ids";
 import { ApiError } from "@oggaq/api-client";
@@ -10,16 +11,18 @@ import { useOnReturn, useResource, useTask } from "./hooks";
 import {
   Button,
   Card,
+  Columns,
   EmptyState,
   ErrorNotice,
   Field,
   Loading,
   ScreenTitle,
   SectionTitle,
-  palette,
+  SplitBar,
+  SplitLegend,
   percent,
-  styles,
 } from "./ui";
+import { useTheme } from "./themeContext";
 
 type Kind = "incorrect" | "blank" | "favorite";
 type StartInput = components["schemas"]["StartExamInput"];
@@ -66,7 +69,7 @@ export function Review({
   return (
     <>
       <ScreenTitle
-        title="Tekrar sınavı"
+        title={vocabulary.review.title}
         subtitle="Yanlış yaptığın, boş bıraktığın veya favoriye eklediğin sorulardan süreli bir sınav yap."
         eyebrow="HATALARINDAN ÖĞREN"
       />
@@ -105,6 +108,7 @@ function ReviewExam({
   count: number;
   openExam: (id: string) => void;
 }) {
+  const { styles } = useTheme();
   const [expanded, setExpanded] = useState(false);
   const [questions, setQuestions] = useState(String(Math.min(count, 20)));
   const [minutes, setMinutes] = useState(
@@ -187,6 +191,7 @@ function ReviewExam({
 }
 
 export function Stats({ context }: { context: StudyContext }) {
+  const { palette, styles } = useTheme();
   const query = useResource(
     (signal) =>
       api.request("get", "/api/v1/contexts/{context}/stats", {
@@ -202,7 +207,7 @@ export function Stats({ context }: { context: StudyContext }) {
   return (
     <>
       <ScreenTitle
-        title="Başarı durumum"
+        title={vocabulary.stats.title}
         subtitle="Cevapladığın sorulardan hesaplanır. Boş cevaplar doğru sayılmaz."
         eyebrow="İLERLEMEN"
       />
@@ -239,46 +244,42 @@ export function Stats({ context }: { context: StudyContext }) {
             </Text>
           </Card>
           <SectionTitle>Derslere göre</SectionTitle>
-          {stats.subjects.map((subject) => (
-            <Card key={subject.subject_id}>
-              <Text style={styles.heading}>{subject.name}</Text>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+          <Columns>
+            {stats.subjects.map((subject) => (
+              <Card key={subject.subject_id}>
+                <Text style={styles.heading}>{subject.name}</Text>
                 <View
-                  accessibilityRole="image"
-                  accessibilityLabel={`${subject.name}: ${subject.correct} doğru, ${subject.incorrect} yanlış, ${subject.blank} boş`}
-                  style={{
-                    flex: 1,
-                    flexDirection: "row",
-                    height: 10,
-                    borderRadius: 5,
-                    overflow: "hidden",
-                    backgroundColor: palette.line,
-                  }}
+                  style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
                 >
-                  <View style={{ flex: subject.correct, backgroundColor: palette.primary }} />
-                  <View style={{ flex: subject.incorrect, backgroundColor: "#c4574b" }} />
-                  <View style={{ flex: subject.blank }} />
-                </View>
-                <Text
-                  style={{ minWidth: 56, textAlign: "right", fontSize: 18, fontWeight: "800", color: palette.ink }}
-                >
-                  {percent(subject.accuracy_percent)}
-                </Text>
-              </View>
-              <View style={{ flexDirection: "row", flexWrap: "wrap", columnGap: 16, rowGap: 6 }}>
-                {[
-                  [palette.primary, subject.correct, "doğru"],
-                  ["#c4574b", subject.incorrect, "yanlış"],
-                  [palette.line, subject.blank, "boş"],
-                ].map(([color, count, label]) => (
-                  <View key={String(label)} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                    <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: String(color) }} />
-                    <Text style={styles.muted}>{`${count} ${label}`}</Text>
+                  <View style={{ flex: 1 }}>
+                    <SplitBar
+                      correct={subject.correct}
+                      incorrect={subject.incorrect}
+                      blank={subject.blank}
+                      height={10}
+                      label={`${subject.name}: ${subject.correct} doğru, ${subject.incorrect} yanlış, ${subject.blank} boş`}
+                    />
                   </View>
-                ))}
-              </View>
-            </Card>
-          ))}
+                  <Text
+                    style={{
+                      minWidth: 56,
+                      textAlign: "right",
+                      fontSize: 18,
+                      fontWeight: "800",
+                      color: palette.ink,
+                    }}
+                  >
+                    {percent(subject.accuracy_percent)}
+                  </Text>
+                </View>
+                <SplitLegend
+                  correct={subject.correct}
+                  incorrect={subject.incorrect}
+                  blank={subject.blank}
+                />
+              </Card>
+            ))}
+          </Columns>
         </>
       )}
     </>

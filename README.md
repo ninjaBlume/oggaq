@@ -83,3 +83,5 @@ Her soruda ders ve ait olduğu çıkmış sınavlar ayrı gösterilir ve ayrı f
 Öğrenci uygulamasını kökte `npm run dev:web` ile `http://127.0.0.1:5173` adresinde açın. Normal veritabanı boşsa yönetim panelinde yayımlanan sorular listelenene kadar boş durum gösterilir.
 
 Mobil için `npm run dev:mobile`. GitHub Actions üzerinde Android APK ve iOS Simulator paketi derlendi ve indirildi; önizleme paketleri yerel API ile çalışır. Kurulum, native doğrulama kanıtı ve Expo build zincirindeki iki düzeltilmemiş advisory [MOBILE](docs/MOBILE.md) içinde açıklanır.
+
+Tasarım ilkeleri, ortak renk/aralık değerleri (`packages/design-tokens`), koyu mod ve pencere sınıfları/tablet düzeni için [DESIGN](docs/DESIGN.md).

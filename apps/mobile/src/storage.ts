@@ -45,3 +45,30 @@ export async function verifyPreviewStorage(): Promise<void> {
     await SecureStore.deleteItemAsync(key);
   }
 }
+
+// The colour scheme choice is a small, non-secret preference. It is written only when the user changes it (never at
+// startup); a store that cannot be read or written leaves the app on "Cihaz ayarı" instead of breaking it.
+const themeKey = "oggaq.theme";
+export const themeStore = {
+  async read(): Promise<string | null> {
+    if (Platform.OS === "web") {
+      try {
+        return globalThis.localStorage?.getItem(themeKey) ?? null;
+      } catch {
+        return null;
+      }
+    }
+    return SecureStore.getItemAsync(themeKey);
+  },
+  async write(value: string): Promise<void> {
+    if (Platform.OS === "web") {
+      try {
+        globalThis.localStorage?.setItem(themeKey, value);
+      } catch {
+        // Private mode or blocked storage: the choice still applies for this visit.
+      }
+      return;
+    }
+    await SecureStore.setItemAsync(themeKey, value);
+  },
+};

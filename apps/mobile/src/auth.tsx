@@ -16,10 +16,10 @@ import {
   Heading,
   StudyHero,
   TextLink,
-  palette,
-  styles,
 } from "./ui";
+import { useTheme } from "./themeContext";
 export function Login({ signedIn }: { signedIn: (user: User) => void }) {
+  const { palette, styles } = useTheme();
   const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -106,7 +106,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
           <ShieldCheck size={23} color={palette.accent} />
           <Text
             style={{
-              color: palette.white,
+              color: palette.onNavy,
               fontSize: 19,
               fontWeight: "800",
               letterSpacing: 2,
@@ -127,7 +127,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
         </Text>
         <Text
           style={{
-            color: palette.white,
+            color: palette.onNavy,
             ...typography.display,
             marginTop: 10,
             width: "72%",
@@ -289,6 +289,7 @@ export function Verify({
   refresh: () => void;
   logout: () => void;
 }) {
+  const { styles } = useTheme();
   const task = useTask<unknown>();
   const [notice, setNotice] = useState("");
   return (

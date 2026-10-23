@@ -13,21 +13,22 @@ import {
 } from "./icons";
 import type { StudyContext, User } from "@oggaq/shared-types";
 import { Enter, ExpressiveEmblem, ExpressivePressable } from "./expressive";
-import { shape, typography } from "./theme";
+import { vocabulary } from "@oggaq/study-core";
+import { scoreTone, shape, typography } from "./theme";
 import { api } from "./api";
 import { useResource, useOnReturn } from "./hooks";
 import {
   Badge,
   Button,
+  Columns,
   EmptyState,
   ErrorNotice,
   ListRow,
   Loading,
   ScreenTitle,
   SectionTitle,
-  palette,
-  styles,
 } from "./ui";
+import { useLayout, useTheme } from "./themeContext";
 export function Home({
   user,
   context,
@@ -47,6 +48,8 @@ export function Home({
   stats: () => void;
   exam: (id: string) => void;
 }) {
+  const { palette, styles } = useTheme();
+  const layout = useLayout();
   const subjects = useResource(
     (signal) =>
       api.request("get", "/api/v1/subjects", {
@@ -81,6 +84,46 @@ export function Home({
     void recentExams.reload();
   });
   const activeExam = recentExams.data?.data.find((e) => e.status === "active" && Date.parse(e.deadline_at) > Date.parse(e.server_time));
+  const quick = [
+    {
+      title: vocabulary.deneme.title,
+      text: "Tam sınav, gerçek süre",
+      icon: Clock3,
+      press: deneme,
+      bg: palette.primaryContainer,
+      color: palette.onPrimaryContainer,
+    },
+    {
+      title: vocabulary.ders.title,
+      text: "Ders ders çalış",
+      icon: BookOpen,
+      press: () => ders(),
+      bg: palette.secondaryContainer,
+      color: palette.onSecondaryContainer,
+    },
+    {
+      title: vocabulary.review.title,
+      text: "Hatalarından sınav yap",
+      icon: ListChecks,
+      press: review,
+      bg: palette.secondaryContainer,
+      color: palette.onSecondaryContainer,
+    },
+    {
+      title: vocabulary.stats.title,
+      text:
+        typeof accuracy === "number"
+          ? `Doğruluk %${accuracy.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}`
+          : "İlerlemeni gör",
+      icon: ChartColumn,
+      press: stats,
+      bg: palette.primaryContainer,
+      color: palette.onPrimaryContainer,
+    },
+  ];
+  // Two quick actions per row on a phone, all four on an expanded window.
+  const perRow = layout.columns === 2 ? 4 : 2;
+  const tiles = [quick.slice(0, perRow), ...(perRow === 2 ? [quick.slice(2)] : [])];
   return (
     <>
       <ScreenTitle
@@ -114,7 +157,7 @@ export function Home({
         </View>
         <Text
           style={{
-            color: palette.white,
+            color: palette.onNavy,
             ...typography.display,
           }}
         >
@@ -135,83 +178,43 @@ export function Home({
           </Button>
         </View>
       </Enter>
-      {[
-        [
-          {
-            title: "Deneme sınavları",
-            text: "Tam sınav, gerçek süre",
-            icon: Clock3,
-            press: deneme,
-            bg: palette.primaryContainer,
-            color: palette.onPrimaryContainer,
-          },
-          {
-            title: "Ders sınavları",
-            text: "Ders ders çalış",
-            icon: BookOpen,
-            press: () => ders(),
-            bg: palette.secondaryContainer,
-            color: palette.onSecondaryContainer,
-          },
-        ],
-        [
-          {
-            title: "Tekrar",
-            text: "Hatalarından sınav yap",
-            icon: ListChecks,
-            press: review,
-            bg: palette.secondaryContainer,
-            color: palette.onSecondaryContainer,
-          },
-          {
-            title: "Başarım",
-            text:
-              typeof accuracy === "number"
-                ? `Doğruluk %${accuracy.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}`
-                : "İlerlemeni gör",
-            icon: ChartColumn,
-            press: stats,
-            bg: palette.primaryContainer,
-            color: palette.onPrimaryContainer,
-          },
-        ],
-      ].map((row) => (
-      <View key={row[0]!.title} style={{ flexDirection: "row", gap: 12 }}>
-        {row.map(({ title, text, icon: Icon, press, bg, color }) => (
-          <ExpressivePressable
-            key={title}
-            radius={title === "Deneme sınavları" ? shape.large : shape.extraLarge}
-            accessibilityRole="button"
-            accessibilityLabel={title + " ekranını aç"}
-            onPress={press}
-            style={{
-              flex: 1,
-              backgroundColor: bg,
-              borderRadius: shape.large,
-              padding: 14,
-              gap: 8,
-            }}
-          >
-            <View
+      {tiles.map((row) => (
+        <View key={row[0]!.title} style={{ flexDirection: "row", gap: 12 }}>
+          {row.map(({ title, text, icon: Icon, press, bg, color }) => (
+            <ExpressivePressable
+              key={title}
+              radius={title === vocabulary.deneme.title ? shape.large : shape.extraLarge}
+              accessibilityRole="button"
+              accessibilityLabel={title + " ekranını aç"}
+              onPress={press}
               style={{
-                width: 42,
-                height: 42,
-                backgroundColor: palette.white,
-                borderRadius: shape.full,
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: 6,
+                flex: 1,
+                backgroundColor: bg,
+                borderRadius: shape.large,
+                padding: layout.cardPadding,
+                gap: 8,
               }}
             >
-              <Icon size={21} color={color} strokeWidth={1.8} />
-            </View>
-            <Text style={{ color, fontSize: 17, fontWeight: "700" }}>
-              {title}
-            </Text>
-            <Text style={{ fontSize: 12, color, lineHeight: 18 }}>{text}</Text>
-          </ExpressivePressable>
-        ))}
-      </View>
+              <View
+                style={{
+                  width: 42,
+                  height: 42,
+                  backgroundColor: palette.surface,
+                  borderRadius: shape.full,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: 6,
+                }}
+              >
+                <Icon size={21} color={color} strokeWidth={1.8} />
+              </View>
+              <Text style={{ color, fontSize: 17, fontWeight: "700" }}>
+                {title}
+              </Text>
+              <Text style={{ fontSize: 12, color, lineHeight: 18 }}>{text}</Text>
+            </ExpressivePressable>
+          ))}
+        </View>
       ))}
       {recentExams.error && (
         <ErrorNotice
@@ -258,9 +261,9 @@ export function Home({
               onPress={() => ders(s.id)}
               style={({ pressed }) => [
                 {
-                  width: "47.8%",
+                  width: layout.columns === 2 ? "23.7%" : "47.8%",
                   flexGrow: 1,
-                  backgroundColor: palette.white,
+                  backgroundColor: palette.surface,
                   borderRadius: 20,
                   padding: 14,
                   gap: 14,
@@ -307,7 +310,8 @@ export function Home({
           onPress={deneme}
         />
       ) : (
-        recentExams.data?.data.map((e) => (
+        <Columns>
+          {recentExams.data?.data.map((e) => (
           <ListRow
             key={e.id}
             icon={Clock3}
@@ -315,7 +319,7 @@ export function Home({
             subtitle={new Date(e.started_at).toLocaleDateString("tr-TR")}
             onPress={() => exam(e.id)}
             badge={
-              <Badge tone={e.status === "completed" ? "success" : "primary"}>
+              <Badge tone={e.status === "completed" && e.result ? scoreTone(e.result.score_percent, palette).badge : "primary"}>
                 {e.status === "active"
                   ? Date.parse(e.deadline_at) > Date.parse(e.server_time) ? "Devam ediyor" : "Süresi doldu"
                   : e.result
@@ -324,7 +328,8 @@ export function Home({
               </Badge>
             }
           />
-        ))
+        ))}
+        </Columns>
       )}
       <Text style={[styles.muted, { textAlign: "center", fontSize: 11 }]}>
         {context.kind === "personal" ? "Kişisel çalışma alanın" : context.name}

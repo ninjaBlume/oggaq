@@ -244,7 +244,7 @@ function ExamContent({
               Soru {index + 1} / {exam.question_count}
             </span>
             {!done && (
-              <strong aria-label="Kalan süre">{timeLabel(seconds)}</strong>
+              <strong className="exam-timer" aria-label="Kalan süre">{timeLabel(seconds)}</strong>
             )}
           </div>
           <h2 className="question-stem">{row.question.stem}</h2>
@@ -380,6 +380,12 @@ function ExamContent({
         </section>
         <aside className="practice-aside">
           <section className="card">
+            {!done && (
+              <div className="aside-timer">
+                <span>Kalan süre</span>
+                <strong aria-label="Kalan süre">{timeLabel(seconds)}</strong>
+              </div>
+            )}
             <h3>
               {done
                 ? "Cevaplarını incele"

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import type { components } from '@oggaq/shared-types';
 import { Link } from 'react-router-dom';
+import { vocabulary } from '@oggaq/study-core';
 import { api } from './api';
 import { PageIntro, useStudyContext } from './App';
 import { ErrorNotice, Loading, percent } from './ui';
@@ -9,7 +10,7 @@ export function Stats() {
   const context = useStudyContext();
   const stats = useQuery({ queryKey: ['stats', context.id], queryFn: ({ signal }) => api.request('get', '/api/v1/contexts/{context}/stats', { params: { context: context.id }, signal }) });
   return <>
-    <PageIntro eyebrow="İLERLEMEN" title="Başarı durumum"><p>{context.name} alanında cevapladığın sorulardan hesaplanır. Boş cevaplar doğru sayılmaz.</p></PageIntro>
+    <PageIntro eyebrow="İLERLEMEN" title={vocabulary.stats.title}><p>{context.name} alanında cevapladığın sorulardan hesaplanır. Boş cevaplar doğru sayılmaz.</p></PageIntro>
     {stats.isPending ? <Loading /> : stats.isError ? <ErrorNotice error={stats.error} retry={() => { void stats.refetch(); }} /> : stats.data.data.answers.total === 0 && stats.data.data.exams.completed === 0 ? <section className="card empty"><h2>Henüz istatistik yok</h2><p>Sınavlara girdikçe sonuçların burada görünür.</p><Link className="button primary" to={`/study/${context.id}/deneme`}>Sınava girmeye başla</Link></section> : <Summary stats={stats.data.data} />}
   </>;
 }

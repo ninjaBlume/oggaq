@@ -3,12 +3,28 @@ import { Pressable, Text, View } from "react-native";
 import { newId } from "./ids";
 import { ApiError, cursorFromLink } from "@oggaq/api-client";
 import type { ExamAttempt, Page, StudyContext, components } from "@oggaq/shared-types";
-import { suggestedMinutes } from "@oggaq/study-core";
+import { suggestedMinutes, vocabulary } from "@oggaq/study-core";
 import { api } from "./api";
 import { useOnReturn, useResource, useTask } from "./hooks";
-import { Badge, Button, Card, EmptyState, ErrorNotice, Field, Loading, ScreenTitle, Sheet, palette, percent, styles } from "./ui";
+import {
+  Badge,
+  Button,
+  Card,
+  Columns,
+  EmptyState,
+  ErrorNotice,
+  Field,
+  Loading,
+  ScreenTitle,
+  Sheet,
+  percent,
+  SplitBar,
+  SplitLegend,
+} from "./ui";
 import { ChoiceGroup } from "./expressive";
 import { BookOpen, ChevronDown, ChevronRight, Clock3 } from "./icons";
+import { scoreTone } from "./theme";
+import { useLayout, useTheme } from "./themeContext";
 
 type OfficialExam = components["schemas"]["OfficialExam"];
 type Summary = components["schemas"]["ExamSummary"];
@@ -54,6 +70,7 @@ function ExamEntry({
   attempts: Summary[];
   open: (id: string) => void;
 }) {
+  const { styles } = useTheme();
   const [expanded, setExpanded] = useState(false);
   const [minutes, setMinutes] = useState(String(suggestedMinutes(exam)));
   const submission = useRef<StartInput | null>(null);
@@ -142,6 +159,7 @@ export function ExamList({
   open: (id: string) => void;
   initialSubject?: string;
 }) {
+  const { palette } = useTheme();
   const [weapon, setWeapon] = useState<"armed" | "unarmed">("armed");
   const [subject, setSubject] = useState<string | undefined>(initialSubject);
   const [picking, setPicking] = useState(false);
@@ -177,7 +195,7 @@ export function ExamList({
   return (
     <>
       <ScreenTitle
-        title={kind === "deneme" ? "Deneme sınavları" : "Ders sınavları"}
+        title={kind === "deneme" ? vocabulary.deneme.title : vocabulary.ders.title}
         subtitle={
           kind === "deneme"
             ? "Geçmiş sınavın tamamını gerçek düzende ve süreyle çöz. Silahlı sınav 125, silahsız sınav 100 sorudur."
@@ -205,7 +223,7 @@ export function ExamList({
               flexDirection: "row",
               alignItems: "center",
               gap: 10,
-              backgroundColor: palette.white,
+              backgroundColor: palette.surface,
               padding: 14,
               borderRadius: 16,
               borderWidth: 1,
@@ -254,39 +272,33 @@ export function ExamList({
       ) : (
         <>
           <ErrorNotice error={attempts.error} retry={() => void attempts.reload()} />
-          {list.map((exam) => (
-            <ExamEntry
-              key={exam.id}
-              context={context}
-              exam={exam}
-              title={`${exam.exam_number ? `${exam.exam_number}. ` : ""}${kind === "deneme" ? "Deneme Sınavı" : "Ders Sınavı"}`}
-              attempts={attempts.data?.data ?? []}
-              open={open}
-            />
-          ))}
+          <Columns>
+            {list.map((exam) => (
+              <ExamEntry
+                key={exam.id}
+                context={context}
+                exam={exam}
+                title={`${exam.exam_number ? `${exam.exam_number}. ` : ""}${kind === "deneme" ? "Deneme Sınavı" : "Ders Sınavı"}`}
+                attempts={attempts.data?.data ?? []}
+                open={open}
+              />
+            ))}
+          </Columns>
         </>
       )}
     </>
   );
 }
 
-// Every exam the student entered, newest first; an open attempt continues, a finished one shows its result.
-// Score colour: strong results read green, weak ones red, the middle stays neutral teal.
-function scoreTone(score: number) {
-  return score >= 70
-    ? { backgroundColor: palette.softSuccess, color: palette.success }
-    : score >= 40
-      ? { backgroundColor: palette.softPrimary, color: palette.primary }
-      : { backgroundColor: palette.softRed, color: palette.red };
-}
-
 // One attempt of the history: the score first, then what the exam was, then how the answers split.
 function ResultCard({ attempt: e, open }: { attempt: Summary; open: () => void }) {
+  const { palette, styles } = useTheme();
+  const layout = useLayout();
   const live = e.status === "active" && Date.parse(e.deadline_at) > Date.parse(e.server_time);
   const result = e.result;
   const title = e.official_exam?.title ?? `${e.question_count} soruluk deneme`;
   const kind = e.official_exam ? (/Ders Sınavı/.test(e.official_exam.title) ? "DERS SINAVI" : "DENEME SINAVI") : "DENEME";
-  const tone = result ? scoreTone(result.score_percent) : { backgroundColor: palette.softPrimary, color: palette.primary };
+  const tone = result ? scoreTone(result.score_percent, palette) : { backgroundColor: palette.softPrimary, color: palette.primary };
   const date = new Date(e.started_at).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" });
   const minutes = Math.round((result ? result.elapsed_seconds : e.duration_seconds) / 60);
   return (
@@ -295,14 +307,14 @@ function ResultCard({ attempt: e, open }: { attempt: Summary; open: () => void }
       accessibilityLabel={live ? "Sınava dön" : `${title} sonucunu incele`}
       onPress={open}
       style={({ pressed }) => [
-        { backgroundColor: palette.white, borderWidth: 1, borderColor: palette.line, borderRadius: 24, padding: 14, gap: 14 },
+        { backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.line, borderRadius: 24, padding: layout.cardPadding, gap: 14 },
         pressed && { backgroundColor: palette.softPrimary },
       ]}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
-        <View style={{ width: 68, height: 68, borderRadius: 20, alignItems: "center", justifyContent: "center", backgroundColor: tone.backgroundColor }}>
+        <View style={{ minWidth: 76, height: 68, paddingHorizontal: 6, borderRadius: 20, alignItems: "center", justifyContent: "center", backgroundColor: tone.backgroundColor }}>
           {result ? (
-            <Text style={{ fontSize: 21, lineHeight: 26, fontWeight: "800", color: tone.color }}>{percent(result.score_percent)}</Text>
+            <Text numberOfLines={1} style={{ fontSize: 20, lineHeight: 26, fontWeight: "800", color: tone.color }}>{percent(result.score_percent)}</Text>
           ) : (
             <Clock3 size={26} color={tone.color} />
           )}
@@ -316,23 +328,8 @@ function ResultCard({ attempt: e, open }: { attempt: Summary; open: () => void }
       </View>
       {result ? (
         <View style={{ gap: 8 }}>
-          <View style={{ flexDirection: "row", height: 8, borderRadius: 4, overflow: "hidden", backgroundColor: palette.line }}>
-            <View style={{ flex: result.correct, backgroundColor: palette.primary }} />
-            <View style={{ flex: result.incorrect, backgroundColor: "#c4574b" }} />
-            <View style={{ flex: result.blank }} />
-          </View>
-          <View style={{ flexDirection: "row", flexWrap: "wrap", columnGap: 16, rowGap: 6 }}>
-            {[
-              [palette.primary, result.correct, "doğru"],
-              ["#c4574b", result.incorrect, "yanlış"],
-              [palette.line, result.blank, "boş"],
-            ].map(([color, count, label]) => (
-              <View key={String(label)} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: String(color) }} />
-                <Text style={styles.muted}>{`${count} ${label}`}</Text>
-              </View>
-            ))}
-          </View>
+          <SplitBar correct={result.correct} incorrect={result.incorrect} blank={result.blank} />
+          <SplitLegend correct={result.correct} incorrect={result.incorrect} blank={result.blank} />
         </View>
       ) : (
         <View style={{ alignSelf: "flex-start" }}>
@@ -359,7 +356,7 @@ export function Results({ context, openExam }: { context: StudyContext; openExam
   });
   return (
     <>
-      <ScreenTitle title="Sonuçlarım" subtitle="Girdiğin deneme ve ders sınavları. Bir sınavı açıp cevaplarını tek tek incele." />
+      <ScreenTitle title={vocabulary.results.title} subtitle="Girdiğin deneme ve ders sınavları. Bir sınavı açıp cevaplarını tek tek incele." />
       {exams.loading ? (
         <Loading />
       ) : exams.error ? (
@@ -367,7 +364,9 @@ export function Results({ context, openExam }: { context: StudyContext; openExam
       ) : exams.data?.data.length === 0 ? (
         <EmptyState icon={Clock3} title="Henüz bir sınava girmedin" message="Girdiğin sınavlar ve sonuçların burada görünür." />
       ) : (
-        exams.data?.data.map((e) => <ResultCard key={e.id} attempt={e} open={() => openExam(e.id)} />)
+        <Columns>
+          {exams.data?.data.map((e) => <ResultCard key={e.id} attempt={e} open={() => openExam(e.id)} />)}
+        </Columns>
       )}
       {exams.data && <Pagination page={exams.data} change={setCursor} />}
     </>
@@ -381,6 +380,7 @@ export function Pagination({
   page: Page<unknown>;
   change: (cursor: string | undefined) => void;
 }) {
+  const { styles } = useTheme();
   if (!page.links.prev && !page.links.next) return null;
   return (
     <View style={styles.row}>

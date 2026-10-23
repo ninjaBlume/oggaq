@@ -31,7 +31,7 @@ test("yanlışlar, boşlar, favoriler ve başarı durumu son sonuca göre günce
   await page.reload();
   await expect(page.getByRole("button", { name: "★ Favorilerde" })).toBeVisible();
 
-  await page.getByRole("link", { name: "Tekrar", exact: true }).click();
+  await page.getByRole("link", { name: "Tekrar sınavı", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Tekrar sınavı" })).toBeVisible();
   const list = (name: string) => page.locator(".sinav-row").filter({ has: page.getByRole("heading", { name, exact: true }) });
   await expect(list("Yanlışlarım")).toContainText("1 soru");
@@ -41,16 +41,16 @@ test("yanlışlar, boşlar, favoriler ve başarı durumu son sonuca göre günce
   await enterReview(page, "Favorilerim");
   await expect(page.getByRole("heading", { name: "Sentetik birinci soru" })).toBeVisible();
   await expect(page.getByText("Soru 1 / 1", { exact: false })).toBeVisible();
-  await page.getByRole("link", { name: "Tekrar", exact: true }).click();
+  await page.getByRole("link", { name: "Tekrar sınavı", exact: true }).click();
   await expect(list("Favorilerim")).toContainText("1 soru");
 
   // Timestamps have second precision; the corrected answer must be the latest one.
   await page.waitForTimeout(1100);
   await solveDers(page, "A");
-  await page.getByRole("link", { name: "Tekrar", exact: true }).click();
+  await page.getByRole("link", { name: "Tekrar sınavı", exact: true }).click();
   await expect(page.getByText("Şu an tekrar edeceğin yanlış soru yok.")).toBeVisible();
 
-  await page.getByRole("link", { name: "Başarım", exact: true }).click();
+  await page.getByRole("link", { name: "Başarı durumum", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Başarı durumum" })).toBeVisible();
   // Two attempts: (correct, wrong, blank, correct... counted per attempt) = 3 correct, 1 wrong, 2 blank.
   await expect(page.getByText("3 doğru · 1 yanlış · 2 boş").first()).toBeVisible();
@@ -72,8 +72,8 @@ test("kişisel ve kurum alanlarının tekrar listeleri ayrıdır", async ({ page
   await login(page);
   await solveDers(page, "B");
   await page.getByLabel("Çalışma alanı", { exact: true }).selectOption({ label: "Sentetik eğitim kurumu" });
-  await page.getByRole("link", { name: "Tekrar", exact: true }).click();
+  await page.getByRole("link", { name: "Tekrar sınavı", exact: true }).click();
   await expect(page.getByText("Şu an tekrar edeceğin yanlış soru yok.")).toBeVisible();
-  await page.getByRole("link", { name: "Başarım", exact: true }).click();
+  await page.getByRole("link", { name: "Başarı durumum", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Henüz istatistik yok" })).toBeVisible();
 });

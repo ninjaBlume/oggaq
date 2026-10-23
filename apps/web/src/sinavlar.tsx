@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, cursorFromLink } from '@oggaq/api-client';
 import type { components } from '@oggaq/shared-types';
-import { randomId, suggestedMinutes } from '@oggaq/study-core';
+import { randomId, scoreBand, suggestedMinutes, vocabulary } from '@oggaq/study-core';
 import { api } from './api';
 import { PageIntro, useStudyContext } from './App';
 import { dateLabel, ErrorNotice, Field, Loading, percent } from './ui';
@@ -100,7 +100,7 @@ export function DenemeSinavlari() {
   const weapon = params.get('silah') === 'unarmed' ? 'unarmed' : 'armed';
   const list = (exams.data ?? []).filter((exam) => !exam.subject && exam.weapon_status === weapon).sort(byNewest);
   return <>
-    <PageIntro eyebrow="SINAVA GİR" title="Deneme sınavları"><p>Geçmiş sınavın tamamını gerçek sınav düzeninde ve süreyle çöz. Silahlı sınav 125, silahsız sınav 100 sorudur; sonuçların kaydedilir.</p></PageIntro>
+    <PageIntro eyebrow="SINAVA GİR" title={vocabulary.deneme.title}><p>Geçmiş sınavın tamamını gerçek sınav düzeninde ve süreyle çöz. Silahlı sınav 125, silahsız sınav 100 sorudur; sonuçların kaydedilir.</p></PageIntro>
     <nav className="tab-bar" aria-label="Silah durumu">{([['armed', 'Silahlı sınav'], ['unarmed', 'Silahsız sınav']] as const).map(([value, label]) => <button key={value} type="button" className={`tab-button${weapon === value ? ' active' : ''}`} aria-pressed={weapon === value} onClick={() => setParams({ silah: value })}>{label}</button>)}</nav>
     {exams.isPending ? <Loading /> : exams.isError ? <ErrorNotice error={exams.error} retry={() => { void exams.refetch(); }} /> : list.length === 0 ? <section className="card empty"><h2>Henüz deneme sınavı yok</h2><p>Yayımlanmış bir deneme sınavı olduğunda burada görünür.</p></section>
       : <>{attempts.isError && <ErrorNotice error={attempts.error} retry={() => { void attempts.refetch(); }} />}<div className="sinav-list">{list.map((exam) => <ExamRow key={exam.id} exam={exam} title={`${exam.exam_number ? `${exam.exam_number}. ` : ''}Deneme Sınavı`} attempts={attempts.data?.data ?? []} />)}</div></>}
@@ -117,7 +117,7 @@ export function DersSinavlari() {
   const selected = withExams.find((subject) => subject.id === params.get('ders')) ?? withExams[0];
   const list = subjectExams.filter((exam) => exam.subject?.id === selected?.id).sort(byNewest);
   return <>
-    <PageIntro eyebrow="DERS DERS ÇALIŞ" title="Ders sınavları"><p>Bir ders seç ve o dersin geçmiş sınavlardaki sorularını sınav olarak çöz. Her sınav numarasının her dersi ayrı bir sınavdır.</p></PageIntro>
+    <PageIntro eyebrow="DERS DERS ÇALIŞ" title={vocabulary.ders.title}><p>Bir ders seç ve o dersin geçmiş sınavlardaki sorularını sınav olarak çöz. Her sınav numarasının her dersi ayrı bir sınavdır.</p></PageIntro>
     {exams.isPending || subjects.isPending ? <Loading /> : exams.isError || subjects.isError ? <ErrorNotice error={exams.error ?? subjects.error} retry={() => { void exams.refetch(); void subjects.refetch(); }} /> : withExams.length === 0 ? <section className="card empty"><h2>Henüz ders sınavı yok</h2><p>Yayımlanmış bir ders sınavı olduğunda burada görünür.</p></section>
       : <>
         <nav className="tab-bar" aria-label="Ders">{withExams.map((subject) => <button key={subject.id} type="button" className={`tab-button${selected?.id === subject.id ? ' active' : ''}`} aria-pressed={selected?.id === subject.id} onClick={() => setParams({ ders: subject.id })}>{subject.name}<small> {subjectExams.filter((exam) => exam.subject?.id === subject.id).length}</small></button>)}</nav>
@@ -133,7 +133,7 @@ function ResultRow({ exam, to }: { exam: Summary; to: string }) {
   const expired = Date.parse(exam.deadline_at) <= Date.parse(exam.server_time);
   const title = exam.official_exam ? exam.official_exam.title : `${exam.question_count} soruluk deneme`;
   const kind = exam.official_exam ? (/Ders Sınavı/.test(exam.official_exam.title) ? 'DERS SINAVI' : 'DENEME SINAVI') : 'DENEME';
-  const tone = !result ? 'pending' : result.score_percent >= 70 ? 'strong' : result.score_percent < 40 ? 'weak' : '';
+  const tone = result ? scoreBand(result.score_percent) : 'pending';
   const minutes = Math.round((result ? result.elapsed_seconds : exam.duration_seconds) / 60);
   return <Link className="history-row" to={to}>
     <span className={`result-score ${tone}`}>{result ? percent(result.score_percent) : expired ? 'Sonucu gör' : 'Devam et'}</span>
@@ -152,7 +152,7 @@ export function Sonuclarim() {
   const [cursor, setCursor] = useState<string>();
   const history = useQuery({ queryKey: ['exams', context.id, cursor], queryFn: ({ signal }) => api.request('get', '/api/v1/contexts/{context}/exam-attempts', { params: { context: context.id }, query: { cursor, per_page: 20 }, signal }) });
   return <>
-    <PageIntro eyebrow="GİRDİĞİN SINAVLAR" title="Sonuçlarım"><p>{context.name} alanında girdiğin deneme ve ders sınavları. Bir sınavı açıp cevaplarını tek tek inceleyebilirsin.</p></PageIntro>
+    <PageIntro eyebrow="GİRDİĞİN SINAVLAR" title={vocabulary.results.title}><p>{context.name} alanında girdiğin deneme ve ders sınavları. Bir sınavı açıp cevaplarını tek tek inceleyebilirsin.</p></PageIntro>
     {history.isPending ? <Loading /> : history.isError ? <ErrorNotice error={history.error} retry={() => { void history.refetch(); }} /> : history.data.data.length === 0 ? <section className="card empty"><h2>Henüz bir sınava girmedin</h2><p>Girdiğin sınavlar ve sonuçların burada saklanır.</p><Link className="button primary" to={`/study/${context.id}/deneme`}>Deneme sınavlarına git</Link></section>
       : <>
         <section className="history-list" aria-label="Sınav sonuçları">{history.data.data.map((exam) => <ResultRow key={exam.id} exam={exam} to={`/study/${context.id}/exams/${exam.id}`} />)}</section>

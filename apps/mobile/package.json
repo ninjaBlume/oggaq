@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@oggaq/api-client": "*",
+    "@oggaq/design-tokens": "*",
     "@oggaq/shared-types": "*",
     "@oggaq/study-core": "*",
     "@react-navigation/native": "7.5.0",

@@ -15,9 +15,11 @@ import {
   Card,
   ScreenTitle,
   SectionTitle,
-  palette,
-  styles,
 } from "./ui";
+import { useTheme } from "./themeContext";
+import { ChoiceGroup } from "./expressive";
+import { vocabulary } from "@oggaq/study-core";
+import { themePreferenceLabels, themePreferences } from "@oggaq/design-tokens";
 export function Profile({
   user,
   context,
@@ -33,9 +35,13 @@ export function Profile({
   logout: () => void;
   pending: boolean;
 }) {
+  const { palette, styles, preference, setPreference } = useTheme();
   return (
     <>
-      <ScreenTitle title="Profilim" subtitle="Hesabın ve çalışma alanların." />
+      <ScreenTitle
+        title={vocabulary.profile.title}
+        subtitle="Hesabın, görünümün ve çalışma alanların."
+      />
       <View style={{ alignItems: "center", paddingVertical: 20, gap: 12 }}>
         <View
           style={{
@@ -46,7 +52,7 @@ export function Profile({
             alignItems: "center",
             justifyContent: "center",
             borderWidth: 6,
-            borderColor: palette.white,
+            borderColor: palette.surface,
           }}
         >
           <Text
@@ -78,6 +84,19 @@ export function Profile({
         </View>
         <Text style={[styles.text, { fontSize: 14 }]}>{user.email}</Text>
       </Card>
+      <SectionTitle>Görünüm</SectionTitle>
+      <Text style={styles.muted}>
+        Uygulama cihazının açık veya koyu ayarını izler; istersen sabitle.
+      </Text>
+      <ChoiceGroup
+        choices={themePreferences.map((value) => ({
+          value,
+          label: themePreferenceLabels[value],
+          accessibilityLabel: `Görünüm: ${themePreferenceLabels[value]}`,
+        }))}
+        value={preference}
+        onChange={setPreference}
+      />
       <SectionTitle>Çalışma alanın</SectionTitle>
       <Text style={styles.muted}>
         Seçtiğin alandaki sorular ve geçmişin gösterilir.
@@ -95,7 +114,7 @@ export function Profile({
               borderWidth: 1.5,
               borderColor: c.id === context.id ? palette.primary : palette.line,
               backgroundColor:
-                c.id === context.id ? palette.softPrimary : palette.white,
+                c.id === context.id ? palette.softPrimary : palette.surface,
               padding: 14,
               flexDirection: "row",
               alignItems: "center",

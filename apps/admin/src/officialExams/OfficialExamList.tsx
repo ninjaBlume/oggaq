@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import type { components } from '@oggaq/shared-types';
+import { vocabulary } from '@oggaq/study-core';
 import { api, collect, loadCatalogs } from '../api';
 import { ErrorNotice, Icon, Loading } from '../ui';
 
@@ -45,7 +46,7 @@ export function OfficialExamList({ kind }: { kind: 'deneme' | 'ders' }) {
   const years = [...new Set(own.map((exam) => exam.year))].sort((a, b) => b - a);
   const visible = scoped.filter((exam) => !year || exam.year === Number(year)).filter((exam) => !onlyAttention || needsAttention(exam));
   const summary = { total: scoped.length, published: scoped.filter((exam) => exam.status === 'published').length, attention: scoped.filter(needsAttention).length };
-  const title = kind === 'deneme' ? 'Deneme sınavları' : 'Ders sınavları';
+  const title = kind === 'deneme' ? vocabulary.deneme.title : vocabulary.ders.title;
   const newLink = kind === 'deneme' ? '/official-exams/new?tur=deneme' : `/official-exams/new?tur=ders${selected ? `&ders=${selected.id}` : ''}`;
   const rows = kind === 'deneme' ? groupWholeExams(visible) : [];
   return <><header className="page-heading"><div><span className="eyebrow">MERKEZİ İÇERİK</span><h1>{title}</h1><p className="muted">{kind === 'deneme' ? 'Tam sınavlar sınav numarasına göre: silahlı ve silahsız sürümler yan yana. Bir sınavı açınca bütün soruları alt alta görür, yerinde düzenler ve yeni soru yazarsınız.' : 'Bir ders seçin; o dersin her sınav numarasındaki sınavı listelenir. Sınavı açınca soruları alt alta görür ve yerinde düzenlersiniz.'}</p></div><Link className="button primary" to={newLink}><Icon name="plus" size={18} />{kind === 'deneme' ? 'Yeni deneme sınavı' : 'Yeni ders sınavı'}</Link></header>

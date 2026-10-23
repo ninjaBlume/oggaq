@@ -16,8 +16,10 @@
   --c-secondary-container: #DCE4EF;
   --c-on-secondary-container: #182B45;
   --c-success: #237A4B;
+  --c-on-success: #FFFFFF;
   --c-soft-success: #EDF5EF;
   --c-red: #B9384A;
+  --c-on-red: #FFFFFF;
   --c-soft-red: #FBEDEF;
   --c-warning: #8A5A00;
   --c-soft-warning: #FBF1DC;
@@ -49,8 +51,10 @@
     --c-secondary-container: #2A3A52;
     --c-on-secondary-container: #D5E2F5;
     --c-success: #6FD39A;
+    --c-on-success: #00210F;
     --c-soft-success: #17301F;
     --c-red: #F2808F;
+    --c-on-red: #3A0010;
     --c-soft-red: #3A1D22;
     --c-warning: #E9B84F;
     --c-soft-warning: #3A2E12;
@@ -78,8 +82,10 @@
   --c-secondary-container: #2A3A52;
   --c-on-secondary-container: #D5E2F5;
   --c-success: #6FD39A;
+  --c-on-success: #00210F;
   --c-soft-success: #17301F;
   --c-red: #F2808F;
+  --c-on-red: #3A0010;
   --c-soft-red: #3A1D22;
   --c-warning: #E9B84F;
   --c-soft-warning: #3A2E12;

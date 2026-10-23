@@ -284,7 +284,7 @@ test("yan menü gerçek ekranlara gider, seçimi gösterir ve odağı içinde tu
     { menu: "Deneme sınavları", title: "Deneme sınavları", tab: "Deneme" },
     { menu: "Ders sınavları", title: "Ders sınavları", tab: "Ders" },
     { menu: "Sonuçlarım", title: "Sonuçlarım", tab: "Sonuçlar" },
-    { menu: "Profilim", title: "Profilim", tab: "Profil" },
+    { menu: "Profil", title: "Profil", tab: "Profil" },
     { menu: "Ana sayfa", title: "Merhaba, E2E.", tab: "Ana sayfa" },
   ];
   for (const target of destinations) {
@@ -294,7 +294,10 @@ test("yan menü gerçek ekranlara gider, seçimi gösterir ve odağı içinde tu
     await expect(page.getByRole("tab", { name: "Ana sayfa" })).toHaveCount(0);
     await menu.getByRole("button", { name: target.menu, exact: true }).click();
     await expect(menu).not.toBeVisible();
-    await expect(page.getByText(target.title, { exact: true })).toBeVisible();
+    // The tab bar says "Profil" too, so the page title is matched by its heading role.
+    await expect(
+      page.getByRole("heading", { name: target.title, exact: true }),
+    ).toBeVisible();
     await expect(
       page.getByRole("tab", { name: target.tab, exact: true }),
     ).toHaveAttribute("aria-selected", "true");
@@ -579,7 +582,7 @@ test("mobil tekrar sınavı hatalardan kurulur; başarı durumu ve sınavlar ger
   await page.getByRole("button", { name: "Geri dön" }).click();
 
   await page.getByRole("tab", { name: "Ana sayfa", exact: true }).click();
-  await page.getByRole("button", { name: "Tekrar ekranını aç" }).click();
+  await page.getByRole("button", { name: "Tekrar sınavı ekranını aç" }).click();
   await expect(page.getByText("Tekrar sınavı", { exact: true })).toBeVisible();
   // Review is an exam: counts per list and an exam to enter, no questions to browse.
   await expect(page.getByText(/^1 soru · Son cevabın yanlış/)).toBeVisible();
@@ -606,7 +609,7 @@ test("mobil tekrar sınavı hatalardan kurulur; başarı durumu ve sınavlar ger
 
   await page.getByRole("tab", { name: "Ana sayfa", exact: true }).click();
   await expect(page.getByText("Doğruluk %0", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Başarım ekranını aç" }).click();
+  await page.getByRole("button", { name: "Başarı durumum ekranını aç" }).click();
   await expect(
     page.getByText("0 doğru · 1 yanlış · 2 boş", { exact: true }).first(),
   ).toBeVisible();

@@ -1,3 +1,4 @@
+import { Children } from "react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import {
@@ -5,7 +6,6 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -26,139 +26,15 @@ import {
 } from "./icons";
 import type { LucideIcon } from "lucide-react-native";
 import { ApiError } from "@oggaq/api-client";
-import { palette } from "./theme";
-import { shape, typography } from "./theme";
+import { shape } from "./theme";
+import { useLayout, useTheme } from "./themeContext";
 import { ExpressivePressable } from "./expressive";
 import { useSpringValue } from "./motion";
 import { Animated } from "react-native";
-export { palette } from "./theme";
 export const percent = (value: number | null) =>
   value === null
     ? "—"
     : `%${value.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}`;
-export const styles = StyleSheet.create({
-  shell: { flex: 1, backgroundColor: palette.paper },
-  body: {
-    width: "100%",
-    maxWidth: 680,
-    alignSelf: "center",
-    padding: 14,
-    gap: 20,
-    paddingBottom: 32,
-  },
-  row: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    gap: 10,
-  },
-  between: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  card: {
-    backgroundColor: palette.white,
-    borderWidth: 1,
-    borderColor: palette.line,
-    borderRadius: shape.large,
-    padding: 14,
-    gap: 12,
-  },
-  title: {
-    ...typography.headline,
-    color: palette.ink,
-  },
-  heading: {
-    ...typography.title,
-    color: palette.ink,
-  },
-  text: { ...typography.body, color: palette.ink },
-  muted: { fontSize: 13, color: palette.muted, lineHeight: 20 },
-  eyebrow: {
-    fontSize: 11,
-    fontWeight: "800",
-    color: palette.muted,
-    letterSpacing: 1.5,
-  },
-  button: {
-    minHeight: 54,
-    borderRadius: 28,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    backgroundColor: palette.primary,
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonText: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: palette.white,
-    lineHeight: 22,
-  },
-  secondary: { backgroundColor: palette.primaryContainer },
-  secondaryText: { color: palette.onPrimaryContainer },
-  disabled: { opacity: 0.45 },
-  input: {
-    flex: 1,
-    minHeight: 54,
-    fontSize: 16,
-    color: palette.ink,
-    paddingVertical: 13,
-    paddingHorizontal: 0,
-  },
-  error: {
-    padding: 14,
-    backgroundColor: palette.softRed,
-    borderRadius: 16,
-    gap: 10,
-  },
-  option: {
-    borderWidth: 1.5,
-    borderColor: palette.line,
-    borderRadius: shape.large,
-    padding: 14,
-    minHeight: 64,
-    flexDirection: "row",
-    gap: 14,
-    alignItems: "center",
-    backgroundColor: palette.white,
-  },
-  selected: {
-    backgroundColor: palette.softPrimary,
-    borderColor: palette.primary,
-  },
-  correct: {
-    backgroundColor: palette.softSuccess,
-    borderColor: palette.success,
-  },
-  header: {
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    backgroundColor: palette.paper,
-    gap: 12,
-  },
-  smallButton: {
-    minWidth: 46,
-    minHeight: 46,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 14,
-    backgroundColor: palette.paper,
-  },
-  iconButton: {
-    width: 46,
-    height: 46,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 16,
-    backgroundColor: palette.white,
-  },
-  link: { color: palette.primary, fontSize: 13, fontWeight: "700" },
-});
 export function Button({
   children,
   onPress,
@@ -176,11 +52,12 @@ export function Button({
   danger?: boolean;
   alignStart?: boolean;
 }) {
+  const { palette, styles } = useTheme();
   const color = danger
     ? palette.red
     : secondary
       ? palette.onPrimaryContainer
-      : palette.white;
+      : palette.onPrimary;
   return (
     <ExpressivePressable
       accessibilityRole="button"
@@ -210,6 +87,7 @@ export function IconButton({
   label: string;
   onPress: () => void;
 }) {
+  const { palette, styles } = useTheme();
   return (
     <ExpressivePressable
       accessibilityRole="button"
@@ -230,6 +108,7 @@ export function TextLink({
   children: string;
   onPress: () => void;
 }) {
+  const { styles } = useTheme();
   return (
     <Pressable
       accessibilityRole="button"
@@ -242,9 +121,32 @@ export function TextLink({
   );
 }
 export function Card({ children }: { children: ReactNode }) {
-  return <View style={styles.card}>{children}</View>;
+  const { styles } = useTheme();
+  const { cardPadding } = useLayout();
+  return (
+    <View style={[styles.card, { padding: cardPadding }]}>{children}</View>
+  );
+}
+// Independent items (cards, exam rows) flow into two columns on an expanded window and stay one column elsewhere.
+export function Columns({ children }: { children: ReactNode }) {
+  const { columns } = useLayout();
+  const items = Children.toArray(children);
+  if (columns === 1) return <>{items}</>;
+  return (
+    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16 }}>
+      {items.map((item, index) => (
+        <View
+          key={index}
+          style={{ flexBasis: "47%", flexGrow: 1, maxWidth: "49.2%" }}
+        >
+          {item}
+        </View>
+      ))}
+    </View>
+  );
 }
 export function Heading({ children }: { children: string }) {
+  const { styles } = useTheme();
   return (
     <Text accessibilityRole="header" style={styles.title}>
       {children}
@@ -260,6 +162,7 @@ export function ScreenTitle({
   subtitle?: string;
   eyebrow?: string;
 }) {
+  const { styles } = useTheme();
   return (
     <View style={{ gap: 7 }}>
       {eyebrow && <Text style={styles.eyebrow}>{eyebrow}</Text>}
@@ -277,6 +180,7 @@ export function SectionTitle({
   action?: string;
   onPress?: () => void;
 }) {
+  const { styles } = useTheme();
   return (
     <View style={styles.between}>
       <Text accessibilityRole="header" style={styles.heading}>
@@ -293,6 +197,7 @@ export function Badge({
   children: string;
   tone?: "primary" | "success" | "red" | "neutral";
 }) {
+  const { palette } = useTheme();
   const backgroundColor =
     tone === "success"
       ? palette.softSuccess
@@ -336,6 +241,7 @@ export function EmptyState({
   action?: string;
   onPress?: () => void;
 }) {
+  const { palette, styles } = useTheme();
   return (
     <View
       style={{
@@ -344,7 +250,7 @@ export function EmptyState({
         paddingHorizontal: 22,
         paddingVertical: 32,
         borderRadius: 20,
-        backgroundColor: palette.white,
+        backgroundColor: palette.surface,
         borderWidth: 1,
         borderColor: palette.line,
       }}
@@ -371,6 +277,7 @@ export function EmptyState({
   );
 }
 export function Loading() {
+  const { palette } = useTheme();
   return (
     <View style={{ padding: 32, alignItems: "center" }}>
       <ActivityIndicator
@@ -388,6 +295,7 @@ export function ErrorNotice({
   error: unknown;
   retry?: () => void;
 }) {
+  const { palette, styles } = useTheme();
   if (!error) return null;
   let message =
     error instanceof ApiError
@@ -428,6 +336,7 @@ export function Field({
   email?: boolean;
   editable?: boolean;
 }) {
+  const { palette, styles, scheme } = useTheme();
   const [focused, setFocused] = useState(false);
   const [reveal, setReveal] = useState(false);
   const Icon = email ? Mail : password ? LockKeyhole : null;
@@ -464,6 +373,9 @@ export function Field({
           editable={editable}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
+          keyboardAppearance={scheme}
+          placeholderTextColor={palette.muted}
+          selectionColor={palette.primary}
           style={styles.input}
           textContentType={
             email ? "emailAddress" : password ? "password" : undefined
@@ -499,6 +411,7 @@ export function Sheet({
   children: ReactNode;
   close: () => void;
 }) {
+  const { palette, styles } = useTheme();
   const insets = useSafeAreaInsets();
   return (
     <Modal
@@ -523,7 +436,10 @@ export function Sheet({
         <View
           accessibilityViewIsModal
           style={{
-            backgroundColor: palette.white,
+            width: "100%",
+            maxWidth: 640,
+            alignSelf: "center",
+            backgroundColor: palette.surface,
             borderTopLeftRadius: 24,
             borderTopRightRadius: 24,
             maxHeight: "80%",
@@ -572,6 +488,7 @@ export function ConfirmDialog({
   cancel: () => void;
   disabled?: boolean;
 }) {
+  const { styles } = useTheme();
   return (
     <Sheet
       visible={visible}
@@ -609,6 +526,7 @@ export function Option({
   disabled: boolean;
   onPress: () => void;
 }) {
+  const { palette, styles } = useTheme();
   const selection = useSpringValue(
     selected || correct || incorrect ? 1 : 0,
     "effects",
@@ -660,13 +578,13 @@ export function Option({
         }}
       >
         {correct ? (
-          <Check size={17} color={palette.white} />
+          <Check size={17} color={palette.onSuccess} />
         ) : (
           <Text
             style={{
               fontSize: 13,
               fontWeight: "700",
-              color: selected || incorrect ? palette.white : color,
+              color: incorrect ? palette.onRed : selected ? palette.onPrimary : color,
             }}
           >
             {label}
@@ -695,6 +613,7 @@ export function ListRow({
   badge?: ReactNode;
   label?: string;
 }) {
+  const { palette, styles } = useTheme();
   return (
     <Pressable
       accessibilityRole="button"
@@ -707,7 +626,7 @@ export function ListRow({
           gap: 14,
           borderRadius: 20,
           padding: 14,
-          backgroundColor: palette.white,
+          backgroundColor: palette.surface,
           borderWidth: 1,
           borderColor: palette.line,
         },
@@ -745,7 +664,78 @@ export function ListRow({
     </Pressable>
   );
 }
+// How the answers split: a bar (correct, incorrect, blank) and a legend that spells it out, so meaning never rests on colour alone.
+export function SplitBar({
+  correct,
+  incorrect,
+  blank,
+  height = 8,
+  label,
+}: {
+  correct: number;
+  incorrect: number;
+  blank: number;
+  height?: number;
+  label?: string;
+}) {
+  const { palette } = useTheme();
+  return (
+    <View
+      accessibilityRole={label ? "image" : undefined}
+      accessibilityLabel={label}
+      style={{
+        flexDirection: "row",
+        height,
+        borderRadius: height / 2,
+        overflow: "hidden",
+        backgroundColor: palette.line,
+      }}
+    >
+      <View style={{ flex: correct, backgroundColor: palette.primary }} />
+      <View style={{ flex: incorrect, backgroundColor: palette.red }} />
+      <View style={{ flex: blank }} />
+    </View>
+  );
+}
+export function SplitLegend({
+  correct,
+  incorrect,
+  blank,
+}: {
+  correct: number;
+  incorrect: number;
+  blank: number;
+}) {
+  const { palette, styles } = useTheme();
+  return (
+    <View
+      style={{ flexDirection: "row", flexWrap: "wrap", columnGap: 16, rowGap: 6 }}
+    >
+      {[
+        [palette.primary, correct, "doğru"],
+        [palette.red, incorrect, "yanlış"],
+        [palette.muted, blank, "boş"],
+      ].map(([color, count, label]) => (
+        <View
+          key={String(label)}
+          style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+        >
+          <View
+            style={{
+              width: 10,
+              height: 10,
+              borderRadius: 5,
+              backgroundColor: String(color),
+            }}
+          />
+          <Text style={styles.muted}>{`${count} ${label}`}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
 export function StudyHero({ compact = false }: { compact?: boolean }) {
+  const { palette } = useTheme();
   return (
     <View
       accessible={false}
@@ -802,7 +792,7 @@ export function StudyHero({ compact = false }: { compact?: boolean }) {
           width: 35,
           height: 35,
           borderRadius: 12,
-          backgroundColor: palette.white,
+          backgroundColor: palette.surface,
           alignItems: "center",
           justifyContent: "center",
           transform: [{ rotate: "10deg" }],

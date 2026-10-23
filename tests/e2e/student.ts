@@ -44,7 +44,7 @@ export async function finish(page: Page) {
 }
 // Tekrar is an exam too: sit a timed exam made of the questions of a review list.
 export async function enterReview(page: Page, list = "Favorilerim", minutes = "5") {
-  await page.getByRole("link", { name: "Tekrar", exact: true }).click();
+  await page.getByRole("link", { name: "Tekrar sınavı", exact: true }).click();
   const card = page.locator(".sinav-row").filter({ has: page.getByRole("heading", { name: list, exact: true }) });
   await card.getByRole("button", { name: "Tekrar sınavına gir" }).click();
   await card.getByLabel("Süre (dakika)", { exact: true }).fill(minutes);

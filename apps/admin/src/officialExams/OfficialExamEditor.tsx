@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ApiError, cursorFromLink } from '@oggaq/api-client';
+import { vocabulary } from '@oggaq/study-core';
 import type { Catalogs, components } from '@oggaq/shared-types';
 import { api, loadCatalogs } from '../api';
 import { ErrorNotice, Field, Icon, Loading, Modal, dateLabel, useNotify } from '../ui';
@@ -35,7 +36,7 @@ export function OfficialExamPage() {
   const exam = useQuery({ queryKey: ['official-exam', examId], enabled: !!examId, queryFn: ({ signal }) => api.request('get', '/api/v1/admin/official-exams/{officialExam}', { params: { officialExam: examId! }, signal }) });
   if (catalogs.isPending || (examId && exam.isPending)) return <Loading text="Editör hazırlanıyor…" />;
   if (catalogs.isError) return <ErrorNotice error={catalogs.error} retry={() => { void catalogs.refetch(); }} />;
-  if (examId && exam.isError) return <><Link className="back-link" to="/deneme-sinavlari"><Icon name="back" size={16} />Deneme sınavları</Link><ErrorNotice error={exam.error} retry={() => { void exam.refetch(); }} /></>;
+  if (examId && exam.isError) return <><Link className="back-link" to="/deneme-sinavlari"><Icon name="back" size={16} />{vocabulary.deneme.title}</Link><ErrorNotice error={exam.error} retry={() => { void exam.refetch(); }} /></>;
   return <OfficialExamEditor key={examId ?? 'new'} exam={exam.data?.data} catalogs={catalogs.data} />;
 }
 

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError } from '@oggaq/api-client';
 import type { components } from '@oggaq/shared-types';
-import { randomId } from '@oggaq/study-core';
+import { randomId, vocabulary } from '@oggaq/study-core';
 import { api } from './api';
 import { PageIntro, useStudyContext } from './App';
 import { ErrorNotice, Field, Loading } from './ui';
@@ -21,7 +21,7 @@ export function Review() {
   const context = useStudyContext();
   const summary = useQuery({ queryKey: ['review', context.id, 'summary'], queryFn: ({ signal }) => api.request('get', '/api/v1/contexts/{context}/review-summary', { params: { context: context.id }, signal }) });
   return <>
-    <PageIntro eyebrow="HATALARINDAN ÖĞREN" title="Tekrar sınavı"><p>{context.name} alanında yanlış yaptığın, boş bıraktığın veya favoriye eklediğin sorulardan süreli bir sınav yap. Sonuçların listeleri günceller.</p></PageIntro>
+    <PageIntro eyebrow="HATALARINDAN ÖĞREN" title={vocabulary.review.title}><p>{context.name} alanında yanlış yaptığın, boş bıraktığın veya favoriye eklediğin sorulardan süreli bir sınav yap. Sonuçların listeleri günceller.</p></PageIntro>
     {summary.isPending ? <Loading /> : summary.isError ? <ErrorNotice error={summary.error} retry={() => { void summary.refetch(); }} /> : <div className="sinav-list">{kinds.map((kind) => <ReviewExam key={kind.id} kind={kind} count={summary.data.data[kind.id]} />)}</div>}
   </>;
 }

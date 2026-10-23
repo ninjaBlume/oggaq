@@ -14,7 +14,7 @@ const pairs: [ColorRole, ColorRole, number][] = [
   ['onPrimary', 'primary', 4.5], ['onPrimaryContainer', 'primaryContainer', 4.5], ['onSecondaryContainer', 'secondaryContainer', 4.5],
   ['success', 'surface', 4.5], ['success', 'softSuccess', 4.5], ['red', 'surface', 4.5], ['red', 'softRed', 4.5],
   ['warning', 'surface', 4.5], ['warning', 'softWarning', 4.5],
-  ['onNavy', 'navy', 4.5], ['onNavyMuted', 'navy', 4.5], ['accent', 'navy', 3],
+  ['onSuccess', 'success', 4.5], ['onRed', 'red', 4.5], ['onNavy', 'navy', 4.5], ['onNavyMuted', 'navy', 4.5], ['accent', 'navy', 3],
   ['red', 'paper', 3], ['success', 'paper', 3],
 ];
 

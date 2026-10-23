@@ -11,7 +11,8 @@ import {
 import Svg, { Path } from "react-native-svg";
 import { Check } from "./icons";
 import { useReducedMotion, useSpringValue } from "./motion";
-import { palette, shape } from "./theme";
+import { shape } from "./theme";
+import { useTheme } from "./themeContext";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -157,6 +158,7 @@ function ChoiceButton<T extends string>({
   disabled: boolean;
   onPress: () => void;
 }) {
+  const { palette } = useTheme();
   const progress = useSpringValue(selected ? 1 : 0);
   const corner = (outer: boolean) =>
     progress.interpolate({
@@ -190,13 +192,13 @@ function ChoiceButton<T extends string>({
         opacity: disabled ? 0.45 : 1,
       }}
     >
-      {selected && <Check size={16} color={palette.white} />}
+      {selected && <Check size={16} color={palette.onPrimary} />}
       <Text
         style={{
           fontSize: 13,
           lineHeight: 20,
           fontWeight: "700",
-          color: selected ? palette.white : palette.onPrimaryContainer,
+          color: selected ? palette.onPrimary : palette.onPrimaryContainer,
           flexShrink: 1,
           textAlign: "center",
         }}
@@ -217,12 +219,14 @@ const flowerPath =
 export function ExpressiveEmblem({
   children,
   size = 64,
-  color = palette.primaryContainer,
+  color,
 }: {
   children: ReactNode;
   size?: number;
   color?: string;
 }) {
+  const { palette } = useTheme();
+  const fill = color ?? palette.primaryContainer;
   return (
     <View
       style={{
@@ -239,7 +243,7 @@ export function ExpressiveEmblem({
         style={{ position: "absolute", inset: 0 }}
       >
         <Svg width={size} height={size} viewBox="0 0 100 100">
-          <Path d={flowerPath} fill={color} />
+          <Path d={flowerPath} fill={fill} />
         </Svg>
       </View>
       <View style={{ zIndex: 1 }}>{children}</View>
@@ -254,6 +258,7 @@ export function TabIndicator({
   selected: boolean;
   children: ReactNode;
 }) {
+  const { palette } = useTheme();
   const progress = useSpringValue(selected ? 1 : 0);
   return (
     <Animated.View

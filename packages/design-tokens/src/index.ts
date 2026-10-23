@@ -6,7 +6,7 @@ export const colorRoles = [
   'paper', 'surface', 'surfaceContainer', 'neutralSurface', 'line',
   'ink', 'muted',
   'primary', 'onPrimary', 'primaryContainer', 'onPrimaryContainer', 'softPrimary', 'secondaryContainer', 'onSecondaryContainer',
-  'success', 'softSuccess', 'red', 'softRed', 'warning', 'softWarning',
+  'success', 'onSuccess', 'softSuccess', 'red', 'onRed', 'softRed', 'warning', 'softWarning',
   'navy', 'onNavy', 'onNavyMuted', 'accent', 'scrim',
 ] as const;
 export type ColorRole = (typeof colorRoles)[number];
@@ -17,7 +17,7 @@ export const lightPalette: Palette = {
   ink: '#202B38', muted: '#5F6B7A',
   primary: '#0F766E', onPrimary: '#FFFFFF', primaryContainer: '#CDE8DF', onPrimaryContainer: '#123D38', softPrimary: '#E7F2EF',
   secondaryContainer: '#DCE4EF', onSecondaryContainer: '#182B45',
-  success: '#237A4B', softSuccess: '#EDF5EF', red: '#B9384A', softRed: '#FBEDEF', warning: '#8A5A00', softWarning: '#FBF1DC',
+  success: '#237A4B', onSuccess: '#FFFFFF', softSuccess: '#EDF5EF', red: '#B9384A', onRed: '#FFFFFF', softRed: '#FBEDEF', warning: '#8A5A00', softWarning: '#FBF1DC',
   navy: '#182B45', onNavy: '#FFFFFF', onNavyMuted: '#C6D2DF', accent: '#D6A64F', scrim: 'rgba(24, 43, 69, 0.48)',
 };
 
@@ -28,7 +28,7 @@ export const darkPalette: Palette = {
   ink: '#E4EAE8', muted: '#9FADA8',
   primary: '#4DC6B8', onPrimary: '#00201C', primaryContainer: '#1B4A44', onPrimaryContainer: '#BDEBE3', softPrimary: '#15332F',
   secondaryContainer: '#2A3A52', onSecondaryContainer: '#D5E2F5',
-  success: '#6FD39A', softSuccess: '#17301F', red: '#F2808F', softRed: '#3A1D22', warning: '#E9B84F', softWarning: '#3A2E12',
+  success: '#6FD39A', onSuccess: '#00210F', softSuccess: '#17301F', red: '#F2808F', onRed: '#3A0010', softRed: '#3A1D22', warning: '#E9B84F', softWarning: '#3A2E12',
   navy: '#1C3355', onNavy: '#FFFFFF', onNavyMuted: '#C6D2DF', accent: '#D6A64F', scrim: 'rgba(0, 0, 0, 0.6)',
 };
 

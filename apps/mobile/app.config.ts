@@ -7,7 +7,7 @@ const config: ExpoConfig = {
   version: "0.1.0",
   scheme: "oggaq",
   orientation: "default",
-  userInterfaceStyle: "light",
+  userInterfaceStyle: "automatic",
   ios: { supportsTablet: true, bundleIdentifier: "net.harunaltay.oggaq" },
   android: { package: "net.harunaltay.oggaq" },
   plugins: ["expo-secure-store", "./plugins/local-preview.cjs"],

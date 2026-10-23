@@ -1,60 +1,37 @@
-// Semantic roles keep branding, actions and answer feedback distinct.
-export const palette = {
-  ink: "#202B38",
-  muted: "#667085",
-  primary: "#0F766E",
-  paper: "#F7F8F6",
-  line: "#E2E7E5",
-  white: "#FFFFFF",
-  red: "#B9384A",
-  success: "#237A4B",
-  softPrimary: "#E7F2EF",
-  softSuccess: "#EDF5EF",
-  softRed: "#FBEDEF",
-  navy: "#182B45",
-  accent: "#D6A64F",
-  onNavyMuted: "#C6D2DF",
-  neutralSurface: "#ECEFEC",
-  scrim: "rgba(24, 43, 69, 0.48)",
-  decorativeLine: "rgba(255, 255, 255, 0.18)",
-  primaryContainer: "#CDE8DF",
-  onPrimaryContainer: "#123D38",
-  secondaryContainer: "#DCE4EF",
-  onSecondaryContainer: "#182B45",
-  surfaceContainer: "#EFF3EF",
-};
+import {
+  darkPalette,
+  lightPalette,
+  palettes as tokenPalettes,
+  shape as tokenShape,
+  typeScale,
+} from "@oggaq/design-tokens";
+import type { ColorScheme, Palette } from "@oggaq/design-tokens";
+import { scoreBand } from "@oggaq/study-core";
 
-export const shape = {
-  small: 8,
-  medium: 16,
-  large: 24,
-  extraLarge: 32,
-  full: 999,
-  connected: 6,
+// Colours are semantic roles with a light and a dark value (packages/design-tokens). Components never name a hex: they
+// read the active palette from useTheme() (themeContext.tsx). Only the thin decorative ring on navy is local.
+export type AppPalette = Palette & { decorativeLine: string };
+const decorativeLine = "rgba(255, 255, 255, 0.18)";
+export const palettes: Record<ColorScheme, AppPalette> = {
+  light: { ...tokenPalettes.light, decorativeLine },
+  dark: { ...tokenPalettes.dark, decorativeLine },
 };
+export { darkPalette, lightPalette };
 
-export const typography = {
-  display: {
-    fontSize: 34,
-    lineHeight: 41,
-    fontWeight: "800" as const,
-    letterSpacing: -1.2,
-  },
-  headline: {
-    fontSize: 30,
-    lineHeight: 37,
-    fontWeight: "800" as const,
-    letterSpacing: -0.8,
-  },
-  title: {
-    fontSize: 21,
-    lineHeight: 28,
-    fontWeight: "700" as const,
-    letterSpacing: -0.4,
-  },
-  body: { fontSize: 17, lineHeight: 27 },
-  label: { fontSize: 15, lineHeight: 22, fontWeight: "700" as const },
-};
+export const shape = { ...tokenShape, connected: 6 } as const;
+
+export const typography = typeScale;
+
+// A score is tinted by its band (60-point mark and 80, see scoreBand): green strong, teal steady, red weak. Colour and
+// tone only; nothing says passed or failed.
+export function scoreTone(score: number, palette: AppPalette) {
+  const band = scoreBand(score);
+  return band === "strong"
+    ? { backgroundColor: palette.softSuccess, color: palette.success, badge: "success" as const }
+    : band === "steady"
+      ? { backgroundColor: palette.softPrimary, color: palette.primary, badge: "primary" as const }
+      : { backgroundColor: palette.softRed, color: palette.red, badge: "red" as const };
+}
 
 // Material 3 Expressive v0_14_0 spring values, adapted to RN's unit-mass model.
 // damping = 2 * dampingRatio * sqrt(stiffness * mass).

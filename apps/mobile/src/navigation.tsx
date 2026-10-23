@@ -32,30 +32,26 @@ import {
   UserRound,
   X,
 } from "./icons";
-import { motion, palette, shape } from "./theme";
+import { vocabulary } from "@oggaq/study-core";
+import { motion, shape } from "./theme";
+import type { AppPalette } from "./theme";
+import { railWidth } from "./layout";
+import { TabIndicator } from "./expressive";
 import { useReducedMotion } from "./motion";
+import { useLayout, useTheme } from "./themeContext";
 
+// Names come from the shared vocabulary (study-core): `short` on tabs and the rail, `title` in the menu.
 export const destinations = [
-  { id: "home", label: "Ana sayfa", menuLabel: "Ana sayfa", icon: House },
-  { id: "deneme", label: "Deneme", menuLabel: "Deneme sınavları", icon: Clock3 },
-  { id: "ders", label: "Ders", menuLabel: "Ders sınavları", icon: BookOpen },
-  { id: "history", label: "Sonuçlar", menuLabel: "Sonuçlarım", icon: History },
-  { id: "profile", label: "Profil", menuLabel: "Profilim", icon: UserRound },
+  { id: "home", label: vocabulary.home.short, menuLabel: vocabulary.home.title, icon: House },
+  { id: "deneme", label: vocabulary.deneme.short, menuLabel: vocabulary.deneme.title, icon: Clock3 },
+  { id: "ders", label: vocabulary.ders.short, menuLabel: vocabulary.ders.title, icon: BookOpen },
+  { id: "history", label: vocabulary.results.short, menuLabel: vocabulary.results.title, icon: History },
+  { id: "profile", label: vocabulary.profile.short, menuLabel: vocabulary.profile.title, icon: UserRound },
 ] as const;
-// Reachable from the side menu and home only; the bottom bar keeps its five primary tabs.
+// Reachable from the side menu and home only; the tab bar / rail keeps its five primary tabs.
 export const extraDestinations = [
-  {
-    id: "review",
-    label: "Tekrar",
-    menuLabel: "Tekrar sınavı",
-    icon: ListChecks,
-  },
-  {
-    id: "stats",
-    label: "Başarım",
-    menuLabel: "Başarı durumum",
-    icon: ChartColumn,
-  },
+  { id: "review", label: vocabulary.review.short, menuLabel: vocabulary.review.title, icon: ListChecks },
+  { id: "stats", label: vocabulary.stats.short, menuLabel: vocabulary.stats.title, icon: ChartColumn },
 ] as const;
 export type MainTab =
   | (typeof destinations)[number]["id"]
@@ -74,8 +70,16 @@ export function MainHeader({
   profile: () => void;
   expanded: boolean;
 }) {
+  const { palette } = useTheme();
+  const navStyles = useNavStyles();
+  const layout = useLayout();
   return (
-    <View style={navStyles.header}>
+    <View
+      style={[
+        navStyles.header,
+        { maxWidth: layout.maxWidth, paddingHorizontal: layout.gutter },
+      ]}
+    >
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Menüyü aç"
@@ -91,10 +95,10 @@ export function MainHeader({
           pressed && navStyles.pressed,
         ]}
       >
-        <Menu size={23} color={palette.navy} strokeWidth={1.8} />
+        <Menu size={23} color={palette.ink} strokeWidth={1.8} />
       </Pressable>
       <View style={navStyles.brand}>
-        <ShieldCheck size={23} color={palette.navy} strokeWidth={1.8} />
+        <ShieldCheck size={23} color={palette.primary} strokeWidth={1.8} />
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={navStyles.wordmark}>{brand.displayName}</Text>
           <Text numberOfLines={1} style={navStyles.contextLabel}>
@@ -141,7 +145,9 @@ export function SideMenu({
   pending: boolean;
   close: () => void;
 }) {
+  const { palette } = useTheme();
   const insets = useSafeAreaInsets();
+  const navStyles = useNavStyles();
   const { width } = useWindowDimensions();
   const panelWidth = Math.min(340, width - 48);
   const progress = useRef(new Animated.Value(0)).current;
@@ -257,7 +263,7 @@ export function SideMenu({
             <View style={navStyles.between}>
               <View style={navStyles.brand}>
                 <ShieldCheck size={24} color={palette.accent} />
-                <Text style={[navStyles.wordmark, { color: palette.white }]}>
+                <Text style={[navStyles.wordmark, { color: palette.onNavy }]}>
                   {brand.displayName}
                 </Text>
               </View>
@@ -270,7 +276,7 @@ export function SideMenu({
                   pressed && navStyles.pressed,
                 ]}
               >
-                <X size={23} color={palette.white} strokeWidth={1.8} />
+                <X size={23} color={palette.onNavy} strokeWidth={1.8} />
               </Pressable>
             </View>
             <Text style={navStyles.accountName}>{user.name}</Text>
@@ -384,7 +390,93 @@ export function SideMenu({
   );
 }
 
-const navStyles = StyleSheet.create({
+// The five primary tabs. Compact windows show them as a bottom bar, wider ones as a rail on the left (docs/DESIGN.md
+// section 5); roles and names are the same, so assistive technology and tests see one navigation.
+export function PrimaryNavigation({
+  tab,
+  select,
+  placement,
+}: {
+  tab: MainTab;
+  select: (id: MainTab) => void;
+  placement: "bottom" | "rail";
+}) {
+  const { palette } = useTheme();
+  const insets = useSafeAreaInsets();
+  const items = destinations.map(({ id, label, icon: Icon }) => (
+    <Pressable
+      key={id}
+      accessibilityRole="tab"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: tab === id }}
+      aria-selected={tab === id}
+      onPress={() => select(id)}
+      style={
+        placement === "bottom"
+          ? { flex: 1, minHeight: 52, alignItems: "center", justifyContent: "center", gap: 5 }
+          : { width: railWidth - 8, minHeight: 56, alignItems: "center", justifyContent: "center", gap: 4 }
+      }
+    >
+      <TabIndicator selected={tab === id}>
+        <Icon
+          size={22}
+          strokeWidth={tab === id ? 2.3 : 1.7}
+          color={tab === id ? palette.primary : palette.muted}
+        />
+      </TabIndicator>
+      <Text
+        style={{
+          fontSize: 11,
+          fontWeight: tab === id ? "700" : "500",
+          color: tab === id ? palette.primary : palette.muted,
+        }}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  ));
+  if (placement === "bottom")
+    return (
+      <View
+        accessibilityLabel="Ana gezinme"
+        style={{
+          flexDirection: "row",
+          paddingTop: 10,
+          paddingBottom: Math.max(insets.bottom, 12),
+          paddingHorizontal: 8,
+          backgroundColor: palette.surface,
+          borderTopWidth: 1,
+          borderColor: palette.line,
+        }}
+      >
+        {items}
+      </View>
+    );
+  return (
+    <ScrollView
+      accessibilityLabel="Ana gezinme"
+      showsVerticalScrollIndicator={false}
+      style={{
+        width: railWidth,
+        flexGrow: 0,
+        backgroundColor: palette.surface,
+        borderRightWidth: 1,
+        borderColor: palette.line,
+      }}
+      contentContainerStyle={{
+        alignItems: "center",
+        gap: 6,
+        paddingTop: 12,
+        paddingBottom: Math.max(insets.bottom, 12),
+      }}
+    >
+      {items}
+    </ScrollView>
+  );
+}
+
+function makeNavStyles(palette: AppPalette) {
+  return StyleSheet.create({
   header: {
     width: "100%",
     maxWidth: 680,
@@ -407,7 +499,7 @@ const navStyles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "800",
     letterSpacing: 1.8,
-    color: palette.navy,
+    color: palette.ink,
   },
   avatarButton: {
     width: 44,
@@ -421,7 +513,7 @@ const navStyles = StyleSheet.create({
   contextLabel: { fontSize: 11, lineHeight: 16, color: palette.muted },
   panel: {
     height: "100%",
-    backgroundColor: palette.white,
+    backgroundColor: palette.surface,
     borderTopRightRadius: shape.extraLarge,
     borderBottomRightRadius: shape.extraLarge,
     overflow: "hidden",
@@ -440,7 +532,7 @@ const navStyles = StyleSheet.create({
   },
   accountName: {
     marginTop: 12,
-    color: palette.white,
+    color: palette.onNavy,
     fontSize: 20,
     fontWeight: "700",
     lineHeight: 28,
@@ -498,3 +590,8 @@ const navStyles = StyleSheet.create({
   },
   pressed: { opacity: 0.65 },
 });
+}
+function useNavStyles() {
+  const { palette } = useTheme();
+  return useMemo(() => makeNavStyles(palette), [palette]);
+}

@@ -162,7 +162,7 @@ test('tekrar sınavı hatalardan kurulur ve sonuçla listeleri günceller', asyn
   await page.getByRole('button', { name: 'Sonraki soru' }).click();
   await answer(page, 'A');
   await finish(page);
-  await page.getByRole('link', { name: 'Tekrar', exact: true }).click();
+  await page.getByRole('link', { name: 'Tekrar sınavı', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Tekrar sınavı' })).toBeVisible();
   await expect(page.locator('.sinav-row').filter({ hasText: 'Yanlışlarım' })).toContainText('1 soru');
   await expect(page.locator('.sinav-row').filter({ hasText: 'Boş bıraktıklarım' })).toContainText('1 soru');
@@ -176,7 +176,7 @@ test('tekrar sınavı hatalardan kurulur ve sonuçla listeleri günceller', asyn
   await expect(page.getByRole('heading', { name: 'Sentetik birinci soru' })).toBeVisible();
   await answer(page, 'A');
   await finish(page);
-  await page.getByRole('link', { name: 'Tekrar', exact: true }).click();
+  await page.getByRole('link', { name: 'Tekrar sınavı', exact: true }).click();
   await expect(page.locator('.sinav-row').filter({ hasText: 'Yanlışlarım' })).toContainText('Şu an tekrar edeceğin yanlış soru yok.');
 });
 
@@ -192,7 +192,7 @@ test('tekrar sınavı başlatma yanıtı kaybolsa aynı işlem kimliğiyle tekra
     if (ids.length === 1) { await route.fetch(); await route.abort('internetdisconnected'); }
     else await route.continue();
   });
-  await page.getByRole('link', { name: 'Tekrar', exact: true }).click();
+  await page.getByRole('link', { name: 'Tekrar sınavı', exact: true }).click();
   const card = page.locator('.sinav-row').filter({ has: page.getByRole('heading', { name: 'Favorilerim', exact: true }) });
   await expect(card).toContainText('3 soru');
   await card.getByRole('button', { name: 'Tekrar sınavına gir' }).click();
