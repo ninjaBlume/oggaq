@@ -26,6 +26,12 @@ Sayfa başlığı ve menü girişi `title`, alt sekme gibi dar yerler `short` ku
 | Başarı | Başarı durumum | Başarım |
 | Profil | Profil | Profil |
 
+## 2a. Metin tonu
+
+- **Slogan somut bilgi verir:** “Özel güvenlik sınavlarına hazırlan.” Genel motivasyon cümleleri (“bir adım daha”, “kendi hızında”) kullanılmaz; her metin kullanıcıya ne yapabileceğini veya ne olduğunu söyler.
+- **Marka metni tek yerde:** ad, alt başlık (“ÖGG Soru Cevap Platformu”) ve slogan mobilde `apps/mobile/brand.json`, webde ve yönetimde `src/config.ts` içindedir. Ekranlar bu değerleri okur; metni ekrana yazmak yerine yapılandırmadan alın.
+- **Başlık altı etiketi:** kişisel çalışma alanında logonun altında platform alt başlığı görünür; kurum alanında kurumun adı görünür. “Kişisel çalışma” yalnız çalışma alanı seçicide kalır.
+
 ## 3. Renk
 
 - **Rol temelli:** bileşen renk adını değil rolü kullanır (`surface`, `ink`, `primary`, `onPrimary`, `softRed` …). Koddaki sabit renk kodu hatadır; yeni renk önce rol olarak eklenir.

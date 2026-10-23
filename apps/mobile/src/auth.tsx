@@ -123,7 +123,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
             letterSpacing: 1.5,
           }}
         >
-          ÖGG SINAVINA HAZIRLIK
+          {brand.subtitle.toLocaleUpperCase("tr-TR")}
         </Text>
         <Text
           style={{
@@ -133,7 +133,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
             width: "72%",
           }}
         >
-          Bir adım daha{"\n"}hazır.
+          Özel güvenlik{"\n"}sınavlarına hazırlan.
         </Text>
         <View style={{ position: "absolute", right: -12, bottom: 12 }}>
           <StudyHero compact />
@@ -141,7 +141,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
         <Text
           style={{ color: palette.onNavyMuted, fontSize: 12, marginTop: 14 }}
         >
-          Öğren. Pratik yap. Kendine güven.
+          Öğrenciler için ücretsiz.
         </Text>
       </View>
       {mode !== "forgot" && (
@@ -175,7 +175,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
           {mode === "login"
             ? "Kaldığın yerden devam etmeye hazır mısın?"
             : mode === "register"
-              ? "Ücretsiz hesabını oluştur, ilk adımını at."
+              ? "Ücretsiz hesabını oluştur; sınavların ve sonuçların saklansın."
               : "E-postana bir yenileme bağlantısı gönderelim."}
         </Text>
       </View>
@@ -275,7 +275,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
       >
         <CheckCircle2 size={15} color={palette.muted} />
         <Text style={{ color: palette.muted, fontSize: 11 }}>
-          Her gün, kendi hızında bir adım.
+          {brand.subtitle}
         </Text>
       </View>
     </>

@@ -102,7 +102,7 @@ export function MainHeader({
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={navStyles.wordmark}>{brand.displayName}</Text>
           <Text numberOfLines={1} style={navStyles.contextLabel}>
-            {context.name}
+            {context.kind === "personal" ? brand.subtitle : context.name}
           </Text>
         </View>
       </View>

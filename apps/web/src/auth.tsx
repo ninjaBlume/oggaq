@@ -39,7 +39,7 @@ export function SessionEvents({ children }: { children: ReactNode }) {
   return children;
 }
 function AuthFrame({ children }: { children: ReactNode }) {
-  return <main className="auth-layout"><section className="auth-story"><Link to="/" className="brand">{brand.name}<span className="brand-dot" /></Link><div><span className="eyebrow">HER GÜN BİR ADIM DAHA</span><h1>Hazırlığına<br />buradan devam et.</h1><p>Dersini seç, soruları çöz, cevabın ardından açıklamayı incele. Çalışmaların hesabında saklansın.</p></div><small>{brand.description}</small></section><section className="auth-content"><div className="auth-card">{children}</div></section></main>;
+  return <main className="auth-layout"><section className="auth-story"><Link to="/" className="brand">{brand.name}<span className="brand-dot" /></Link><div><span className="eyebrow">{brand.subtitle.toLocaleUpperCase('tr-TR')}</span><h1>Özel güvenlik<br />sınavlarına hazırlan.</h1><p>Deneme ve ders sınavlarını gerçek süreyle çöz; sonuçlarını, yanlışlarını ve gelişimini takip et. Çalışmaların hesabında saklanır.</p></div><small>Öğrenciler için ücretsiz.</small></section><section className="auth-content"><div className="auth-card">{children}</div></section></main>;
 }
 export function Login() {
   const [mode, setMode] = useState<'login' | 'register' | 'forgot'>('login');

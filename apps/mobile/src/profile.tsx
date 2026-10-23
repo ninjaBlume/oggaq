@@ -151,7 +151,7 @@ export function Profile({
       <View style={[styles.row, { justifyContent: "center", paddingTop: 12 }]}>
         <ShieldCheck size={15} color={palette.muted} />
         <Text style={[styles.muted, { fontSize: 11 }]}>
-          {brand.displayName} · Sınava hazırlık, kendi hızında.
+          {brand.displayName} · {brand.subtitle}
         </Text>
       </View>
     </>

@@ -29,6 +29,7 @@ import {
   SectionTitle,
 } from "./ui";
 import { useLayout, useTheme } from "./themeContext";
+import brand from "../brand.json";
 export function Home({
   user,
   context,
@@ -128,7 +129,7 @@ export function Home({
     <>
       <ScreenTitle
         title={`Merhaba, ${user.name.trim().split(/\s+/)[0]}.`}
-        subtitle="Bugün kendine bir adım daha yaklaş."
+        subtitle="Bir sınav seç, kaldığın yerden devam et."
       />
       <Enter
         style={{
@@ -149,7 +150,7 @@ export function Home({
               letterSpacing: 1.5,
             }}
           >
-            BUGÜNÜN İLK ADIMI
+            {brand.subtitle.toLocaleUpperCase("tr-TR")}
           </Text>
           <ExpressiveEmblem size={48} color={palette.accent}>
             <BookOpen size={22} color={palette.navy} strokeWidth={1.8} />
@@ -161,7 +162,7 @@ export function Home({
             ...typography.display,
           }}
         >
-          Hazırlan.{"\n"}Bir adım ilerle.
+          Özel güvenlik{"\n"}sınavlarına hazırlan.
         </Text>
         <Text
           style={{
@@ -170,7 +171,7 @@ export function Home({
             lineHeight: 19,
           }}
         >
-          Küçük adımlar, daha güçlü bir hazırlık.
+          Deneme ve ders sınavlarını gerçek süreyle çöz, eksiklerini gör, tekrar et.
         </Text>
         <View style={{ alignSelf: "flex-start" }}>
           <Button secondary icon={ArrowRight} onPress={deneme}>
