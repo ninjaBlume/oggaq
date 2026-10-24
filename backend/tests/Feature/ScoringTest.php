@@ -10,6 +10,7 @@ use App\Modules\QuestionBank\Actions\PublishQuestion;
 use App\Modules\QuestionBank\Actions\SaveOfficialExam;
 use App\Modules\QuestionBank\Actions\SaveQuestion;
 use App\Modules\QuestionBank\Models\ExamType;
+use App\Modules\QuestionBank\Models\OfficialExam;
 use App\Modules\QuestionBank\Models\QuestionSource;
 use App\Modules\QuestionBank\Models\Subject;
 use App\Modules\Scoring\Actions\ManageScoring;
@@ -205,6 +206,73 @@ class ScoringTest extends TestCase
         $incompatible->save();
         $this->putJson('/api/v1/admin/scoring-periods/'.$p->id, ['scoring_rule_id' => $incompatible->id, 'number' => 104, 'exam_date' => '2023-08-26', 'source_url' => 'https://www.egm.gov.tr'])->assertUnprocessable();
         $this->assertSame($p->scoring_rule_id, $p->fresh()->scoring_rule_id);
+    }
+
+    public function test_full_exam_with_63_general_and_13_weapon_correct_scores_both_variants_from_saved_answers(): void
+    {
+        $admin = $this->createUser(['platform_role' => 'platform_admin']);
+        $this->artisan('scoring:install-verified')->assertSuccessful();
+        $period = ScoringPeriod::where('education_type', 'basic')->where('weapon_status', 'armed')->where('number', 104)->firstOrFail();
+        $source = QuestionSource::create(['title' => 'Sentetik 63/13 puanlama test kaynağı']);
+        $subject = Subject::create(['name' => 'Sentetik puanlama dersi', 'code' => 'synthetic-63-13']);
+        $type = ExamType::create(['name' => 'Sentetik deneme', 'code' => 'synthetic-63-13']);
+        $versions = [];
+        foreach (range(1, 125) as $position) {
+            $question = app(SaveQuestion::class)->execute($admin, ['source_id' => $source->id, 'subject_id' => $subject->id, 'stem' => 'Sentetik 63/13 sorusu '.$position, 'options' => ['Doğru', 'Yanlış'], 'correct_option_position' => 1]);
+            $question = app(PublishQuestion::class)->execute($admin, $question, $question->revision);
+            $versions[] = $question->published_version_id;
+        }
+        $official = app(SaveOfficialExam::class)->execute($admin, ['exam_type_id' => $type->id, 'source_id' => $source->id, 'title' => 'Sentetik 63/13 denemesi', 'year' => 2023, 'exam_number' => '104', 'weapon_status' => 'armed', 'generate_unarmed' => true, 'question_version_ids' => $versions, 'scoring_period_id' => $period->id]);
+        app(PublishOfficialExam::class)->execute($admin, $official);
+        $unarmed = OfficialExam::where('derived_from_id', $official->id)->firstOrFail();
+        $student = $this->createUser();
+        $this->asToken($student);
+        $path = '/api/v1/contexts/'.$student->studyContexts()->firstOrFail()->id.'/exam-attempts';
+        $complete = function (OfficialExam $template) use ($path): array {
+            $exam = $this->postJson($path, ['id' => (string) Str::uuid(), 'official_exam_id' => $template->id, 'duration_seconds' => 3600])->assertOk()->json('data');
+            foreach ($exam['questions'] as $index => $answer) {
+                $position = $index + 1;
+                if ($position === 114) {
+                    continue; // One blank in the weapon section; no blank in the first 100.
+                }
+                $this->travel(2)->seconds(); // Simulate answering time without bypassing API throttling.
+                $correct = $position <= 63 || ($position >= 101 && $position <= 113);
+                $exam = $this->putJson($path.'/'.$exam['id'].'/answers/'.$answer['id'], ['base_version' => $exam['revision'], 'selected_option_id' => $answer['question']['options'][$correct ? 0 : 1]['id']])->assertOk()->json('data');
+            }
+
+            return $this->postJson($path.'/'.$exam['id'].'/finish', ['base_version' => $exam['revision']])->assertOk()->json('data');
+        };
+        $armed = $complete($official);
+        $this->assertSame(76, $armed['result']['correct']);
+        $this->assertSame(48, $armed['result']['incorrect']);
+        $this->assertSame(1, $armed['result']['blank']);
+        $this->assertEquals(60.8, $armed['result']['score_percent']);
+        $score = $armed['score_result']['output'];
+        $this->assertEquals(['general_correct' => 63, 'general_wrong' => 37, 'weapon_correct' => 13, 'weapon_wrong' => 11, 'shooting_hits' => null, 'previous_general_score' => null], $armed['score_result']['input']);
+        $this->assertSame([63, 13, null], array_column($score['sections'], 'correct'));
+        $this->assertSame([37, 11, 0], array_column($score['sections'], 'wrong'));
+        $this->assertSame([0, 1, 0], array_column($score['sections'], 'blank'));
+        $this->assertEquals([63, 26, null], array_column($score['sections'], 'score'));
+        $this->assertNull($score['final_score']);
+        $this->assertNull($score['passed']);
+        $this->assertSame('awaiting_shooting', $score['status']);
+        $this->assertSame(44.5, $score['minimum_score']);
+        $this->assertSame(69.5, $score['maximum_score']);
+        foreach ([44.5, 49.5, 54.5, 59.5, 64.5, 69.5] as $hits => $expected) {
+            $this->postJson($path.'/'.$armed['id'].'/score', ['id' => (string) Str::uuid(), 'shooting_hits' => $hits])->assertCreated()->assertJsonPath('data.output.final_score', $expected)->assertJsonPath('data.output.passed', $hits >= 4);
+        }
+        $this->getJson($path.'/'.$armed['id'])->assertOk()->assertJsonPath('data.result.correct', 76)->assertJsonPath('data.result.incorrect', 48)->assertJsonPath('data.result.blank', 1)->assertJsonPath('data.result.score_percent', 60.8)->assertJsonPath('data.score_result.output.final_score', 69.5);
+        $this->assertSame('awaiting_shooting', ExamScoreResult::findOrFail($armed['score_result']['id'])->output['status']);
+        $withoutWeapon = $complete($unarmed);
+        $this->assertSame(100, $withoutWeapon['question_count']);
+        $this->assertSame(63, $withoutWeapon['result']['correct']);
+        $this->assertSame(37, $withoutWeapon['result']['incorrect']);
+        $this->assertSame(0, $withoutWeapon['result']['blank']);
+        $this->assertEquals(63, $withoutWeapon['result']['score_percent']);
+        $this->assertEquals(63, $withoutWeapon['score_result']['output']['final_score']);
+        $this->assertTrue($withoutWeapon['score_result']['output']['passed']);
+        $this->assertCount(1, $withoutWeapon['score_result']['output']['sections']);
+        $this->assertDatabaseCount('exam_score_results', 8);
     }
 
     public function test_verified_install_is_idempotent_and_keeps_unconfirmed_models_in_draft(): void
