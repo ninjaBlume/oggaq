@@ -49,6 +49,8 @@ Yerel doğrulamada tam backend paketi **215 test / 2.112 assertion**, tam Chromi
 
 - PostgreSQL `JobsTest`: platform/kurum/öğrenci yetkisi, taslak/kapalı/süresi dolmuş ilanlar, tekrar başvuru, şifreli kayıt, yalnız kendi verisi, ilan kopyasının korunması, değerlendirme çakışması, sahte korunan alanlar, iletişim doğrulaması ve hesap dışa aktarma/silme.
 - `tests/e2e/jobs.spec.ts`: gerçek API ile admin oluştur/yayımla → öğrenci başvur → admin değerlendir → öğrenci güncel durumu gör; kapanan ilan ve geçmiş; mobil menüden Bearer başvurusu ve kayıp yanıtın güvenli tekrarı; web API/alan hatası; üç arayüzde açık/koyu tema ve 320/834/1280 genişlikleri.
-- Native iOS/Android paket export'u ayrı doğrulanır. Chromium'daki Expo önizlemesi fiziksel iPad/Android klavye, kaydırma veya native erişilebilirlik testi yerine geçmez; bu yeni ekranların fiziksel cihaz teyidi ayrıca gerekir.
+- Üç platform Expo export'u geçti. Device Hub'daki iPhone 18 Pro / iOS 27 / Expo Go SDK 58 üzerinde gerçek geliştirme API'sine bağlı İş Başvuruları menüsü, İlanlar ve Başvurularım boş durumları açılarak doğrulandı. İlan/form akışının native cihazda tamamlanması ve fiziksel iPad/Android klavye, kaydırma ve erişilebilirlik teyidi ayrıca gerekir; Chromium önizlemesi bunların yerine geçmez.
 
 Sentetik ilanlar yalnız `oggaq_test` fixture'ında üretilir. Geliştirme sunucusuna örnek/gerçek ilan otomatik eklenmez; yönetici gerçek ilan içeriğini girer.
+
+API, admin ve öğrenci web geliştirme sunucusunda yayımlandı. Ayrı yönetici hesabı kullanıcının belirttiği adresle oluşturuldu; gerçek HTTPS üzerinde öğrenci/admin girişleri, kişisel liste uçları ve yönetici erişim ayrımı doğrulandı. [Dağıtım kaydı](../deploy/server-development/README.md#24-ekim-2026-iş-başvuruları).
