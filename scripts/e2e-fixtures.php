@@ -35,7 +35,7 @@ if (config('database.default') !== 'pgsql' || config('database.connections.pgsql
     throw new RuntimeException('Browser fixtures require the isolated oggaq_test PostgreSQL database.');
 }
 $operation = $argv[1] ?? '';
-if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'long-result', 'cleanup'], true)) {
+if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'long-result', 'paired-exam-draft', 'cleanup'], true)) {
     throw new InvalidArgumentException('Expected setup or cleanup.');
 }
 if (in_array($operation, ['verification-link', 'reset-link'], true)) {
@@ -87,10 +87,11 @@ if ($operation === 'near-deadline') {
     echo '/study/'.$context->id.'/exams/'.$exam->id;
     exit;
 }
-if ($operation === 'long-result') {
+if (in_array($operation, ['long-result', 'paired-exam-draft'], true)) {
+    $paired = $operation === 'paired-exam-draft';
     $admin = User::where('email', 'e2e-admin@example.test')->firstOrFail();
     $versions = [];
-    for ($position = 1; $position <= 200; $position++) {
+    for ($position = 1; $position <= ($paired ? 125 : 200); $position++) {
         $question = app(SaveQuestion::class)->execute($admin, [
             'subject_id' => Subject::firstOrFail()->id, 'source_id' => QuestionSource::firstOrFail()->id,
             'stem' => 'Uzun sonuç sentetik soru '.$position, 'options' => ['Sentetik A '.$position, 'Sentetik B '.$position],
@@ -101,8 +102,9 @@ if ($operation === 'long-result') {
     }
     $official = app(SaveOfficialExam::class)->execute($admin, [
         'exam_type_id' => ExamType::where('code', 'synthetic-whole')->firstOrFail()->id, 'weapon_status' => 'armed',
-        'title' => 'Uzun sentetik sınav', 'year' => 2024, 'exam_number' => '200', 'question_version_ids' => $versions,
+        'title' => $paired ? 'Tek giriş sentetik sınav' : 'Uzun sentetik sınav', 'year' => 2024, 'exam_number' => $paired ? '125' : '200', 'question_version_ids' => $versions, 'generate_unarmed' => $paired,
     ]);
+    if ($paired) { echo $official->id; exit; }
     app(PublishOfficialExam::class)->execute($admin, $official);
     $student = User::where('email', 'e2e-student@example.test')->firstOrFail();
     $context = $student->studyContexts()->whereNull('tenant_id')->firstOrFail();

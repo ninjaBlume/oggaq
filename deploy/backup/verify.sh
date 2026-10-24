@@ -27,7 +27,7 @@ checksum() {
                (select md5(string_agg(o.id::text || o.position::text || o.text, ',' order by o.position)) from question_options o where o.question_version_id = v.id)) as x
         from question_versions v where v.published_at is not null) a), '')
       || coalesce((select string_agg(y, '|' order by y) from (
-        select concat_ws('~', e.id, e.exam_type_id, e.year, coalesce(e.term,''), coalesce(e.exam_number,''), coalesce(e.weapon_status,''), coalesce(e.subject_id::text,''), e.title,
+        select concat_ws('~', e.id, e.exam_type_id, e.year, coalesce(e.term,''), coalesce(e.exam_number,''), coalesce(e.weapon_status,''), coalesce(e.subject_id::text,''), e.title, e.generate_unarmed, coalesce(e.derived_from_id::text,''),
                (select md5(string_agg(p.position::text || p.question_id::text || p.question_version_id::text, ',' order by p.position)) from official_exam_questions p where p.official_exam_id = e.id)) as y
         from official_exams e where e.published_at is not null) b), ''))" "${1:-$db}"
 }
@@ -43,7 +43,7 @@ count="$(q 'select count(*) from migrations')"
 [ "$count" -gt 0 ] && ok "migrations: $count kayıt, son: $(q 'select migration from migrations order by id desc limit 1')" || fail "migrations tablosu boş"
 
 # 2) Değişmezlik tetikleyicileri yerinde mi?
-expected_triggers=(guard_account_erasure guard_exam_answer guard_exam_attempt guard_official_exam_question guard_official_exam guard_practice_attempt guard_published_question_option guard_question_report guard_published_question_version guard_question_publication_pointer)
+expected_triggers=(official_exam_pair_complete official_exam_pair_questions guard_account_erasure guard_exam_answer guard_exam_attempt guard_official_exam_question guard_official_exam guard_practice_attempt guard_published_question_option guard_question_report guard_published_question_version guard_question_publication_pointer)
 for trigger in "${expected_triggers[@]}"; do
   [ "$(q "select count(*) from pg_trigger where tgname = '$trigger' and not tgisinternal")" -ge 1 ] || fail "tetikleyici yok: $trigger"
 done

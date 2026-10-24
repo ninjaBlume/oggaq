@@ -88,3 +88,5 @@ Her soruda ders ve ait olduğu çıkmış sınavlar ayrı gösterilir ve ayrı f
 Mobil için `npm run dev:mobile`. GitHub Actions üzerinde Android APK ve iOS Simulator paketi derlendi ve indirildi; önizleme paketleri yerel API ile çalışır. Kurulum, native doğrulama kanıtı ve Expo build zincirindeki iki düzeltilmemiş advisory [MOBILE](docs/MOBILE.md) içinde açıklanır.
 
 Tasarım ilkeleri, ortak renk/aralık değerleri (`packages/design-tokens`), koyu mod ve pencere sınıfları/tablet düzeni için [DESIGN](docs/DESIGN.md).
+
+24 Ekim 2026: yeni Deneme Sınavı girişinde 125 soru bir kez eklenerek silahlı 125 ve silahsız ilk 100 soruluk seçenek birlikte yayımlanır. Ortak sorudaki düzeltme iki şablona uygulanır, geçmiş denemeler korunur. Mevcut bağımsız sınavlar otomatik birleştirilmez. [İçerik yönetimi ve hata davranışları](docs/QUESTION_BANK.md#tek-girişten-silahlı-ve-silahsız-seçenekler-24-ekim-2026).

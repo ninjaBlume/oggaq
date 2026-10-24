@@ -36,6 +36,8 @@ test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal s�
   await adminLogin(adminPage);
   await expect(adminPage.getByText("Henüz deneme sınavı yok")).toBeVisible();
   await adminPage.getByRole("link", { name: "Yeni deneme sınavı", exact: true }).first().click();
+  // This short synthetic scenario exercises the existing single-variant flow.
+  await adminPage.getByLabel('Silahlı ve silahsız seçenekleri birlikte oluştur', { exact: true }).uncheck();
   // A new Deneme Sınavı opens with its exam type already chosen.
   await expect(adminPage.getByLabel("Sınav türü", { exact: true })).toHaveValue(/.+/);
   await adminPage.getByLabel("Sınav türü", { exact: true }).selectOption({ label: "Deneme Sınavı" });

@@ -124,3 +124,9 @@ Identity/Tenancy/QuestionBank FK/CHECK/unique, transaction ve yayımlanmış iç
 ## İş ilanları ve başvurular (uygulandı)
 
 `job_postings` merkezi ilanları; `job_applications` kullanıcıya ait başvuruları saklar. Kullanıcı+ilan unique, durum/revision CHECK, kullanıcı silmede CASCADE ve ilan silmede RESTRICT FK ile korunur. Başvurunun iletişim/ön yazı alanları encrypted cast kullanır; `job_snapshot` başvuru anındaki ilan içeriğidir. Alanlar, indeksler, erişim ve migration ayrıntıları [JOBS](JOBS.md#yetki-ve-veri-modeli) içindedir. Başvurular çalışma/kurum bağlamından bağımsız kişisel veridir; hesap dışa aktarma ve silme kapsamındadır.
+
+## Bağlı sınav seçenekleri (24 Ekim 2026, uygulandı)
+
+`official_exams.generate_unarmed` boolean, varsayılan false; `derived_from_id` nullable UUID, aynı tablonun `id` alanına `RESTRICT` FK ve tekil indekstir. Ana silahlı kayıt bayrağı açar, otomatik oluşturulan silahsız kayıt ana kimliğe bağlanır. `official_exam_variant_shape` check kısıtı kendi kendine bağlantıyı, silahsız/derse özel ana kaydı ve türetilmiş kaydın tekrar ana kayıt olmasını engeller.
+
+`official_exam_pair_complete` ve `official_exam_pair_questions` PostgreSQL constraint trigger'ları `DEFERRABLE INITIALLY DEFERRED` çalışır: transaction sonunda yayımlanmış ana kaydın 125, bağlı silahsız kaydın 100 sorusu olmalı; künye/kaynak eşleşmeli; ilk 100 soru, sıra ve sürüm aynı olmalıdır. Böylece ortak düzeltme iki şablona birlikte yazılabilir, tek tarafta bırakılan değişiklik commit edilemez. Mevcut yayımlanmış künye/sıra değişmezliği ve sürüm FK'ları korunur. Eski kayıtlar false/null ile kalır; otomatik içerik eşleştirme yapılmaz.

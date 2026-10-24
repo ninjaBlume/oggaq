@@ -84,8 +84,8 @@ update question_versions v set correct_option_id = s.correct_option_id from stag
 update question_versions v set published_at = s.published_at from stage_question_versions s where s.id = v.id and s.published_at is not null;
 update questions q set latest_version_id = s.latest_version_id, published_version_id = s.published_version_id, updated_at = s.updated_at from stage_questions s where s.id = q.id;
 -- Sınavlar: önce taslak, sorular eklenir, sonra yayın zamanı (tetikleyici sıra ve yayımlanmış sürüm şartını denetler).
-insert into official_exams (id, exam_type_id, source_id, created_by, title, year, term, exam_number, published_at, created_at, updated_at, weapon_status, subject_id)
-  select id, exam_type_id, source_id, $created_by::uuid, title, year, term, exam_number, null, created_at, updated_at, weapon_status, subject_id from stage_official_exams;
+insert into official_exams (id, exam_type_id, source_id, created_by, title, year, term, exam_number, published_at, created_at, updated_at, weapon_status, subject_id, generate_unarmed, derived_from_id)
+  select id, exam_type_id, source_id, $created_by::uuid, title, year, term, exam_number, null, created_at, updated_at, weapon_status, subject_id, generate_unarmed, derived_from_id from stage_official_exams;
 insert into official_exam_questions select * from stage_official_exam_questions;
 update official_exams e set published_at = s.published_at, updated_at = s.updated_at from stage_official_exams s where s.id = e.id and s.published_at is not null;
 insert into official_exam_question_changes select * from stage_official_exam_question_changes;

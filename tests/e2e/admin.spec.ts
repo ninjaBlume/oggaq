@@ -58,6 +58,8 @@ async function writeQuestion(page: Page, stem = 'Sentetik E2E soru — resmî de
 // A draft Deneme Sınavı with one newly written question; returns the question id.
 async function draftExam(page: Page) {
   await page.getByRole('link', { name: 'Yeni deneme sınavı', exact: true }).first().click();
+  // This short synthetic scenario exercises the existing single-variant flow.
+  await page.getByLabel('Silahlı ve silahsız seçenekleri birlikte oluştur', { exact: true }).uncheck();
   await page.getByLabel('Başlık', { exact: true }).fill('Sentetik E2E deneme sınavı');
   await page.getByLabel('Yıl', { exact: true }).fill('2024');
   await page.getByLabel('Sınav numarası', { exact: true }).fill('7');

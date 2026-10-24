@@ -94,6 +94,107 @@ class OfficialExamTest extends TestCase
         }
     }
 
+    private function pairedDraft(int $count = 125): array
+    {
+        for ($i = count($this->questions); $i < $count; $i++) {
+            $this->questions[] = $this->publishedQuestion('Sentetik ortak sınav '.$i);
+        }
+
+        return $this->createExam(['weapon_status' => 'armed', 'generate_unarmed' => true, 'question_version_ids' => $this->versionIds(range(0, $count - 1))]);
+    }
+
+    private function assertPairConstraints(): void
+    {
+        DB::statement('SET CONSTRAINTS official_exam_pair_complete, official_exam_pair_questions IMMEDIATE');
+        DB::statement('SET CONSTRAINTS official_exam_pair_complete, official_exam_pair_questions DEFERRED');
+    }
+
+    public function test_one_armed_source_publishes_both_variants_without_copying_questions(): void
+    {
+        $draft = $this->pairedDraft();
+        $this->assertDatabaseCount('official_exams', 1);
+        $this->postJson('/api/v1/admin/official-exams/'.$draft['id'].'/publish')->assertOk()->assertJsonPath('data.generate_unarmed', true);
+        $child = DB::table('official_exams')->where('derived_from_id', $draft['id'])->first();
+        $this->assertNotNull($child);
+        $this->assertPairConstraints();
+        $this->postJson('/api/v1/admin/official-exams/'.$draft['id'].'/publish')->assertOk();
+        $this->assertDatabaseCount('official_exams', 2);
+        $this->assertDatabaseCount('questions', 125);
+        $this->assertDatabaseCount('question_versions', 125);
+        $this->getJson('/api/v1/admin/official-exams/'.$child->id)->assertOk()->assertJsonPath('data.derived_from_id', $draft['id'])->assertJsonPath('data.question_count', 100);
+        $student = $this->createUser();
+        $armed = $this->startOfficial($draft['id'], student: $student)->assertOk()->json('data');
+        $unarmed = $this->startOfficial($child->id, student: $student)->assertOk()->json('data');
+        $this->assertCount(125, $armed['questions']);
+        $this->assertCount(100, $unarmed['questions']);
+        $this->assertSame(array_slice(array_column($armed['questions'], 'question_id'), 0, 100), array_column($unarmed['questions'], 'question_id'));
+        $this->assertSame(array_slice(array_column(array_column($armed['questions'], 'question'), 'id'), 0, 100), array_column(array_column($unarmed['questions'], 'question'), 'id'));
+        $this->getJson('/api/v1/official-exams?weapon_status=unarmed')->assertOk()->assertJsonPath('data.0.id', $child->id)->assertJsonPath('data.0.question_count', 100);
+        $this->getJson('/api/v1/official-exams?weapon_status=armed')->assertJsonPath('data.0.id', $draft['id'])->assertJsonPath('data.0.question_count', 125);
+        $this->getJson('/api/v1/admin/official-exams/'.$child->id)->assertForbidden();
+    }
+
+    public function test_linked_variants_require_complete_questions_and_cannot_overwrite_existing_unarmed_exams(): void
+    {
+        $draft = $this->pairedDraft(124);
+        $this->postJson('/api/v1/admin/official-exams/'.$draft['id'].'/publish')->assertUnprocessable()->assertJsonValidationErrors('question_version_ids');
+        $this->assertDatabaseMissing('official_exams', ['derived_from_id' => $draft['id']]);
+        $this->postJson('/api/v1/admin/official-exams', $this->payload(['generate_unarmed' => true, 'weapon_status' => 'unarmed', 'exam_number' => 'invalid']))->assertUnprocessable();
+        $this->postJson('/api/v1/admin/official-exams', $this->payload(['derived_from_id' => $draft['id'], 'exam_number' => 'forged']))->assertUnprocessable();
+        $single = $this->createExam(['weapon_status' => 'unarmed'], true);
+        $this->questions[] = $this->publishedQuestion('Sentetik son silah sorusu');
+        $this->putJson('/api/v1/admin/official-exams/'.$draft['id'], $this->payload(['weapon_status' => 'armed', 'generate_unarmed' => true, 'question_version_ids' => $this->versionIds(range(0, 124))]))->assertOk();
+        $this->postJson('/api/v1/admin/official-exams/'.$draft['id'].'/publish')->assertConflict()->assertJsonPath('code', 'unarmed_exam_exists');
+        $this->assertDatabaseHas('official_exams', ['id' => $draft['id'], 'published_at' => null]);
+        $this->assertDatabaseHas('official_exams', ['id' => $single['id'], 'published_at' => $single['published_at']]);
+        $this->assertDatabaseCount('official_exams', 2);
+        $this->assertPairConstraints();
+    }
+
+    public function test_shared_corrections_update_both_variants_and_preserve_previous_attempts(): void
+    {
+        $draft = $this->pairedDraft();
+        $this->postJson('/api/v1/admin/official-exams/'.$draft['id'].'/publish')->assertOk();
+        $childId = DB::table('official_exams')->where('derived_from_id', $draft['id'])->value('id');
+        $student = $this->createUser();
+        $armed = $this->startOfficial($draft['id'], student: $student)->assertOk()->json('data');
+        $unarmed = $this->startOfficial($childId, student: $student)->assertOk()->json('data');
+        $first = $this->questions[0];
+        $this->asToken($this->admin);
+        $next = app(SaveQuestion::class)->execute($this->admin, ['source_id' => $this->source->id, 'subject_id' => $this->subject->id, 'stem' => 'Sentetik ortak düzeltme', 'options' => ['A', 'B'], 'correct_option_position' => 2, 'base_version' => $first->revision], $first);
+        $next = app(PublishQuestion::class)->execute($this->admin, $next, $next->revision);
+        $this->putJson('/api/v1/admin/official-exams/'.$childId.'/questions/'.$first->id, ['question_version_id' => $next->published_version_id])->assertOk();
+        foreach ([$draft['id'], $childId] as $id) {
+            $this->assertDatabaseHas('official_exam_questions', ['official_exam_id' => $id, 'position' => 1, 'question_version_id' => $next->published_version_id]);
+        }
+        $this->assertDatabaseCount('official_exam_question_changes', 2);
+        $this->assertPairConstraints();
+        $this->putJson('/api/v1/admin/official-exams/'.$childId, $this->payload(['weapon_status' => 'unarmed']))->assertConflict()->assertJsonPath('code', 'derived_exam');
+        $this->putJson('/api/v1/admin/official-exams/'.$childId.'/questions/'.$this->questions[124]->id, ['question_version_id' => $this->questions[124]->published_version_id])->assertNotFound();
+        $this->putJson('/api/v1/admin/official-exams/'.$draft['id'].'/questions/'.$first->id, ['question_version_id' => $first->published_version_id])->assertUnprocessable();
+        $this->asToken($student);
+        $contextId = $student->studyContexts()->firstOrFail()->id;
+        foreach ([$armed, $unarmed] as $old) {
+            $this->getJson('/api/v1/contexts/'.$contextId.'/exam-attempts/'.$old['id'])->assertOk()->assertJsonPath('data.questions.0.question.id', $first->published_version_id);
+        }
+        $this->startOfficial($childId, student: $student)->assertOk()->assertJsonPath('data.questions.0.question.id', $next->published_version_id);
+    }
+
+    public function test_database_rejects_a_linked_pair_with_different_common_versions(): void
+    {
+        $draft = $this->pairedDraft();
+        $this->postJson('/api/v1/admin/official-exams/'.$draft['id'].'/publish')->assertOk();
+        $this->assertPairConstraints();
+        $first = $this->questions[0];
+        $next = app(SaveQuestion::class)->execute($this->admin, ['source_id' => $this->source->id, 'subject_id' => $this->subject->id, 'stem' => 'Sentetik tutarsız düzeltme', 'options' => ['A', 'B'], 'correct_option_position' => 1, 'base_version' => $first->revision], $first);
+        $next = app(PublishQuestion::class)->execute($this->admin, $next, $next->revision);
+        $this->assertRejectedByDatabase(function () use ($draft, $next) {
+            DB::table('official_exam_questions')->where('official_exam_id', $draft['id'])->where('position', 1)->update(['question_version_id' => $next->published_version_id]);
+            $this->assertPairConstraints();
+        });
+        $this->assertDatabaseHas('official_exam_questions', ['official_exam_id' => $draft['id'], 'position' => 1, 'question_version_id' => $first->published_version_id]);
+    }
+
     public function test_admin_builds_ordered_draft_and_students_only_see_published_metadata(): void
     {
         $order = [2, 0, 1];

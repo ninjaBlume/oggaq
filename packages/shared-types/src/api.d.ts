@@ -970,7 +970,7 @@ export interface paths {
         get?: never;
         /**
          * Sınavdaki bir sorunun sürümünü değiştirme
-         * @description Yalnız platform yöneticisi. Soru sırası ve üyeliği değişmez. Taslak sınav aynı sorunun herhangi bir sürümünü alabilir; yayımlanmış sınav yalnız sorunun daha yeni yayımlanmış sürümünü alır (denetim kaydıyla düzeltme). Başlamış denemeler kendi sürümlerini korur. Başka soru veya geri sürüm 422 verir.
+         * @description Yalnız platform yöneticisi. Soru sırası ve üyeliği değişmez. Taslak sınav aynı sorunun herhangi bir sürümünü alabilir; yayımlanmış sınav yalnız sorunun daha yeni yayımlanmış sürümünü alır (denetim kaydıyla düzeltme). Başlamış denemeler kendi sürümlerini korur. Başka soru veya geri sürüm 422 verir. Bağlı iki seçenekli sınavın ilk 100 sorusundaki düzeltme hangi seçenek üzerinden istenirse istensin iki seçeneğe atomik uygulanır. 101–125. sorular yalnız ana silahlı seçenekte güncellenebilir; silahsız kimlikle istenirse 404. Başlamış denemeler eski sürümlerini korur.
          */
         put: operations["updateOfficialExamQuestion"];
         post?: never;
@@ -991,7 +991,7 @@ export interface paths {
         put?: never;
         /**
          * Çıkmış sınavı yayımlama
-         * @description Idempotent. 1–200 soru gerekir ve sabitlenen tüm soru sürümleri yayımlanmış olmalıdır (aksi 422, eksik sıralar listelenir). Yayımdan sonra künye, soru sırası ve sürümleri PostgreSQL trigger'larıyla değiştirilemez.
+         * @description Idempotent. Sabitlenen tüm soru sürümleri yayımlanmış olmalıdır (aksi 422, eksik sıralar listelenir). generate_unarmed=true ana sınavda tam 125 soru gerektirir: tek transaction içinde silahlı 125 ve aynı ilk 100 soru/sürümü kullanan bağlı silahsız seçenek yayımlanır. Aynı künye ile silahsız kayıt varsa 409 unarmed_exam_exists; hiçbir seçenek yayımlanmaz ve mevcut kayıt değiştirilmez. Türetilmiş seçenek doğrudan yayımlanamaz (409 derived_exam). Diğer sınavlarda 1–200 soru sınırı korunur. Yayımlanmış künye, sıra ve soru üyeliği sabittir; denetimli yeni sürüm düzeltmeleri ayrı uçtan yapılır.
          */
         post: operations["publishOfficialExam"];
         delete?: never;
@@ -2128,6 +2128,13 @@ export interface components {
                 id: string;
                 name: string;
             } | null;
+            /** @description Tam silahlı sınavdan ilk 100 soruluk bağlı silahsız seçenek otomatik oluşturulur; yayım için tam 125 soru gerekir. */
+            generate_unarmed: boolean;
+            /**
+             * Format: uuid
+             * @description Bağlı silahsız seçeneğin yönetildiği ana silahlı sınav kimliği.
+             */
+            derived_from_id: string | null;
         };
         OfficialExamInput: {
             /** Format: uuid */
@@ -2150,6 +2157,11 @@ export interface components {
              * @description Ders sınavında dersin kimliği; tam (Deneme) sınavda boş bırakılır. Kimlik türü, yıl, dönem, numara, silah durumu ve dersle birlikte tekildir.
              */
             subject_id?: string | null;
+            /**
+             * @description Silahlı tam sınavda 125 sorudan bağlı silahsız seçenek üret; taslakta soru sayısı tamamlanabilir.
+             * @default false
+             */
+            generate_unarmed: boolean;
         };
         OfficialExamResponse: {
             data: components["schemas"]["OfficialExam"];

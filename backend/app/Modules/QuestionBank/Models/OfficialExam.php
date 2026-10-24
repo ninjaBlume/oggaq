@@ -13,7 +13,7 @@ class OfficialExam extends Model
 
     protected function casts(): array
     {
-        return ['published_at' => 'immutable_datetime'];
+        return ['published_at' => 'immutable_datetime', 'generate_unarmed' => 'boolean'];
     }
 
     public function examType(): BelongsTo

@@ -29,15 +29,26 @@ class SaveOfficialExam
                     $exam->created_by = $actor->id;
                 } else {
                     $exam = OfficialExam::whereKey($exam->id)->lockForUpdate()->firstOrFail();
+                    if ($exam->derived_from_id !== null) {
+                        throw new ApiProblem(409, 'derived_exam', 'Bu seçenek ana silahlı sınavdan yönetilir. Ana sınavı açın.');
+                    }
                     if ($exam->published_at !== null) {
                         throw new ApiProblem(409, 'already_published', 'Yayımlanmış çıkmış sınav değiştirilemez.');
                     }
                 }
                 $versions = $this->versions($attributes['question_version_ids']);
+                $generateUnarmed = (bool) ($attributes['generate_unarmed'] ?? false);
+                if ($generateUnarmed && (($attributes['weapon_status'] ?? null) !== 'armed' || ($attributes['subject_id'] ?? null) !== null)) {
+                    throw ValidationException::withMessages(['generate_unarmed' => ['İki seçenek yalnız silahlı tam sınavdan oluşturulabilir.']]);
+                }
+                if ($generateUnarmed && count($attributes['question_version_ids']) > 125) {
+                    throw ValidationException::withMessages(['question_version_ids' => ['İki seçenek için en fazla 125 soru eklenebilir.']]);
+                }
                 $exam->forceFill([
                     'exam_type_id' => $attributes['exam_type_id'], 'source_id' => $attributes['source_id'] ?? null,
                     'title' => $attributes['title'], 'year' => $attributes['year'],
                     'term' => $attributes['term'] ?? null, 'exam_number' => $attributes['exam_number'] ?? null, 'weapon_status' => $attributes['weapon_status'] ?? null, 'subject_id' => $attributes['subject_id'] ?? null,
+                    'generate_unarmed' => $generateUnarmed,
                 ])->save();
                 DB::table('official_exam_questions')->where('official_exam_id', $exam->id)->delete();
                 foreach ($attributes['question_version_ids'] as $index => $versionId) {

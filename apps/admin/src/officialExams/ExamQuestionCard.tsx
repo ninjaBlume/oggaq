@@ -19,6 +19,7 @@ interface Props {
   examId: string;
   examPublished: boolean;
   catalogs: Catalogs;
+  variantScope?: 'shared' | 'armed';
   // Draft-exam list controls; omitted for published exams.
   actions?: { canMoveUp: boolean; canMoveDown: boolean; onMove: (by: -1 | 1) => void; onRemove: () => void };
   onExamUpdated: (record: OfficialExam) => void;
@@ -26,7 +27,7 @@ interface Props {
 
 // One question of an exam, shown in full. Editing happens in place: the question gets a new version, which is
 // published and pinned to this exam in one step (a published exam only takes a newer published version).
-export function ExamQuestionCard({ row, number, examId, examPublished, catalogs, actions, onExamUpdated }: Props) {
+export function ExamQuestionCard({ row, number, examId, examPublished, catalogs, variantScope, actions, onExamUpdated }: Props) {
   const [editing, setEditing] = useState(false);
   const [revision, setRevision] = useState(row.question_revision);
   const [form, setForm] = useState<EditorState>(() => initialEditor(row.latest_version ?? row.question));
@@ -85,6 +86,7 @@ export function ExamQuestionCard({ row, number, examId, examPublished, catalogs,
       <div className="question-card-meta">
         {subject && <span className="chip">{subject.name}</span>}{topic && <span className="chip muted-chip">{topic.name}</span>}
         <span className="chip muted-chip">Sınavdaki sürüm {version.version}</span>
+        {variantScope && <span className="chip">{variantScope === 'shared' ? 'Silahlı / Silahsız ortak' : 'Yalnız silahlı'}</span>}
         {version.published_at === null && <span className="badge amber"><span />Taslak sürüm</span>}
         {newerPublished && <span className="badge green"><span />Daha yeni yayımlanmış sürüm var</span>}
         {unpublishedDraft && <span className="badge amber"><span />Yayımlanmamış taslak değişiklik</span>}
@@ -99,6 +101,7 @@ export function ExamQuestionCard({ row, number, examId, examPublished, catalogs,
     </header>
     {!editing ? <>
       <QuestionBody version={version} />
+      {variantScope === 'shared' && <p className="field-hint">Bu soru silahlı ve silahsız seçeneklerde birlikte güncellenir.</p>}
       {mutationError && <ErrorNotice error={mutationError} />}
       <footer className="question-card-actions">
         <button type="button" className="button secondary small" disabled={busy} onClick={start}>Düzenle</button>
@@ -112,7 +115,8 @@ export function ExamQuestionCard({ row, number, examId, examPublished, catalogs,
       {mutationError && <ErrorNotice error={mutationError} />}
       {note && <div className="notice info" role="status"><p>{note}</p></div>}
       {missing.length > 0 && <ul className="requirements">{missing.map((item) => <li key={item}>{item}</li>)}</ul>}
-      {row.exam_count > 1 && <label className="check-row"><input type="checkbox" checked={applyAll} onChange={(event) => setApplyAll(event.target.checked)} />Bu soruyu kullanan tüm sınavlarda güncelle ({row.exam_count} sınav)</label>}
+      {variantScope === 'shared' && <p className="field-hint">Ortak soru düzeltmesi iki seçeneğe de uygulanır; önceki denemeler eski sürümde kalır.</p>}
+      {row.exam_count > (variantScope === 'shared' ? 2 : 1) && <label className="check-row"><input type="checkbox" checked={applyAll} onChange={(event) => setApplyAll(event.target.checked)} />Bu soruyu kullanan tüm sınavlarda güncelle ({row.exam_count} sınav)</label>}
       <footer className="question-card-actions">
         <button type="submit" className="button primary small" disabled={busy || !dirty || missing.length > 0}>{save.isPending ? 'Kaydediliyor…' : examPublished ? 'Kaydet, yayımla ve sınavda güncelle' : 'Kaydet ve yayımla'}</button>
         <button type="button" className="button secondary small" disabled={busy || !dirty} onClick={() => save.mutate(false)}>Yalnız taslak kaydet</button>

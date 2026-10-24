@@ -22,37 +22,51 @@ class UpdateOfficialExamQuestion
         return DB::transaction(function () use ($actor, $exam, $questionId, $versionId) {
             $actor = User::whereKey($actor->id)->lockForUpdate()->firstOrFail();
             Gate::forUser($actor)->authorize('manage', Question::class);
-            $exam = OfficialExam::whereKey($exam->id)->lockForUpdate()->firstOrFail();
+            $requestedId = $exam->id;
+            $exam = OfficialExam::whereKey($exam->derived_from_id ?? $exam->id)->lockForUpdate()->firstOrFail();
             $row = DB::table('official_exam_questions')->where('official_exam_id', $exam->id)->where('question_id', $questionId)->lockForUpdate()->first();
-            if ($row === null) {
+            if ($row === null || ($requestedId !== $exam->id && $row->position > 100)) {
                 throw new ApiProblem(404, 'not_found', 'Soru bu sınavda yer almıyor.');
             }
             $next = QuestionVersion::whereKey($versionId)->where('question_id', $questionId)->first();
             if ($next === null) {
                 throw ValidationException::withMessages(['question_version_id' => ['Sürüm bu soruya ait değil.']]);
             }
-            if ($row->question_version_id === $next->id) {
-                return $exam;
+            $targets = [$exam];
+            if ($exam->generate_unarmed && $exam->published_at !== null && $row->position <= 100) {
+                $targets[] = OfficialExam::where('derived_from_id', $exam->id)->lockForUpdate()->firstOrFail();
             }
-            if ($exam->published_at !== null) {
-                $current = QuestionVersion::findOrFail($row->question_version_id);
-                if ($next->published_at === null || $next->version <= $current->version) {
-                    throw ValidationException::withMessages(['question_version_id' => ['Yayımlanmış sınavda yalnız sorunun daha yeni yayımlanmış sürümü kullanılabilir.']]);
-                }
+            foreach ($targets as $target) {
+                $this->update($actor, $target, $questionId, $next);
             }
-            DB::table('official_exam_questions')->where('official_exam_id', $exam->id)->where('question_id', $questionId)->update(['question_version_id' => $next->id]);
-            $now = now();
-            DB::table('official_exam_question_changes')->insert([
-                'id' => Str::uuid(), 'official_exam_id' => $exam->id, 'question_id' => $questionId,
-                'from_version_id' => $row->question_version_id, 'to_version_id' => $next->id, 'actor_id' => $actor->id, 'created_at' => $now,
-            ]);
-            DB::table('audit_events')->insert([
-                'id' => Str::uuid(), 'actor_id' => $actor->id, 'tenant_id' => null, 'target_id' => $exam->id,
-                'action' => 'official_exam.question_version_updated', 'created_at' => $now,
-            ]);
-            // The exam row itself is never written: a published exam is immutable at the database level; the change log is the trace.
 
-            return $exam;
+            return $requestedId === $exam->id ? $exam : OfficialExam::findOrFail($requestedId);
         });
+    }
+
+    private function update(User $actor, OfficialExam $exam, string $questionId, QuestionVersion $next): void
+    {
+        $row = DB::table('official_exam_questions')->where('official_exam_id', $exam->id)->where('question_id', $questionId)->lockForUpdate()->first();
+        if ($row->question_version_id === $next->id) {
+            return;
+        }
+        if ($exam->published_at !== null) {
+            $current = QuestionVersion::findOrFail($row->question_version_id);
+            if ($next->published_at === null || $next->version <= $current->version) {
+                throw ValidationException::withMessages(['question_version_id' => ['Yayımlanmış sınavda yalnız sorunun daha yeni yayımlanmış sürümü kullanılabilir.']]);
+            }
+        }
+        DB::table('official_exam_questions')->where('official_exam_id', $exam->id)->where('question_id', $questionId)->update(['question_version_id' => $next->id]);
+        $now = now();
+        DB::table('official_exam_question_changes')->insert([
+            'id' => Str::uuid(), 'official_exam_id' => $exam->id, 'question_id' => $questionId,
+            'from_version_id' => $row->question_version_id, 'to_version_id' => $next->id, 'actor_id' => $actor->id, 'created_at' => $now,
+        ]);
+        DB::table('audit_events')->insert([
+            'id' => Str::uuid(), 'actor_id' => $actor->id, 'tenant_id' => null, 'target_id' => $exam->id,
+            'action' => 'official_exam.question_version_updated', 'created_at' => $now,
+        ]);
+        // The exam row itself is never written: a published exam is immutable at the database level; the change log is the trace.
+
     }
 }

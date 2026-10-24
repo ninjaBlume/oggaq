@@ -11,6 +11,7 @@ class AdminOfficialExamResource extends OfficialExamResource
     {
         return parent::toArray($request) + [
             'status' => $this->published_at === null ? 'draft' : 'published',
+            'generate_unarmed' => $this->generate_unarmed, 'derived_from_id' => $this->derived_from_id,
             'draft_question_count' => $this->draft_question_count ?? 0, 'outdated_question_count' => $this->outdated_question_count ?? 0,
             'created_at' => $this->created_at->toISOString(), 'updated_at' => $this->updated_at->toISOString(),
             'questions' => $this->whenLoaded('questions', fn () => $this->questions->map(fn ($row) => [
