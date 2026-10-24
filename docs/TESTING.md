@@ -1,6 +1,6 @@
 # Test ve doğrulama stratejisi
 
-Mevcut yerel sonuç: PHP 8.4 / gerçek PostgreSQL 18 / Redis ile **208 backend testi, 2.018 assertion**; admin 11, web 4, mobil 23, `study-core` 12 ve `design-tokens` 59 olmak üzere **109 Vitest**. **58 Chromium E2E** (tek seferde, son çalıştırma) admin, öğrenci, deneme, tasarım, bildirim, hesap ve Expo ekran/Bearer akışlarını kapsar. Strict TypeScript, iki web production build, üç platform Metro export, native prebuild ve Expo Doctor (21/21) doğrulandı. Native derleme sonuçları [MOBILE](MOBILE.md) içinde ayrı tutulur; Chromium kontrolü cihaz testi yerine geçmez. İki upstream Expo build advisory'si açıktır; ham npm audit temiz değildir.
+Mevcut yerel sonuç: PHP 8.4 / gerçek PostgreSQL 18 / Redis ile **230 backend testi, 2.279 assertion**; admin 11, web 4, mobil 25, `study-core` 16 ve `design-tokens` 63 olmak üzere **119 Vitest**. **83 Chromium E2E** (tek seferde, 24 Ekim 2026 son çalıştırma; iş ilanları, puan hesaplama, sınav sonuçları ve bağlı sınav seçenekleri dahil) admin, öğrenci, deneme, tasarım, bildirim, hesap ve Expo ekran/Bearer akışlarını kapsar. Strict TypeScript, iki web production build, üç platform Metro export, native prebuild ve Expo Doctor (21/21) doğrulandı. Native derleme sonuçları [MOBILE](MOBILE.md) içinde ayrı tutulur; Chromium kontrolü cihaz testi yerine geçmez. İki upstream Expo build advisory'si açıktır; ham npm audit temiz değildir.
 
 ## Araçlar ve ortamlar
 
