@@ -29,21 +29,24 @@ checksum() {
       || coalesce((select string_agg(y, '|' order by y) from (
         select concat_ws('~', e.id, e.exam_type_id, e.year, coalesce(e.term,''), coalesce(e.exam_number,''), coalesce(e.weapon_status,''), coalesce(e.subject_id::text,''), e.title, e.generate_unarmed, coalesce(e.derived_from_id::text,''),
                (select md5(string_agg(p.position::text || p.question_id::text || p.question_version_id::text, ',' order by p.position)) from official_exam_questions p where p.official_exam_id = e.id)) as y
-        from official_exams e where e.published_at is not null) b), ''))" "${1:-$db}"
+        from official_exams e where e.published_at is not null) b), '')
+      || coalesce((select string_agg(concat_ws('~',r.id,r.code,r.version,r.title,r.education_type,r.weapon_status,r.effective_from,r.effective_until,r.period_from,r.period_until,r.configuration::text,r.source_urls::text,r.verification_note,r.published_at is not null,r.archived_at is not null), '|' order by r.id) from scoring_rules r), '')
+      || coalesce((select string_agg(concat_ws('~',p.id,p.education_type,p.weapon_status,p.number,p.exam_date,p.scoring_rule_id,p.source_url), '|' order by p.id) from scoring_periods p), '')
+      || coalesce((select string_agg(l.official_exam_id::text || '~' || l.scoring_period_id::text, '|' order by l.official_exam_id) from official_exam_scoring l), ''))" "${1:-$db}"
 }
 [ "$print_only" = 1 ] && { checksum; exit 0; }
 fail() { echo "BAŞARISIZ: $*" >&2; failures=$((failures + 1)); }
 ok() { echo "tamam: $*"; }
 
-content_tables=(exam_types subjects topics question_sources questions question_versions question_options official_exams official_exam_questions)
-account_tables=(users study_contexts exam_attempts exam_answers favorite_questions memberships question_reports account_erasures)
+content_tables=(exam_types subjects topics question_sources questions question_versions question_options scoring_rules scoring_periods official_exams official_exam_questions official_exam_scoring)
+account_tables=(exam_score_results users study_contexts exam_attempts exam_answers favorite_questions memberships question_reports account_erasures)
 
 # 1) Migration kayıtları: tablo var, boş değil, son migration adı yazılabilir.
 count="$(q 'select count(*) from migrations')"
 [ "$count" -gt 0 ] && ok "migrations: $count kayıt, son: $(q 'select migration from migrations order by id desc limit 1')" || fail "migrations tablosu boş"
 
 # 2) Değişmezlik tetikleyicileri yerinde mi?
-expected_triggers=(official_exam_pair_complete official_exam_pair_questions guard_account_erasure guard_exam_answer guard_exam_attempt guard_official_exam_question guard_official_exam guard_practice_attempt guard_published_question_option guard_question_report guard_published_question_version guard_question_publication_pointer)
+expected_triggers=(scoring_rule_guard scoring_period_guard exam_score_result_guard official_exam_pair_complete official_exam_pair_questions guard_account_erasure guard_exam_answer guard_exam_attempt guard_official_exam_question guard_official_exam guard_practice_attempt guard_published_question_option guard_question_report guard_published_question_version guard_question_publication_pointer)
 for trigger in "${expected_triggers[@]}"; do
   [ "$(q "select count(*) from pg_trigger where tgname = '$trigger' and not tgisinternal")" -ge 1 ] || fail "tetikleyici yok: $trigger"
 done

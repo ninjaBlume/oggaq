@@ -1478,6 +1478,195 @@ export interface paths {
         patch: operations["reviewJobApplication"];
         trace?: never;
     };
+    "/api/v1/scoring-periods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Doğrulanmış dönem ve puanlama kurallarını listele */
+        get: operations["listScoringPeriods"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/score-calculations/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Kalıcı kayıt oluşturmadan backend puan hesabı */
+        post: operations["previewScore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/score-calculations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Yalnız kendi bağımsız puan hesapları */
+        get: operations["listMyScores"];
+        put?: never;
+        /** Kişisel puan hesabını işlem UUID ile sakla */
+        post: operations["saveScore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/scoring-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Platform yöneticisi kural sürüm geçmişi */
+        get: operations["listAdminScoringRules"];
+        put?: never;
+        /** Yeni taslak kural sürümü oluştur */
+        post: operations["createScoringRule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/scoring-periods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Kuralı eğitim ve sınav dönemine bağla */
+        post: operations["createScoringPeriod"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/scoring-rules/{rule}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Yalnız taslak kuralı düzenle */
+        put: operations["updateScoringRule"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/scoring-rules/{rule}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resmî kaynak doğrulamasıyla kuralı yayımla; çakışan aralıklar reddedilir */
+        post: operations["publishScoringRule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/scoring-rules/{rule}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Kuralı arşivle; eski sonuç ve dönemler korunur */
+        post: operations["archiveScoringRule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/official-exams/{officialExam}/scoring": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Tam sınavı açıkça puanlama dönemine bağla */
+        put: operations["linkExamScoring"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contexts/{context}/exam-attempts/{exam}/score": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Biten denemenin sabit cevaplarından puan; atış düzeltmeleri yeni sürüm olarak saklanır */
+        post: operations["appendExamScore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/scoring-periods/{period}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Döneme yeni kural sürümü bağla; eski sonuçlar sabit sürümünü korur */
+        put: operations["rebindScoringPeriod"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1943,6 +2132,8 @@ export interface components {
             official_exam: components["schemas"]["OfficialExamRef"] | null;
             /** @description Son görüntülenen soru sırası; eski veya yeni konum kaydı olmayan sınavlarda null. Cevap revision değerini veya süreyi değiştirmez. */
             resume_position?: number | null;
+            score_result: components["schemas"]["ScoreResult"] | null;
+            scoring_available: boolean;
         };
         ExamQuestion: {
             /** Format: uuid */
@@ -1988,6 +2179,8 @@ export interface components {
             result: components["schemas"]["ExamResult"] | null;
             questions: components["schemas"]["ExamQuestion"][];
             official_exam: components["schemas"]["OfficialExamRef"] | null;
+            score_result: components["schemas"]["ScoreResult"] | null;
+            scoring_available: boolean;
         };
         ExamAttemptResponse: {
             data: components["schemas"]["ExamAttempt"];
@@ -2135,6 +2328,8 @@ export interface components {
              * @description Bağlı silahsız seçeneğin yönetildiği ana silahlı sınav kimliği.
              */
             derived_from_id: string | null;
+            /** Format: uuid */
+            scoring_period_id: string | null;
         };
         OfficialExamInput: {
             /** Format: uuid */
@@ -2162,6 +2357,8 @@ export interface components {
              * @default false
              */
             generate_unarmed: boolean;
+            /** Format: uuid */
+            scoring_period_id?: string | null;
         };
         OfficialExamResponse: {
             data: components["schemas"]["OfficialExam"];
@@ -2609,6 +2806,214 @@ export interface components {
             /** @enum {string} */
             status: "submitted" | "reviewing" | "accepted" | "rejected";
             base_version: number;
+        };
+        /** @enum {string} */
+        ScoreEducationType: "basic" | "renewal" | "weapon_difference";
+        ScoringConfiguration: {
+            general_count: number;
+            general_maximum: number;
+            general_weight: number;
+            weapon_count: number;
+            weapon_maximum: number;
+            weapon_weight: number;
+            shooting_count: number;
+            shooting_maximum: number;
+            shooting_weight: number;
+            /** @enum {string} */
+            decision_mode: "pass_fail" | "level" | "unverified";
+            requires_previous: boolean;
+            minimums: {
+                general?: number;
+                weapon?: number;
+                shooting?: number;
+                weapon_total?: number;
+                total?: number;
+            };
+            decimals: number;
+            formula: string;
+        };
+        ScoringRuleInput: {
+            code: string;
+            title: string;
+            education_type: components["schemas"]["ScoreEducationType"];
+            /** @enum {string} */
+            weapon_status: "armed" | "unarmed";
+            /** Format: date */
+            effective_from: string;
+            /** Format: date */
+            effective_until: string | null;
+            period_from: number;
+            period_until: number;
+            configuration: components["schemas"]["ScoringConfiguration"];
+            source_urls: string[];
+            verification_note: string;
+        };
+        ScoringRule: {
+            /** Format: uuid */
+            id: string;
+            version: number;
+            code: string;
+            title: string;
+            education_type: components["schemas"]["ScoreEducationType"];
+            /** @enum {string} */
+            weapon_status: "armed" | "unarmed";
+            /** Format: date */
+            effective_from: string;
+            /** Format: date */
+            effective_until: string | null;
+            period_from: number;
+            period_until: number;
+            configuration: components["schemas"]["ScoringConfiguration"];
+            source_urls: string[];
+            verification_note: string;
+            /** Format: date-time */
+            published_at: string | null;
+            /** Format: date-time */
+            archived_at: string | null;
+        };
+        ScoringPeriod: {
+            /** Format: uuid */
+            id: string;
+            education_type: components["schemas"]["ScoreEducationType"];
+            /** @enum {string} */
+            weapon_status: "armed" | "unarmed";
+            number: number;
+            /** Format: date */
+            exam_date: string;
+            /** Format: uri */
+            source_url: string;
+            rule: components["schemas"]["ScoringRule"];
+        };
+        ScoringPeriodInput: {
+            /** Format: uuid */
+            scoring_rule_id: string;
+            number: number;
+            /** Format: date */
+            exam_date: string;
+            /** Format: uri */
+            source_url: string;
+        };
+        ScoreCounts: {
+            general_correct: number;
+            general_wrong: number;
+            weapon_correct: number;
+            weapon_wrong: number;
+            shooting_hits: number | null;
+            previous_general_score: number | null;
+        };
+        ScoreCalculationInput: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            period_id: string;
+            general_correct: number;
+            general_wrong: number;
+            weapon_correct: number;
+            weapon_wrong: number;
+            shooting_hits: number | null;
+            previous_general_score: number | null;
+            /**
+             * Format: uuid
+             * @description Önizleme kuralının kimliği; dönem arada değişirse yeni kayıtta 409. Eski başarılı işlemin tekrarı korunur.
+             */
+            expected_rule_id?: string;
+        };
+        ScoreSection: {
+            /** @enum {string} */
+            key: "general" | "weapon" | "shooting" | "previous_general";
+            label: string;
+            count: number;
+            correct: number | null;
+            wrong: number;
+            blank: number;
+            score: number | null;
+            maximum: number;
+        };
+        CalculatedScore: {
+            /** Format: uuid */
+            rule_id: string;
+            rule_version: number;
+            title: string;
+            final_score: number | null;
+            minimum_score: number;
+            maximum_score: number;
+            /** @enum {string} */
+            status: "awaiting_shooting" | "awaiting_previous_score" | "level" | "unverified" | "passed" | "failed";
+            status_label: string;
+            passed: boolean | null;
+            /** @enum {string} */
+            decision_mode: "pass_fail" | "level" | "unverified";
+            sections: components["schemas"]["ScoreSection"][];
+            checks: {
+                section: string;
+                minimum: number;
+                met: boolean | null;
+                label: string;
+            }[];
+            formula: string;
+            verification_note: string;
+            source_urls: string[];
+            notice: string;
+            input: components["schemas"]["ScoreCounts"];
+        };
+        ScoreResult: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            exam_attempt_id: string | null;
+            revision: number;
+            /** Format: uuid */
+            period_id: string;
+            input: components["schemas"]["ScoreCounts"];
+            output: components["schemas"]["CalculatedScore"];
+            /** Format: date-time */
+            created_at: string;
+        };
+        ExamScoreInput: {
+            /** Format: uuid */
+            id: string;
+            shooting_hits: number | null;
+            previous_general_score: number | null;
+        };
+        ScoringLinkInput: {
+            /** Format: uuid */
+            scoring_period_id: string;
+        };
+        ScoringLink: {
+            /** Format: uuid */
+            official_exam_id: string;
+            /** Format: uuid */
+            scoring_period_id: string;
+        };
+        ScoringRuleResponse: {
+            data: components["schemas"]["ScoringRule"];
+        };
+        ScoringPeriodResponse: {
+            data: components["schemas"]["ScoringPeriod"];
+        };
+        ScoreResultResponse: {
+            data: components["schemas"]["ScoreResult"];
+        };
+        CalculatedScoreResponse: {
+            data: components["schemas"]["CalculatedScore"];
+        };
+        ScoringLinkResponse: {
+            data: components["schemas"]["ScoringLink"];
+        };
+        ScoringRuleListResponse: {
+            data: components["schemas"]["ScoringRule"][];
+        };
+        ScoringPeriodListResponse: {
+            data: components["schemas"]["ScoringPeriod"][];
+        };
+        ScoreResultListResponse: {
+            data: components["schemas"]["ScoreResult"][];
+            links: components["schemas"]["CursorLinks"];
+            meta: components["schemas"]["CursorMeta"];
+        };
+        VerifyScoringSourceInput: {
+            /** @constant */
+            source_verified: true;
         };
     };
     responses: {
@@ -5223,6 +5628,441 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["JobApplication"];
                     };
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    listScoringPeriods: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoringPeriodListResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    previewScore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScoreCalculationInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CalculatedScoreResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    listMyScores: {
+        parameters: {
+            query?: {
+                per_page?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoreResultListResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    saveScore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScoreCalculationInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoreResultResponse"];
+                };
+            };
+            /** @description Başarılı işlem. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoreResultResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    listAdminScoringRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoringRuleListResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    createScoringRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScoringRuleInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoringRuleResponse"];
+                };
+            };
+            /** @description Başarılı işlem. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoringRuleResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    createScoringPeriod: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScoringPeriodInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoringPeriodResponse"];
+                };
+            };
+            /** @description Başarılı işlem. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoringPeriodResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    updateScoringRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                rule: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScoringRuleInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoringRuleResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    publishScoringRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                rule: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyScoringSourceInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoringRuleResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    archiveScoringRule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                rule: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoringRuleResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    linkExamScoring: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                officialExam: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScoringLinkInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoringLinkResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    appendExamScore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+                exam: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExamScoreInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoreResultResponse"];
+                };
+            };
+            /** @description Başarılı işlem. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoreResultResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    rebindScoringPeriod: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScoringPeriodInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoringPeriodResponse"];
+                };
+            };
+            /** @description Başarılı işlem. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoringPeriodResponse"];
                 };
             };
             401: components["responses"]["Problem"];

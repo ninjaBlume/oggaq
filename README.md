@@ -90,3 +90,5 @@ Mobil için `npm run dev:mobile`. GitHub Actions üzerinde Android APK ve iOS Si
 Tasarım ilkeleri, ortak renk/aralık değerleri (`packages/design-tokens`), koyu mod ve pencere sınıfları/tablet düzeni için [DESIGN](docs/DESIGN.md).
 
 24 Ekim 2026: yeni Deneme Sınavı girişinde 125 soru bir kez eklenerek silahlı 125 ve silahsız ilk 100 soruluk seçenek birlikte yayımlanır. Ortak sorudaki düzeltme iki şablona uygulanır, geçmiş denemeler korunur. Mevcut bağımsız sınavlar otomatik birleştirilmez. [İçerik yönetimi ve hata davranışları](docs/QUESTION_BANK.md#tek-girişten-silahlı-ve-silahsız-seçenekler-24-ekim-2026).
+
+ÖGG **Puan hesapla**: web ve mobil menüden doğru/yanlış/atış kaydırıcıları, merkezi API motoru, sürümlü dönem kuralları ve kişisel hesap geçmişi. Uygun tam denemelerde otomatik ÖGG hesabı; atış eksikse puan aralığı. Yönetimde kaynaklı kural taslağı/yayını, sürüm/arşiv ve dönem eşleştirmesi. [Özellik ve API](docs/EXAM_SCORING.md), [resmî kaynaklar ve belirsizlikler](docs/EXAM_SCORING_RULES.md). 2025 yeni modelinin dönem geçişi tahmin edilerek etkinleştirilmez.

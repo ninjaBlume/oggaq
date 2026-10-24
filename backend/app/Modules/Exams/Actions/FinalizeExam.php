@@ -3,6 +3,7 @@
 namespace App\Modules\Exams\Actions;
 
 use App\Modules\Exams\Models\ExamAttempt;
+use App\Modules\Scoring\Actions\ScoreExam;
 use Illuminate\Support\Facades\DB;
 
 class FinalizeExam
@@ -28,6 +29,7 @@ class FinalizeExam
             'score_percent' => round($counts->correct * 100 / $attempt->question_count, 2),
             'revision' => $attempt->revision + 1,
         ])->save();
+        app(ScoreExam::class)->finalize($attempt);
         $attempt->unsetRelation('answers');
 
         return $attempt;

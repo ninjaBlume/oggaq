@@ -13,19 +13,19 @@ import type { NewEntry } from './NewQuestionCard';
 
 type OfficialExam = components['schemas']['AdminOfficialExam'];
 type Entry = { questionId: string; versionId: string; stem: string; published: boolean; latestPublished: string | null };
-type Form = { exam_type_id: string; weapon_status: '' | 'armed' | 'unarmed'; generate_unarmed: boolean; subject_id: string; source_id: string; title: string; year: string; term: string; exam_number: string; entries: Entry[] };
+type Form = { scoring_period_id: string; exam_type_id: string; weapon_status: '' | 'armed' | 'unarmed'; generate_unarmed: boolean; subject_id: string; source_id: string; title: string; year: string; term: string; exam_number: string; entries: Entry[] };
 
-const emptyForm: Form = { generate_unarmed: false, exam_type_id: '', weapon_status: '', subject_id: '', source_id: '', title: '', year: String(new Date().getFullYear()), term: '', exam_number: '', entries: [] };
+const emptyForm: Form = { scoring_period_id: '', generate_unarmed: false, exam_type_id: '', weapon_status: '', subject_id: '', source_id: '', title: '', year: String(new Date().getFullYear()), term: '', exam_number: '', entries: [] };
 function toForm(exam?: OfficialExam): Form {
   if (!exam) return emptyForm;
   return {
-    generate_unarmed: exam.generate_unarmed, exam_type_id: exam.exam_type_id, weapon_status: exam.weapon_status ?? '', subject_id: exam.subject?.id ?? '', source_id: exam.source?.id ?? '', title: exam.title, year: String(exam.year), term: exam.term ?? '', exam_number: exam.exam_number ?? '',
+    scoring_period_id: exam.scoring_period_id ?? '', generate_unarmed: exam.generate_unarmed, exam_type_id: exam.exam_type_id, weapon_status: exam.weapon_status ?? '', subject_id: exam.subject?.id ?? '', source_id: exam.source?.id ?? '', title: exam.title, year: String(exam.year), term: exam.term ?? '', exam_number: exam.exam_number ?? '',
     entries: (exam.questions ?? []).map((row) => ({ questionId: row.question_id, versionId: row.question.id, stem: row.question.stem, published: row.question.published_at !== null, latestPublished: row.published_version_id })),
   };
 }
 export function toInput(form: Form) {
   return {
-    generate_unarmed: form.generate_unarmed, exam_type_id: form.exam_type_id, weapon_status: form.weapon_status || null, subject_id: form.subject_id || null, source_id: form.source_id || null, title: form.title.trim(), year: Number(form.year),
+    scoring_period_id: form.scoring_period_id || null, generate_unarmed: form.generate_unarmed, exam_type_id: form.exam_type_id, weapon_status: form.weapon_status || null, subject_id: form.subject_id || null, source_id: form.source_id || null, title: form.title.trim(), year: Number(form.year),
     term: form.term.trim() || null, exam_number: form.exam_number.trim() || null, question_version_ids: form.entries.map((entry) => entry.versionId),
   };
 }
@@ -51,6 +51,7 @@ function OfficialExamEditor({ exam, catalogs }: { exam?: OfficialExam; catalogs:
     const wanted = params.get('tur') === 'ders' ? /^ders/i : /^deneme/i;
     return { ...emptyForm, generate_unarmed: params.get('tur') !== 'ders', weapon_status: params.get('tur') === 'ders' ? '' : 'armed', exam_type_id: catalogs['exam-types'].find((type) => wanted.test(type.name))?.id ?? '', subject_id: params.get('tur') === 'ders' ? params.get('ders') ?? '' : '' };
   });
+  const scoringPeriods = useQuery({ queryKey: ['scoring-periods'], queryFn: ({ signal }) => api.request('get', '/api/v1/scoring-periods', { signal }) });
   const [picker, setPicker] = useState(false);
   const [writing, setWriting] = useState(false);
   const [confirmPublish, setConfirmPublish] = useState(false);
@@ -134,6 +135,8 @@ function OfficialExamEditor({ exam, catalogs }: { exam?: OfficialExam; catalogs:
         <Field label="Silah durumu" name="weapon_status" error={fieldError('weapon_status')} hint="Sınav türünden (Deneme/Ders) ayrıdır; silahlı ve silahsız sınav ayrı kayıtlardır. Ders sınavında boş bırakılır.">{(props) => <select {...props} value={form.weapon_status} onChange={(event) => patch('weapon_status', event.target.value as Form['weapon_status'])}><option value="">Belirtilmedi</option><option value="armed">Silahlı</option><option value="unarmed">Silahsız</option></select>}</Field></>}
 
         <Field label="Ders" name="subject_id" error={fieldError('subject_id')} hint="Yalnız Ders Sınavı için: sınavın dersi. Deneme (tam) sınavda boş bırakın.">{(props) => <select {...props} value={form.subject_id} onChange={(event) => setForm((old) => ({ ...old, subject_id: event.target.value, ...(event.target.value ? { generate_unarmed: false, weapon_status: '' } : {}) }))}><option value="">Ders yok (tam sınav)</option>{catalogs.subjects.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select>}</Field>
+        {!isSubjectExam && <Field label="ÖGG puanlama dönemi" name="scoring_period_id" error={fieldError('scoring_period_id')} hint="Eğitim türünü ve sınav tarihini doğrulayarak seçin. Temel/yenileme aynı numaradan çıkarılmaz; eşleşmeyen sınavda yalnız doğru yüzdesi gösterilir.">{(props) => <select {...props} value={form.scoring_period_id} onChange={(event) => patch('scoring_period_id', event.target.value)}><option value="">Henüz eşleştirilmedi</option>{scoringPeriods.data?.data.filter((p) => p.weapon_status === form.weapon_status && String(p.number) === form.exam_number && p.exam_date.startsWith(form.year + '-')).map((p) => <option key={p.id} value={p.id}>{p.number}. {p.education_type === 'basic' ? 'Temel eğitim' : p.education_type === 'renewal' ? 'Yenileme' : 'Silah farkı'} · {p.exam_date}</option>)}</select>}</Field>}
+        {scoringPeriods.isError && <ErrorNotice error={scoringPeriods.error} retry={() => { void scoringPeriods.refetch(); }} />}
         <Field label="Kaynak" name="source_id" error={fieldError('source_id')} hint="Sınavın duyurulduğu belge veya yayın (isteğe bağlı).">{(props) => <select {...props} value={form.source_id} onChange={(event) => patch('source_id', event.target.value)}><option value="">Kaynak seçilmedi</option>{catalogs['question-sources'].map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select>}</Field>
         <Field label="Başlık" name="title" error={fieldError('title')}>{(props) => <input {...props} required maxLength={240} value={form.title} onChange={(event) => patch('title', event.target.value)} />}</Field>
         <Field label="Yıl" name="year" error={fieldError('year')}>{(props) => <input {...props} type="number" required min={1990} max={2200} value={form.year} onChange={(event) => patch('year', event.target.value)} />}</Field>

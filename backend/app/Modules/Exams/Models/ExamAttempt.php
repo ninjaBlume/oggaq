@@ -3,6 +3,7 @@
 namespace App\Modules\Exams\Models;
 
 use App\Modules\QuestionBank\Models\OfficialExam;
+use App\Modules\Scoring\Models\ExamScoreResult;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,7 +18,7 @@ class ExamAttempt extends Model
 
     protected $keyType = 'string';
 
-    protected $with = ['officialExam', 'bookmark'];
+    protected $with = ['officialExam', 'bookmark', 'scoreResult'];
 
     protected function casts(): array
     {
@@ -33,6 +34,11 @@ class ExamAttempt extends Model
     public function officialExam(): BelongsTo
     {
         return $this->belongsTo(OfficialExam::class);
+    }
+
+    public function scoreResult(): HasOne
+    {
+        return $this->hasOne(ExamScoreResult::class)->orderByDesc('revision');
     }
 
     public function bookmark(): HasOne

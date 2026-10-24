@@ -8,6 +8,7 @@ use App\Modules\Exams\Models\ExamAttempt;
 use App\Modules\Exams\Models\ExamBookmark;
 use App\Modules\QuestionBank\Models\OfficialExam;
 use App\Modules\QuestionBank\Models\Question;
+use App\Modules\Scoring\Actions\ScoreExam;
 use App\Modules\Study\Actions\ResolveStudyContext;
 use App\Modules\Study\ReviewQuestionSet;
 use App\Support\ApiProblem;
@@ -59,6 +60,7 @@ class StartExam
                 }
 
                 ExamBookmark::create(['exam_attempt_id' => $attempt->id, 'position' => 1]);
+                app(ScoreExam::class)->pin($attempt, $actor->id);
 
                 return $attempt->load(['answers.questionVersion.options', 'answers.questionVersion.source']);
             });

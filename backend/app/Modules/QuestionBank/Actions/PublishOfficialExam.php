@@ -5,6 +5,8 @@ namespace App\Modules\QuestionBank\Actions;
 use App\Models\User;
 use App\Modules\QuestionBank\Models\OfficialExam;
 use App\Modules\QuestionBank\Models\Question;
+use App\Modules\Scoring\Actions\ManageScoring;
+use App\Modules\Scoring\Models\ScoringPeriod;
 use App\Support\ApiProblem;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -38,6 +40,13 @@ class PublishOfficialExam
                     if ($unpublished->isNotEmpty()) {
                         throw ValidationException::withMessages(['question_version_ids' => ['Şu sıralardaki soruların sabitlenen sürümü yayımlanmamış: '.$unpublished->implode(', ').'. Soruyu yayımlayıp sınavda yayımlanmış sürümle değiştirin.']]);
                     }
+                    if ($exam->scoringLink) {
+                        $period = ScoringPeriod::with('rule')->findOrFail($exam->scoringLink->scoring_period_id);
+                        if ($count !== $period->rule->configuration['general_count'] + $period->rule->configuration['weapon_count']) {
+                            throw ValidationException::withMessages(['scoring_period_id' => ['Puanlama kuralının soru sayısı tam sınavla eşleşmeli.']]);
+                        }
+                        app(ManageScoring::class)->link($actor, $exam, $exam->scoringLink->scoring_period_id);
+                    }
                     $exam->published_at = now();
                     $exam->save();
                     if ($exam->generate_unarmed) {
@@ -70,6 +79,14 @@ class PublishOfficialExam
         DB::table('official_exam_questions')->insert($rows);
         $child->published_at = $source->published_at;
         $child->save();
+        if ($source->scoringLink) {
+            $period = ScoringPeriod::findOrFail($source->scoringLink->scoring_period_id);
+            $unarmed = ScoringPeriod::where('education_type', $period->education_type)->where('weapon_status', 'unarmed')->where('number', $period->number)->first();
+            if (! $unarmed) {
+                throw ValidationException::withMessages(['scoring_period_id' => ['Bu dönem için silahsız puanlama kuralını da tanımlayın.']]);
+            }
+            app(ManageScoring::class)->link($actor, $child, $unarmed->id);
+        }
         DB::table('audit_events')->insert([
             'id' => Str::uuid(), 'actor_id' => $actor->id, 'tenant_id' => null,
             'target_id' => $child->id, 'action' => 'official_exam.unarmed_derived', 'created_at' => now(),

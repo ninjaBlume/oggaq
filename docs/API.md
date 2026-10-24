@@ -108,3 +108,7 @@ Import yolları: `POST /admin/imports` upload/staging; `GET /admin/imports/{id}`
 Endpoint uygulanmadan path/DTO/validation/response sözleşmesi, 401/403/404/422/409 davranışı ve ilgili testleri birlikte yazılır. CI, OpenAPI tiplerini yeniden üretip Git farkı olmamasını ve admin/öğrenci web strict tip kontrolünü denetler. Cursor `links`/`meta` nesneleri sözleşmede açık alanlarla tanımlanmıştır. İstemci sunucunun döndürdüğü URL'yi doğrudan çağırmaz; yalnız cursor değerini kendi yapılandırılmış API origin'ine taşır.
 
 Exams yolları ve tekrar/süre semantiği [EXAMS](EXAMS.md) içinde; tamamlanana kadar feedback/result gizlidir.
+
+## ÖGG puanlama
+
+Dönem listesi, kayıtsız hesap önizlemesi, kişisel puan geçmişi, denemede ek atış hesabı ve platform yöneticisi kural/dönem uçları eklendi. Sınav kaynaklarında `scoring_available` ve nullable `score_result` vardır; mevcut doğru yüzdesi değiştirilmez. Uçlar ve giriş/çıktı örnekleri [EXAM_SCORING](EXAM_SCORING.md#api), dönem doğrulama sınırları [EXAM_SCORING_RULES](EXAM_SCORING_RULES.md) içindedir.

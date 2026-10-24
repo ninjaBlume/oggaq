@@ -39,6 +39,10 @@
     {
       "name": "Jobs",
       "description": "ÖGG iş ilanları ve kişisel başvurular; yalnız platform yöneticisi yönetir."
+    },
+    {
+      "name": "Scoring",
+      "description": "Dönem bazlı, sürümlü ÖGG puan hesaplama."
     }
   ],
   "security": [
@@ -5575,6 +5579,848 @@
           }
         }
       }
+    },
+    "/api/v1/scoring-periods": {
+      "get": {
+        "operationId": "listScoringPeriods",
+        "summary": "Doğrulanmış dönem ve puanlama kurallarını listele",
+        "tags": [
+          "Scoring"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoringPeriodListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/api/v1/me/score-calculations/preview": {
+      "post": {
+        "operationId": "previewScore",
+        "summary": "Kalıcı kayıt oluşturmadan backend puan hesabı",
+        "tags": [
+          "Scoring"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalculatedScoreResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScoreCalculationInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/score-calculations": {
+      "post": {
+        "operationId": "saveScore",
+        "summary": "Kişisel puan hesabını işlem UUID ile sakla",
+        "tags": [
+          "Scoring"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoreResultResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "201": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoreResultResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScoreCalculationInput"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listMyScores",
+        "summary": "Yalnız kendi bağımsız puan hesapları",
+        "tags": [
+          "Scoring"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoreResultListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/scoring-rules": {
+      "post": {
+        "operationId": "createScoringRule",
+        "summary": "Yeni taslak kural sürümü oluştur",
+        "tags": [
+          "Scoring"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoringRuleResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "201": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoringRuleResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScoringRuleInput"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listAdminScoringRules",
+        "summary": "Platform yöneticisi kural sürüm geçmişi",
+        "tags": [
+          "Scoring"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoringRuleListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/scoring-periods": {
+      "post": {
+        "operationId": "createScoringPeriod",
+        "summary": "Kuralı eğitim ve sınav dönemine bağla",
+        "tags": [
+          "Scoring"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoringPeriodResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "201": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoringPeriodResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScoringPeriodInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/scoring-rules/{rule}": {
+      "put": {
+        "operationId": "updateScoringRule",
+        "summary": "Yalnız taslak kuralı düzenle",
+        "tags": [
+          "Scoring"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoringRuleResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScoringRuleInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "rule",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/scoring-rules/{rule}/publish": {
+      "post": {
+        "operationId": "publishScoringRule",
+        "summary": "Resmî kaynak doğrulamasıyla kuralı yayımla; çakışan aralıklar reddedilir",
+        "tags": [
+          "Scoring"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoringRuleResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyScoringSourceInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "rule",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/scoring-rules/{rule}/archive": {
+      "post": {
+        "operationId": "archiveScoringRule",
+        "summary": "Kuralı arşivle; eski sonuç ve dönemler korunur",
+        "tags": [
+          "Scoring"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoringRuleResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "rule",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/official-exams/{officialExam}/scoring": {
+      "put": {
+        "operationId": "linkExamScoring",
+        "summary": "Tam sınavı açıkça puanlama dönemine bağla",
+        "tags": [
+          "Scoring"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoringLinkResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScoringLinkInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "officialExam",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/contexts/{context}/exam-attempts/{exam}/score": {
+      "post": {
+        "operationId": "appendExamScore",
+        "summary": "Biten denemenin sabit cevaplarından puan; atış düzeltmeleri yeni sürüm olarak saklanır",
+        "tags": [
+          "Scoring"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoreResultResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "201": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoreResultResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExamScoreInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "exam",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/scoring-periods/{period}": {
+      "put": {
+        "operationId": "rebindScoringPeriod",
+        "summary": "Döneme yeni kural sürümü bağla; eski sonuçlar sabit sürümünü korur",
+        "tags": [
+          "Scoring"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoringPeriodResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "201": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoringPeriodResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScoringPeriodInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "period",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -7376,6 +8222,19 @@
             "minimum": 1,
             "maximum": 200,
             "description": "Son görüntülenen soru sırası; eski veya yeni konum kaydı olmayan sınavlarda null. Cevap revision değerini veya süreyi değiştirmez."
+          },
+          "score_result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScoreResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scoring_available": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -7394,7 +8253,9 @@
           "finished_at",
           "finish_reason",
           "result",
-          "official_exam"
+          "official_exam",
+          "score_result",
+          "scoring_available"
         ]
       },
       "ExamQuestion": {
@@ -7553,6 +8414,19 @@
                 "type": "null"
               }
             ]
+          },
+          "score_result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScoreResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scoring_available": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -7572,7 +8446,9 @@
           "finish_reason",
           "result",
           "questions",
-          "official_exam"
+          "official_exam",
+          "score_result",
+          "scoring_available"
         ]
       },
       "ExamAttemptResponse": {
@@ -8100,6 +8976,13 @@
             ],
             "format": "uuid",
             "description": "Bağlı silahsız seçeneğin yönetildiği ana silahlı sınav kimliği."
+          },
+          "scoring_period_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
           }
         },
         "required": [
@@ -8121,7 +9004,8 @@
           "outdated_question_count",
           "subject",
           "generate_unarmed",
-          "derived_from_id"
+          "derived_from_id",
+          "scoring_period_id"
         ]
       },
       "OfficialExamInput": {
@@ -8195,6 +9079,13 @@
             "type": "boolean",
             "default": false,
             "description": "Silahlı tam sınavda 125 sorudan bağlı silahsız seçenek üret; taslakta soru sayısı tamamlanabilir."
+          },
+          "scoring_period_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
           }
         },
         "required": [
@@ -9931,6 +10822,910 @@
             "minimum": 1
           }
         },
+        "additionalProperties": false
+      },
+      "ScoreEducationType": {
+        "type": "string",
+        "enum": [
+          "basic",
+          "renewal",
+          "weapon_difference"
+        ]
+      },
+      "ScoringConfiguration": {
+        "type": "object",
+        "properties": {
+          "general_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200
+          },
+          "general_maximum": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "general_weight": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000
+          },
+          "weapon_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200
+          },
+          "weapon_maximum": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "weapon_weight": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000
+          },
+          "shooting_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 20
+          },
+          "shooting_maximum": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "shooting_weight": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000
+          },
+          "decision_mode": {
+            "type": "string",
+            "enum": [
+              "pass_fail",
+              "level",
+              "unverified"
+            ]
+          },
+          "requires_previous": {
+            "type": "boolean"
+          },
+          "minimums": {
+            "type": "object",
+            "properties": {
+              "general": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "weapon": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "shooting": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "weapon_total": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "total": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "decimals": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4
+          },
+          "formula": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "general_count",
+          "general_maximum",
+          "general_weight",
+          "weapon_count",
+          "weapon_maximum",
+          "weapon_weight",
+          "shooting_count",
+          "shooting_maximum",
+          "shooting_weight",
+          "decision_mode",
+          "requires_previous",
+          "minimums",
+          "decimals",
+          "formula"
+        ],
+        "additionalProperties": false
+      },
+      "ScoringRuleInput": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "education_type": {
+            "$ref": "#/components/schemas/ScoreEducationType"
+          },
+          "weapon_status": {
+            "type": "string",
+            "enum": [
+              "armed",
+              "unarmed"
+            ]
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date"
+          },
+          "effective_until": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "period_from": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000
+          },
+          "period_until": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000
+          },
+          "configuration": {
+            "$ref": "#/components/schemas/ScoringConfiguration"
+          },
+          "source_urls": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "minItems": 1
+          },
+          "verification_note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "title",
+          "education_type",
+          "weapon_status",
+          "effective_from",
+          "effective_until",
+          "period_from",
+          "period_until",
+          "configuration",
+          "source_urls",
+          "verification_note"
+        ],
+        "additionalProperties": false
+      },
+      "ScoringRule": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "education_type": {
+            "$ref": "#/components/schemas/ScoreEducationType"
+          },
+          "weapon_status": {
+            "type": "string",
+            "enum": [
+              "armed",
+              "unarmed"
+            ]
+          },
+          "effective_from": {
+            "type": "string",
+            "format": "date"
+          },
+          "effective_until": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "period_from": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000
+          },
+          "period_until": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000
+          },
+          "configuration": {
+            "$ref": "#/components/schemas/ScoringConfiguration"
+          },
+          "source_urls": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "minItems": 1
+          },
+          "verification_note": {
+            "type": "string"
+          },
+          "published_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "archived_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "code",
+          "title",
+          "education_type",
+          "weapon_status",
+          "effective_from",
+          "effective_until",
+          "period_from",
+          "period_until",
+          "configuration",
+          "source_urls",
+          "verification_note",
+          "published_at",
+          "archived_at"
+        ],
+        "additionalProperties": false
+      },
+      "ScoringPeriod": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "education_type": {
+            "$ref": "#/components/schemas/ScoreEducationType"
+          },
+          "weapon_status": {
+            "type": "string",
+            "enum": [
+              "armed",
+              "unarmed"
+            ]
+          },
+          "number": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000
+          },
+          "exam_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "source_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "rule": {
+            "$ref": "#/components/schemas/ScoringRule"
+          }
+        },
+        "required": [
+          "id",
+          "education_type",
+          "weapon_status",
+          "number",
+          "exam_date",
+          "source_url",
+          "rule"
+        ],
+        "additionalProperties": false
+      },
+      "ScoringPeriodInput": {
+        "type": "object",
+        "properties": {
+          "scoring_rule_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000
+          },
+          "exam_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "source_url": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "scoring_rule_id",
+          "number",
+          "exam_date",
+          "source_url"
+        ],
+        "additionalProperties": false
+      },
+      "ScoreCounts": {
+        "type": "object",
+        "properties": {
+          "general_correct": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200
+          },
+          "general_wrong": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200
+          },
+          "weapon_correct": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200
+          },
+          "weapon_wrong": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200
+          },
+          "shooting_hits": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 20
+          },
+          "previous_general_score": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "general_correct",
+          "general_wrong",
+          "weapon_correct",
+          "weapon_wrong",
+          "shooting_hits",
+          "previous_general_score"
+        ],
+        "additionalProperties": false
+      },
+      "ScoreCalculationInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "period_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "general_correct": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200
+          },
+          "general_wrong": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200
+          },
+          "weapon_correct": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200
+          },
+          "weapon_wrong": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200
+          },
+          "shooting_hits": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 20
+          },
+          "previous_general_score": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "expected_rule_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Önizleme kuralının kimliği; dönem arada değişirse yeni kayıtta 409. Eski başarılı işlemin tekrarı korunur."
+          }
+        },
+        "required": [
+          "period_id",
+          "general_correct",
+          "general_wrong",
+          "weapon_correct",
+          "weapon_wrong",
+          "shooting_hits",
+          "previous_general_score"
+        ],
+        "additionalProperties": false
+      },
+      "ScoreSection": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "general",
+              "weapon",
+              "shooting",
+              "previous_general"
+            ]
+          },
+          "label": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200
+          },
+          "correct": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "wrong": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200
+          },
+          "blank": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 200
+          },
+          "score": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "maximum": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "count",
+          "correct",
+          "wrong",
+          "blank",
+          "score",
+          "maximum"
+        ],
+        "additionalProperties": false
+      },
+      "CalculatedScore": {
+        "type": "object",
+        "properties": {
+          "rule_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "rule_version": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000
+          },
+          "title": {
+            "type": "string"
+          },
+          "final_score": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "minimum_score": {
+            "type": "number"
+          },
+          "maximum_score": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "awaiting_shooting",
+              "awaiting_previous_score",
+              "level",
+              "unverified",
+              "passed",
+              "failed"
+            ]
+          },
+          "status_label": {
+            "type": "string"
+          },
+          "passed": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "decision_mode": {
+            "type": "string",
+            "enum": [
+              "pass_fail",
+              "level",
+              "unverified"
+            ]
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScoreSection"
+            }
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "section": {
+                  "type": "string"
+                },
+                "minimum": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "met": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "label": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "section",
+                "minimum",
+                "met",
+                "label"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "formula": {
+            "type": "string"
+          },
+          "verification_note": {
+            "type": "string"
+          },
+          "source_urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notice": {
+            "type": "string"
+          },
+          "input": {
+            "$ref": "#/components/schemas/ScoreCounts"
+          }
+        },
+        "required": [
+          "rule_id",
+          "rule_version",
+          "title",
+          "final_score",
+          "minimum_score",
+          "maximum_score",
+          "status",
+          "status_label",
+          "passed",
+          "decision_mode",
+          "sections",
+          "checks",
+          "formula",
+          "verification_note",
+          "source_urls",
+          "notice",
+          "input"
+        ],
+        "additionalProperties": false
+      },
+      "ScoreResult": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "exam_attempt_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000000
+          },
+          "period_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "input": {
+            "$ref": "#/components/schemas/ScoreCounts"
+          },
+          "output": {
+            "$ref": "#/components/schemas/CalculatedScore"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "exam_attempt_id",
+          "revision",
+          "period_id",
+          "input",
+          "output",
+          "created_at"
+        ],
+        "additionalProperties": false
+      },
+      "ExamScoreInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "shooting_hits": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 20
+          },
+          "previous_general_score": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "shooting_hits",
+          "previous_general_score"
+        ],
+        "additionalProperties": false
+      },
+      "ScoringLinkInput": {
+        "type": "object",
+        "properties": {
+          "scoring_period_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "scoring_period_id"
+        ],
+        "additionalProperties": false
+      },
+      "ScoringLink": {
+        "type": "object",
+        "properties": {
+          "official_exam_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scoring_period_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "official_exam_id",
+          "scoring_period_id"
+        ],
+        "additionalProperties": false
+      },
+      "ScoringRuleResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ScoringRule"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "ScoringPeriodResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ScoringPeriod"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "ScoreResultResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ScoreResult"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "CalculatedScoreResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CalculatedScore"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "ScoringLinkResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ScoringLink"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "ScoringRuleListResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScoringRule"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "ScoringPeriodListResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScoringPeriod"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "additionalProperties": false
+      },
+      "ScoreResultListResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScoreResult"
+            }
+          },
+          "links": {
+            "$ref": "#/components/schemas/CursorLinks"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/CursorMeta"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "VerifyScoringSourceInput": {
+        "type": "object",
+        "properties": {
+          "source_verified": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": [
+          "source_verified"
+        ],
         "additionalProperties": false
       }
     },

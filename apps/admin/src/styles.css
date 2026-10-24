@@ -339,3 +339,15 @@ tbody tr:hover { background: var(--c-surface-container); }
 .job-description { white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.7 }
 @media(min-width:840px) { .job-form-grid { grid-template-columns:repeat(2,minmax(0,1fr)) } }
 @media(max-width:599px) { .job-editor,.job-admin-row,.job-applications > .card { padding:16px } .job-admin-row { flex-direction:column; align-items:flex-start } }
+
+.scoring-rule-grid { display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(330px,100%),1fr));margin-bottom:28px; }
+.scoring-rule { display:grid;gap:15px;min-width:0; }
+.scoring-rule h2 { font-size:19px;line-height:1.45; }
+.scoring-rule details { overflow-wrap:anywhere;font-size:13px; }
+.scoring-rule details a { display:block; }.scoring-rule details p { margin:10px 0; }
+.scoring-actions { display:flex;flex-wrap:wrap;gap:12px;align-items:center; }
+.scoring-rule-form { display:grid;gap:22px;border:0;padding:0;min-width:0; }
+.scoring-config-grid { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px; }
+.scoring-config-part { display:grid;gap:14px;min-width:0; }
+.scoring-period-editor { display:grid;gap:24px; }
+@media(max-width:650px) { .scoring-config-grid { grid-template-columns:minmax(0,1fr); } }

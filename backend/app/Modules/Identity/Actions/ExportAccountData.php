@@ -4,6 +4,7 @@ namespace App\Modules\Identity\Actions;
 
 use App\Models\User;
 use App\Modules\Jobs\Models\JobApplication;
+use App\Modules\Scoring\Models\ExamScoreResult;
 use Closure;
 use Generator;
 use Illuminate\Http\Request;
@@ -42,6 +43,7 @@ class ExportAccountData
             'job' => $application->job_snapshot, 'contact_name' => $application->contact_name, 'contact_email' => $application->contact_email,
             'phone' => $application->phone, 'cover_letter' => $application->cover_letter, 'status' => $application->status, 'created_at' => $application->created_at->toISOString(),
         ]));
+        $this->section($out, 'score_calculations', ExamScoreResult::where('user_id', $user->id)->whereNotNull('output')->orderBy('id')->lazyById(self::CHUNK)->map(fn ($row) => ['id' => $row->id, 'exam_attempt_id' => $row->exam_attempt_id, 'revision' => $row->revision, 'scoring_rule_id' => $row->scoring_rule_id, 'scoring_period_id' => $row->scoring_period_id, 'input' => $row->input, 'output' => $row->output, 'created_at' => $row->created_at->toISOString()]));
         $this->section($out, 'exam_attempts', $this->examAttempts($contextIds));
         $this->section($out, 'practice_attempts', $this->practiceAttempts($contextIds));
         $this->section($out, 'favorites', DB::table('favorite_questions as f')->whereIn('f.study_context_id', $contextIds)->orderBy('f.created_at')

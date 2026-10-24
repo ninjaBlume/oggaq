@@ -36,7 +36,7 @@ manifest="$dir/manifest.txt"
 [ -f "$manifest" ] && grep -qx 'format=oggaq-content-1' "$manifest" || die "Arşiv biçimi tanınmadı."
 field() { grep -E "^$1=" "$manifest" | head -n1 | cut -d= -f2-; }
 
-tables=(exam_types subjects topics question_sources questions question_versions question_options official_exams official_exam_questions official_exam_question_changes import_batches import_records)
+tables=(exam_types subjects topics question_sources questions question_versions question_options scoring_rules scoring_periods official_exams official_exam_questions official_exam_scoring official_exam_question_changes import_batches import_records)
 
 # 1) Hedef hazır mı: migrate edilmiş, arşivdeki son migration var, şema sütunları aynı, içerik tabloları boş.
 [ "$(q "select count(*) from migrations where migration = '$(field latest_migration)'")" = 1 ] \
@@ -84,9 +84,12 @@ update question_versions v set correct_option_id = s.correct_option_id from stag
 update question_versions v set published_at = s.published_at from stage_question_versions s where s.id = v.id and s.published_at is not null;
 update questions q set latest_version_id = s.latest_version_id, published_version_id = s.published_version_id, updated_at = s.updated_at from stage_questions s where s.id = q.id;
 -- Sınavlar: önce taslak, sorular eklenir, sonra yayın zamanı (tetikleyici sıra ve yayımlanmış sürüm şartını denetler).
+insert into scoring_rules select * from stage_scoring_rules;
+insert into scoring_periods select * from stage_scoring_periods;
 insert into official_exams (id, exam_type_id, source_id, created_by, title, year, term, exam_number, published_at, created_at, updated_at, weapon_status, subject_id, generate_unarmed, derived_from_id)
   select id, exam_type_id, source_id, $created_by::uuid, title, year, term, exam_number, null, created_at, updated_at, weapon_status, subject_id, generate_unarmed, derived_from_id from stage_official_exams;
 insert into official_exam_questions select * from stage_official_exam_questions;
+insert into official_exam_scoring select * from stage_official_exam_scoring;
 update official_exams e set published_at = s.published_at, updated_at = s.updated_at from stage_official_exams s where s.id = e.id and s.published_at is not null;
 insert into official_exam_question_changes select * from stage_official_exam_question_changes;
 insert into import_batches select * from stage_import_batches;

@@ -35,7 +35,7 @@ if (config('database.default') !== 'pgsql' || config('database.connections.pgsql
     throw new RuntimeException('Browser fixtures require the isolated oggaq_test PostgreSQL database.');
 }
 $operation = $argv[1] ?? '';
-if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'long-result', 'paired-exam-draft', 'cleanup'], true)) {
+if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'long-result', 'paired-exam-draft', 'scoring', 'scored-exam-draft', 'cleanup'], true)) {
     throw new InvalidArgumentException('Expected setup or cleanup.');
 }
 if (in_array($operation, ['verification-link', 'reset-link'], true)) {
@@ -87,8 +87,10 @@ if ($operation === 'near-deadline') {
     echo '/study/'.$context->id.'/exams/'.$exam->id;
     exit;
 }
-if (in_array($operation, ['long-result', 'paired-exam-draft'], true)) {
-    $paired = $operation === 'paired-exam-draft';
+if ($operation === 'scoring') { Artisan::call('scoring:install-verified'); echo 'scoring ready'; exit; }
+if (in_array($operation, ['long-result', 'paired-exam-draft', 'scored-exam-draft'], true)) {
+    $scored = $operation === 'scored-exam-draft';
+    $paired = $operation !== 'long-result';
     $admin = User::where('email', 'e2e-admin@example.test')->firstOrFail();
     $versions = [];
     for ($position = 1; $position <= ($paired ? 125 : 200); $position++) {
@@ -102,7 +104,7 @@ if (in_array($operation, ['long-result', 'paired-exam-draft'], true)) {
     }
     $official = app(SaveOfficialExam::class)->execute($admin, [
         'exam_type_id' => ExamType::where('code', 'synthetic-whole')->firstOrFail()->id, 'weapon_status' => 'armed',
-        'title' => $paired ? 'Tek giriş sentetik sınav' : 'Uzun sentetik sınav', 'year' => 2024, 'exam_number' => $paired ? '125' : '200', 'question_version_ids' => $versions, 'generate_unarmed' => $paired,
+        'title' => $paired ? 'Tek giriş sentetik sınav' : 'Uzun sentetik sınav', 'year' => $scored ? 2023 : 2024, 'exam_number' => $scored ? '104' : ($paired ? '125' : '200'), 'question_version_ids' => $versions, 'generate_unarmed' => $paired, 'scoring_period_id' => $scored ? \App\Modules\Scoring\Models\ScoringPeriod::where('education_type','basic')->where('weapon_status','armed')->where('number',104)->firstOrFail()->id : null,
     ]);
     if ($paired) { echo $official->id; exit; }
     app(PublishOfficialExam::class)->execute($admin, $official);

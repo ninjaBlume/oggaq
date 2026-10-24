@@ -14,7 +14,7 @@ out="${2:?kullanım: export-content.sh <veritabanı> <çıktı.tar.gz>}"
 [[ "$out" == *.tar.gz ]] || { echo "Çıktı .tar.gz ile bitmeli." >&2; exit 2; }
 
 # Bağımlılık sırası: ebeveyn tablolar önce (içe aktarım bu sırayla yükler).
-tables=(exam_types subjects topics question_sources questions question_versions question_options official_exams official_exam_questions official_exam_question_changes import_batches import_records)
+tables=(exam_types subjects topics question_sources questions question_versions question_options scoring_rules scoring_periods official_exams official_exam_questions official_exam_scoring official_exam_question_changes import_batches import_records)
 user_columns="created_by approved_by actor_id"
 
 q() { psql -X -v ON_ERROR_STOP=1 -Atq -d "$db" -c "$1"; }
@@ -45,6 +45,7 @@ for table in "${tables[@]}"; do
   # topics: ebeveyn önce gelsin (özyinelemeli derinliğe göre), diğerleri birincil anahtara göre sabit sırada.
   case "$table" in
     topics) query="with recursive t as (select *, 0 as depth from topics where parent_id is null union all select c.*, t.depth + 1 from topics c join t on c.parent_id = t.id) select $select_list from t order by depth, id" ;;
+    official_exam_scoring) query="select $select_list from $table order by official_exam_id" ;;
     official_exam_questions) query="select $select_list from $table order by official_exam_id, position" ;;
     import_records) query="select $select_list from $table order by source_system, source_table, source_key" ;;
     *) query="select $select_list from $table order by id" ;;

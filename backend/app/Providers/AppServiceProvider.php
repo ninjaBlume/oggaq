@@ -8,6 +8,7 @@ use App\Modules\Jobs\Models\JobPosting;
 use App\Modules\Jobs\Policies\JobPostingPolicy;
 use App\Modules\QuestionBank\Models\Question;
 use App\Modules\QuestionBank\Policies\QuestionPolicy;
+use App\Modules\Scoring\Commands\InstallVerifiedScoring;
 use App\Modules\Tenancy\Models\StudyContext;
 use App\Modules\Tenancy\Models\Tenant;
 use App\Modules\Tenancy\Policies\StudyContextPolicy;
@@ -35,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
-            $this->commands([LegacyImportPreview::class, LegacyImportCommit::class]);
+            $this->commands([LegacyImportPreview::class, LegacyImportCommit::class, InstallVerifiedScoring::class]);
         }
         Gate::policy(Tenant::class, TenantPolicy::class);
         Gate::policy(StudyContext::class, StudyContextPolicy::class);

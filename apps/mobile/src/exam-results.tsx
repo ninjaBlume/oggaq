@@ -1,3 +1,4 @@
+import { ExamScorePanel } from "./scoring";
 import { FlatList, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { ExamAttempt, StudyContext } from '@oggaq/shared-types';
@@ -42,7 +43,7 @@ export function CompletedExam({ exam, context, updateQuestion, error, reload }: 
     initialNumToRender={4}
     maxToRenderPerBatch={4}
     windowSize={5}
-    ListHeaderComponent={<View style={{ gap: 20 }}><ResultSummary exam={exam} /><SectionTitle>Cevaplarını incele</SectionTitle><Text style={styles.muted}>{exam.question_count} sorunun tamamı aşağıda. Cevaplarını ve açıklamaları kaydırarak inceleyebilirsin.</Text><ErrorNotice error={error} retry={reload} /></View>}
+    ListHeaderComponent={<View style={{ gap: 20 }}><ResultSummary exam={exam} /><ExamScorePanel exam={exam} contextId={context.id} /><SectionTitle>Cevaplarını incele</SectionTitle><Text style={styles.muted}>{exam.question_count} sorunun tamamı aşağıda. Cevaplarını ve açıklamaları kaydırarak inceleyebilirsin.</Text><ErrorNotice error={error} retry={reload} /></View>}
     renderItem={({ item }) => <ResultQuestion row={item} total={exam.question_count} contextId={context.id} examId={exam.id} updateQuestion={updateQuestion} favorite={favorites[item.question_id]} toggleFavorite={(next) => { void toggleFavorite(item.question_id, next); }} />}
   /></View>;
 }

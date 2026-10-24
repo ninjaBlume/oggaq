@@ -5,6 +5,7 @@ import type { ExamAttempt } from '@oggaq/shared-types';
 import { api } from './api';
 import { PageIntro } from './App';
 import { ErrorNotice } from './ui';
+import { ExamScorePanel } from './scoring';
 import { ReportQuestion } from './report';
 
 type Row = ExamAttempt['questions'][number];
@@ -14,6 +15,7 @@ export function CompletedExam({ exam, contextId }: { exam: ExamAttempt; contextI
     <Link className="back-link" to={`/study/${contextId}/sonuclar`}>← Sonuçlarıma dön</Link>
     <PageIntro eyebrow="DENEME TAMAMLANDI" title="Deneme sonucun"><p>Cevapların, başladığın soru sürümlerinden değerlendirildi.</p></PageIntro>
     {exam.result && <section className="card exam-result" role="status"><div><span className="eyebrow">DOĞRU YÜZDESİ</span><strong>%{exam.result.score_percent}</strong></div><p><b>{exam.result.correct}</b> doğru · <b>{exam.result.incorrect}</b> yanlış · <b>{exam.result.blank}</b> boş</p><p>{exam.finish_reason === 'expired' ? 'Süre dolduğunda tamamlandı.' : 'Denemeyi sen bitirdin.'} Çalışma puanı; geçme / kalma kararı değildir.</p></section>}
+    <ExamScorePanel exam={exam} contextId={contextId} />
     <section className="exam-review" aria-label="Sınav soruları ve cevapların"><header><h2>Cevaplarını incele</h2><p className="muted">{exam.question_count} sorunun tamamı aşağıda. Cevaplarını ve açıklamaları kaydırarak inceleyebilirsin.</p></header>
       {exam.questions.map((row) => <ResultQuestion key={row.id} row={row} contextId={contextId} examId={exam.id} total={exam.question_count} />)}
     </section>

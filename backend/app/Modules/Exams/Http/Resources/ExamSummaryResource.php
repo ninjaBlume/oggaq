@@ -2,6 +2,7 @@
 
 namespace App\Modules\Exams\Http\Resources;
 
+use App\Modules\Scoring\Http\Resources\ScoreResultResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -21,6 +22,8 @@ class ExamSummaryResource extends JsonResource
             ],
             'started_at' => $this->started_at->toISOString(), 'deadline_at' => $this->deadline_at->toISOString(),
             'server_time' => now()->toISOString(), 'finished_at' => $this->finished_at?->toISOString(), 'finish_reason' => $this->finish_reason,
+            'scoring_available' => $this->officialExam?->scoringLink !== null,
+            'score_result' => $this->finished_at === null || $this->scoreResult?->output === null ? null : new ScoreResultResource($this->scoreResult),
             'result' => $this->finished_at === null ? null : [
                 'correct' => $this->correct_count, 'incorrect' => $this->incorrect_count, 'blank' => $this->blank_count,
                 'score_percent' => $this->score_percent,

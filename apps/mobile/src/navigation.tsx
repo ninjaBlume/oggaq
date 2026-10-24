@@ -29,6 +29,7 @@ import {
   LogOut,
   Menu,
   ShieldCheck,
+  SlidersHorizontal,
   UserRound,
   X,
 } from "./icons";
@@ -51,6 +52,7 @@ export const destinations = [
 ] as const;
 // Reachable from the side menu and home only; the tab bar / rail keeps its five primary tabs.
 export const extraDestinations = [
+  { id: "score", label: "Puan hesapla", menuLabel: "Puan hesapla", icon: SlidersHorizontal },
   { id: "review", label: vocabulary.review.short, menuLabel: vocabulary.review.title, icon: ListChecks },
   { id: "stats", label: vocabulary.stats.short, menuLabel: vocabulary.stats.title, icon: ChartColumn },
   { id: "jobs", label: vocabulary.jobs.short, menuLabel: vocabulary.jobs.title, icon: Briefcase },

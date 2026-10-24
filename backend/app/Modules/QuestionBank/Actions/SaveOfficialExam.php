@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Modules\QuestionBank\Models\OfficialExam;
 use App\Modules\QuestionBank\Models\Question;
 use App\Modules\QuestionBank\Models\QuestionVersion;
+use App\Modules\Scoring\Actions\ManageScoring;
 use App\Support\ApiProblem;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
@@ -56,6 +57,9 @@ class SaveOfficialExam
                         'official_exam_id' => $exam->id, 'position' => $index + 1,
                         'question_id' => $versions[$versionId]->question_id, 'question_version_id' => $versionId,
                     ]);
+                }
+                if (array_key_exists('scoring_period_id', $attributes)) {
+                    app(ManageScoring::class)->link($actor, $exam, $attributes['scoring_period_id']);
                 }
                 DB::table('audit_events')->insert([
                     'id' => Str::uuid(), 'actor_id' => $actor->id, 'tenant_id' => null,

@@ -23,6 +23,7 @@ class SaveOfficialExamRequest extends FormRequest
             'year' => ['required', 'integer', 'between:1990,2200'],
             'term' => ['nullable', 'string', 'max:80'], 'exam_number' => ['nullable', 'string', 'max:40'],
             'weapon_status' => ['nullable', Rule::in(['armed', 'unarmed'])],
+            'scoring_period_id' => ['nullable', 'uuid', Rule::exists('scoring_periods', 'id')],
             'generate_unarmed' => ['sometimes', 'boolean'],
             'subject_id' => ['nullable', 'uuid', Rule::exists('subjects', 'id')],
             'question_version_ids' => ['required', 'array', 'list', 'min:1', 'max:200'],
