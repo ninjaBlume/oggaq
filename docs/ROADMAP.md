@@ -111,6 +111,10 @@ Soru bildirimi (öğrenci sonuç ekranı, web/mobil) ve yönetici inceleme kuyru
 
 Reklam/sponsor mimarisi çekirdek sınavı kesintiye uğratmayacak şekilde ileride ele alınır. İlk sürümde reklam SDK'sı ve kişisel hedefleme zorunlu değildir; gizlilik/mağaza değerlendirmesi yapılmadan aktive edilmez.
 
+## Mağaza yayın hazırlığı (24 Ekim 2026)
+
+Taslak herkese açık yasal sayfalar (`/legal/gizlilik|kosullar|destek|hesap-silme.html`), web/mobil yasal bağlantılar ve "resmî kurum değildir" notu, geçici marka ikonu seti, `eas.json`, `app.config.ts` mağaza alanları (izin temizliği, şifreleme beyanı) ve `npm run check:store` ön kontrolü eklendi. **Yayına hazır değil:** hukuki metinler, yayıncı/veri sorumlusu, soru içeriği hakkı, puanlama uzman onayı, nihai logo ve mağaza hesapları açıktır. Ayrıntı, adımlar ve engeller: [STORE_RELEASE](STORE_RELEASE.md).
+
 ## Üretim kapısı ve açık girdiler
 
 | Girdi / karar | İlgili kapı |
@@ -121,6 +125,8 @@ Reklam/sponsor mimarisi çekirdek sınavı kesintiye uğratmayacak şekilde iler
 | Offline kapsamı ve minimum cihaz/OS | Mobil paket/yerel çalışma tasarımı |
 | Marka ve tasarım kararları | Kullanıcı/mağaza yayını |
 | Hosting/servis sağlayıcısı ve veri konumu | Gerçek kullanıcı verisi işleme |
-| Aydınlatma/gizlilik, saklama/imha ve aktarım koşulları | Üretim ve mağaza hazırlığı |
+| Aydınlatma/gizlilik, saklama/imha ve aktarım koşulları | Üretim ve mağaza hazırlığı (taslak sayfalar var, hukukçu onayı yok: [STORE_RELEASE](STORE_RELEASE.md)) |
+| Soru içeriğinin kullanım hakkı (eski veritabanı sahibi, EGM yayınları) | Mağaza gönderimi (Apple 5.2.1) |
+| Yayıncı adı, paket kimliği, mağaza hesapları | Derleme ve gönderim |
 
 Güvenlik/performance, HTTPS/secret yönetimi, backup/restore, olay izleme, hesabı güvenle silme, CI/deploy/rollback ve Android/iOS/web yayın ortamları doğrulanmadan ürün yayına hazır sayılmaz. Her işte plan, uygulanmış backend ve uçtan uca ürün özelliği ayrı raporlanır.

@@ -96,6 +96,10 @@ CI, OpenAPI tip üretimi/fark kontrolü, admin/öğrenci web strict tip/Vitest/b
 
 Backend migration'ını `php artisan migrate` ile uygulayıp kökte `npm run dev:web` çalıştırın. Uygulama `http://127.0.0.1:5173` adresindedir. Kayıt/doğrulama/reset, ders/konu çalışması ve kalıcı çözüm geçmişi [web README](../apps/web/README.md) ve [STUDY](STUDY.md) içinde açıklanır. `npm run test:web`, `npm run build:web` ve ortak `npm run typecheck` webi de kontrol eder. Bildirim bağlantısı değiştiğinden açık Horizon worker'ını yeni kodla yeniden başlatın.
 
+## Mağaza ön kontrolü
+
+`npm run check:store` yasal sayfa taslakları, ikon boyutları, destek e-postası, üretim derleme adresleri ve elle kontrol maddelerini çevrimdışı denetler; engel varsa çıkış kodu 1'dir. Betiğin kendi testi: `npm run test:store`. İkonları yeniden üretmek: `node apps/mobile/scripts/generate-icons.mjs`. Ayrıntı: [STORE_RELEASE](STORE_RELEASE.md).
+
 ## Durdurma ve üretim sınırı
 
 Önce API, Horizon ve scheduler terminallerini Ctrl+C ile kapatın; sonra kökte:

@@ -387,3 +387,8 @@ shred -u /tmp/icerik.tar.gz 2>/dev/null || rm -f /tmp/icerik.tar.gz
 4. Yedek hedefi (rclone uzak türü ya da rsync makinesi) ve özel anahtarın kimde, nerede saklanacağı.
 5. Veri sorumlusu ve hukuki metinler (aydınlatma, kullanım koşulları); günlük ve yedek saklama sürelerinin hukuki teyidi.
 6. Gerçek içeriğin üretim sunucusuna aktarımı için açık onay (ayrı geliştirme sunucusuna aktarım 23 Ekim 2026'da onaylanıp tamamlandı).
+
+## Herkese açık yasal sayfalar (`/legal/`)
+
+Web derlemesi `apps/web/public/legal/` altındaki dört statik sayfayı (`gizlilik`, `kosullar`, `destek`, `hesap-silme`) `dist/legal/` içine olduğu gibi kopyalar; Google Play hesap silme bağlantısı ve Apple gizlilik/destek URL'leri bu adreslerdir. Üretim şablonunda (`deploy/nginx/oggaq-app.conf`) `/legal/` ayrı bir `location`'dır: her istekte doğrulanır (`no-cache`), bilinmeyen yol SPA'ya düşmez (404), CSP `script-src 'self'; style-src 'self'` ile yeterlidir (sayfalarda satır içi betik/stil yoktur). Sunucu geliştirme ortamı (`deploy/server-development/nginx.conf`) sayfaları `location /` ile sunar ve `X-Robots-Tag: noindex` ekler; yayın alan adında bu başlık olmamalıdır. Sayfalar taslaktır (TASLAK bandı, işaretli alanlar): `npm run check:store` yayına engel olanları listeler ([STORE_RELEASE](STORE_RELEASE.md)).
+

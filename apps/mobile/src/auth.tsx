@@ -16,6 +16,7 @@ import {
   TextLink,
 } from "./ui";
 import { useTheme } from "./themeContext";
+import { AuthLegal } from "./legal";
 
 const devicePlatform = Platform.OS === "ios" || Platform.OS === "android" ? Platform.OS : "web";
 export function Login({ signedIn }: { signedIn: (user: User) => void }) {
@@ -175,6 +176,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
           <GraduationCap size={17} color={palette.muted} />
           <Text style={styles.muted}>Öğrenciler için ücretsiz.</Text>
         </View>
+        <AuthLegal register={mode === "register"} />
       </View>
     </View>
   );

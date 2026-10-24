@@ -19,6 +19,7 @@ import {
 } from "./ui";
 import { useTheme } from "./themeContext";
 import { ChoiceGroup } from "./expressive";
+import { LegalSection } from "./legal";
 import { vocabulary } from "@oggaq/study-core";
 import { themePreferenceLabels, themePreferences } from "@oggaq/design-tokens";
 export function Profile({
@@ -180,6 +181,8 @@ export function Profile({
           ))}
         </>
       )}
+      <SectionTitle>Yasal ve destek</SectionTitle>
+      <LegalSection />
       <View style={{ paddingTop: 12 }}>
         <Button danger icon={LogOut} disabled={pending} onPress={logout}>
           {pending ? "Oturum kapatılıyor…" : "Çıkış yap"}

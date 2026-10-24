@@ -6,3 +6,5 @@ import { fileURLToPath } from 'node:url';
 import { cssTokens } from '../src/css.ts';
 
 writeFileSync(fileURLToPath(new URL('../tokens.css', import.meta.url)), cssTokens());
+// The static legal pages (apps/web/public/legal) cannot import the package, so they carry a copy; apps/web tests check it.
+writeFileSync(fileURLToPath(new URL('../../../apps/web/public/legal/tokens.css', import.meta.url)), cssTokens());

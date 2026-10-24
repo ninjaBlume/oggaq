@@ -5,12 +5,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { QueryClient } from '@tanstack/react-query';
 import type { User } from '@oggaq/shared-types';
 import { ApiError } from '@oggaq/api-client';
+import { notOfficialNotice } from '@oggaq/study-core';
 import { api } from './api';
 import { brand } from './config';
 import { verificationInput } from './verification';
 import { ErrorNotice, Field, Loading, PasswordField } from './ui';
 import { Icon } from './icons';
 import { ThemeSwitch } from './theme';
+import { LegalLinks, RegisterNotice } from './legal';
 
 const sessionKey = ['session'] as const;
 export async function replaceSession(cache: QueryClient, user: User | null) {
@@ -47,7 +49,7 @@ export function AuthFrame({ children }: { children: ReactNode }) {
       <div className="auth-story-copy"><h1>{brand.tagline}</h1><p>Deneme ve ders sınavlarını süreyle çöz; sonuçlarını ve tekrar listelerini hesabından takip et.</p></div>
       <div className="auth-features"><span><Icon name="book" />Deneme ve ders sınavları</span><span><Icon name="chart" />Sonuçlar ve gelişim</span></div>
     </section>
-    <section className="auth-content"><div className="auth-card">{children}</div><p className="auth-free"><Icon name="cap" size={18} />Öğrenciler için ücretsiz.</p></section>
+    <section className="auth-content"><div className="auth-card">{children}</div><p className="auth-free"><Icon name="cap" size={18} />Öğrenciler için ücretsiz.</p><LegalLinks /><p className="legal-official">{notOfficialNotice}</p></section>
     <div className="auth-appearance"><ThemeSwitch /></div>
   </main>;
 }
@@ -78,6 +80,7 @@ export function Login() {
     <Field label="E-posta adresi" error={fieldError('email')}>{(props) => <div className="input-shell"><Icon name="mail" /><input {...props} required type="email" autoComplete="username" placeholder="ornek@eposta.com" value={email} onChange={(event) => setEmail(event.target.value)} /></div>}</Field>
     {mode !== 'forgot' && <PasswordField key={`${mode}-password`} value={password} onChange={setPassword} newPassword={mode === 'register'} error={fieldError('password')} hint={mode === 'register' ? 'En az 12 karakter; büyük/küçük harf, rakam ve sembol.' : undefined} labelAction={mode === 'login' ? <button className="text-button" type="button" onClick={() => changeMode('forgot')}>Parolamı unuttum</button> : undefined} />}
     {mode === 'register' && <PasswordField label="Parola tekrar" value={confirmation} onChange={setConfirmation} newPassword error={fieldError('password_confirmation')} />}
+    {mode === 'register' && <RegisterNotice />}
     <button className="button primary full" type="submit">{mutation.isPending ? 'İşlem yapılıyor…' : mode === 'register' ? 'Hesap oluştur' : mode === 'forgot' ? 'Bağlantı gönder' : 'Giriş yap'}</button>
   </fieldset></form><div className="auth-links">{mode !== 'forgot' && <span className="muted">{mode === 'login' ? 'Henüz hesabın yok mu?' : 'Zaten hesabın var mı?'}</span>}<button className="text-button" disabled={mutation.isPending} onClick={() => changeMode(mode === 'login' ? 'register' : 'login')}>{mode === 'login' ? 'Hesap oluştur' : 'Girişe dön'}</button></div></AuthFrame>;
 }

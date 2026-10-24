@@ -123,3 +123,5 @@ export { resumeQuestionIndex, ExamPositionSaver } from './exam-position';
 export type { ExamPositionState } from './exam-position';
 export { mergeExamAnswerState } from './exam-state';
 export { jobStatusLabels, jobWeaponLabels, jobApplicationStatusLabels, jobApplicationNotice } from './jobs';
+
+export * from './legal';

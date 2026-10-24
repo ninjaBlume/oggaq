@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ExamAttempt, components } from '@oggaq/shared-types';
 import { ApiError } from '@oggaq/api-client';
-import { randomId } from '@oggaq/study-core';
+import { randomId, scoreEstimateNotice } from '@oggaq/study-core';
 import { api } from './api';
 import { PageIntro } from './App';
 import { ErrorNotice, Loading } from './ui';
@@ -21,7 +21,7 @@ export function ScoreCalculator() {
   const available = periods.data?.data.filter((p) => p.education_type === education && p.weapon_status === (education === 'weapon_difference' ? 'armed' : weapon)) ?? [];
   const period = available.find((p) => p.id === periodId) ?? available[0];
   return <>
-    <PageIntro eyebrow="DİĞER SEÇENEKLER" title="Puan hesapla"><p>Sınav dönemini seç; doğru, yanlış ve atış bilgilerini kaydırarak puanını hesapla.</p></PageIntro>
+    <PageIntro eyebrow="DİĞER SEÇENEKLER" title="Puan hesapla"><p>Sınav dönemini seç; doğru, yanlış ve atış bilgilerini kaydırarak puanını hesapla. {scoreEstimateNotice}</p></PageIntro>
     <section className="card score-settings"><h2>Sınavını seç</h2><div className="score-selectors">
       <label>Eğitim türü<select aria-label="Eğitim türü" value={education} onChange={(e) => { setEducation(e.target.value as typeof education); setPeriodId(''); }}>{Object.entries(educationLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
       {education !== 'weapon_difference' && <label>Sınav seçeneği<select aria-label="Sınav seçeneği" value={weapon} onChange={(e) => { setWeapon(e.target.value as typeof weapon); setPeriodId(''); }}><option value="unarmed">Silahsız</option><option value="armed">Silahlı</option></select></label>}

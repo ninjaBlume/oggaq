@@ -1403,3 +1403,14 @@ input::placeholder { color:var(--c-muted); opacity:1 }
 .score-checks { display:grid;gap:6px;font-size:13px; }
 .score-checks [data-met="false"] { color:var(--c-red); }
 .score-saved-detail { display:grid;gap:14px; }
+
+/* Yasal bağlantılar ve resmî değildir notu (docs/DESIGN.md, docs/STORE_RELEASE.md) */
+.legal-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 6px; margin-bottom: 8px; }
+.legal-links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; color: var(--c-muted); font-size: 12px; text-underline-offset: 3px; }
+.legal-links a:hover { color: var(--c-primary); }
+.legal-official { color: var(--c-muted); font-size: 12px; line-height: 1.5; max-width: 560px; margin: 6px auto 0; text-align: center; }
+.legal-consent { color: var(--c-muted); font-size: 13px; line-height: 1.5; margin: 4px 0 12px; }
+.legal-consent a { color: var(--c-primary); }
+.auth-content .legal-links { margin-top: 18px; }
+.auth-content .legal-official { font-size: 11px; }
+.site-footer p { margin: 4px 0; }

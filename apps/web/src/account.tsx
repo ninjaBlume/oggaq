@@ -11,6 +11,7 @@ import { Icon } from './icons';
 import { ThemeSwitch } from './theme';
 import { dateLabel, ErrorNotice, Field, Loading } from './ui';
 import { verificationInput } from './verification';
+import { SiteFooter } from './legal';
 
 // The newest sessions are shown first; the rest sit behind a toggle so a long list never buries the page.
 const visibleSessions = 5;
@@ -182,7 +183,7 @@ export function AccountPage() {
         <DeleteAccount />
       </div>
     </main>
-    <footer className="site-footer">{brand.name} · {brand.subtitle}</footer></div>;
+    <SiteFooter /></div>;
 }
 
 export function AccountDeleted() {

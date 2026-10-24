@@ -28,7 +28,9 @@
     "audit": "node scripts/audit-node.mjs",
     "export:mobile:preview": "EXPO_PUBLIC_LOCAL_PREVIEW=1 EXPO_PUBLIC_API_URL=http://127.0.0.1:8001 npm run export:mobile",
     "test:tokens": "npm run test --workspace @oggaq/design-tokens",
-    "generate:tokens": "npm run generate --workspace @oggaq/design-tokens"
+    "generate:tokens": "npm run generate --workspace @oggaq/design-tokens",
+    "check:store": "node scripts/check-store-release.mjs",
+    "test:store": "node --test scripts/check-store-release.test.mjs"
   },
   "devDependencies": {
     "@redocly/cli": "2.60.0",
