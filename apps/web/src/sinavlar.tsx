@@ -27,11 +27,11 @@ async function collect<T>(fetchPage: (cursor?: string) => Promise<{ data: T[]; l
 }
 
 // The two kinds of exam of the institution: a Deneme Sınavı is a whole exam (no subject), a Ders Sınavı belongs to one subject.
-function useOfficialExams() {
-  return useQuery({ queryKey: ['official-exams', 'all'], queryFn: ({ signal }) => collect((cursor) => api.request('get', '/api/v1/official-exams', { signal, query: { per_page: 100, cursor } })) });
+function useOfficialExams(filters: { scope: 'whole' | 'subject'; weapon_status?: 'armed' | 'unarmed'; subject_id?: string }, enabled = true) {
+  return useQuery({ queryKey: ['official-exams', filters], enabled, queryFn: ({ signal }) => collect((cursor) => api.request('get', '/api/v1/official-exams', { signal, query: { ...filters, per_page: 100, cursor } })) });
 }
 function useSubjects() {
-  return useQuery({ queryKey: ['subjects', 'all'], queryFn: ({ signal }) => collect((cursor) => api.request('get', '/api/v1/subjects', { signal, query: { per_page: 100, cursor } })) });
+  return useQuery({ queryKey: ['subjects', 'exam-counts'], queryFn: ({ signal }) => collect((cursor) => api.request('get', '/api/v1/subjects', { signal, query: { per_page: 100, cursor, with_exam_counts: true } })) });
 }
 function useRecentAttempts() {
   const context = useStudyContext();
@@ -95,10 +95,10 @@ function byNewest(a: OfficialExam, b: OfficialExam) {
 }
 
 export function DenemeSinavlari() {
-  const exams = useOfficialExams();
   const attempts = useRecentAttempts();
   const [params, setParams] = useSearchParams();
   const weapon = params.get('silah') === 'unarmed' ? 'unarmed' : 'armed';
+  const exams = useOfficialExams({ scope: 'whole', weapon_status: weapon });
   const list = (exams.data ?? []).filter((exam) => !exam.subject && exam.weapon_status === weapon).sort(byNewest);
   return <>
     <PageIntro eyebrow="SINAVA GİR" title={vocabulary.deneme.title}><p>Geçmiş sınavın tamamını gerçek sınav düzeninde ve süreyle çöz. Silahlı sınav 125, silahsız sınav 100 sorudur; sonuçların kaydedilir.</p></PageIntro>
@@ -109,19 +109,18 @@ export function DenemeSinavlari() {
 }
 
 export function DersSinavlari() {
-  const exams = useOfficialExams();
   const subjects = useSubjects();
   const attempts = useRecentAttempts();
   const [params, setParams] = useSearchParams();
-  const subjectExams = (exams.data ?? []).filter((exam) => exam.subject);
-  const withExams = (subjects.data ?? []).filter((subject) => subjectExams.some((exam) => exam.subject?.id === subject.id));
+  const withExams = (subjects.data ?? []).filter((subject) => (subject.published_exam_count ?? 0) > 0);
   const selected = withExams.find((subject) => subject.id === params.get('ders')) ?? withExams[0];
-  const list = subjectExams.filter((exam) => exam.subject?.id === selected?.id).sort(byNewest);
+  const exams = useOfficialExams({ scope: 'subject', subject_id: selected?.id }, !!selected);
+  const list = [...(exams.data ?? [])].sort(byNewest);
   return <>
     <PageIntro eyebrow="DERS DERS ÇALIŞ" title={vocabulary.ders.title}><p>Bir ders seç ve o dersin geçmiş sınavlardaki sorularını sınav olarak çöz. Her sınav numarasının her dersi ayrı bir sınavdır.</p></PageIntro>
-    {exams.isPending || subjects.isPending ? <Loading /> : exams.isError || subjects.isError ? <ErrorNotice error={exams.error ?? subjects.error} retry={() => { void exams.refetch(); void subjects.refetch(); }} /> : withExams.length === 0 ? <section className="card empty"><h2>Henüz ders sınavı yok</h2><p>Yayımlanmış bir ders sınavı olduğunda burada görünür.</p></section>
+    {(!!selected && exams.isPending) || subjects.isPending ? <Loading /> : exams.isError || subjects.isError ? <ErrorNotice error={exams.error ?? subjects.error} retry={() => { if (selected) void exams.refetch(); void subjects.refetch(); }} /> : withExams.length === 0 ? <section className="card empty"><h2>Henüz ders sınavı yok</h2><p>Yayımlanmış bir ders sınavı olduğunda burada görünür.</p></section>
       : <>
-        <nav className="tab-bar" aria-label="Ders">{withExams.map((subject) => <button key={subject.id} type="button" className={`tab-button${selected?.id === subject.id ? ' active' : ''}`} aria-pressed={selected?.id === subject.id} onClick={() => setParams({ ders: subject.id })}>{subject.name}<small> {subjectExams.filter((exam) => exam.subject?.id === subject.id).length}</small></button>)}</nav>
+        <nav className="tab-bar" aria-label="Ders">{withExams.map((subject) => <button key={subject.id} type="button" className={`tab-button${selected?.id === subject.id ? ' active' : ''}`} aria-pressed={selected?.id === subject.id} onClick={() => setParams({ ders: subject.id })}>{subject.name}<small> {subject.published_exam_count}</small></button>)}</nav>
         {attempts.isError && <ErrorNotice error={attempts.error} retry={() => { void attempts.refetch(); }} />}
         <div className="sinav-list">{list.map((exam) => <ExamRow key={exam.id} exam={exam} title={`${exam.exam_number ? `${exam.exam_number}. ` : ''}Ders Sınavı`} attempts={attempts.data?.data ?? []} />)}</div>
       </>}

@@ -1834,6 +1834,8 @@ export interface components {
             id: string;
             name: string;
             code: string;
+            /** @description with_exam_counts=1 ile istenen yayımlanmış ders sınavı sayısı. */
+            published_exam_count?: number;
         };
         Topic: {
             /** Format: uuid */
@@ -3015,6 +3017,17 @@ export interface components {
             /** @constant */
             source_verified: true;
         };
+        ExamAnswerState: components["schemas"]["ExamSummary"] & {
+            answers: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                selected_option_id: string | null;
+            }[];
+        };
+        ExamAnswerStateResponse: {
+            data: components["schemas"]["ExamAnswerState"];
+        };
     };
     responses: {
         /** @description Türkçe problem ayrıntısı. 429 yanıtında Retry-After bulunur. */
@@ -3841,6 +3854,8 @@ export interface operations {
             query?: {
                 per_page?: number;
                 cursor?: string;
+                /** @description Yayımlanmış ders sınavı sayılarını da getirir; yalnız katalog metaverisidir. */
+                with_exam_counts?: boolean;
             };
             header?: never;
             path?: never;
@@ -4388,7 +4403,10 @@ export interface operations {
     };
     saveExamAnswer: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Soruların değişmez metinleri yerine kanonik özet ve tüm cevap seçimlerini döndürür. Tamamlanmış durumda ayrıntı GET ile alınır. */
+                compact?: boolean;
+            };
             header?: never;
             path: {
                 context: string;
@@ -4409,7 +4427,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ExamAttemptResponse"];
+                    "application/json": components["schemas"]["ExamAttemptResponse"] | components["schemas"]["ExamAnswerStateResponse"];
                 };
             };
             401: components["responses"]["Problem"];
@@ -4582,6 +4600,8 @@ export interface operations {
                 weapon_status?: "armed" | "unarmed";
                 /** @description Yalnız bu dersin Ders Sınavları. */
                 subject_id?: string;
+                /** @description Tam deneme veya ders sınavı filtresi. */
+                scope?: "whole" | "subject";
             };
             header?: never;
             path?: never;

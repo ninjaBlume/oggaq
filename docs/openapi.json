@@ -1625,6 +1625,14 @@
               "type": "string",
               "maxLength": 2048
             }
+          },
+          {
+            "name": "with_exam_counts",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Yayımlanmış ders sınavı sayılarını da getirir; yalnız katalog metaverisidir."
           }
         ]
       }
@@ -2811,7 +2819,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ExamAttemptResponse"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ExamAttemptResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ExamAnswerStateResponse"
+                    }
+                  ]
                 }
               }
             }
@@ -2862,6 +2877,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "compact",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Soruların değişmez metinleri yerine kanonik özet ve tüm cevap seçimlerini döndürür. Tamamlanmış durumda ayrıntı GET ile alınır."
           }
         ],
         "requestBody": {
@@ -3346,6 +3370,18 @@
               "format": "uuid"
             },
             "description": "Yalnız bu dersin Ders Sınavları."
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "whole",
+                "subject"
+              ]
+            },
+            "description": "Tam deneme veya ders sınavı filtresi."
           }
         ]
       }
@@ -7024,6 +7060,11 @@
           "code": {
             "type": "string",
             "maxLength": 80
+          },
+          "published_exam_count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "with_exam_counts=1 ile istenen yayımlanmış ders sınavı sayısı."
           }
         },
         "required": [
@@ -11727,6 +11768,55 @@
           "source_verified"
         ],
         "additionalProperties": false
+      },
+      "ExamAnswerState": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ExamSummary"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "answers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "selected_option_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "uuid"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "selected_option_id"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "answers"
+            ]
+          }
+        ]
+      },
+      "ExamAnswerStateResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ExamAnswerState"
+          }
+        },
+        "required": [
+          "data"
+        ]
       }
     },
     "responses": {

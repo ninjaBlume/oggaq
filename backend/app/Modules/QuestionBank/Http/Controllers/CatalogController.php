@@ -13,6 +13,7 @@ use App\Modules\QuestionBank\Models\Subject;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
@@ -26,6 +27,10 @@ class CatalogController extends Controller
         $catalog = $request->route('catalog');
         $model = Catalog::MODELS[$catalog];
         $query = $model::query();
+        if ($catalog === 'subjects' && $request->boolean('with_exam_counts')) {
+            $query->select('subjects.*')->selectSub(DB::table('official_exams')->selectRaw('count(*)')
+                ->whereColumn('official_exams.subject_id', 'subjects.id')->whereNotNull('published_at'), 'published_exam_count');
+        }
         if ($catalog === 'topics') {
             if ($request->route('subject') !== null) {
                 $subject = Subject::findOrFail($request->route('subject'));

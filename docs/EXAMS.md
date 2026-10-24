@@ -67,3 +67,7 @@ Yerel teslim kontrolü: **219 backend testi / 2173 assertion**, **79 Chromium E2
 ## Ayrı ÖGG puan hesabı (24 Ekim 2026)
 
 Doğrulanmış puanlama dönemine açıkça bağlanmış tam denemelerde başlangıçta kural sabitlenir ve bitişte cevapların genel/silah bölümleri merkezi motorla ayrıca puanlanır. Atış yoksa sıfır varsayılmaz; olası aralık ve “Atış sonucu bekleniyor” gösterilir. Kullanıcı atışını sonradan ekleyebilir; yeni hesaplama sürümü saklanır, bitmiş deneme doğru yüzdesi değişmez. Eski tamamlanmış deneme GET ile sessizce yeniden puanlanmaz; uygun kayıtta “ÖGG puanını hesapla” işlemi sunulur. Rastgele veya ders bazlı denemeye sayıdan mevzuat kuralı tahmin edilmez. [Mimari/API](EXAM_SCORING.md), [kurallar ve açık belirsizlikler](EXAM_SCORING_RULES.md).
+
+## Cevap kaydında küçük durum yanıtı (24 Ekim 2026)
+
+Web ve mobil cevap yazarken `?compact=true` kullanır. Yanıt kanonik sınav özeti ve bütün `id/selected_option_id` seçimlerini içerir; değişmez soru metni/şıkları tekrar gönderilmez. Backend yine aktif bağlamı, rolü, sürümü, seçenek aidiyetini ve son tarihi aynı transaction içinde doğrular. İstemci yalnız aynı bağlam/sınav ve eksiksiz cevap kimlikleri eşleşirse sunucu seçimlerini mevcut sabit sorularla birleştirir; eski revision daha yeni durumu ezmez. Bir başka cihazın başka soruda yaptığı değişiklik de kanonik seçimlerde gelir. Sınav tamamlandıysa ayrıntı yeniden GET ile alınır, değerlendirme istemcide yapılmaz. `compact` göndermeyen mevcut istemciler tam yanıtı almaya devam eder.

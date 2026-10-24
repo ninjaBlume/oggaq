@@ -11,7 +11,7 @@ import {
 } from "./icons";
 import type { ExamAttempt, StudyContext } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
-import { anchorClock, remainingSeconds, timeLabel, resumeQuestionIndex, ExamPositionSaver } from "@oggaq/study-core";
+import { mergeExamAnswerState, anchorClock, remainingSeconds, timeLabel, resumeQuestionIndex, ExamPositionSaver } from "@oggaq/study-core";
 import { api } from "./api";
 import { CompletedExam } from "./exam-results";
 import { useResource, useResume, useTask } from "./hooks";
@@ -212,15 +212,16 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
     query.cancel();
     setSubmission(s);
     void task.run(
-      () =>
-        api.request(
-          "put",
-          "/api/v1/contexts/{context}/exam-attempts/{exam}/answers/{answer}",
-          {
-            params: { context: context.id, exam: id, answer: s.row },
-            body: { base_version: s.revision, selected_option_id: s.option },
-          },
-        ),
+      async () => {
+        const response = await api.request("put", "/api/v1/contexts/{context}/exam-attempts/{exam}/answers/{answer}", {
+          params: { context: context.id, exam: id, answer: s.row }, query: { compact: true },
+          body: { base_version: s.revision, selected_option_id: s.option },
+        });
+        if ('questions' in response.data) return { data: response.data };
+        if (response.data.status === 'completed') return api.request('get', '/api/v1/contexts/{context}/exam-attempts/{exam}', { params: { context: context.id, exam: id } });
+        if (!latest.current) throw new Error('Sınav yeniden yüklenmeli.');
+        return { data: mergeExamAnswerState(latest.current, response.data) };
+      },
       accept,
     );
   }

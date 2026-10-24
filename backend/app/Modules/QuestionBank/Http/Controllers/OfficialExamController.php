@@ -13,6 +13,9 @@ class OfficialExamController extends Controller
     public function index(OfficialExamListRequest $request): AnonymousResourceCollection
     {
         $query = OfficialExam::with('source', 'examType', 'subject')->withCount('questions')->whereNotNull('published_at');
+        if ($request->has('scope')) {
+            $request->validated('scope') === 'whole' ? $query->whereNull('subject_id') : $query->whereNotNull('subject_id');
+        }
         foreach (['exam_type_id', 'year', 'term', 'weapon_status', 'subject_id'] as $filter) {
             if ($request->has($filter)) {
                 $query->where($filter, $request->validated($filter));

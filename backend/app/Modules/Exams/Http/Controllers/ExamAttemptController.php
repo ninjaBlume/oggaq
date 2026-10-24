@@ -14,6 +14,7 @@ use App\Modules\Exams\Http\Requests\ReportQuestionRequest;
 use App\Modules\Exams\Http\Requests\SaveExamAnswerRequest;
 use App\Modules\Exams\Http\Requests\SaveExamPositionRequest;
 use App\Modules\Exams\Http\Requests\StartExamRequest;
+use App\Modules\Exams\Http\Resources\ExamAnswerStateResource;
 use App\Modules\Exams\Http\Resources\ExamAttemptResource;
 use App\Modules\Exams\Http\Resources\ExamSummaryResource;
 use Illuminate\Http\JsonResponse;
@@ -37,9 +38,11 @@ class ExamAttemptController extends Controller
         return new ExamAttemptResource($action->execute($request->user(), $context, $exam));
     }
 
-    public function answer(SaveExamAnswerRequest $request, string $context, string $exam, string $answer, AccessExam $action): ExamAttemptResource
+    public function answer(SaveExamAnswerRequest $request, string $context, string $exam, string $answer, AccessExam $action): ExamAttemptResource|ExamAnswerStateResource
     {
-        return new ExamAttemptResource($action->execute($request->user(), $context, $exam, $request->validated() + ['answer_id' => $answer]));
+        $attempt = $action->execute($request->user(), $context, $exam, $request->validated() + ['answer_id' => $answer], compact: $request->boolean('compact'));
+
+        return $request->boolean('compact') ? new ExamAnswerStateResource($attempt) : new ExamAttemptResource($attempt);
     }
 
     public function position(SaveExamPositionRequest $request, string $context, string $exam, SaveExamPosition $action): ExamSummaryResource

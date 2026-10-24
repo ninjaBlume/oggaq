@@ -34,3 +34,5 @@ export type StudyContext = components['schemas']['Context'];
 export type ExamAttempt = components['schemas']['ExamAttempt'];
 export type ExamSummary = components['schemas']['ExamSummary'];
 export type ExamQuestion = components['schemas']['ExamQuestion'];
+
+export type ExamAnswerState = components['schemas']['ExamAnswerState'];

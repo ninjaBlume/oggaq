@@ -19,6 +19,31 @@ class ExamTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_compact_answer_preserves_canonical_selections_conflicts_and_expiry_without_question_payload(): void
+    {
+        $this->pool(25);
+        $student = $this->createUser();
+        $this->asToken($student);
+        $context = $student->studyContexts()->firstOrFail()->id;
+        $exam = $this->start($context, ['question_count' => 25]);
+        $path = '/api/v1/contexts/'.$context.'/exam-attempts/'.$exam['id'];
+        $first = $exam['questions'][0];
+        $second = $exam['questions'][1];
+        $body = ['base_version' => 1, 'selected_option_id' => $first['question']['options'][0]['id']];
+        $compact = $this->putJson($path.'/answers/'.$first['id'].'?compact=true', $body)->assertOk()->assertJsonPath('data.revision', 2)->assertJsonMissingPath('data.questions')->assertJsonMissingPath('data.answers.0.feedback')->assertJsonMissingPath('data.answers.0.question');
+        $this->assertLessThan(strlen(json_encode($exam)) / 3, strlen($compact->getContent()));
+        $this->putJson($path.'/answers/'.$second['id'], ['base_version' => 1, 'selected_option_id' => $second['question']['options'][1]['id']])->assertOk()->assertJsonPath('data.revision', 3);
+        $this->putJson($path.'/answers/'.$first['id'].'?compact=1', $body)->assertOk()->assertJsonPath('data.revision', 3)->assertJsonPath('data.answers.0.selected_option_id', $first['question']['options'][0]['id'])->assertJsonPath('data.answers.1.selected_option_id', $second['question']['options'][1]['id']);
+        $this->putJson($path.'/answers/'.$first['id'].'?compact=true', ['base_version' => 1, 'selected_option_id' => null])->assertConflict();
+        $this->putJson($path.'/answers/'.$first['id'].'?compact=bad', $body)->assertUnprocessable();
+        $this->asToken($this->createUser());
+        $this->putJson($path.'/answers/'.$first['id'].'?compact=true', $body)->assertNotFound();
+        $this->asToken($student);
+        $this->travel(61)->seconds();
+        $this->putJson($path.'/answers/'.$first['id'].'?compact=true', $body)->assertOk()->assertJsonPath('data.status', 'completed')->assertJsonMissingPath('data.questions')->assertJsonPath('data.result.blank', 23);
+        $this->getJson($path)->assertOk()->assertJsonPath('data.status', 'completed')->assertJsonPath('data.questions.0.feedback.outcome', 'correct');
+    }
+
     private function pool(int $count = 3): array
     {
         $admin = $this->createUser(['platform_role' => 'platform_admin']);
