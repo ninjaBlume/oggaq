@@ -1,0 +1,12 @@
+[Unit]
+Description=OGGAQ development: nightly encrypted database backup
+# Optional alternative to cron: install as a USER unit (no root; needs `sudo loginctl enable-linger <user>` once).
+# Copy to ~/.config/systemd/user/ and run: systemctl --user daemon-reload && systemctl --user enable --now oggaq-dev-backup.timer
+
+[Service]
+Type=oneshot
+Environment=BACKUP_ENV=%h/oggaq-development/shared/backup.env
+ExecStart=/bin/bash %h/oggaq-development/backup-tools/deploy/server-development/backup/backup.sh
+UMask=0077
+Nice=10
+IOSchedulingClass=idle

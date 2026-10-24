@@ -1,0 +1,9 @@
+PATH=/usr/local/bin:/usr/bin:/bin
+# Install as the deploy user (crontab -e). No root needed, no host-level service is touched.
+# Logs hold no secrets (names, times, sizes). Create the log directory once: mkdir -p ~/oggaq-development/logs
+# Nightly database backup at 00:30 UTC (03:30 Türkiye):
+30 0 * * *  /bin/bash $HOME/oggaq-development/backup-tools/deploy/server-development/backup/backup.sh   >>$HOME/oggaq-development/logs/backup.log   2>&1
+# Hourly deleted-account ledger export:
+7 * * * *   /bin/bash $HOME/oggaq-development/backup-tools/deploy/server-development/backup/erasures.sh >>$HOME/oggaq-development/logs/erasures.log 2>&1
+# Morning freshness check (non-zero exit is mailed by cron if MAILTO works; otherwise rely on the Mac-side warning):
+15 7 * * *  /bin/bash $HOME/oggaq-development/backup-tools/deploy/server-development/backup/backup.sh --check >>$HOME/oggaq-development/logs/backup.log 2>&1

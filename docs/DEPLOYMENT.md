@@ -268,6 +268,8 @@ Prova: `deploy.sh` yerelde geçici depo ve dizinle denendi (§22); `systemctl`/`
 
 ## 17. Yedekleme ve geri yükleme
 
+> Docker Compose geliştirme sunucusu (`deploy/server-development/`) için ayrı, o ortama uyarlanmış yedekleme kurulumu: [deploy/server-development/backup/README.md](../deploy/server-development/backup/README.md) (şifreli gece yedeği, Mac'ten çekme, aylık geri yükleme provası, felaket kurtarma). Aşağıdaki bölüm systemd/nginx üretim şablonları içindir.
+
 ### 17.1 Ne yedeklenir
 
 - **PostgreSQL veritabanı** (`pg_dump` özel biçim): kullanıcılar, denemeler, sorular, her şey. Yedek içeriği kişisel veri taşır, bu yüzden **şifreli** yazılır; şifresiz kopya diske hiç yazılmaz.

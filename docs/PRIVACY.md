@@ -53,7 +53,7 @@ Eski bir yedek geri yüklenirse silinmiş hesaplar yeniden ortaya çıkar. `php 
 ## Açık kalanlar
 
 - **Hukuki metinler:** aydınlatma metni, kullanım koşulları, veri sorumlusu (henüz belirlenmedi) ve işleyen rolleri, VERBİS uygulanabilirliği, saklama sürelerinin hukuki dayanağı ve yurt dışı aktarım koşulları kararlaştırılmadı; hukukçu gerekir. Bu belge o kararların yerine geçmez.
-- **Yedek dönemi:** silinmiş hesabın verisinin yedek dosyalarında ne kadar kalacağı (yedek saklama süresi: şu an 7 gün / 4 hafta / 6 ay önerisi) hukuki teyitle belirlenir; sunucu dışı kopyalar da aynı döneme tabidir.
+- **Yedek dönemi:** silinmiş hesabın verisinin yedek dosyalarında ne kadar kalacağı (yedek saklama süresi: şu an 7 gün / 4 hafta / 6 ay önerisi) hukuki teyitle belirlenir; sunucu dışı kopyalar da aynı döneme tabidir. Sunucu geliştirme ortamı için hazırlanan yedekleme kurulumunda (henüz sunucuda çalıştırılmadı) sunucuda 7/4/6, Mac'teki çekilmiş kopyada 14/8/12 saklama önerilir ve silme listesi yedekten ayrı, saatlik şifreli dışa aktarılır ([backup/README](../deploy/server-development/backup/README.md)).
 - **Gerçek e-posta sağlayıcısı:** hesap e-postaları yerelde Mailpit'e gider; üretim SMTP sağlayıcısı ve verinin konumu seçilmedi.
 - **Günlük saklama:** uygulama ve erişim günlüklerinin süresi, konumu ve maskeleme denetimi barındırma planında belirlenecek.
 - **Soru bildirim notları** kişisel veri içerebilir; yalnızca platform yöneticisi görür.

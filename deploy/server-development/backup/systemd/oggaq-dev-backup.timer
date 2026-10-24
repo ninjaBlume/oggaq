@@ -1,0 +1,10 @@
+[Unit]
+Description=OGGAQ development: nightly backup timer
+
+[Timer]
+OnCalendar=*-*-* 00:30:00 UTC
+Persistent=true
+Unit=oggaq-dev-backup.service
+
+[Install]
+WantedBy=timers.target

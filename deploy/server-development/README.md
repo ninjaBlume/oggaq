@@ -70,7 +70,7 @@ Yayından sonra `OGGAQ_DIRECT=1 node deploy/server-development/smoke.mjs` doğru
 
 ## Veri kalıcılığı ve sınırlar
 
-PostgreSQL, Redis AOF ve Laravel storage ayrı named volume'lardadır. `docker compose down` bu verileri silmez; `down --volumes` veri kaybına yol açar. Gerçek veri eklenmeden önce sunucu dışı yedek ve geri yükleme planı ayrıca uygulanmalıdır; Compose'un çalışması yedek alındığı anlamına gelmez.
+PostgreSQL, Redis AOF ve Laravel storage ayrı named volume'lardadır. `docker compose down` bu verileri silmez; `down --volumes` veri kaybına yol açar. Gerçek veri eklenmeden önce sunucu dışı yedek ve geri yükleme planı ayrıca uygulanmalıdır; Compose'un çalışması yedek alındığı anlamına gelmez. Bu ortam için şifreli gece yedeği, Mac'ten çekme ile sunucu dışı kopya, geri yükleme provası ve felaket kurtarma adımları [backup/README.md](backup/README.md) içinde hazırlanmıştır (betikler hazır ve yerelde denenmiştir; **sunucuda henüz kurulmadı ve çalıştırılmadı**).
 
 Bu dosya tek alan adı ve paylaşılan sunucu için mevcut [üretim şablonlarına](../../docs/DEPLOYMENT.md) alternatif bir geliştirme kurulumudur. Üretim şablonları ve host servis yönetimiyle birlikte çalıştırılmaz.
 

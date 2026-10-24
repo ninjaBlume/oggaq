@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Yedek betiklerinin ortak işlevleri (kaynak olarak yüklenir; tek başına çalıştırılmaz).
 log() { printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*"; }
 die() { log "HATA: $*" >&2; alert "$*"; exit 1; }
@@ -7,7 +8,8 @@ die() { log "HATA: $*" >&2; alert "$*"; exit 1; }
 # Mattermost uyumlu); farklı bir hizmet için burayı uyarlayın.
 alert() {
   [ -n "${ALERT_WEBHOOK_URL:-}" ] || return 0
-  local text="OGGAQ yedek: $1 ($(hostname -s))"
+  local host text
+  host="$(hostname -s)"; text="OGGAQ yedek: $1 ($host)"
   text="${text//\\/\\\\}"; text="${text//\"/\\\"}"
   curl -fsS --max-time 10 -X POST -H 'Content-Type: application/json' -d "{\"text\":\"${text}\"}" "$ALERT_WEBHOOK_URL" >/dev/null 2>&1 || log "Uyarı gönderilemedi (webhook)." >&2
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Copy to ~/Library/LaunchAgents/com.oggaq.backup-pull.plist, replace KULLANICI and the repo path, then:
+       launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.oggaq.backup-pull.plist
+     Runs once at login and then every hour while the Mac is awake (launchd runs missed jobs after wake).
+     Stop: launchctl bootout gui/$(id -u)/com.oggaq.backup-pull -->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.oggaq.backup-pull</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/KULLANICI/oggaq/deploy/server-development/backup/mac/pull-backups.sh</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict><key>PATH</key><string>/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin</string></dict>
+  <key>RunAtLoad</key><true/>
+  <key>StartInterval</key><integer>3600</integer>
+  <key>StandardOutPath</key><string>/Users/KULLANICI/Library/Logs/oggaq-backup-pull.log</string>
+  <key>StandardErrorPath</key><string>/Users/KULLANICI/Library/Logs/oggaq-backup-pull.log</string>
+  <key>ProcessType</key><string>Background</string>
+  <key>Nice</key><integer>10</integer>
+</dict>
+</plist>

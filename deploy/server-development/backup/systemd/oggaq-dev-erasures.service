@@ -1,0 +1,8 @@
+[Unit]
+Description=OGGAQ development: deleted-account ledger export (no personal data)
+
+[Service]
+Type=oneshot
+Environment=BACKUP_ENV=%h/oggaq-development/shared/backup.env
+ExecStart=/bin/bash %h/oggaq-development/backup-tools/deploy/server-development/backup/erasures.sh
+UMask=0077

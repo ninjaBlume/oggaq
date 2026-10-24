@@ -1,0 +1,10 @@
+[Unit]
+Description=OGGAQ development: hourly ledger export timer
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+Unit=oggaq-dev-erasures.service
+
+[Install]
+WantedBy=timers.target
