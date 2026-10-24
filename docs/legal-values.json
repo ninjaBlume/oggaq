@@ -1,0 +1,30 @@
+{
+  "_nasil": "Bu dosya dört yasal sayfanın ve uygulamaların boş alanlarını tek yerden doldurur. Boş bırakılan alan sayfada işaretli yer tutucu olarak kalır. Doldurduktan sonra `npm run legal:apply` çalıştırın; kalan eksikleri `npm run legal:apply -- --check` ve `npm run check:store` gösterir.",
+  "_dikkat": "'Öneri' ile başlayan notlar benim önerimdir, hukuki görüş değildir. Dolu gelen alanlar uygulamanın bugünkü gerçek davranışına göre yazıldı; davranış değişirse güncelleyin. Metinleri siz onaylıyorsanız en altta \"taslak\": false yapın, TASLAK bandı kalkar.",
+  "taslak": true,
+  "degerler": {
+    "veri-sorumlusu-unvan": "",
+    "veri-sorumlusu-adres": "",
+    "destek-eposta": "",
+    "yayinci-adi": "",
+    "yururluk-tarihi": "",
+    "verbis": "",
+    "barindirma-konumu": "",
+    "eposta-saglayicisi": "",
+    "yurt-disi-aktarim": "",
+    "uygulanacak-hukuk": "",
+    "hukuki-sebep": "Hesabı ve sınav hizmetini sunmak, sonuçlarını saklamak ve iş ilanı başvurusunu işleme almak için sözleşmenin kurulması veya ifasıyla doğrudan ilgili olması (KVKK m.5/2-c); güvenliği sağlamak ve hataları gidermek için veri sorumlusunun meşru menfaati (KVKK m.5/2-f).",
+    "yanit-suresi": "en geç 30 gün",
+    "gunluk-suresi": "Sunucu günlükleri boyut sınırına göre dönüşümlü tutulur; sınır dolunca en eski kayıtlar otomatik silinir. Günlüklere parola ve oturum anahtarı yazılmaz.",
+    "yedek-suresi": "en çok 12 ay (sunucuda 6 aya kadar, sunucu dışı şifreli kopyada 12 aya kadar)",
+    "basvuru-saklama": "iş ilanı başvuruları ilan kapandığında kendiliğinden silinmez; başvuruyu hesabını silerek ya da bize yazarak sildirebilirsin",
+    "basvuru-sureci": "Başvurunu yalnızca platform yöneticileri görür ve durumunu (Başvuru alındı, İnceleniyor, Olumlu değerlendirildi, Olumsuz değerlendirildi) güncelleyebilir. Platform başvurunu ilan sahibi firmaya otomatik göndermez; iş veren hesabı ve dış başvuru yönlendirmesi yoktur."
+  },
+  "_oneriler": {
+    "veri-sorumlusu-unvan": "Öneri: platformu işleten ve amaç/araçlara karar veren tüzel kişi. Şirket adı, ticari unvanıyla ve varsa MERSİS numarasıyla.",
+    "verbis": "Öneri: KVKK Kurumu sitesinden güncel istisna ölçütlerine bakın. Yükümlü değilseniz: 'VERBİS kayıt yükümlülüğünden istisnadır'; yükümlüyse kayıt numarası.",
+    "yurt-disi-aktarim": "Öneri: sunucu ve e-posta sağlayıcısı Türkiye'deyse 'Kişisel verilerin yurt dışına aktarılmıyor.'; değilse hangi ülkeye, hangi sağlayıcıya ve hangi güvenceyle (KVKK m.9) aktarıldığını yazın.",
+    "uygulanacak-hukuk": "Öneri: 'Türkiye Cumhuriyeti hukuku uygulanır; <şehir> mahkemeleri ve icra daireleri yetkilidir.'",
+    "yayinci-adi": "Mağazadaki yayıncı adıyla birebir aynı yazın (Apple/Google hesabındaki ad)."
+  }
+}

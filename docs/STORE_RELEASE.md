@@ -57,6 +57,17 @@ Sayfalar JavaScript olmadan çalışan statik HTML'dir; web uygulamasıyla aynı
 - **Paket kimliği:** `apps/mobile/app.config.ts` içinde tek yerdedir (`OGGAQ_BUNDLE_ID` ortam değişkeni, varsayılan `net.harunaltay.oggaq`). İki platformu birlikte değiştirir. İlk App Store Connect / Play Console yüklemesinden sonra değiştirilemez; yayıncı belli olmadan karar verilmemeli.
 - **Sürüm:** `version` `0.1.0`; `ios.buildNumber` ve `android.versionCode` `1`. EAS `production` profili derleme numaralarını `autoIncrement` ile artırır.
 
+## 2a. Yasal sayfa değerlerini tek dosyadan doldurma
+
+Dört yasal sayfadaki ve uygulamalardaki boş alanlar `docs/legal-values.json` dosyasından doldurulur; HTML elle düzenlenmez.
+
+1. `docs/legal-values.json` içindeki `degerler` alanlarını doldurun. Dolu gelenler uygulamanın bugünkü davranışına göre yazılmış önerilerdir (hukuki sebep, saklama süreleri, başvuru süreci); doğruysa bırakın, değilse değiştirin. `_oneriler` bölümü boş alanlar için ne yazılabileceğini gösterir.
+2. `npm run legal:apply` sayfaları ve `supportEmail` değerini (`apps/mobile/brand.json`, `apps/web/src/config.ts`) günceller. Tekrar çalıştırmak güvenlidir; bir alanı boşaltmak işaretli yer tutucuyu geri getirir. `npm run legal:apply -- --check` yazmadan boş alanları listeler.
+3. Metinleri onayladığınızda dosyanın başındaki `"taslak": true` değerini `false` yapıp tekrar çalıştırın; TASLAK bandı kalkar.
+4. `npm run check:store` kalan engelleri gösterir. Mağazadaki yayıncı adı, iletişim e-postası, veri sorumlusu ve yürürlük tarihi gerçek değerlerle dolmalıdır.
+
+Not: dolu gelen öneriler hukuki görüş değildir; sorumluluk metni onaylayanındır.
+
 ## 3. Derleme (EAS) — çalıştırılmadı
 
 `apps/mobile/eas.json`: `development` ve `preview` (içeride dağıtım, Android APK; API ve web adresi geliştirme sunucusu), `production` (mağaza paketi). **Üretim adresleri bilerek yer tutucudur** (`https://alan-adi-belirlenmedi.invalid`); gerçek alan adı belli olunca `EXPO_PUBLIC_API_URL` ve `EXPO_PUBLIC_WEB_URL` değerlerini HTTPS olarak yazın (`check:store` yer tutucuyu engel sayar). `development` profili bir geliştirme istemcisi değildir (`expo-dev-client` kurulu değil); geliştirme API'sine bağlı bir sürüm paketidir.
