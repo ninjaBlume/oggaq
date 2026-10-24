@@ -52,6 +52,38 @@ class ExamTest extends TestCase
         return $this->putJson($this->url($exam, '/answers/'.$row['id']), ['base_version' => $exam['revision'], 'selected_option_id' => $option === null ? null : $row['question']['options'][$option]['id']])->assertOk()->json('data');
     }
 
+    public function test_resume_position_survives_reopening_without_changing_answers_revision_or_deadline(): void
+    {
+        $this->pool();
+        $student = $this->createUser();
+        $this->asToken($student);
+        $exam = $this->answer($this->start(), 0, 0);
+        $this->assertSame(1, $exam['resume_position']);
+        $saved = $this->putJson($this->url($exam, '/position'), ['position' => 3])->assertOk()->assertJsonPath('data.resume_position', 3)->json('data');
+        $this->assertSame($exam['revision'], $saved['revision']);
+        $this->assertSame($exam['deadline_at'], $saved['deadline_at']);
+        $again = $this->getJson($this->url($exam))->assertOk()->json('data');
+        $this->assertSame(3, $again['resume_position']);
+        $this->assertSame($exam['questions'], $again['questions']);
+        $this->putJson($this->url($exam, '/position'), ['position' => 0])->assertUnprocessable();
+        $this->putJson($this->url($exam, '/position'), ['position' => 4])->assertUnprocessable();
+        $this->putJson($this->url($exam, '/position'), ['position' => 1.5])->assertUnprocessable();
+        $done = $this->postJson($this->url($exam, '/finish'), ['base_version' => $exam['revision']])->assertOk()->json('data');
+        $this->putJson($this->url($exam, '/position'), ['position' => 2])->assertOk()->assertJsonPath('data.resume_position', 3)->assertJsonPath('data.result', $done['result']);
+        $this->asToken($this->createUser());
+        $this->putJson($this->url($exam, '/position'), ['position' => 1])->assertNotFound();
+    }
+
+    public function test_expired_exam_cannot_move_bookmark_or_extend_time(): void
+    {
+        $this->pool();
+        $this->asToken($this->createUser());
+        $exam = $this->start();
+        $this->putJson($this->url($exam, '/position'), ['position' => 2])->assertOk();
+        $this->travel(61)->seconds();
+        $this->putJson($this->url($exam, '/position'), ['position' => 3])->assertOk()->assertJsonPath('data.status', 'completed')->assertJsonPath('data.resume_position', 2)->assertJsonPath('data.deadline_at', $exam['deadline_at']);
+    }
+
     public function test_snapshot_hides_keys_and_remains_stable_with_unique_questions(): void
     {
         $this->pool();
@@ -238,13 +270,16 @@ class ExamTest extends TestCase
         $context = $student->studyContexts()->where('tenant_id', $tenant->id)->firstOrFail();
         $company = $this->start($context->id);
         $this->getJson('/api/v1/contexts/'.$personal['context_id'].'/exam-attempts/'.$company['id'])->assertNotFound();
+        $this->putJson('/api/v1/contexts/'.$personal['context_id'].'/exam-attempts/'.$company['id'].'/position', ['position' => 2])->assertNotFound();
         $admin = $this->createUser(['platform_role' => 'platform_admin']);
         $this->asToken($admin);
         $this->getJson($this->url($personal))->assertNotFound();
         $this->getJson($this->url($company))->assertNotFound();
+        $this->putJson($this->url($company, '/position'), ['position' => 2])->assertNotFound();
         $this->asToken($student);
         app(RevokeMembership::class)->execute($admin, $tenant, $membership->id);
         $this->getJson($this->url($company))->assertForbidden();
+        $this->putJson($this->url($company, '/position'), ['position' => 2])->assertForbidden();
         $this->postJson($this->url($company, '/finish'), ['base_version' => 1])->assertForbidden();
         $this->getJson($this->url($personal))->assertOk();
     }

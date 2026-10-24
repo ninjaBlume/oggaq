@@ -4761,6 +4761,100 @@
           }
         }
       }
+    },
+    "/api/v1/contexts/{context}/exam-attempts/{exam}/position": {
+      "put": {
+        "operationId": "saveExamPosition",
+        "summary": "Son görüntülenen sınav sorusunu kaydet",
+        "description": "Yalnız bağlam sahibi aktif sınavda konum kaydeder. Süre uzamaz, cevaplar/revision değişmez; süresi dolmuş veya bitmiş sınavda konum değişmeden kanonik özet döner.",
+        "tags": [
+          "Exams"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ExamSummary"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "exam",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "position"
+                ],
+                "properties": {
+                  "position": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 200
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -6553,6 +6647,15 @@
                 "type": "null"
               }
             ]
+          },
+          "resume_position": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Son görüntülenen soru sırası; eski veya yeni konum kaydı olmayan sınavlarda null. Cevap revision değerini veya süreyi değiştirmez."
           }
         },
         "required": [

@@ -205,3 +205,7 @@ API adresi düzeltmesini içeren `268607fee5906e11bec79ad9d5925ea1e75bbf09` içi
 ## Hesabım (hesap yaşam döngüsü)
 
 Profil → **Hesabım** kartı yığında yeni bir ekran açar (`src/account.tsx`): e-posta ve parola değiştirme, cihazlar ve oturumlar (opak kimlikli liste, “Bu cihaz” işareti, tek tek ve toplu çıkış), veri dışa aktarma ve hesap silme. Her işlem mevcut parolayı ister; silme ayrıca “HESABIMI SİL” yazısını ister ve ardından uygulama içi onay ekranına geçer (App Store uygulama içi silmeyi şart koşar; politika metni resmî kaynaktan ayrıca doğrulanmalıdır). Dışa aktarma native'de `Share.share` ile JSON metnini sistem paylaşım sayfasına verir, web önizlemede Blob indirmesi kullanır. Yedek ve yasal metin kararları [PRIVACY](PRIVACY.md) içindedir. Doğrulama: Chromium'da web önizleme (cihaz listesi, silme akışı, koyu mod); fiziksel iPhone/Android, Expo Go ve paylaşım sayfası denenmedi.
+
+## 24 Ekim 2026: Sınava son sorudan devam
+
+Sınav ekranı yeniden açılınca indis 0'a dönmesi düzeltildi. Web ile ortak `resumeQuestionIndex` ve `ExamPositionSaver` son görüntülenen soruyu API'den geri yükler; sıralı konum yazımı, kayıt hatası ve yeniden deneme uygulanır. Kaydedilmiş cevaplar korunur, süre uygulama dışında işlemeye devam eder. Yeni oturum/başka cihaz yalnız sunucudaki konum kaydını kullanır; cihaz deposuna yeni öğrenci verisi yazılmaz. Eski sınavlarda konum yoksa ilk cevapsız soru açılır. Ayrıntı ve sınırlar [EXAMS](EXAMS.md#son-sorudan-devam-etme-24-ekim-2026).

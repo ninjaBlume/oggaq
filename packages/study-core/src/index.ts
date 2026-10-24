@@ -113,3 +113,6 @@ export const reportReasons = [
 export type ReportReason = (typeof reportReasons)[number]['value'];
 export const reportNoteLimit = 500;
 export const reportReasonLabel = (reason: string) => reportReasons.find((item) => item.value === reason)?.label ?? reason;
+
+export { resumeQuestionIndex, ExamPositionSaver } from './exam-position';
+export type { ExamPositionState } from './exam-position';

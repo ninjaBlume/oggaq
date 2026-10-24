@@ -12,6 +12,7 @@ class ExamSummaryResource extends JsonResource
         return [
             'id' => $this->id, 'context_id' => $this->study_context_id, 'revision' => $this->revision,
             'status' => $this->finished_at === null ? 'active' : 'completed',
+            'resume_position' => $this->bookmark?->position,
             'question_count' => $this->question_count, 'duration_seconds' => $this->duration_seconds,
             'subject_id' => $this->subject_id, 'topic_id' => $this->topic_id, 'scoring_rule' => $this->scoring_rule,
             'official_exam' => $this->officialExam === null ? null : [

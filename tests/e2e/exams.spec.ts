@@ -15,7 +15,8 @@ test("sınav cevapları saklanır; bitişte doğru yanlış boş ve kaynak açı
   await answer(page, "B");
   const url = page.url();
   await page.reload();
-  await expect(page.getByRole("radio", { name: /Sentetik A/ })).toBeChecked();
+  await expect(page.getByText("Soru 2 / 3", { exact: true })).toBeVisible();
+  await expect(page.getByRole("radio", { name: /Sentetik B/ })).toBeChecked();
   await finish(page);
   await expect(page.getByRole("status").filter({ hasText: "DOĞRU YÜZDESİ" })).toContainText("1 doğru · 1 yanlış · 1 boş");
   await expect(page.getByText("Sentetik açıklama — gerçek sınav içeriği değildir.", { exact: true })).toBeVisible();
@@ -84,4 +85,36 @@ test("geçersiz süre ile sınav başlatılamaz", async ({ page }) => {
   await row.getByLabel("Süre (dakika)", { exact: true }).fill("150");
   await row.getByRole("button", { name: "Sınavı başlat" }).click();
   await expect(page.getByRole("heading", { name: "Denemen devam ediyor" })).toBeVisible();
+});
+
+test('devam son görüntülenen cevapsız soruyu korur; konum hatası yeniden denenir', async ({ page }) => {
+  await login(page); await enterDeneme(page);
+  await answer(page, 'A');
+  let fail = true;
+  await page.route('**/exam-attempts/*/position', async (route) => {
+    if (fail) await route.abort('internetdisconnected');
+    else await route.continue();
+  });
+  await page.getByRole('button', { name: 'Sonraki soru' }).click();
+  await expect(page.getByText('Soru 2 / 3', { exact: true })).toBeVisible();
+  await expect(page.getByRole('alert')).toContainText('Son baktığın soru kaydedilemedi');
+  fail = false;
+  const saved = page.waitForResponse((r) => r.url().endsWith('/position') && r.status() === 200);
+  await page.getByRole('button', { name: 'Konumu yeniden kaydet' }).click();
+  await saved;
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  await page.getByRole('link', { name: 'Deneme sınavları', exact: true }).click();
+  await page.locator('.sinav-row').getByRole('link', { name: 'Devam et', exact: true }).click();
+  await expect(page.getByText('Soru 2 / 3', { exact: true })).toBeVisible();
+  const third = page.waitForResponse((r) => r.url().endsWith('/position') && r.status() === 200);
+  await page.getByRole('button', { name: 'Soru 3', exact: true }).click();
+  await third;
+  await page.reload();
+  await expect(page.getByText('Soru 3 / 3', { exact: true })).toBeVisible();
+  const first = page.waitForResponse((r) => r.url().endsWith('/position') && r.status() === 200);
+  await page.getByRole('button', { name: 'Soru 1', exact: true }).click();
+  await first;
+  await expect(page.getByRole('radio', { name: /Sentetik A/ })).toBeChecked();
+  await page.reload();
+  await expect(page.getByText('Soru 1 / 3', { exact: true })).toBeVisible();
 });

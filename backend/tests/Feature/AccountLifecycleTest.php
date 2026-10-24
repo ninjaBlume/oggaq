@@ -316,6 +316,7 @@ class AccountLifecycleTest extends TestCase
         $this->assertArrayHasKey('correct', $finished['answers'][0]['options'][0]);
         // A running attempt never carries the answer key.
         $open = collect($data['exam_attempts'])->firstWhere('finished_at', null);
+        $this->assertSame(1, $open['resume_position']);
         $this->assertNull($open['answers'][0]['outcome']);
         foreach ($open['answers'] as $answer) {
             foreach ($answer['options'] as $option) {
@@ -366,6 +367,7 @@ class AccountLifecycleTest extends TestCase
 
         return [
             'contexts' => $contexts->count(), 'memberships' => DB::table('memberships')->where('user_id', $user->id)->count(),
+            'bookmarks' => DB::table('exam_bookmarks')->whereIn('exam_attempt_id', $attempts)->count(),
             'attempts' => $attempts->count(), 'answers' => DB::table('exam_answers')->whereIn('exam_attempt_id', $attempts)->count(),
             'practice' => DB::table('practice_attempts')->whereIn('study_context_id', $contexts)->count(),
             'favorites' => DB::table('favorite_questions')->whereIn('study_context_id', $contexts)->count(),
@@ -518,7 +520,7 @@ SQL);
             // deleted with the person
             'memberships(user_id) -> users', 'study_contexts(user_id) -> users', 'sessions(user_id) -> users',
             'exam_attempts(study_context_id) -> study_contexts', 'practice_attempts(study_context_id) -> study_contexts', 'favorite_questions(study_context_id) -> study_contexts',
-            'exam_answers(exam_attempt_id) -> exam_attempts', 'study_contexts(membership_id,tenant_id,user_id) -> memberships',
+            'exam_answers(exam_attempt_id) -> exam_attempts', 'exam_bookmarks(exam_attempt_id) -> exam_attempts', 'study_contexts(membership_id,tenant_id,user_id) -> memberships',
             // link severed, row kept
             'audit_events(actor_id) -> users', 'question_reports(user_id) -> users', 'question_reports(exam_attempt_id) -> exam_attempts',
             // only platform admins author these, and platform admins cannot delete themselves

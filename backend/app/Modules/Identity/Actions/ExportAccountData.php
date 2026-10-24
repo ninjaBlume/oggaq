@@ -51,8 +51,8 @@ class ExportAccountData
 
     private function examAttempts(array $contextIds): Generator
     {
-        $attempts = DB::table('exam_attempts as a')->leftJoin('official_exams as e', 'e.id', '=', 'a.official_exam_id')->whereIn('a.study_context_id', $contextIds)
-            ->select('a.id', 'a.study_context_id', 'e.title as exam', 'a.started_at', 'a.deadline_at', 'a.finished_at', 'a.finish_reason', 'a.duration_seconds',
+        $attempts = DB::table('exam_attempts as a')->leftJoin('official_exams as e', 'e.id', '=', 'a.official_exam_id')->leftJoin('exam_bookmarks as b', 'b.exam_attempt_id', '=', 'a.id')->whereIn('a.study_context_id', $contextIds)
+            ->select('a.id', 'a.study_context_id', 'b.position as resume_position', 'e.title as exam', 'a.started_at', 'a.deadline_at', 'a.finished_at', 'a.finish_reason', 'a.duration_seconds',
                 'a.question_count', 'a.correct_count', 'a.incorrect_count', 'a.blank_count', 'a.score_percent');
         foreach ($attempts->lazyById(self::CHUNK, 'a.id', 'id')->chunk(self::CHUNK) as $chunk) {
             $answers = DB::table('exam_answers as x')->join('question_versions as v', 'v.id', '=', 'x.question_version_id')
@@ -66,7 +66,7 @@ class ExportAccountData
                 yield [
                     'context_id' => $attempt->study_context_id, 'exam' => $attempt->exam, 'started_at' => $attempt->started_at, 'deadline_at' => $attempt->deadline_at,
                     'finished_at' => $attempt->finished_at, 'finish_reason' => $attempt->finish_reason, 'duration_seconds' => $attempt->duration_seconds,
-                    'question_count' => $attempt->question_count, 'correct' => $attempt->correct_count, 'incorrect' => $attempt->incorrect_count,
+                    'question_count' => $attempt->question_count, 'resume_position' => $attempt->resume_position, 'correct' => $attempt->correct_count, 'incorrect' => $attempt->incorrect_count,
                     'blank' => $attempt->blank_count, 'score_percent' => $attempt->score_percent === null ? null : (float) $attempt->score_percent,
                     'answers' => ($byAttempt[$attempt->id] ?? collect())->map(fn ($answer) => [
                         'position' => $answer->position, 'question' => $answer->stem,

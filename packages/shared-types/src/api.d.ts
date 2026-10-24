@@ -1320,6 +1320,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/contexts/{context}/exam-attempts/{exam}/position": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Son görüntülenen sınav sorusunu kaydet
+         * @description Yalnız bağlam sahibi aktif sınavda konum kaydeder. Süre uzamaz, cevaplar/revision değişmez; süresi dolmuş veya bitmiş sınavda konum değişmeden kanonik özet döner.
+         */
+        put: operations["saveExamPosition"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1783,6 +1803,8 @@ export interface components {
             finish_reason: "manual" | "expired" | null;
             result: components["schemas"]["ExamResult"] | null;
             official_exam: components["schemas"]["OfficialExamRef"] | null;
+            /** @description Son görüntülenen soru sırası; eski veya yeni konum kaydı olmayan sınavlarda null. Cevap revision değerini veya süreyi değiştirmez. */
+            resume_position?: number | null;
         };
         ExamQuestion: {
             /** Format: uuid */
@@ -4589,6 +4611,42 @@ export interface operations {
                     "application/json": components["schemas"]["ReadinessResponse"];
                 };
             };
+        };
+    };
+    saveExamPosition: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+                exam: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    position: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExamSummary"];
+                    };
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
         };
     };
 }

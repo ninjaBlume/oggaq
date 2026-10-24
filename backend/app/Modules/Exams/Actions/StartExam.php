@@ -5,6 +5,7 @@ namespace App\Modules\Exams\Actions;
 use App\Models\User;
 use App\Modules\Exams\Models\ExamAnswer;
 use App\Modules\Exams\Models\ExamAttempt;
+use App\Modules\Exams\Models\ExamBookmark;
 use App\Modules\QuestionBank\Models\OfficialExam;
 use App\Modules\QuestionBank\Models\Question;
 use App\Modules\Study\Actions\ResolveStudyContext;
@@ -56,6 +57,8 @@ class StartExam
                 foreach ($picked as $position => $question) {
                     (new ExamAnswer)->forceFill($question + ['exam_attempt_id' => $attempt->id, 'position' => $position + 1])->save();
                 }
+
+                ExamBookmark::create(['exam_attempt_id' => $attempt->id, 'position' => 1]);
 
                 return $attempt->load(['answers.questionVersion.options', 'answers.questionVersion.source']);
             });

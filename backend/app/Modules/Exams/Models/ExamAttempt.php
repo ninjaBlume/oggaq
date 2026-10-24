@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ExamAttempt extends Model
 {
@@ -16,7 +17,7 @@ class ExamAttempt extends Model
 
     protected $keyType = 'string';
 
-    protected $with = ['officialExam'];
+    protected $with = ['officialExam', 'bookmark'];
 
     protected function casts(): array
     {
@@ -32,6 +33,11 @@ class ExamAttempt extends Model
     public function officialExam(): BelongsTo
     {
         return $this->belongsTo(OfficialExam::class);
+    }
+
+    public function bookmark(): HasOne
+    {
+        return $this->hasOne(ExamBookmark::class);
     }
 
     public function answers(): HasMany

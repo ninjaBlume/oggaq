@@ -749,3 +749,34 @@ test("giriş isteği sürerken form ve yön değiştiren bağlantılar kilitleni
   release();
   await expect(page.getByText("Merhaba, E2E.", { exact: true })).toBeVisible();
 });
+
+test('mobil devam son görüntülenen cevapsız soruya döner; yeniden girişte ve cihaz değişiminde konum korunur', async ({ page, browser }) => {
+  await login(page); await enter(page, 'Deneme');
+  await page.getByRole('radio', { name: 'Sentetik A', exact: true }).click();
+  await expect(page.getByText('Cevaplar sunucuda kayıtlı', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Sonraki soru', exact: true }).click();
+  const saved = page.waitForResponse((r) => r.url().endsWith('/position') && r.status() === 200 && r.request().postDataJSON().position === 3);
+  await page.getByRole('button', { name: 'Sonraki soru', exact: true }).click();
+  await saved;
+  await expect(page.getByText('Soru 3 / 3', { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Geri dön', exact: true }).click();
+  await page.getByRole('tab', { name: 'Ana sayfa', exact: true }).click();
+  await page.getByRole('button', { name: 'Denemene devam et', exact: true }).click();
+  await expect(page.getByText('Soru 3 / 3', { exact: true })).toBeVisible();
+  // A new browser context has no preview memory or local state: the API bookmark must be enough.
+  const otherContext = await browser.newContext({ baseURL: 'http://127.0.0.1:5185', viewport: { width: 390, height: 844 } });
+  try {
+    const other = await otherContext.newPage();
+    await login(other);
+    await other.getByRole('button', { name: 'Denemene devam et', exact: true }).click();
+    await expect(other.getByText('Soru 3 / 3', { exact: true })).toBeVisible();
+    const back = other.waitForResponse((r) => r.url().endsWith('/position') && r.status() === 200);
+    await other.getByRole('button', { name: 'Önceki soru', exact: true }).click();
+    await back;
+    await other.reload(); await login(other);
+    await other.getByRole('button', { name: 'Denemene devam et', exact: true }).click();
+    await expect(other.getByText('Soru 2 / 3', { exact: true })).toBeVisible();
+    await other.getByRole('button', { name: 'Önceki soru', exact: true }).click();
+    await expect(other.getByRole('radio', { name: 'Sentetik A', exact: true })).toHaveAttribute('aria-checked', 'true');
+  } finally { await otherContext.close(); }
+});

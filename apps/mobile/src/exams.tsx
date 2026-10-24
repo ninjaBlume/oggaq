@@ -11,7 +11,7 @@ import {
 } from "./icons";
 import type { ExamAttempt, StudyContext } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
-import { anchorClock, remainingSeconds, timeLabel } from "@oggaq/study-core";
+import { anchorClock, remainingSeconds, timeLabel, resumeQuestionIndex, ExamPositionSaver } from "@oggaq/study-core";
 import { api } from "./api";
 import { ReportQuestion } from "./report";
 import { useResource, useResume, useTask } from "./hooks";
@@ -138,12 +138,26 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
     [context.id, id],
   );
   const task = useTask<{ data: ExamAttempt }>();
-  const [index, setIndex] = useState(0);
+  const [selectedIndex, setIndex] = useState<number | null>(null);
+  const [positionState, setPositionState] = useState<{ pending: boolean; error: unknown }>({ pending: false, error: null });
+  const positionSaver = useRef<ExamPositionSaver | null>(null);
+  if (!positionSaver.current) positionSaver.current = new ExamPositionSaver(async (position) => {
+    const response = await api.request('put', '/api/v1/contexts/{context}/exam-attempts/{exam}/position', { params: { context: context.id, exam: id }, body: { position } });
+    if (response.data.status === 'completed') await query.reload();
+  }, setPositionState);
+  useEffect(() => {
+    positionSaver.current!.listen(setPositionState);
+    return () => positionSaver.current?.detach();
+  }, []);
   const [submission, setSubmission] = useState<Save | null>(null);
   const [finishing, setFinishing] = useState<number | null>(null);
   const [seconds, setSeconds] = useState(0);
   const [confirm, setConfirm] = useState(false);
   const exam = query.data?.data;
+  // Polling and another device may refresh the bookmark; only opening this screen restores it.
+  const initialIndex = useRef<number | null>(null);
+  if (initialIndex.current === null && exam) initialIndex.current = resumeQuestionIndex(exam);
+  const index = selectedIndex ?? initialIndex.current ?? 0;
   const done = exam?.status === "completed";
   useEffect(() => {
     if (done) {
@@ -297,6 +311,7 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
   ).length;
   function choose(index: number) {
     setIndex(index);
+    if (!done) positionSaver.current!.request(index + 1);
     setOverview(false);
     scroll.current?.scrollTo({ y: 0, animated: false });
   }
@@ -310,6 +325,8 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
         cancel={() => setConfirm(false)}
         disabled={blocked}
       />
+      {positionState.pending && <Text accessibilityRole="text" style={styles.muted}>Soru konumu kaydediliyor…</Text>}
+      {positionState.error != null && <ErrorNotice title="Son baktığın soru kaydedilemedi" error={positionState.error} retry={() => positionSaver.current!.retry()} />}
       <Sheet
         visible={overview}
         title="Soruların"

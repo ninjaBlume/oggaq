@@ -7,10 +7,12 @@ use App\Http\Requests\PaginationRequest;
 use App\Modules\Exams\Actions\AccessExam;
 use App\Modules\Exams\Actions\ListExams;
 use App\Modules\Exams\Actions\ReportExamQuestion;
+use App\Modules\Exams\Actions\SaveExamPosition;
 use App\Modules\Exams\Actions\StartExam;
 use App\Modules\Exams\Http\Requests\FinishExamRequest;
 use App\Modules\Exams\Http\Requests\ReportQuestionRequest;
 use App\Modules\Exams\Http\Requests\SaveExamAnswerRequest;
+use App\Modules\Exams\Http\Requests\SaveExamPositionRequest;
 use App\Modules\Exams\Http\Requests\StartExamRequest;
 use App\Modules\Exams\Http\Resources\ExamAttemptResource;
 use App\Modules\Exams\Http\Resources\ExamSummaryResource;
@@ -38,6 +40,11 @@ class ExamAttemptController extends Controller
     public function answer(SaveExamAnswerRequest $request, string $context, string $exam, string $answer, AccessExam $action): ExamAttemptResource
     {
         return new ExamAttemptResource($action->execute($request->user(), $context, $exam, $request->validated() + ['answer_id' => $answer]));
+    }
+
+    public function position(SaveExamPositionRequest $request, string $context, string $exam, SaveExamPosition $action): ExamSummaryResource
+    {
+        return new ExamSummaryResource($action->execute($request->user(), $context, $exam, $request->integer('position')));
     }
 
     public function finish(FinishExamRequest $request, string $context, string $exam, AccessExam $action): ExamAttemptResource

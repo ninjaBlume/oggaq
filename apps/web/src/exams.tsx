@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiError } from "@oggaq/api-client";
 import {
   anchorClock,
+  resumeQuestionIndex,
+  ExamPositionSaver,
   remainingSeconds,
   timeLabel,
 } from "@oggaq/study-core";
@@ -19,6 +21,9 @@ export function Exam() {
   const cache = useQueryClient();
   const query = useQuery({
     queryKey: ["exam", context.id, id],
+    // Opening an attempt must read its bookmark from the server, including when another device moved it.
+    // Do not initialize the question from an otherwise fresh TanStack cache entry.
+    refetchOnMount: 'always',
     queryFn: async ({ signal }) => {
       const response = await api.request(
         "get",
@@ -37,7 +42,7 @@ export function Exam() {
     refetchInterval: (q) =>
       q.state.data?.data.status === "active" ? 15000 : false,
   });
-  if (query.isPending) return <Loading />;
+  if (query.isPending || (!query.isFetchedAfterMount && !query.isError)) return <Loading />;
   if (query.isError)
     return (
       <ErrorNotice
@@ -65,7 +70,21 @@ function ExamContent({
 }) {
   const context = useStudyContext();
   const cache = useQueryClient();
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(() => resumeQuestionIndex(exam));
+  const [positionState, setPositionState] = useState<{ pending: boolean; error: unknown }>({ pending: false, error: null });
+  const positionSaver = useRef<ExamPositionSaver | null>(null);
+  if (!positionSaver.current) positionSaver.current = new ExamPositionSaver(async (position) => {
+    const response = await api.request('put', '/api/v1/contexts/{context}/exam-attempts/{exam}/position', { params: { context: context.id, exam: exam.id }, body: { position } });
+    if (response.data.status === 'completed') await reload();
+  }, setPositionState);
+  useEffect(() => {
+    positionSaver.current!.listen(setPositionState);
+    return () => positionSaver.current?.detach();
+  }, []);
+  function goTo(next: number) {
+    setIndex(next);
+    if (exam.status === 'active') positionSaver.current!.request(next + 1);
+  }
   const [confirm, setConfirm] = useState(false);
   const [submission, setSubmission] = useState<Save | null>(null);
   const [finishSubmission, setFinishSubmission] = useState<number | null>(null);
@@ -295,6 +314,8 @@ function ExamContent({
               </span>
             </div>
           )}
+          {positionState.pending && <p role="status" className="muted">Soru konumu kaydediliyor…</p>}
+          {positionState.error != null && <div className="notice error" role="alert"><p>Son baktığın soru kaydedilemedi. Cevapların ayrıca kaydedilir.</p><button className="text-button" onClick={() => positionSaver.current!.retry()}>Konumu yeniden kaydet</button></div>}
           {error && (
             <>
               <ErrorNotice
@@ -367,14 +388,14 @@ function ExamContent({
             <button
               className="button secondary"
               disabled={index === 0 || blocked}
-              onClick={() => setIndex(index - 1)}
+              onClick={() => goTo(index - 1)}
             >
               Önceki soru
             </button>
             <button
               className="button secondary"
               disabled={index === exam.question_count - 1 || blocked}
-              onClick={() => setIndex(index + 1)}
+              onClick={() => goTo(index + 1)}
             >
               Sonraki soru
             </button>
@@ -401,7 +422,7 @@ function ExamContent({
                   aria-label={`Soru ${i + 1}`}
                   aria-current={i === index ? "step" : undefined}
                   disabled={blocked}
-                  onClick={() => setIndex(i)}
+                  onClick={() => goTo(i)}
                 >
                   {i + 1}
                 </button>
