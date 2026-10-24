@@ -12,7 +12,7 @@ import {
 import type { ExamAttempt } from "@oggaq/shared-types";
 import { api } from "./api";
 import { PageIntro, useStudyContext } from "./App";
-import { ReportQuestion } from "./report";
+import { CompletedExam } from "./exam-results";
 import { ErrorNotice, Loading } from "./ui";
 
 export function Exam() {
@@ -151,38 +151,6 @@ function ExamContent({
       setSubmission(null);
     },
   });
-  // Favorites do not change the attempt revision, so the cached rows are updated directly.
-  const favorite = useMutation({
-    mutationFn: (next: boolean) =>
-      next
-        ? api.request(
-            "put",
-            "/api/v1/contexts/{context}/favorites/{question}",
-            { params: { context: context.id, question: exam.questions[index]!.question_id } },
-          )
-        : api.request(
-            "delete",
-            "/api/v1/contexts/{context}/favorites/{question}",
-            { params: { context: context.id, question: exam.questions[index]!.question_id } },
-          ),
-    onSuccess: (response) => {
-      cache.setQueryData<{ data: ExamAttempt }>(
-        ["exam", context.id, exam.id],
-        (old) =>
-          old && {
-            data: {
-              ...old.data,
-              questions: old.data.questions.map((item) =>
-                item.question_id === response.data.question_id
-                  ? { ...item, is_favorite: response.data.favorite }
-                  : item,
-              ),
-            },
-          },
-      );
-      void cache.invalidateQueries({ queryKey: ["review", context.id] });
-    },
-  });
   const finish = useMutation({
     mutationFn: (revision: number) =>
       api.request(
@@ -224,6 +192,7 @@ function ExamContent({
   }
   const error = save.error ?? finish.error;
   const conflict = error instanceof ApiError && error.status === 409;
+  if (done) return <CompletedExam exam={exam} contextId={context.id} />;
   return (
     <>
       <Link className="back-link" to={`/study/${context.id}/sonuclar`}>
@@ -239,24 +208,6 @@ function ExamContent({
             : "Cevapların seçtikçe kaydedilir. Süre bitmeden değiştirebilirsin."}
         </p>
       </PageIntro>
-      {done && exam.result && (
-        <section className="card exam-result" role="status">
-          <div>
-            <span className="eyebrow">DOĞRU YÜZDESİ</span>
-            <strong>%{exam.result.score_percent}</strong>
-          </div>
-          <p>
-            <b>{exam.result.correct}</b> doğru · <b>{exam.result.incorrect}</b>{" "}
-            yanlış · <b>{exam.result.blank}</b> boş
-          </p>
-          <p>
-            {exam.finish_reason === "expired"
-              ? "Süre dolduğunda tamamlandı."
-              : "Denemeyi sen bitirdin."}{" "}
-            Çalışma puanı; geçme / kalma kararı değildir.
-          </p>
-        </section>
-      )}
       <div className="practice-layout">
         <section className="card practice-card">
           <div className="question-meta">
@@ -356,33 +307,6 @@ function ExamContent({
                 Sonucu kontrol et
               </button>
             </div>
-          )}
-          {done && row.feedback && (
-            <section className={`feedback ${row.feedback.outcome}`}>
-              <h3>
-                {row.feedback.outcome === "correct"
-                  ? "Doğru"
-                  : row.feedback.outcome === "incorrect"
-                    ? "Yanlış"
-                    : "Boş bırakıldı"}
-              </h3>
-              {row.feedback.explanation && <p>{row.feedback.explanation}</p>}
-              <button
-                className="text-button"
-                aria-pressed={row.is_favorite}
-                disabled={favorite.isPending}
-                onClick={() => favorite.mutate(!row.is_favorite)}
-              >
-                {row.is_favorite ? "★ Favorilerde" : "☆ Favoriye ekle"}
-              </button>
-              {favorite.isError && (
-                <ErrorNotice
-                  error={favorite.error}
-                  retry={() => favorite.mutate(!row.is_favorite)}
-                />
-              )}
-              <ReportQuestion key={row.id} contextId={context.id} examId={exam.id} row={row} />
-            </section>
           )}
           <div className="answer-actions">
             <button

@@ -87,7 +87,7 @@ export const vocabulary = {
   profile: { title: 'Profil', short: 'Profil' },
   reports: { title: 'Bildirimler', short: 'Bildirimler' },
   account: { title: 'Hesabım', short: 'Hesabım' },
-  jobs: { title: 'İş Başvuruları', short: 'İş Başvuruları' },
+  jobs: { title: 'İş İlanları', short: 'İş İlanları' },
 } as const;
 
 // crypto.randomUUID exists only in secure contexts (HTTPS or localhost); a development server opened over the LAN

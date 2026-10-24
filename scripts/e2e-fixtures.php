@@ -35,7 +35,7 @@ if (config('database.default') !== 'pgsql' || config('database.connections.pgsql
     throw new RuntimeException('Browser fixtures require the isolated oggaq_test PostgreSQL database.');
 }
 $operation = $argv[1] ?? '';
-if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'cleanup'], true)) {
+if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'long-result', 'cleanup'], true)) {
     throw new InvalidArgumentException('Expected setup or cleanup.');
 }
 if (in_array($operation, ['verification-link', 'reset-link'], true)) {
@@ -84,6 +84,35 @@ if ($operation === 'near-deadline') {
     $context = $student->studyContexts()->whereNull('tenant_id')->firstOrFail();
     Carbon::setTestNow(now()->subSeconds(57));
     $exam = app(StartExam::class)->execute($student, $context->id, ['id' => (string) Str::uuid(), 'question_count' => 3, 'duration_seconds' => 60]);
+    echo '/study/'.$context->id.'/exams/'.$exam->id;
+    exit;
+}
+if ($operation === 'long-result') {
+    $admin = User::where('email', 'e2e-admin@example.test')->firstOrFail();
+    $versions = [];
+    for ($position = 1; $position <= 200; $position++) {
+        $question = app(SaveQuestion::class)->execute($admin, [
+            'subject_id' => Subject::firstOrFail()->id, 'source_id' => QuestionSource::firstOrFail()->id,
+            'stem' => 'Uzun sonuç sentetik soru '.$position, 'options' => ['Sentetik A '.$position, 'Sentetik B '.$position],
+            'correct_option_position' => 1, 'explanation' => 'Sentetik açıklama '.$position.' — gerçek sınav içeriği değildir.',
+        ]);
+        $question = app(PublishQuestion::class)->execute($admin, $question, $question->revision);
+        $versions[] = $question->published_version_id;
+    }
+    $official = app(SaveOfficialExam::class)->execute($admin, [
+        'exam_type_id' => ExamType::where('code', 'synthetic-whole')->firstOrFail()->id, 'weapon_status' => 'armed',
+        'title' => 'Uzun sentetik sınav', 'year' => 2024, 'exam_number' => '200', 'question_version_ids' => $versions,
+    ]);
+    app(PublishOfficialExam::class)->execute($admin, $official);
+    $student = User::where('email', 'e2e-student@example.test')->firstOrFail();
+    $context = $student->studyContexts()->whereNull('tenant_id')->firstOrFail();
+    $exam = app(StartExam::class)->execute($student, $context->id, ['id' => (string) Str::uuid(), 'official_exam_id' => $official->id, 'duration_seconds' => 300]);
+    foreach ([1 => 1, 2 => 2] as $position => $optionPosition) {
+        $answer = DB::table('exam_answers')->where('exam_attempt_id', $exam->id)->where('position', $position)->first();
+        $option = DB::table('question_options')->where('question_version_id', $answer->question_version_id)->where('position', $optionPosition)->first();
+        DB::table('exam_answers')->where('id', $answer->id)->update(['selected_option_id' => $option->id]);
+    }
+    DB::transaction(fn () => app(FinalizeExam::class)->execute(ExamAttempt::whereKey($exam->id)->lockForUpdate()->firstOrFail()));
     echo '/study/'.$context->id.'/exams/'.$exam->id;
     exit;
 }

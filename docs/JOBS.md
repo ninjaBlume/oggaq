@@ -1,11 +1,11 @@
-# İş Başvuruları
+# İş İlanları
 
 24 Ekim 2026: Jobs modülü; platform yöneticisi için ilan yönetimi ve başvuru inceleme, öğrenci web ve Expo istemcisi için ilanları görme ve uygulama içinden başvurma akışını uygular. Başvuru ad, e-posta, telefon ve isteğe bağlı kısa ön yazı alır. CV yükleme, işveren hesabı, dış başvuru yönlendirmesi ve başvuru bildirimi bu sürümde yoktur.
 
 ## Kullanım
 
-- **Admin:** İş Başvuruları → İlan ekle. Başlık, firma, şehir/konum, açıklama ve ÖGG kart türü girilir. İlan taslak kaydedilir veya yayımlanır; isteğe bağlı son başvuru tarihi belirlenir. İlan düzenleme ekranındaki Başvurular bölümünde adayın iletişim bilgileri ve ön yazısı görülür, durum Başvuru alındı / İnceleniyor / Olumlu değerlendirildi / Olumsuz değerlendirildi olarak değiştirilebilir. Geliştirme sunucusunda adres `/yonetim/is-ilanlari`.
-- **Öğrenci web:** İş Başvuruları gezinme öğesi. **Mobil:** soldan açılan menü → İş Başvuruları. İlanlar sekmesinde ayrıntı ve başvuru formu; Başvurularım sekmesinde kişisel başvuru ve değerlendirme durumu bulunur. Ad ve e-posta hesap profilinden doldurulur, başvurmadan önce değiştirilebilir. İletişim bilgilerinin platform yöneticisince görüleceği formda açıklanır.
+- **Admin:** İş İlanları → İlan ekle. Başlık, firma, şehir/konum, açıklama ve ÖGG kart türü girilir. İlan taslak kaydedilir veya yayımlanır; isteğe bağlı son başvuru tarihi belirlenir. İlan düzenleme ekranındaki Başvurular bölümünde adayın iletişim bilgileri ve ön yazısı görülür, durum Başvuru alındı / İnceleniyor / Olumlu değerlendirildi / Olumsuz değerlendirildi olarak değiştirilebilir. Geliştirme sunucusunda adres `/yonetim/is-ilanlari`.
+- **Öğrenci web:** İş İlanları gezinme öğesi. **Mobil:** soldan açılan menü → İş İlanları. İlanlar sekmesinde ayrıntı ve başvuru formu; Başvurularım sekmesinde kişisel başvuru ve değerlendirme durumu bulunur. Ad ve e-posta hesap profilinden doldurulur, başvurmadan önce değiştirilebilir. İletişim bilgilerinin platform yöneticisince görüleceği formda açıklanır.
 - Yalnız yayımlanmış ve süresi dolmamış ilanlar öğrenci listesine/ayrıntısına açıktır. Kapanan veya süresi dolan ilanın önceki başvurusu Başvurularım'da kalır. Başvuru yeni ilan içeriğiyle geriye dönük değiştirilmez.
 - Arayüzler yükleniyor, boş liste, doğrulama, API hatası, yeniden deneme ve sayfalama durumlarını içerir. Başvuru durumları yenile düğmesiyle tekrar alınabilir; anlık bildirim/push yoktur.
 
@@ -49,7 +49,7 @@ Yerel doğrulamada tam backend paketi **215 test / 2.112 assertion**, tam Chromi
 
 - PostgreSQL `JobsTest`: platform/kurum/öğrenci yetkisi, taslak/kapalı/süresi dolmuş ilanlar, tekrar başvuru, şifreli kayıt, yalnız kendi verisi, ilan kopyasının korunması, değerlendirme çakışması, sahte korunan alanlar, iletişim doğrulaması ve hesap dışa aktarma/silme.
 - `tests/e2e/jobs.spec.ts`: gerçek API ile admin oluştur/yayımla → öğrenci başvur → admin değerlendir → öğrenci güncel durumu gör; kapanan ilan ve geçmiş; mobil menüden Bearer başvurusu ve kayıp yanıtın güvenli tekrarı; web API/alan hatası; üç arayüzde açık/koyu tema ve 320/834/1280 genişlikleri.
-- Üç platform Expo export'u geçti. Device Hub'daki iPhone 18 Pro / iOS 27 / Expo Go SDK 58 üzerinde gerçek geliştirme API'sine bağlı İş Başvuruları menüsü, İlanlar ve Başvurularım boş durumları açılarak doğrulandı. İlan/form akışının native cihazda tamamlanması ve fiziksel iPad/Android klavye, kaydırma ve erişilebilirlik teyidi ayrıca gerekir; Chromium önizlemesi bunların yerine geçmez.
+- Üç platform Expo export'u geçti. Device Hub'daki iPhone 18 Pro / iOS 27 / Expo Go SDK 58 üzerinde gerçek geliştirme API'sine bağlı İş İlanları menüsü, İlanlar ve Başvurularım boş durumları açılarak doğrulandı. İlan/form akışının native cihazda tamamlanması ve fiziksel iPad/Android klavye, kaydırma ve erişilebilirlik teyidi ayrıca gerekir; Chromium önizlemesi bunların yerine geçmez.
 
 Sentetik ilanlar yalnız `oggaq_test` fixture'ında üretilir. Geliştirme sunucusuna örnek/gerçek ilan otomatik eklenmez; yönetici gerçek ilan içeriğini girer.
 

@@ -576,7 +576,7 @@ export function Option({
   return (
     <Pressable
       accessibilityRole="radio"
-      accessibilityLabel={text}
+      accessibilityLabel={correct ? `${text} · Doğru cevap` : text}
       accessibilityState={{ checked: selected, disabled }}
       aria-checked={selected}
       aria-disabled={disabled}

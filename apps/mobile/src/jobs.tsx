@@ -17,7 +17,7 @@ export function Jobs({ user }: { user: User }) {
   const [tab, setTab] = useState<'jobs' | 'applications'>('jobs');
   const [selected, setSelected] = useState<string | null>(null);
   function change(next: typeof tab) { setSelected(null); setTab(next); }
-  return <><ScreenTitle title="İş Başvuruları" subtitle="ÖGG ilanlarını incele, başvur ve başvurularını takip et." />
+  return <><ScreenTitle title="İş İlanları" subtitle="ÖGG ilanlarını incele, başvur ve başvurularını takip et." />
     <View style={{ flexDirection: 'row', gap: 8 }}><View style={{ flex: 1 }}><Button compact secondary={tab !== 'jobs'} onPress={() => change('jobs')}>İlanlar</Button></View><View style={{ flex: 1 }}><Button compact secondary={tab !== 'applications'} onPress={() => change('applications')}>Başvurularım</Button></View></View>
     {selected ? <JobDetail key={selected} id={selected} user={user} back={() => setSelected(null)} applications={() => change('applications')} /> : tab === 'jobs' ? <JobList open={setSelected} /> : <MyApplications userId={user.id} />}
   </>;

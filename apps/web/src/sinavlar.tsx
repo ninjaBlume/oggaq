@@ -153,7 +153,7 @@ export function Sonuclarim() {
   const [cursor, setCursor] = useState<string>();
   const history = useQuery({ queryKey: ['exams', context.id, cursor], queryFn: ({ signal }) => api.request('get', '/api/v1/contexts/{context}/exam-attempts', { params: { context: context.id }, query: { cursor, per_page: 20 }, signal }) });
   return <>
-    <PageIntro eyebrow="GİRDİĞİN SINAVLAR" title={vocabulary.results.title}><p>{context.kind === 'personal' ? 'Girdiğin deneme ve ders sınavları.' : `${context.name} alanında girdiğin deneme ve ders sınavları.`} Bir sınavı açıp cevaplarını tek tek inceleyebilirsin.</p></PageIntro>
+    <PageIntro eyebrow="GİRDİĞİN SINAVLAR" title={vocabulary.results.title}><p>{context.kind === 'personal' ? 'Girdiğin deneme ve ders sınavları.' : `${context.name} alanında girdiğin deneme ve ders sınavları.`} Bir sınavı açıp tüm sorularını ve cevaplarını kaydırarak inceleyebilirsin.</p></PageIntro>
     {history.isPending ? <Loading /> : history.isError ? <ErrorNotice error={history.error} retry={() => { void history.refetch(); }} /> : history.data.data.length === 0 ? <section className="card empty"><h2>Henüz bir sınava girmedin</h2><p>Girdiğin sınavlar ve sonuçların burada saklanır.</p><Link className="button primary" to={`/study/${context.id}/deneme`}>Deneme sınavlarına git</Link></section>
       : <>
         <section className="history-list" aria-label="Sınav sonuçları">{history.data.data.map((exam) => <ResultRow key={exam.id} exam={exam} to={`/study/${context.id}/exams/${exam.id}`} />)}</section>

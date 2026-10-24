@@ -129,9 +129,9 @@ test("mobil sekmeler gerçek Bearer API ile deneme sınavı, sonuçlar ve çık�
     page.getByRole("button", { name: "Bitir ve değerlendir" }),
   ).not.toBeVisible();
   await screenshot(page, "exam-result");
-  await page.getByRole("button", { name: "☆ Favoriye ekle" }).click();
+  await page.getByTestId("result-question-1").getByRole("button", { name: "☆ Favoriye ekle" }).click();
   await expect(
-    page.getByRole("button", { name: "★ Favorilerde" }),
+    page.getByTestId("result-question-1").getByRole("button", { name: "★ Favorilerde" }),
   ).toBeVisible();
   expect(
     await page.evaluate(
@@ -564,9 +564,9 @@ test("mobil tekrar sınavı hatalardan kurulur; başarı durumu ve sınavlar ger
     .click();
   await page.getByRole("button", { name: "Bitir ve değerlendir" }).click();
   await expect(page.getByText("Deneme sonucun", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "☆ Favoriye ekle" }).click();
+  await page.getByTestId("result-question-1").getByRole("button", { name: "☆ Favoriye ekle" }).click();
   await expect(
-    page.getByRole("button", { name: "★ Favorilerde" }),
+    page.getByTestId("result-question-1").getByRole("button", { name: "★ Favorilerde" }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Geri dön" }).click();
 

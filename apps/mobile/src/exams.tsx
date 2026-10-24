@@ -13,21 +13,17 @@ import type { ExamAttempt, StudyContext } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
 import { anchorClock, remainingSeconds, timeLabel, resumeQuestionIndex, ExamPositionSaver } from "@oggaq/study-core";
 import { api } from "./api";
-import { ReportQuestion } from "./report";
+import { CompletedExam } from "./exam-results";
 import { useResource, useResume, useTask } from "./hooks";
 import {
   Button,
   Card,
   ConfirmDialog,
   ErrorNotice,
-  Heading,
   Loading,
   Option,
-  SectionTitle,
   Sheet,
-  TextLink,
 } from "./ui";
-import { Enter, ExpressiveEmblem } from "./expressive";
 import { useBody, useLayout, useTheme } from "./themeContext";
 // The numbered question buttons: in a sheet on narrow windows, in the side panel on expanded ones.
 function QuestionMap({
@@ -197,54 +193,12 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
   }, [exam?.server_time, done]);
-  const favorite = useTask<{
-    data: { question_id: string; favorite: boolean };
-  }>();
-  // Favorites do not change the attempt revision, so the loaded rows are updated directly.
-  function toggleFavorite(questionId: string, next: boolean) {
-    void favorite.run(
-      () =>
-        next
-          ? api.request(
-              "put",
-              "/api/v1/contexts/{context}/favorites/{question}",
-              {
-                params: { context: context.id, question: questionId },
-              },
-            )
-          : api.request(
-              "delete",
-              "/api/v1/contexts/{context}/favorites/{question}",
-              { params: { context: context.id, question: questionId } },
-            ),
-      (response) => {
-        const mark = (value: ExamAttempt): ExamAttempt => ({
-          ...value,
-          questions: value.questions.map((item) =>
-            item.question_id === response.data.question_id
-              ? { ...item, is_favorite: response.data.favorite }
-              : item,
-          ),
-        });
-        if (latest.current) latest.current = mark(latest.current);
-        query.setData((current) =>
-          current ? { data: mark(current.data) } : current,
-        );
-      },
-    );
-  }
-  // A report does not change the attempt either: only the loaded row is flagged.
-  function markReported(questionId: string) {
+  function updateQuestion(questionId: string, patch: { is_favorite?: boolean; reported?: boolean }) {
     const mark = (value: ExamAttempt): ExamAttempt => ({
-      ...value,
-      questions: value.questions.map((item) =>
-        item.question_id === questionId ? { ...item, reported: true } : item,
-      ),
+      ...value, questions: value.questions.map((item) => item.question_id === questionId ? { ...item, ...patch } : item),
     });
     if (latest.current) latest.current = mark(latest.current);
-    query.setData((current) =>
-      current ? { data: mark(current.data) } : current,
-    );
+    query.setData((current) => current ? { data: mark(current.data) } : current);
   }
   function accept(r: { data: ExamAttempt }) {
     if (!latest.current || latest.current.revision <= r.data.revision) {
@@ -303,6 +257,7 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
     ) : (
       <Loading />
     );
+  if (done) return <CompletedExam exam={exam} context={context} updateQuestion={updateQuestion} error={query.error} reload={() => { void query.reload(); }} />;
   const blocked = task.pending || submission !== null || finishing !== null;
   const locked = done || blocked || seconds === 0;
   const row = exam.questions[index];
@@ -433,115 +388,7 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={[body, { paddingTop: 8 }]}
           >
-            {done && exam.result ? (
-              <>
-                <Heading>Deneme sonucun</Heading>
-                <Enter>
-                  <Card>
-                    <View
-                      style={{
-                        alignItems: "center",
-                        gap: 12,
-                        paddingVertical: 10,
-                      }}
-                    >
-                      <ExpressiveEmblem size={160}>
-                        <Text
-                          style={{
-                            color: palette.onPrimaryContainer,
-                            fontSize: 32,
-                            fontWeight: "800",
-                            letterSpacing: -1,
-                          }}
-                        >
-                          %{exam.result.score_percent}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.muted,
-                            { color: palette.onPrimaryContainer },
-                          ]}
-                        >
-                          doğru oranı
-                        </Text>
-                      </ExpressiveEmblem>
-                      <Text style={styles.heading}>Bir prova daha tamam!</Text>
-                    </View>
-                    <View style={{ flexDirection: "row", gap: 10 }}>
-                      {[
-                        {
-                          value: exam.result.correct,
-                          label: "Doğru",
-                          color: palette.success,
-                          bg: palette.softSuccess,
-                        },
-                        {
-                          value: exam.result.incorrect,
-                          label: "Yanlış",
-                          color: palette.red,
-                          bg: palette.softRed,
-                        },
-                        {
-                          value: exam.result.blank,
-                          label: "Boş",
-                          color: palette.muted,
-                          bg: palette.paper,
-                        },
-                      ].map((stat) => (
-                        <View
-                          key={stat.label}
-                          style={{
-                            flex: 1,
-                            alignItems: "center",
-                            padding: 14,
-                            backgroundColor: stat.bg,
-                            borderRadius: 16,
-                            gap: 4,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              fontSize: 22,
-                              fontWeight: "800",
-                              color: stat.color,
-                            }}
-                          >
-                            {stat.value}
-                          </Text>
-                          <Text
-                            style={{
-                              fontSize: 11,
-                              fontWeight: "600",
-                              color: stat.color,
-                            }}
-                          >
-                            {stat.label}
-                          </Text>
-                        </View>
-                      ))}
-                    </View>
-                    <Text style={[styles.muted, { textAlign: "center" }]}>
-                      {exam.result.correct} doğru · {exam.result.incorrect}{" "}
-                      yanlış · {exam.result.blank} boş
-                    </Text>
-                    <Text
-                      style={[
-                        styles.muted,
-                        { fontSize: 11, textAlign: "center" },
-                      ]}
-                    >
-                      {exam.finish_reason === "expired"
-                        ? "Süre dolduğunda tamamlandı."
-                        : "Denemeyi sen bitirdin."}{" "}
-                      Çalışma puanı; geçme / kalma kararı değildir.
-                    </Text>
-                  </Card>
-                </Enter>
-                <SectionTitle>Cevaplarını incele</SectionTitle>
-              </>
-            ) : (
-              <Text style={styles.eyebrow}>DENEMEN DEVAM EDİYOR</Text>
-            )}
+            <Text style={styles.eyebrow}>DENEMEN DEVAM EDİYOR</Text>
             <Card>
               <Text style={[styles.heading, { fontSize: 21, lineHeight: 32 }]}>
                 {row.question.stem}
@@ -597,51 +444,6 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
                     Cevabı temizle
                   </Button>
                 </>
-              )}
-              {done && row.feedback && (
-                <View
-                  style={{
-                    backgroundColor:
-                      row.feedback.outcome === "correct"
-                        ? palette.softSuccess
-                        : palette.softRed,
-                    padding: 16,
-                    borderRadius: 16,
-                    gap: 8,
-                  }}
-                >
-                  <Text style={styles.heading}>
-                    {row.feedback.outcome === "correct"
-                      ? "Doğru"
-                      : row.feedback.outcome === "incorrect"
-                        ? "Yanlış"
-                        : "Boş bırakıldı"}
-                  </Text>
-                  {row.feedback.explanation && (
-                    <Text style={[styles.text, { fontSize: 14 }]}>
-                      {row.feedback.explanation}
-                    </Text>
-                  )}
-                  <TextLink
-                    onPress={() =>
-                      toggleFavorite(row.question_id, !row.is_favorite)
-                    }
-                  >
-                    {favorite.pending
-                      ? "Kaydediliyor…"
-                      : row.is_favorite
-                        ? "★ Favorilerde"
-                        : "☆ Favoriye ekle"}
-                  </TextLink>
-                  <ErrorNotice error={favorite.error} />
-                  <ReportQuestion
-                    key={row.id}
-                    contextId={context.id}
-                    examId={exam.id}
-                    row={row}
-                    reported={markReported}
-                  />
-                </View>
               )}
               <ErrorNotice
                 error={task.error}

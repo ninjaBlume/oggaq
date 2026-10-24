@@ -348,7 +348,7 @@ export function Results({ context, openExam }: { context: StudyContext; openExam
   });
   return (
     <>
-      <ScreenTitle title={vocabulary.results.title} subtitle="Girdiğin deneme ve ders sınavları. Bir sınavı açıp cevaplarını tek tek incele." />
+      <ScreenTitle title={vocabulary.results.title} subtitle="Girdiğin deneme ve ders sınavları. Bir sınavı açıp tüm sorularını ve cevaplarını kaydırarak incele." />
       {exams.loading ? (
         <Loading layout="list" label="Sonuçların yükleniyor" />
       ) : exams.error ? (

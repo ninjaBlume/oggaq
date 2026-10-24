@@ -14,7 +14,7 @@ type Input = components['schemas']['SaveJobPostingInput'];
 export function JobList() {
   const [cursor, setCursor] = useState<string>();
   const jobs = useQuery({ queryKey: ['jobs-admin', cursor], queryFn: ({ signal }) => api.request('get', '/api/v1/admin/job-postings', { signal, query: { per_page: 20, cursor } }) });
-  return <><header className="page-heading"><div><span className="eyebrow">İŞ İLANLARI</span><h1>İş Başvuruları</h1><p className="muted">ÖGG ilanlarını yayımla, başvuruları incele ve durumlarını güncelle.</p></div><Link to="/is-ilanlari/yeni" className="button primary">İlan ekle</Link></header>
+  return <><header className="page-heading"><div><span className="eyebrow">İŞ İLANLARI</span><h1>İş İlanları</h1><p className="muted">ÖGG ilanlarını yayımla, başvuruları incele ve durumlarını güncelle.</p></div><Link to="/is-ilanlari/yeni" className="button primary">İlan ekle</Link></header>
     {jobs.isPending ? <Loading /> : jobs.isError ? <ErrorNotice error={jobs.error} retry={() => { void jobs.refetch(); }} /> : <>
       {jobs.data.data.length === 0 ? <section className="card empty-state"><h2>Henüz iş ilanı yok</h2><p>Yeni bir ilan ekleyerek başla.</p></section> : <div className="job-admin-list">{jobs.data.data.map((job) => <Link key={job.id} to={`/is-ilanlari/${job.id}`} className="card job-admin-row"><div><span className="badge">{job.status === 'published' && !job.is_open ? 'Süresi doldu' : jobStatusLabels[job.status]}</span><h2>{job.title}</h2><p className="muted">{job.company_name} · {job.city} · {jobWeaponLabels[job.weapon_requirement]}</p></div><span>{job.applications_count ?? 0} başvuru →</span></Link>)}</div>}
       <div className="pagination"><button className="button secondary" disabled={!jobs.data.links.prev} onClick={() => setCursor(cursorFromLink(jobs.data.links.prev))}>Önceki</button><button className="button secondary" disabled={!jobs.data.links.next} onClick={() => setCursor(cursorFromLink(jobs.data.links.next))}>Sonraki</button></div>
@@ -27,7 +27,7 @@ export function JobEditor() {
   const job = useQuery({ queryKey: ['job-admin', jobId], enabled: !!jobId, queryFn: ({ signal }) => api.request('get', '/api/v1/admin/job-postings/{job}', { signal, params: { job: jobId! } }) });
   if (jobId && job.isPending) return <Loading />;
   if (jobId && job.isError) return <ErrorNotice error={job.error} retry={() => { void job.refetch(); }} />;
-  return <><Link className="text-button" to="/is-ilanlari">← İlanlara dön</Link><header className="page-heading"><div><h1>{jobId ? 'İlanı düzenle' : 'İlan ekle'}</h1><p className="muted">Yayımlanan ve süresi dolmamış ilanlar öğrencilerin İş Başvuruları bölümünde görünür.</p></div></header><JobForm key={`${jobId ?? 'new'}-${job.data?.data.revision ?? 0}`} job={job.data?.data} />{jobId && <JobApplications id={jobId} />}</>;
+  return <><Link className="text-button" to="/is-ilanlari">← İlanlara dön</Link><header className="page-heading"><div><h1>{jobId ? 'İlanı düzenle' : 'İlan ekle'}</h1><p className="muted">Yayımlanan ve süresi dolmamış ilanlar öğrencilerin İş İlanları bölümünde görünür.</p></div></header><JobForm key={`${jobId ?? 'new'}-${job.data?.data.revision ?? 0}`} job={job.data?.data} />{jobId && <JobApplications id={jobId} />}</>;
 }
 
 function JobForm({ job }: { job?: Job }) {

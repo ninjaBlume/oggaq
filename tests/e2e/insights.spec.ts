@@ -22,14 +22,11 @@ test("yanlışlar, boşlar, favoriler ve başarı durumu son sonuca göre günce
   await login(page);
   await solveDers(page, "B");
   await expect(page.getByRole("status").filter({ hasText: "DOĞRU YÜZDESİ" })).toContainText("1 doğru · 1 yanlış · 1 boş");
-  // The result shows one question at a time; go back to the first (wrong) one before favoriting it.
-  await page.getByRole("button", { name: "Önceki soru" }).click();
-  await page.getByRole("button", { name: "Önceki soru" }).click();
   await expect(page.getByRole("heading", { name: "Sentetik birinci soru" })).toBeVisible();
-  await page.getByRole("button", { name: "☆ Favoriye ekle" }).click();
-  await expect(page.getByRole("button", { name: "★ Favorilerde" })).toBeVisible();
+  await page.getByTestId("result-question-1").getByRole("button", { name: "☆ Favoriye ekle" }).click();
+  await expect(page.getByTestId("result-question-1").getByRole("button", { name: "★ Favorilerde" })).toBeVisible();
   await page.reload();
-  await expect(page.getByRole("button", { name: "★ Favorilerde" })).toBeVisible();
+  await expect(page.getByTestId("result-question-1").getByRole("button", { name: "★ Favorilerde" })).toBeVisible();
 
   await page.getByRole("link", { name: "Tekrar sınavı", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Tekrar sınavı" })).toBeVisible();

@@ -37,7 +37,7 @@ test("öğrenci sonuçtan soruyu bildirir; yönetici kuyrukta görür, sınavda 
 
   // The first question of the exam is "Sentetik üçüncü soru" (the fixture exam is in reverse order).
   await expect(student.getByRole("heading", { name: "Sentetik üçüncü soru" })).toBeVisible();
-  await student.getByRole("button", { name: "Soruyu bildir", exact: true }).click();
+  await student.getByTestId("result-question-1").getByRole("button", { name: "Soruyu bildir", exact: true }).click();
   const send = student.getByRole("button", { name: "Bildirimi gönder", exact: true });
   await expect(send).toBeDisabled();
   await student.getByRole("radio", { name: "Cevap anahtarı yanlış", exact: true }).check();
@@ -89,7 +89,7 @@ test("öğrenci sonuçtan soruyu bildirir; yönetici kuyrukta görür, sınavda 
 
   // With the report closed the student may report the question again.
   await student.reload();
-  await expect(student.getByRole("button", { name: "Soruyu bildir", exact: true })).toBeVisible();
+  await expect(student.getByTestId("result-question-1").getByRole("button", { name: "Soruyu bildir", exact: true })).toBeVisible();
   expect(errors).toEqual([]);
   await studentContext.close();
   await adminContext.close();
@@ -100,7 +100,7 @@ test("rapor formu nedensiz gönderilmez; hata gösterilir ve vazgeçilebilir", a
   await enterDeneme(page);
   await answer(page, "A");
   await finish(page);
-  await page.getByRole("button", { name: "Soruyu bildir", exact: true }).click();
+  await page.getByTestId("result-question-1").getByRole("button", { name: "Soruyu bildir", exact: true }).click();
   await expect(page.getByRole("button", { name: "Bildirimi gönder", exact: true })).toBeDisabled();
   // A failing server answer is shown with a retry, and the form stays open.
   await page.route("**/report", (route) => route.fulfill({ status: 500, contentType: "application/problem+json", body: JSON.stringify({ title: "Server Error", status: 500, code: "server_error", detail: "Sunucu hatası" }) }));
@@ -109,7 +109,7 @@ test("rapor formu nedensiz gönderilmez; hata gösterilir ve vazgeçilebilir", a
   await expect(page.getByRole("alert")).toBeVisible();
   await expect(page.getByRole("button", { name: "Bildirdin" })).toHaveCount(0);
   await page.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Soruyu bildir", exact: true })).toBeVisible();
+  await expect(page.getByTestId("result-question-1").getByRole("button", { name: "Soruyu bildir", exact: true })).toBeVisible();
 });
 
 test.describe("mobil", () => {
@@ -128,14 +128,14 @@ test.describe("mobil", () => {
     await page.getByLabel("Süre (dakika)", { exact: true }).fill("5");
     await page.getByRole("button", { name: "Sınavı başlat" }).click();
     await expect(page.getByText("DENEMEN DEVAM EDİYOR", { exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Soruyu bildir", exact: true })).toHaveCount(0);
+    await expect(page.getByTestId("result-question-1").getByRole("button", { name: "Soruyu bildir", exact: true })).toHaveCount(0);
     await page.getByRole("radio", { name: "Sentetik A", exact: true }).click();
     await expect(page.getByText("Cevaplar sunucuda kayıtlı", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Denemeyi bitir", exact: true }).click();
     await page.getByRole("button", { name: "Bitir ve değerlendir" }).click();
     await expect(page.getByText("Deneme sonucun", { exact: true })).toBeVisible();
 
-    await page.getByRole("button", { name: "Soruyu bildir", exact: true }).click();
+    await page.getByTestId("result-question-1").getByRole("button", { name: "Soruyu bildir", exact: true }).click();
     const send = page.getByRole("button", { name: "Bildirimi gönder", exact: true });
     await expect(send).toBeDisabled();
     await page.getByRole("radio", { name: "Yazım veya dil hatası", exact: true }).click();
@@ -145,7 +145,7 @@ test.describe("mobil", () => {
     await send.click();
     await expect(page.getByText("Bildirimin alındı, teşekkürler.", { exact: true })).toBeVisible();
     await expect(page.getByText("Bildirdin", { exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Soruyu bildir", exact: true })).toHaveCount(0);
+    await expect(page.getByTestId("result-question-1").getByRole("button", { name: "Soruyu bildir", exact: true })).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect(errors).toEqual([]);
   });

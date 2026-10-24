@@ -1351,3 +1351,17 @@ input::placeholder { color:var(--c-muted); opacity:1 }
 .job-detail textarea { width:100%; min-height:110px; padding:14px; border:1px solid var(--edge); border-radius:16px; background:var(--c-paper); color:var(--c-ink); font:inherit; resize:vertical }
 .job-card summary { min-height:44px; display:flex; align-items:center; cursor:pointer; color:var(--c-primary); font-weight:600 }
 @media(min-width:840px) { .job-grid { grid-template-columns:repeat(2,minmax(0,1fr)) } }
+
+.exam-review { width:100%; max-width:760px; margin:32px auto; display:grid; grid-template-columns:minmax(0,1fr); gap:24px }
+.result-question { content-visibility:auto; contain-intrinsic-block-size:auto 640px; min-width:0; overflow-wrap:anywhere }
+.result-question .question-meta { flex-wrap:wrap; gap:8px }
+.result-question .answer-option { cursor:default; display:grid; grid-template-columns:29px minmax(0,1fr); gap:8px 11px }
+.result-question .option-note { grid-column:2; max-width:none; margin-left:0; font-size:11px }
+.result-outcome { font-weight:700; color:var(--c-muted) }
+.result-outcome.correct { color:var(--c-success) }
+.result-outcome.incorrect { color:var(--c-red) }
+.result-explanation { margin-top:20px; padding:16px; border-radius:16px; background:var(--c-surface-container) }
+.result-explanation h4 { margin:0 0 8px }
+.result-explanation p { margin:0; white-space:pre-wrap; line-height:1.7 }
+.result-actions { margin-top:16px; display:grid; gap:8px; justify-items:start }
+.result-actions .report-state,.result-actions .report-form { width:100% }

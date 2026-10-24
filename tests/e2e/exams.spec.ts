@@ -19,7 +19,9 @@ test("sınav cevapları saklanır; bitişte doğru yanlış boş ve kaynak açı
   await expect(page.getByRole("radio", { name: /Sentetik B/ })).toBeChecked();
   await finish(page);
   await expect(page.getByRole("status").filter({ hasText: "DOĞRU YÜZDESİ" })).toContainText("1 doğru · 1 yanlış · 1 boş");
-  await expect(page.getByText("Sentetik açıklama — gerçek sınav içeriği değildir.", { exact: true })).toBeVisible();
+  await expect(page.getByText("Sentetik açıklama — gerçek sınav içeriği değildir.", { exact: true })).toHaveCount(3);
+  await expect(page.getByTestId("result-question-3")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Sonraki soru" })).toHaveCount(0);
   mkdirSync("artifacts/web-preview", { recursive: true });
   await page.screenshot({ path: "artifacts/web-preview/exam-result.png", fullPage: true });
   await page.getByRole("link", { name: "Sonuçlarıma dön", exact: false }).click();
