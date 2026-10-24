@@ -98,21 +98,30 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
       ? "Ücretsiz hesabınla sınavlarını ve sonuçlarını takip et."
       : "E-posta adresine parola yenileme bağlantısı gönderelim.";
   return (
-    <View style={{ width: "100%", maxWidth: 480, alignSelf: "center", gap: 24, paddingTop: 12 }}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 12, paddingBottom: 20, borderBottomWidth: 1, borderColor: palette.line }}>
-        <View style={{ width: 48, height: 48, borderRadius: shape.medium, backgroundColor: palette.primaryContainer, alignItems: "center", justifyContent: "center" }}>
-          <ShieldCheck size={27} color={palette.onPrimaryContainer} strokeWidth={1.8} />
+    <View style={{ width: "100%", maxWidth: 480, alignSelf: "center", gap: 20, paddingTop: 12 }}>
+      <View style={{ backgroundColor: palette.navy, borderRadius: shape.large, padding: 22, gap: 18, overflow: "hidden" }}>
+        <View pointerEvents="none" accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ position: "absolute", right: -36, top: -42, width: 156, height: 156, borderRadius: shape.extraLarge, borderWidth: 1, borderColor: palette.decorativeLine, transform: [{ rotate: "25deg" }] }}>
+          <View style={{ position: "absolute", inset: 18, borderRadius: shape.large, borderWidth: 1, borderColor: palette.decorativeLine }} />
         </View>
-        <View style={{ flex: 1, gap: 3 }}>
-          <Text style={{ color: palette.ink, fontSize: 20, lineHeight: 26, fontWeight: "800", letterSpacing: 1 }}>{brand.displayName}</Text>
-          <Text style={[styles.muted, { fontSize: 13, lineHeight: 19 }]}>{brand.subtitle}</Text>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+          <View style={{ width: 46, height: 46, borderRadius: shape.medium, backgroundColor: palette.primaryContainer, alignItems: "center", justifyContent: "center" }}>
+            <ShieldCheck size={26} color={palette.onPrimaryContainer} strokeWidth={1.8} />
+          </View>
+          <View style={{ flex: 1, gap: 3 }}>
+            <Text style={{ color: palette.onNavy, fontSize: 21, lineHeight: 27, fontWeight: "800", letterSpacing: 1.2 }}>{brand.displayName}</Text>
+            <Text style={{ color: palette.onNavyMuted, fontSize: 12, lineHeight: 18 }}>{brand.subtitle}</Text>
+          </View>
         </View>
-      </View>
-      <View style={{ gap: 8 }}>
-        <Text accessibilityRole="header" style={[typography.headline, { color: palette.ink }]}>{heading}</Text>
-        <Text style={styles.muted}>{description}</Text>
+        <View style={{ borderTopWidth: 1, borderColor: palette.decorativeLine, paddingTop: 14 }}>
+          <Text style={{ color: palette.onNavyMuted, fontSize: 13, lineHeight: 20 }}>{brand.tagline}</Text>
+        </View>
       </View>
       <View style={{ backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.line, borderRadius: shape.large, padding: 20, gap: 18 }}>
+        <View style={{ gap: 6, paddingBottom: 18, borderBottomWidth: 1, borderColor: palette.line }}>
+          <View style={{ width: 28, height: 3, borderRadius: shape.full, backgroundColor: palette.primary, marginBottom: 4 }} />
+          <Text accessibilityRole="header" style={[typography.headline, { color: palette.ink }]}>{heading}</Text>
+          <Text style={styles.muted}>{description}</Text>
+        </View>
         {mode === "register" && (
           <Field label="Ad soyad" value={name} onChange={setName} editable={!task.pending} outlined />
         )}
