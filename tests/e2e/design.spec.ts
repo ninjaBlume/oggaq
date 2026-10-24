@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { execFileSync } from "node:child_process";
+import { mkdirSync } from "node:fs";
 import { browserTestEnv, phpBinary } from "../../playwright.config";
 import { contrastRatio, luminance } from "../../packages/design-tokens/src/contrast";
 
@@ -72,6 +73,7 @@ test("web: koyu tema cihazı izler, kullanıcı seçimi onu geçersiz kılar ve 
 
 for (const scheme of schemes) {
   test(`web (${scheme}): sayfalar 320–1280 px taşmaz ve başlık kontrastı AA`, async ({ browser }) => {
+    mkdirSync('artifacts/web-preview/redesign', { recursive: true });
     const context = await browser.newContext({ colorScheme: scheme });
     const page = await context.newPage();
     await webLogin(page);
@@ -82,6 +84,7 @@ for (const scheme of schemes) {
         await expect(page.getByRole("heading", { name: name === "Tekrar sınavı" ? /Tekrar/ : name }).first()).toBeVisible();
         await expectFits(page);
         await expectHeadingContrast(page);
+        await page.screenshot({ path: `artifacts/web-preview/redesign/${scheme}-${width}-${name}.png`, fullPage: true, animations: 'disabled' });
       }
     }
     await context.close();

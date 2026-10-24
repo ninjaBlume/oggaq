@@ -6,6 +6,53 @@ test.use({ baseURL: 'http://127.0.0.1:5183' });
 test.beforeEach(() => { fixture('setup-study'); fixture('official-exam'); fixture('subject-exam'); });
 test.afterAll(() => fixture('cleanup'));
 
+test('web giriş formu açık/koyu ve dar/geniş ekrana sığar; parola görünürlüğü ekran değişiminde sıfırlanır', async ({ page }) => {
+  mkdirSync('artifacts/web-preview/redesign', { recursive: true });
+  await page.goto('/');
+  for (const colorScheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme });
+    for (const width of [320, 390, 834, 1280]) {
+      await page.setViewportSize({ width, height: 844 });
+      await expect(page.getByRole('heading', { name: 'Hoş geldin' })).toBeVisible();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await expect(page.getByRole('button', { name: 'Giriş yap', exact: true })).toBeInViewport();
+      await page.screenshot({ path: `artifacts/web-preview/redesign/login-${colorScheme}-${width}.png`, fullPage: true, animations: 'disabled' });
+    }
+  }
+  const password = page.getByLabel('Parola', { exact: true });
+  await password.fill('Synthetic-Browser-42!');
+  await page.getByRole('button', { name: 'Parola: parolayı göster', exact: true }).click();
+  await expect(password).toHaveAttribute('type', 'text');
+  await page.getByRole('button', { name: 'Hesap oluştur', exact: true }).click();
+  await expect(password).toHaveValue('');
+  await expect(password).toHaveAttribute('type', 'password');
+  await expect(password).toHaveAttribute('autocomplete', 'new-password');
+  await page.getByRole('button', { name: 'Girişe dön', exact: true }).click();
+  await page.getByRole('button', { name: 'Parolamı unuttum' }).click();
+  await expect(page.getByRole('heading', { name: 'Parolanı yenile' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /parolayı göster/ })).toHaveCount(0);
+});
+
+test('giriş beklerken parola ve mod kontrolleri kilitlenir; tek erişim alanında seçici görünmez', async ({ page }) => {
+  fixture('setup');
+  let release!: () => void;
+  const gate = new Promise<void>((resolve) => { release = resolve; });
+  await page.route('**/api/v1/auth/login', async (route) => { await gate; await route.continue(); });
+  await page.goto('/');
+  await page.getByLabel('E-posta adresi', { exact: true }).fill('e2e-student@example.test');
+  await page.getByLabel('Parola', { exact: true }).fill('Synthetic-Browser-42!');
+  await page.getByRole('button', { name: 'Giriş yap', exact: true }).click();
+  try {
+    await expect(page.getByLabel('Parola', { exact: true })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Parola: parolayı göster', exact: true })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Parolamı unuttum' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Hesap oluştur', exact: true })).toBeDisabled();
+  } finally { release(); }
+  await expect(page.getByRole('heading', { name: 'Deneme sınavları', exact: true })).toBeVisible();
+  await expect(page.getByLabel('Çalışma alanı', { exact: true })).toHaveCount(0);
+  await expect(page.locator('.site-header')).toContainText('ÖGG Soru Cevap Platformu');
+});
+
 test('öğrenci deneme sınavına girer; cevaplar, sonuç ve geçmiş kalır', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
@@ -91,7 +138,7 @@ test('bireysel kayıt, giriş ve imzalı e-posta doğrulama öğrenci ekranında
   await page.getByLabel('Ad soyad').fill('Sentetik yeni öğrenci');
   await page.getByLabel('E-posta adresi', { exact: true }).fill('e2e-new@example.test');
   await page.getByLabel('Parola', { exact: true }).fill('Synthetic-Browser-42!');
-  await page.getByLabel('Parola tekrar').fill('Synthetic-Browser-42!');
+  await page.getByLabel('Parola tekrar', { exact: true }).fill('Synthetic-Browser-42!');
   await page.getByRole('button', { name: 'Hesap oluştur', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('Hesabınız oluşturuldu.');
   await page.getByLabel('Parola', { exact: true }).fill('Synthetic-Browser-42!');
@@ -113,7 +160,7 @@ test('parola sıfırlama formu gerçek token ile yeni giriş sağlar', async ({ 
   // The local fixture issues a real Laravel broker token and uses the mail notification's URL.
   await page.goto(fixture('reset-link', 'e2e-student@example.test'));
   await page.getByLabel('Yeni parola', { exact: true }).fill('Synthetic-New-Password-42!');
-  await page.getByLabel('Parola tekrar').fill('Synthetic-New-Password-42!');
+  await page.getByLabel('Parola tekrar', { exact: true }).fill('Synthetic-New-Password-42!');
   await page.getByRole('button', { name: 'Parolayı yenile' }).click();
   await expect(page.getByRole('heading', { name: 'Parolan yenilendi' })).toBeVisible();
   await page.getByRole('link', { name: 'Girişe dön' }).click();

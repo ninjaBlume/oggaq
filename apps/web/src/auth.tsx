@@ -8,7 +8,9 @@ import { ApiError } from '@oggaq/api-client';
 import { api } from './api';
 import { brand } from './config';
 import { verificationInput } from './verification';
-import { ErrorNotice, Field, Loading } from './ui';
+import { ErrorNotice, Field, Loading, PasswordField } from './ui';
+import { Icon } from './icons';
+import { ThemeSwitch } from './theme';
 
 const sessionKey = ['session'] as const;
 export async function replaceSession(cache: QueryClient, user: User | null) {
@@ -39,7 +41,15 @@ export function SessionEvents({ children }: { children: ReactNode }) {
   return children;
 }
 export function AuthFrame({ children }: { children: ReactNode }) {
-  return <main className="auth-layout"><section className="auth-story"><Link to="/" className="brand">{brand.name}<span className="brand-dot" /></Link><div><span className="eyebrow">{brand.subtitle.toLocaleUpperCase('tr-TR')}</span><h1>Özel güvenlik<br />sınavlarına hazırlan.</h1><p>Deneme ve ders sınavlarını gerçek süreyle çöz; sonuçlarını, yanlışlarını ve gelişimini takip et. Çalışmaların hesabında saklanır.</p></div><small>Öğrenciler için ücretsiz.</small></section><section className="auth-content"><div className="auth-card">{children}</div></section></main>;
+  return <main className="auth-layout">
+    <section className="auth-story" aria-label={brand.subtitle}>
+      <Link to="/" className="brand"><span className="brand-mark"><Icon name="shield" size={27} /></span><span>{brand.name}<small>{brand.subtitle}</small></span></Link>
+      <div className="auth-story-copy"><h1>{brand.tagline}</h1><p>Deneme ve ders sınavlarını süreyle çöz; sonuçlarını ve tekrar listelerini hesabından takip et.</p></div>
+      <div className="auth-features"><span><Icon name="book" />Deneme ve ders sınavları</span><span><Icon name="chart" />Sonuçlar ve gelişim</span></div>
+    </section>
+    <section className="auth-content"><div className="auth-card">{children}</div><p className="auth-free"><Icon name="cap" size={18} />Öğrenciler için ücretsiz.</p></section>
+    <div className="auth-appearance"><ThemeSwitch /></div>
+  </main>;
 }
 export function Login() {
   const [mode, setMode] = useState<'login' | 'register' | 'forgot'>('login');
@@ -63,13 +73,13 @@ export function Login() {
   const fieldError = (field: string) => mutation.error instanceof ApiError ? mutation.error.field(field) : undefined;
   function changeMode(next: typeof mode) { setMode(next); setMessage(''); setPassword(''); setConfirmation(''); mutation.reset(); }
   function submit(event: FormEvent) { event.preventDefault(); mutation.mutate(); }
-  return <AuthFrame><span className="eyebrow">ÜCRETSİZ ÖĞRENCİ HESABI</span><h2>{mode === 'register' ? 'Birlikte başlayalım' : mode === 'forgot' ? 'Parolanı yenile' : 'Hoş geldin'}</h2><p className="muted">{mode === 'login' ? 'Çalışmalarına kaldığın yerden devam et.' : mode === 'register' ? 'Bir kuruma bağlı olmadan da çalışabilirsin.' : 'E-posta adresine sıfırlama bağlantısı gönderelim.'}</p>{message && <p role="status" className="notice success">{message}</p>}{mutation.isError && <ErrorNotice error={mutation.error} />}<form onSubmit={submit}><fieldset disabled={mutation.isPending}>
+  return <AuthFrame><div className="auth-heading"><h2>{mode === 'register' ? 'Hesap oluştur' : mode === 'forgot' ? 'Parolanı yenile' : 'Hoş geldin'}</h2><p className="muted">{mode === 'login' ? 'Denemelerine ve sonuçlarına ulaş.' : mode === 'register' ? 'Ücretsiz hesabınla sınavlarını ve sonuçlarını takip et.' : 'E-posta adresine parola yenileme bağlantısı gönderelim.'}</p></div>{message && <p role="status" className="notice success">{message}</p>}{mutation.isError && <ErrorNotice error={mutation.error} />}<form onSubmit={submit}><fieldset disabled={mutation.isPending}>
     {mode === 'register' && <Field label="Ad soyad" error={fieldError('name')}>{(props) => <input {...props} required maxLength={100} autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} />}</Field>}
-    <Field label="E-posta adresi" error={fieldError('email')}>{(props) => <input {...props} required type="email" autoComplete="username" value={email} onChange={(event) => setEmail(event.target.value)} />}</Field>
-    {mode !== 'forgot' && <Field label="Parola" error={fieldError('password')} hint={mode === 'register' ? 'En az 12 karakter; büyük/küçük harf, rakam ve sembol.' : undefined}>{(props) => <input {...props} required type="password" minLength={mode === 'register' ? 12 : undefined} maxLength={128} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} value={password} onChange={(event) => setPassword(event.target.value)} />}</Field>}
-    {mode === 'register' && <Field label="Parola tekrar" error={fieldError('password_confirmation')}>{(props) => <input {...props} required type="password" autoComplete="new-password" value={confirmation} onChange={(event) => setConfirmation(event.target.value)} />}</Field>}
+    <Field label="E-posta adresi" error={fieldError('email')}>{(props) => <div className="input-shell"><Icon name="mail" /><input {...props} required type="email" autoComplete="username" placeholder="ornek@eposta.com" value={email} onChange={(event) => setEmail(event.target.value)} /></div>}</Field>
+    {mode !== 'forgot' && <PasswordField key={`${mode}-password`} value={password} onChange={setPassword} newPassword={mode === 'register'} error={fieldError('password')} hint={mode === 'register' ? 'En az 12 karakter; büyük/küçük harf, rakam ve sembol.' : undefined} labelAction={mode === 'login' ? <button className="text-button" type="button" onClick={() => changeMode('forgot')}>Parolamı unuttum</button> : undefined} />}
+    {mode === 'register' && <PasswordField label="Parola tekrar" value={confirmation} onChange={setConfirmation} newPassword error={fieldError('password_confirmation')} />}
     <button className="button primary full" type="submit">{mutation.isPending ? 'İşlem yapılıyor…' : mode === 'register' ? 'Hesap oluştur' : mode === 'forgot' ? 'Bağlantı gönder' : 'Giriş yap'}</button>
-  </fieldset></form><div className="auth-links"><button disabled={mutation.isPending} onClick={() => changeMode(mode === 'login' ? 'register' : 'login')}>{mode === 'login' ? 'Hesap oluştur' : 'Girişe dön'}</button>{mode === 'login' && <button disabled={mutation.isPending} onClick={() => changeMode('forgot')}>Parolamı unuttum</button>}</div></AuthFrame>;
+  </fieldset></form><div className="auth-links">{mode !== 'forgot' && <span className="muted">{mode === 'login' ? 'Henüz hesabın yok mu?' : 'Zaten hesabın var mı?'}</span>}<button className="text-button" disabled={mutation.isPending} onClick={() => changeMode(mode === 'login' ? 'register' : 'login')}>{mode === 'login' ? 'Hesap oluştur' : 'Girişe dön'}</button></div></AuthFrame>;
 }
 export function AuthGate({ children }: { children: ReactNode }) {
   const session = useSession();
@@ -95,7 +105,7 @@ export function ResetPassword() {
     return api.request('post', '/api/v1/auth/reset-password', { body: { email, token: token ?? '', password, password_confirmation: confirmation } });
   }, onSuccess: async () => { setPassword(''); setConfirmation(''); await replaceSession(cache, null); navigate('/reset-password?completed=1', { replace: true }); } });
   if (search.has('completed')) return <AuthFrame><h2>Parolan yenilendi</h2><p>Yeni parolanla giriş yapabilirsin.</p><Link className="button primary" to="/">Girişe dön</Link></AuthFrame>;
-  return <AuthFrame><h2>Yeni parola belirle</h2>{!token ? <><p className="notice error" role="alert">Parola sıfırlama bağlantısı eksik. Yeni bir bağlantı iste.</p><Link to="/">Girişe dön</Link></> : <form onSubmit={(event) => { event.preventDefault(); reset.mutate(); }}>{reset.isError && <ErrorNotice error={reset.error} />}<fieldset disabled={reset.isPending}><Field label="E-posta adresi">{(props) => <input {...props} type="email" required value={email} onChange={(event) => setEmail(event.target.value)} />}</Field><Field label="Yeni parola" hint="En az 12 karakter; büyük/küçük harf, rakam ve sembol." error={reset.error instanceof ApiError ? reset.error.field('password') : undefined}>{(props) => <input {...props} type="password" required minLength={12} maxLength={128} autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} />}</Field><Field label="Parola tekrar">{(props) => <input {...props} type="password" required autoComplete="new-password" value={confirmation} onChange={(event) => setConfirmation(event.target.value)} />}</Field><button type="submit" className="button primary full">{reset.isPending ? 'Kaydediliyor…' : 'Parolayı yenile'}</button></fieldset></form>}</AuthFrame>;
+  return <AuthFrame><h2>Yeni parola belirle</h2>{!token ? <><p className="notice error" role="alert">Parola sıfırlama bağlantısı eksik. Yeni bir bağlantı iste.</p><Link to="/">Girişe dön</Link></> : <form onSubmit={(event) => { event.preventDefault(); reset.mutate(); }}>{reset.isError && <ErrorNotice error={reset.error} />}<fieldset disabled={reset.isPending}><Field label="E-posta adresi">{(props) => <input {...props} type="email" required value={email} onChange={(event) => setEmail(event.target.value)} />}</Field><PasswordField label="Yeni parola" value={password} onChange={setPassword} newPassword hint="En az 12 karakter; büyük/küçük harf, rakam ve sembol." error={reset.error instanceof ApiError ? reset.error.field('password') : undefined} /><PasswordField label="Parola tekrar" value={confirmation} onChange={setConfirmation} newPassword /><button type="submit" className="button primary full">{reset.isPending ? 'Kaydediliyor…' : 'Parolayı yenile'}</button></fieldset></form>}</AuthFrame>;
 }
 export function VerifyEmail() {
   const [search] = useSearchParams();

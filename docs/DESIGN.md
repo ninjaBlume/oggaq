@@ -32,7 +32,7 @@ Sayfa başlığı ve menü girişi `title`, alt sekme gibi dar yerler `short` ku
 
 - **Slogan somut bilgi verir:** “Özel güvenlik sınavlarına hazırlan.” Genel motivasyon cümleleri (“bir adım daha”, “kendi hızında”) kullanılmaz; her metin kullanıcıya ne yapabileceğini veya ne olduğunu söyler.
 - **Marka metni tek yerde:** ad, alt başlık (“ÖGG Soru Cevap Platformu”) ve slogan mobilde `apps/mobile/brand.json`, webde ve yönetimde `src/config.ts` içindedir. Ekranlar bu değerleri okur; metni ekrana yazmak yerine yapılandırmadan alın.
-- **Başlık altı etiketi:** bireysel kullanımda logonun altında platform alt başlığı görünür; kurumda kurumun adı görünür. Tek erişim alanı olan mobil öğrenciye “kişisel çalışma alanı” etiketi veya seçici gösterilmez. Alan seçimi yalnız birden fazla seçenek olduğunda sunulur.
+- **Başlık altı etiketi:** bireysel kullanımda logonun altında platform alt başlığı görünür; kurumda kurumun adı görünür. Tek erişim alanı olan mobil ve web öğrencisine “kişisel çalışma alanı” etiketi veya seçici gösterilmez. Alan seçimi yalnız birden fazla seçenek olduğunda sunulur.
 
 ## 3. Renk
 
@@ -77,6 +77,8 @@ Web ve yönetim paneli aynı sınıfları kullanır: telefonda üst gezinme kayd
 - **Mobil eylem:** kart köşesi 24px, düğme köşesi 16px (basışta 12px); kapsül seçim gruplarına ayrılır. Liste eylemleri en az 44px, normal düğmeler en az 54px yüksekliğindedir. Devam eylemi ana dolgu, yeni sınav ikincil dolgu kullanır.
 - **Bekleme ve hata:** listeler statik iskeletle yerini korur; erişilebilir tek yükleme açıklaması bulunur. Hata ilgili bölümün neyi yükleyemediğini ve uygulanabilir yeniden deneme yolunu gösterir.
 - **Mobil giriş formları:** en çok 480px genişlik, kompakt lacivert marka kartı ve ince geometrik çizgiler kullanır. Başlık, açıklama ve belirgin çerçeveli alanlar tek form kartında toplanır; küçük mavi vurgu başlık hiyerarşisini destekler. Tek ana eylem bulunur. Kayıt ve parola yenileme metin bağlantılarıyla açılır. Parola görünürlüğü hedefi en az 44×44px'dir; gönderim sırasında alanlar ve ekran değiştiren bağlantılar kilitlenir. Açık ve koyu temada aynı renk rolleri kullanılır.
+
+- **Öğrenci web:** mobildeki 24px kart, 16px eylem, mavi seçim ve tipografi hiyerarşisini kullanır. Girişte geniş ekranda lacivert tanıtım kartı ile form yan yanadır; 840px altında kompakt marka kartı formun üstüne geçer. Form sütunu 480px'i aşmaz. Parola gösterme, yükleme iskeleti ve gönderim kilidi ortak kalıplardır. Masaüstü üst gezinme ve sınav çözme sütunları webin doğal düzenini korur.
 
 ## 7. Reklam yuvası (ileride)
 

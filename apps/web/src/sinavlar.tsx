@@ -5,6 +5,7 @@ import { ApiError, cursorFromLink } from '@oggaq/api-client';
 import type { components } from '@oggaq/shared-types';
 import { randomId, scoreBand, suggestedMinutes, vocabulary } from '@oggaq/study-core';
 import { api } from './api';
+import { Icon } from './icons';
 import { PageIntro, useStudyContext } from './App';
 import { dateLabel, ErrorNotice, Field, Loading, percent } from './ui';
 
@@ -71,13 +72,13 @@ function ExamRow({ exam, title, attempts }: { exam: OfficialExam; title: string;
   const expired = progress.open && Date.parse(progress.open.deadline_at) <= Date.parse(progress.open.server_time);
   return <article className="card sinav-row">
     <div className="sinav-main">
-      <h2>{title}</h2>
+      <div className="sinav-title"><span className="exam-mark"><Icon name="book" size={22} /></span><h2>{title}</h2></div>
       <p>{[exam.term ? `${exam.term} ${exam.year}` : String(exam.year), `${exam.question_count} soru`, `önerilen süre ${suggestedMinutes(exam)} dk`].join(' · ')}</p>
       <p className="sinav-progress">{progress.runs === 0 && !progress.open ? 'Henüz girmedin' : [progress.open ? (expired ? 'Süresi dolmuş deneme var' : 'Devam eden denemen var') : null, progress.runs > 0 ? `${progress.runs} kez tamamlandı · en iyi %${progress.best}` : null].filter(Boolean).join(' · ')}</p>
     </div>
     <div className="sinav-action">
       {progress.open ? <Link className="button primary" to={`/study/${context.id}/exams/${progress.open.id}`}>{expired ? 'Sonucu gör' : 'Devam et'}</Link>
-        : <button type="button" className="button primary" aria-expanded={open} onClick={() => setOpen(!open)}>{progress.runs > 0 ? 'Tekrar gir' : 'Sınava gir'}</button>}
+        : <button type="button" className="button secondary" aria-expanded={open} onClick={() => setOpen(!open)}>{progress.runs > 0 ? 'Tekrar gir' : 'Sınava gir'}</button>}
     </div>
     {open && !progress.open && <form className="start-panel" onSubmit={(event) => { event.preventDefault(); begin(); }}>
       <fieldset disabled={locked}>
@@ -152,7 +153,7 @@ export function Sonuclarim() {
   const [cursor, setCursor] = useState<string>();
   const history = useQuery({ queryKey: ['exams', context.id, cursor], queryFn: ({ signal }) => api.request('get', '/api/v1/contexts/{context}/exam-attempts', { params: { context: context.id }, query: { cursor, per_page: 20 }, signal }) });
   return <>
-    <PageIntro eyebrow="GİRDİĞİN SINAVLAR" title={vocabulary.results.title}><p>{context.name} alanında girdiğin deneme ve ders sınavları. Bir sınavı açıp cevaplarını tek tek inceleyebilirsin.</p></PageIntro>
+    <PageIntro eyebrow="GİRDİĞİN SINAVLAR" title={vocabulary.results.title}><p>{context.kind === 'personal' ? 'Girdiğin deneme ve ders sınavları.' : `${context.name} alanında girdiğin deneme ve ders sınavları.`} Bir sınavı açıp cevaplarını tek tek inceleyebilirsin.</p></PageIntro>
     {history.isPending ? <Loading /> : history.isError ? <ErrorNotice error={history.error} retry={() => { void history.refetch(); }} /> : history.data.data.length === 0 ? <section className="card empty"><h2>Henüz bir sınava girmedin</h2><p>Girdiğin sınavlar ve sonuçların burada saklanır.</p><Link className="button primary" to={`/study/${context.id}/deneme`}>Deneme sınavlarına git</Link></section>
       : <>
         <section className="history-list" aria-label="Sınav sonuçları">{history.data.data.map((exam) => <ResultRow key={exam.id} exam={exam} to={`/study/${context.id}/exams/${exam.id}`} />)}</section>

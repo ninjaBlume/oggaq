@@ -7,6 +7,7 @@ import { deleteAccountConfirmation, vocabulary } from '@oggaq/study-core';
 import { api } from './api';
 import { AuthFrame, Login, replaceSession, useLogout, useSession } from './auth';
 import { brand } from './config';
+import { Icon } from './icons';
 import { ThemeSwitch } from './theme';
 import { dateLabel, ErrorNotice, Field, Loading } from './ui';
 import { verificationInput } from './verification';
@@ -170,7 +171,7 @@ export function AccountPage() {
   const logout = useLogout();
   const user = session.data;
   if (!user) return null;
-  return <div className="app-shell"><header className="site-header"><Link to="/" className="brand">{brand.name}<span className="brand-dot" /></Link><nav aria-label="Ana menü"><Link to="/">← Çalışmaya dön</Link></nav><div className="user-menu"><span>{user.name}</span><ThemeSwitch /><button className="text-button" disabled={logout.isPending} onClick={() => logout.mutate()}>Çıkış yap</button></div></header>
+  return <div className="app-shell"><header className="site-header"><Link to="/" className="brand"><span className="brand-mark"><Icon name="shield" size={24} /></span><span>{brand.name}<small>{brand.subtitle}</small></span></Link><nav aria-label="Ana menü"><Link to="/">← Çalışmaya dön</Link></nav><div className="user-menu"><span>{user.name}</span><ThemeSwitch /><button className="text-button" disabled={logout.isPending} onClick={() => logout.mutate()}>Çıkış yap</button></div></header>
     <main className="content account-page">
       <div className="page-intro"><span className="eyebrow">HESAP VE GİZLİLİK</span><h1>{vocabulary.account.title}</h1><p>{user.name} · {user.email}{user.email_verified_at ? '' : ' (doğrulanmadı)'}</p></div>
       <div className="account-grid">
