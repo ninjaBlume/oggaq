@@ -106,20 +106,20 @@ export function IconButton({
     </ExpressivePressable>
   );
 }
-export function TextLink({
-  children,
-  onPress,
-}: {
+export function TextLink({ children, onPress, disabled = false }: {
   children: string;
   onPress: () => void;
+  disabled?: boolean;
 }) {
   const { styles } = useTheme();
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={children}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
       onPress={onPress}
-      style={{ minHeight: 44, justifyContent: "center" }}
+      style={{ minHeight: 44, justifyContent: "center", opacity: disabled ? 0.45 : 1 }}
     >
       <Text style={styles.link}>{children}</Text>
     </Pressable>
@@ -338,6 +338,10 @@ export function Field({
   editable = true,
   multiline = false,
   maxLength,
+  outlined = false,
+  placeholder,
+  labelAction,
+  newPassword = false,
 }: {
   label: string;
   value: string;
@@ -348,6 +352,10 @@ export function Field({
   editable?: boolean;
   multiline?: boolean;
   maxLength?: number;
+  outlined?: boolean;
+  placeholder?: string;
+  labelAction?: ReactNode;
+  newPassword?: boolean;
 }) {
   const { palette, styles, scheme } = useTheme();
   const [focused, setFocused] = useState(false);
@@ -355,9 +363,10 @@ export function Field({
   const Icon = email ? Mail : password ? LockKeyhole : null;
   return (
     <View style={{ gap: 8 }}>
-      <Text style={{ fontSize: 14, fontWeight: "700", color: palette.ink }}>
-        {label}
-      </Text>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+        <Text style={{ fontSize: 14, lineHeight: 21, fontWeight: "700", color: palette.ink }}>{label}</Text>
+        {labelAction}
+      </View>
       <View
         style={{
           flexDirection: "row",
@@ -367,7 +376,7 @@ export function Field({
           backgroundColor: palette.paper,
           borderRadius: 16,
           borderWidth: 1.5,
-          borderColor: focused ? palette.primary : "transparent",
+          borderColor: focused ? palette.primary : outlined ? palette.line : "transparent",
         }}
       >
         {Icon && (
@@ -387,6 +396,7 @@ export function Field({
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           keyboardAppearance={scheme}
+          placeholder={placeholder}
           placeholderTextColor={palette.muted}
           selectionColor={palette.primary}
           multiline={multiline}
@@ -400,17 +410,19 @@ export function Field({
                 ]
               : styles.input
           }
+          autoComplete={email ? "email" : password ? newPassword ? "new-password" : "current-password" : undefined}
           textContentType={
-            email ? "emailAddress" : password ? "password" : undefined
+            email ? "emailAddress" : password ? newPassword ? "newPassword" : "password" : undefined
           }
         />
         {password && (
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={reveal ? "Parolayı gizle" : "Parolayı göster"}
+            accessibilityState={{ disabled: !editable }}
+            disabled={!editable}
             onPress={() => setReveal(!reveal)}
-            hitSlop={10}
-            style={{ minHeight: 44, justifyContent: "center" }}
+            style={{ minHeight: 44, minWidth: 44, marginRight: -8, alignItems: "center", justifyContent: "center" }}
           >
             {reveal ? (
               <EyeOff size={19} color={palette.muted} />

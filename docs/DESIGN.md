@@ -76,6 +76,7 @@ Web ve yönetim paneli aynı sınıfları kullanır: telefonda üst gezinme kayd
 - **Mobil öncelik:** devam eden sınav ana sayfada kısayollardan önce gelir. Alt sekmeler günlük hedefleri taşır; yan menü tekrar/başarı araçları ve çıkış içindir. Birden fazla erişim alanı varsa menü/profil alan seçimini de gösterir.
 - **Mobil eylem:** kart köşesi 24px, düğme köşesi 16px (basışta 12px); kapsül seçim gruplarına ayrılır. Liste eylemleri en az 44px, normal düğmeler en az 54px yüksekliğindedir. Devam eylemi ana dolgu, yeni sınav ikincil dolgu kullanır.
 - **Bekleme ve hata:** listeler statik iskeletle yerini korur; erişilebilir tek yükleme açıklaması bulunur. Hata ilgili bölümün neyi yükleyemediğini ve uygulanabilir yeniden deneme yolunu gösterir.
+- **Mobil giriş formları:** en çok 480px genişlik, küçük marka başlığı, belirgin alan çerçeveleri ve tek ana eylem kullanır. Kayıt ve parola yenileme metin bağlantılarıyla açılır. Parola görünürlüğü hedefi en az 44×44px'dir; gönderim sırasında alanlar ve ekran değiştiren bağlantılar kilitlenir. Açık ve koyu temada aynı renk rolleri kullanılır.
 
 ## 7. Reklam yuvası (ileride)
 

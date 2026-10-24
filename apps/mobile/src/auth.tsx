@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Linking, Platform, Text, View } from "react-native";
-import { ArrowLeft, ArrowRight, ShieldCheck, CheckCircle2 } from "./icons";
+import { ShieldCheck, CheckCircle2, GraduationCap } from "./icons";
 import brand from "../brand.json";
-import { ChoiceGroup } from "./expressive";
 import { shape, typography } from "./theme";
 import type { User } from "@oggaq/shared-types";
 import { api, frontendUrl } from "./api";
@@ -14,7 +13,6 @@ import {
   ErrorNotice,
   Field,
   Heading,
-  StudyHero,
   TextLink,
 } from "./ui";
 import { useTheme } from "./themeContext";
@@ -93,194 +91,83 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
     setConfirmation("");
     task.reset();
   }
+  const heading = mode === "login" ? "Hoş geldin" : mode === "register" ? "Hesap oluştur" : "Parolanı yenile";
+  const description = mode === "login"
+    ? "Denemelerine ve sonuçlarına ulaş."
+    : mode === "register"
+      ? "Ücretsiz hesabınla sınavlarını ve sonuçlarını takip et."
+      : "E-posta adresine parola yenileme bağlantısı gönderelim.";
   return (
-    <>
-      <View
-        style={{
-          backgroundColor: palette.navy,
-          borderRadius: shape.extraLarge,
-          padding: 26,
-          minHeight: 235,
-          overflow: "hidden",
-        }}
-      >
-        <View style={[styles.row, { marginBottom: 22 }]}>
-          <ShieldCheck size={23} color={palette.accent} />
-          <Text
-            style={{
-              color: palette.onNavy,
-              fontSize: 19,
-              fontWeight: "800",
-              letterSpacing: 2,
-            }}
-          >
-            {brand.displayName}
-          </Text>
+    <View style={{ width: "100%", maxWidth: 480, alignSelf: "center", gap: 24, paddingTop: 12 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 12, paddingBottom: 20, borderBottomWidth: 1, borderColor: palette.line }}>
+        <View style={{ width: 48, height: 48, borderRadius: shape.medium, backgroundColor: palette.primaryContainer, alignItems: "center", justifyContent: "center" }}>
+          <ShieldCheck size={27} color={palette.onPrimaryContainer} strokeWidth={1.8} />
         </View>
-        <Text
-          style={{
-            color: palette.onNavyMuted,
-            fontSize: 10,
-            fontWeight: "700",
-            letterSpacing: 1.5,
-          }}
-        >
-          {brand.subtitle.toLocaleUpperCase("tr-TR")}
-        </Text>
-        <Text
-          style={{
-            color: palette.onNavy,
-            ...typography.display,
-            marginTop: 10,
-            width: "72%",
-          }}
-        >
-          Özel güvenlik{"\n"}sınavlarına hazırlan.
-        </Text>
-        <View style={{ position: "absolute", right: -12, bottom: 12 }}>
-          <StudyHero compact />
+        <View style={{ flex: 1, gap: 3 }}>
+          <Text style={{ color: palette.ink, fontSize: 20, lineHeight: 26, fontWeight: "800", letterSpacing: 1 }}>{brand.displayName}</Text>
+          <Text style={[styles.muted, { fontSize: 13, lineHeight: 19 }]}>{brand.subtitle}</Text>
         </View>
-        <Text
-          style={{ color: palette.onNavyMuted, fontSize: 12, marginTop: 14 }}
-        >
-          Öğrenciler için ücretsiz.
-        </Text>
       </View>
-      {mode !== "forgot" && (
-        <ChoiceGroup
-          choices={[
-            {
-              value: "login",
-              label: "Giriş yap",
-              accessibilityLabel: "Giriş sekmesi",
-            },
-            {
-              value: "register",
-              label: "Hesap oluştur",
-              accessibilityLabel: "Kayıt sekmesi",
-            },
-          ]}
-          value={mode}
-          onChange={change}
-          disabled={task.pending}
-        />
-      )}
-      <View style={{ gap: 7 }}>
-        <Heading>
-          {mode === "login"
-            ? "Hoş geldin"
-            : mode === "register"
-              ? "Aramıza katıl"
-              : "Parolanı yenile"}
-        </Heading>
-        <Text style={styles.muted}>
-          {mode === "login"
-            ? "Kaldığın yerden devam etmeye hazır mısın?"
-            : mode === "register"
-              ? "Ücretsiz hesabını oluştur; sınavların ve sonuçların saklansın."
-              : "E-postana bir yenileme bağlantısı gönderelim."}
-        </Text>
+      <View style={{ gap: 8 }}>
+        <Text accessibilityRole="header" style={[typography.headline, { color: palette.ink }]}>{heading}</Text>
+        <Text style={styles.muted}>{description}</Text>
       </View>
-      <Card>
+      <View style={{ backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.line, borderRadius: shape.large, padding: 20, gap: 18 }}>
         {mode === "register" && (
-          <Field
-            label="Ad soyad"
-            value={name}
-            onChange={setName}
-            editable={!task.pending}
-          />
+          <Field label="Ad soyad" value={name} onChange={setName} editable={!task.pending} outlined />
         )}
-        <Field
-          label="E-posta adresi"
-          email
-          value={email}
-          onChange={setEmail}
-          editable={!task.pending}
-        />
+        <Field label="E-posta adresi" email value={email} onChange={setEmail} editable={!task.pending} placeholder="ornek@eposta.com" outlined />
         {mode !== "forgot" && (
           <Field
+            key={`${mode}-password`}
             label="Parola"
             password
+            newPassword={mode === "register"}
             value={password}
             onChange={setPassword}
             editable={!task.pending}
+            outlined
+            labelAction={mode === "login" ? (
+              <TextLink disabled={task.pending} onPress={() => change("forgot")}>Parolamı unuttum</TextLink>
+            ) : undefined}
           />
         )}
-        {mode === "login" && (
-          <View style={{ alignSelf: "flex-end", marginTop: -8 }}>
-            <TextLink
-              onPress={() => {
-                if (!task.pending) change("forgot");
-              }}
-            >
-              Parolamı unuttum
-            </TextLink>
+        {mode === "register" && (
+          <View style={{ gap: 10 }}>
+            <Field label="Parola tekrar" password newPassword value={confirmation} onChange={setConfirmation} editable={!task.pending} outlined />
+            <Text style={styles.muted}>En az 12 karakter; büyük / küçük harf, sayı ve simge.</Text>
           </View>
         )}
-        {mode === "register" && (
-          <>
-            <Field
-              label="Parola tekrar"
-              password
-              value={confirmation}
-              onChange={setConfirmation}
-              editable={!task.pending}
-            />
-            <Text style={styles.muted}>
-              En az 12 karakter; büyük / küçük harf, sayı ve simge.
-            </Text>
-          </>
-        )}
         {notice !== "" && (
-          <View
-            accessibilityRole="alert"
-            style={{
-              backgroundColor: palette.softSuccess,
-              padding: 14,
-              borderRadius: 14,
-            }}
-          >
-            <Text
-              style={[styles.text, { fontSize: 14, color: palette.success }]}
-            >
-              {notice}
-            </Text>
+          <View accessibilityRole="alert" style={{ backgroundColor: palette.softSuccess, padding: 14, borderRadius: shape.medium, flexDirection: "row", gap: 10, alignItems: "flex-start" }}>
+            <CheckCircle2 size={20} color={palette.success} />
+            <Text style={[styles.muted, { color: palette.success, flex: 1 }]}>{notice}</Text>
           </View>
         )}
         <ErrorNotice error={task.error} />
-        <Button
-          disabled={task.pending || !email || (mode !== "forgot" && !password)}
-          onPress={submit}
-          icon={ArrowRight}
-        >
+        <Button disabled={task.pending || !email || (mode !== "forgot" && !password)} onPress={submit}>
           {task.pending
-            ? "İşleniyor…"
-            : mode === "login"
-              ? "Giriş yap"
-              : mode === "register"
-                ? "Hesap oluştur"
-                : "Bağlantı gönder"}
+            ? mode === "login" ? "Giriş yapılıyor…" : mode === "register" ? "Hesap oluşturuluyor…" : "Bağlantı gönderiliyor…"
+            : mode === "login" ? "Giriş yap" : mode === "register" ? "Hesap oluştur" : "Bağlantı gönder"}
         </Button>
-        {mode === "forgot" && (
-          <Button
-            secondary
-            disabled={task.pending}
-            onPress={() => change("login")}
-            icon={ArrowLeft}
-          >
-            Girişe dön
-          </Button>
-        )}
-      </Card>
-      <View
-        style={[styles.row, { justifyContent: "center", paddingBottom: 12 }]}
-      >
-        <CheckCircle2 size={15} color={palette.muted} />
-        <Text style={{ color: palette.muted, fontSize: 11 }}>
-          {brand.subtitle}
-        </Text>
       </View>
-    </>
+      <View style={{ gap: 10, alignItems: "center" }}>
+        {mode === "forgot" ? (
+          <TextLink disabled={task.pending} onPress={() => change("login")}>Girişe dön</TextLink>
+        ) : (
+          <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", justifyContent: "center", columnGap: 6 }}>
+            <Text style={styles.muted}>{mode === "login" ? "Henüz hesabın yok mu?" : "Zaten hesabın var mı?"}</Text>
+            <TextLink disabled={task.pending} onPress={() => change(mode === "login" ? "register" : "login")}>
+              {mode === "login" ? "Hesap oluştur" : "Giriş yap"}
+            </TextLink>
+          </View>
+        )}
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7 }}>
+          <GraduationCap size={17} color={palette.muted} />
+          <Text style={styles.muted}>Öğrenciler için ücretsiz.</Text>
+        </View>
+      </View>
+    </View>
   );
 }
 

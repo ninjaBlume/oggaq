@@ -64,6 +64,14 @@ Ardından mevcut Expo Metro terminalinde `a` tuşuna basın. Expo Go 58.0.5 resm
 
 Emülatörün Qt penceresi bilgisayar kullanım aracının uygulama listesine alınamadı. Bu nedenle Android'de görsel ekran kontrolü, öğrenci girişi ve sınav çözme akışı bu oturumda doğrulanmış sayılmaz. Mac'teki Metro/tünel açık kalmalıdır; bu bir mağaza dağıtımı değildir.
 
+## 24 Ekim 2026: Giriş, kayıt ve parola yenileme tasarımı
+
+Kimlik formları mavi temayla yeniden düzenlendi: küçük marka başlığı, 480px sınırında form, görünür alan kenarları, odakta mavi vurgu ve tek ana düğme. Kayıt ve parola yenileme metin bağlantılarıyla açılır. Mevcut marka yapılandırması ve ortak renk rolleri kullanılır. Giriş düğmesi 320/390px telefon görünümünde ilk ekrana sığar; yatay ekranda form kaydırılabilir. Parola göster/gizle kontrolü 44×44px hedefe sahiptir. Otomatik doldurma ipuçları e-posta / mevcut parola / yeni parola olarak ayrılır; gönderim sırasında alanlar salt okunur, görünürlük ve yön değiştiren bağlantılar devre dışıdır. Kayıt/parola yenileme API işlemleri, sunucu doğrulaması ve SecureStore oturumu korunur.
+
+Strict TypeScript ve 25 mobil birim testi geçti. Mobil Chromium E2E'de 20 senaryo doğrulandı: 19'u ilk koşumda geçti; bekleme durumu testinin RN Web'in salt okunur alanlarını `disabled` yerine düzenlenebilirlik üzerinden kontrol etmesi düzeltildikten sonra ilgili senaryo yeniden geçti. Yeni senaryolar açık/koyu 320/390/834px ve yatay yerleşimi, parola görünürlüğünü, gerçek PostgreSQL/API ile kayıt doğrulaması/kayıt oluşturmayı, parola yenilemeyi ve gönderim kilidini kapsar; yalnız `oggaq_test` veritabanı kullanıldı. iOS/Android Hermes ve web export başarılıdır.
+
+Device Hub iPhone 18 Pro / Expo Go üzerinde açık temada giriş, kayıt ve parola yenileme formları incelendi; klavye/odak görünümü ve sunucu API'siyle mevcut sentetik öğrenci girişi doğrulandı. Simülatör önceki açık tema ve Tekrar ekranına geri getirildi. Web QA görüntüleri `artifacts/mobile-preview/redesign/auth-*`, native görüntüler `artifacts/auth-redesign/` içinde git dışındadır. Fiziksel Android/iPhone ve gerçek parola yöneticisiyle otomatik doldurma bu değişiklikte ayrıca test edilmedi. Sunucudaki web/admin arayüzleri bu mobil düzenlemede değiştirilmedi; önceki audit bulgusu devam eder.
+
 ## Mobil tasarım ve gezinme
 
 10 Ekim 2026 mobil arayüzü telefon uygulaması olarak yenilendi. `apps/web` ve `apps/admin` masaüstü arayüzlerinden bağımsızdır; ortak API istemcisi ve iş kuralları korunur. Renkler `src/theme.ts`, bileşenler `src/ui.tsx`, marka başlığı `brand.json` içindedir.

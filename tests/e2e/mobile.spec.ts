@@ -672,3 +672,80 @@ test("kuruma bağlı olmayan öğrenciye kişisel çalışma alanı veya gereksi
   await expect(menu.getByRole("button", { name: "Tekrar sınavı", exact: true })).toBeVisible();
   await expect(menu.getByRole("button", { name: "Çıkış yap", exact: true })).toBeVisible();
 });
+
+
+test("giriş formu iki temada dar/yatay ekrana sığar; parola görünürlüğü ve yenileme çalışır", async ({ page }) => {
+  for (const colorScheme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme });
+    await page.goto("/");
+    for (const viewport of [{ width: 320, height: 844 }, { width: 390, height: 844 }, { width: 844, height: 390 }, { width: 834, height: 1112 }]) {
+      await page.setViewportSize(viewport);
+      await expect(page.getByRole("heading", { name: "Hoş geldin", exact: true })).toBeVisible();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      const submit = page.getByRole("button", { name: "Giriş yap", exact: true });
+      if (viewport.height > 800) await expect(submit).toBeInViewport();
+      else { await submit.scrollIntoViewIfNeeded(); await expect(submit).toBeInViewport(); }
+      await screenshot(page, `auth-${colorScheme}-${viewport.width}x${viewport.height}`);
+    }
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  const password = page.getByLabel("Parola", { exact: true });
+  await expect(password).toHaveAttribute("autocomplete", "current-password");
+  await password.fill("Synthetic-Browser-42!");
+  await expect(password).toHaveAttribute("type", "password");
+  await page.getByRole("button", { name: "Parolayı göster", exact: true }).click();
+  await expect(password).toHaveAttribute("type", "text");
+  await page.getByRole("button", { name: "Parolayı gizle", exact: true }).click();
+  await expect(password).toHaveAttribute("type", "password");
+  await page.getByLabel("E-posta adresi", { exact: true }).fill("e2e-student@example.test");
+  await page.getByRole("button", { name: "Parolamı unuttum", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Parolanı yenile", exact: true })).toBeVisible();
+  await expect(password).toHaveCount(0);
+  const reset = page.waitForResponse((r) => r.url().endsWith("/api/v1/auth/forgot-password") && r.request().method() === "POST");
+  await page.getByRole("button", { name: "Bağlantı gönder", exact: true }).click();
+  expect((await reset).ok()).toBe(true);
+  await expect(page.getByRole("alert")).toContainText("parola yenileme bağlantısı gönderildi");
+  await screenshot(page, "auth-reset-notice");
+  await page.getByRole("button", { name: "Girişe dön", exact: true }).click();
+  await expect(password).toHaveValue("");
+  await expect(password).toHaveAttribute("type", "password");
+});
+
+test("yeni kayıt ekranı sunucu doğrulamasını gösterir ve gerçek kayıt oluşturur", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Hesap oluştur", exact: true }).click();
+  await page.getByLabel("Ad soyad", { exact: true }).fill("Sentetik Mobil Öğrenci");
+  await page.getByLabel("E-posta adresi", { exact: true }).fill("mobile-auth@example.test");
+  await expect(page.getByLabel("Parola", { exact: true })).toHaveAttribute("autocomplete", "new-password");
+  await page.getByLabel("Parola", { exact: true }).fill("Design-Synthetic-42!");
+  await page.getByLabel("Parola tekrar", { exact: true }).fill("Does-Not-Match-42!");
+  const invalid = page.waitForResponse((r) => r.url().endsWith("/api/v1/auth/register") && r.request().method() === "POST");
+  await page.getByRole("button", { name: "Hesap oluştur", exact: true }).click();
+  expect((await invalid).status()).toBe(422);
+  await expect(page.getByRole("alert")).toBeVisible();
+  await page.getByLabel("Parola tekrar", { exact: true }).fill("Design-Synthetic-42!");
+  const created = page.waitForResponse((r) => r.url().endsWith("/api/v1/auth/register") && r.request().method() === "POST");
+  await page.getByRole("button", { name: "Hesap oluştur", exact: true }).click();
+  expect((await created).status()).toBe(201);
+  await expect(page.getByRole("heading", { name: "Hoş geldin", exact: true })).toBeVisible();
+  await expect(page.getByRole("alert")).toContainText("Hesabın oluşturuldu");
+  await expect(page.getByLabel("Parola", { exact: true })).toHaveValue("");
+});
+
+test("giriş isteği sürerken form ve yön değiştiren bağlantılar kilitlenir", async ({ page }) => {
+  await page.goto("/");
+  let release!: () => void;
+  const gate = new Promise<void>((resolve) => { release = resolve; });
+  await page.route("**/api/v1/auth/mobile-tokens", async (route) => { await gate; await route.continue(); });
+  await page.getByLabel("E-posta adresi", { exact: true }).fill("e2e-student@example.test");
+  await page.getByLabel("Parola", { exact: true }).fill("Synthetic-Browser-42!");
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Giriş yapılıyor…", exact: true })).toBeDisabled();
+  await expect(page.getByLabel("E-posta adresi", { exact: true })).not.toBeEditable();
+  await expect(page.getByLabel("Parola", { exact: true })).not.toBeEditable();
+  await expect(page.getByRole("button", { name: "Parolayı göster", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Parolamı unuttum", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Hesap oluştur", exact: true })).toBeDisabled();
+  release();
+  await expect(page.getByText("Merhaba, E2E.", { exact: true })).toBeVisible();
+});
