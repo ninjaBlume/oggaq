@@ -51,9 +51,9 @@ export const destinations = [
 ] as const;
 // Reachable from the side menu and home only; the tab bar / rail keeps its five primary tabs.
 export const extraDestinations = [
-  { id: "jobs", label: vocabulary.jobs.short, menuLabel: vocabulary.jobs.title, icon: Briefcase },
   { id: "review", label: vocabulary.review.short, menuLabel: vocabulary.review.title, icon: ListChecks },
   { id: "stats", label: vocabulary.stats.short, menuLabel: vocabulary.stats.title, icon: ChartColumn },
+  { id: "jobs", label: vocabulary.jobs.short, menuLabel: vocabulary.jobs.title, icon: Briefcase },
 ] as const;
 export type MainTab =
   | (typeof destinations)[number]["id"]
@@ -207,6 +207,42 @@ export function SideMenu({
       }),
     [animate, dismiss, panelWidth, progress],
   );
+  function renderDestination({ id, menuLabel, icon: Icon }: (typeof extraDestinations)[number]) {
+    return (
+      <Pressable
+        key={id}
+        accessibilityRole="button"
+        accessibilityLabel={menuLabel}
+        accessibilityState={{ selected: selected === id }}
+        aria-selected={selected === id}
+        onPress={() => dismiss(() => select(id))}
+        style={({ pressed }) => [
+          navStyles.menuRow,
+          selected === id && navStyles.selectedRow,
+          pressed && navStyles.pressed,
+        ]}
+      >
+        <Icon
+          size={21}
+          color={selected === id ? palette.primary : palette.muted}
+          strokeWidth={1.8}
+        />
+        <Text
+          style={[
+            navStyles.menuText,
+            selected === id && { color: palette.primary },
+          ]}
+        >
+          {menuLabel}
+        </Text>
+        {selected === id ? (
+          <View style={navStyles.selectionDot} />
+        ) : (
+          <ChevronRight size={16} color={palette.muted} />
+        )}
+      </Pressable>
+    );
+  }
   return (
     <Modal
       visible
@@ -289,42 +325,7 @@ export function SideMenu({
             contentContainerStyle={navStyles.menuBody}
           >
             <Text style={navStyles.sectionLabel}>DİĞER SEÇENEKLER</Text>
-            {extraDestinations.map(
-              ({ id, menuLabel, icon: Icon }) => (
-              <Pressable
-                key={id}
-                accessibilityRole="button"
-                accessibilityLabel={menuLabel}
-                accessibilityState={{ selected: selected === id }}
-                aria-selected={selected === id}
-                onPress={() => dismiss(() => select(id))}
-                style={({ pressed }) => [
-                  navStyles.menuRow,
-                  selected === id && navStyles.selectedRow,
-                  pressed && navStyles.pressed,
-                ]}
-              >
-                <Icon
-                  size={21}
-                  color={selected === id ? palette.primary : palette.muted}
-                  strokeWidth={1.8}
-                />
-                <Text
-                  style={[
-                    navStyles.menuText,
-                    selected === id && { color: palette.primary },
-                  ]}
-                >
-                  {menuLabel}
-                </Text>
-                {selected === id ? (
-                  <View style={navStyles.selectionDot} />
-                ) : (
-                  <ChevronRight size={16} color={palette.muted} />
-                )}
-              </Pressable>
-              ),
-            )}
+            {extraDestinations.filter(({ id }) => id !== "jobs").map(renderDestination)}
             {contexts.length > 1 && (
               <>
                 <View style={navStyles.separator} />
@@ -372,6 +373,7 @@ export function SideMenu({
               { paddingBottom: Math.max(insets.bottom, 16) },
             ]}
           >
+            {extraDestinations.filter(({ id }) => id === "jobs").map(renderDestination)}
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Çıkış yap"

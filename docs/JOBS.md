@@ -6,6 +6,7 @@
 
 - **Admin:** İş İlanları → İlan ekle. Başlık, firma, şehir/konum, açıklama ve ÖGG kart türü girilir. İlan taslak kaydedilir veya yayımlanır; isteğe bağlı son başvuru tarihi belirlenir. İlan düzenleme ekranındaki Başvurular bölümünde adayın iletişim bilgileri ve ön yazısı görülür, durum Başvuru alındı / İnceleniyor / Olumlu değerlendirildi / Olumsuz değerlendirildi olarak değiştirilebilir. Geliştirme sunucusunda adres `/yonetim/is-ilanlari`.
 - **Öğrenci web:** İş İlanları gezinme öğesi. **Mobil:** soldan açılan menü → İş İlanları. İlanlar sekmesinde ayrıntı ve başvuru formu; Başvurularım sekmesinde kişisel başvuru ve değerlendirme durumu bulunur. Ad ve e-posta hesap profilinden doldurulur, başvurmadan önce değiştirilebilir. İletişim bilgilerinin platform yöneticisince görüleceği formda açıklanır.
+- Mobilde İş İlanları ana çalışma seçeneklerinden ayrılmıştır; açılan menünün alt kısmında, Çıkış yap öğesinin hemen üstündedir. Ana alt sekmeler değişmez. Bu yerleşim mevcut dört yan menü E2E senaryosu, strict tip ve üç platform Expo export ile doğrulanır.
 - Yalnız yayımlanmış ve süresi dolmamış ilanlar öğrenci listesine/ayrıntısına açıktır. Kapanan veya süresi dolan ilanın önceki başvurusu Başvurularım'da kalır. Başvuru yeni ilan içeriğiyle geriye dönük değiştirilmez.
 - Arayüzler yükleniyor, boş liste, doğrulama, API hatası, yeniden deneme ve sayfalama durumlarını içerir. Başvuru durumları yenile düğmesiyle tekrar alınabilir; anlık bildirim/push yoktur.
 
