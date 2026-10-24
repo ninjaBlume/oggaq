@@ -2,6 +2,8 @@
 
 Mevcut yerel sonuç: PHP 8.4 / gerçek PostgreSQL 18 / Redis ile **233 backend testi, 2.598 assertion**; admin 11, web 4, mobil 27, `study-core` 19 ve `design-tokens` 63 olmak üzere **124 Vitest**. **85 Chromium E2E** (tek seferde, 24 Ekim 2026 son çalıştırma; iş ilanları, puan hesaplama, sınav sonuçları ve bağlı sınav seçenekleri dahil) admin, öğrenci, deneme, tasarım, bildirim, hesap ve Expo ekran/Bearer akışlarını kapsar. Strict TypeScript, iki web production build, üç platform Metro export, native prebuild ve Expo Doctor (21/21) doğrulandı. Native derleme sonuçları [MOBILE](MOBILE.md) içinde ayrı tutulur; Chromium kontrolü cihaz testi yerine geçmez. İki upstream Expo build advisory'si açıktır; ham npm audit temiz değildir.
 
+24 Ekim 2026 başlık gösterimi kontrolü: parantezli sınav tarihini gizleyen ortak gösterim web, mobil ve yönetim başlıklarına uygulandı. Strict TypeScript, mevcut 124 Vitest, web/admin build ve ayrı çıktı klasöründe mobil web export geçti. Mevcut Vite servisinden yüklenen ortak fonksiyonla tarihli/tarihsiz başlık ve tarih dışı parantezli açıklama elle doğrulandı; API istekleri sentetik yanıtla kesildi, hesap/veritabanı kullanılmadı. Düşük etkili sunum değişikliği için yeni test eklenmedi; test sayıları aynı kaldı. Backend ve E2E yeniden çalıştırılmadı; ortak `5185` önizleme servisi durdurulmadı. Native cihaz doğrulaması yapılmadı.
+
 ## Araçlar ve ortamlar
 
 Backend standardı PHPUnit 12.5.38; Composer lock dosyasıyla kilitli. Gerçek PostgreSQL servisinde feature/database/authorization testleri; gerektiğinde Redis queue integration. Merkezi PostgreSQL testleri SQLite ile ikame edilmez.

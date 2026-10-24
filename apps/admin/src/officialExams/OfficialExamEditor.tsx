@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ApiError, cursorFromLink } from '@oggaq/api-client';
-import { vocabulary } from '@oggaq/study-core';
+import { examDisplayTitle, vocabulary } from '@oggaq/study-core';
 import type { Catalogs, components } from '@oggaq/shared-types';
 import { api, loadCatalogs } from '../api';
 import { ErrorNotice, Field, Icon, Loading, Modal, dateLabel, useNotify } from '../ui';
@@ -125,7 +125,7 @@ function OfficialExamEditor({ exam, catalogs }: { exam?: OfficialExam; catalogs:
   function submit(event: FormEvent) { event.preventDefault(); if (!busy && complete) { publish.reset(); save.mutate(undefined); } }
 
   return <><Link className="back-link" to={isSubjectExam ? '/ders-sinavlari' : '/deneme-sinavlari'}><Icon name="back" size={16} />{isSubjectExam ? 'Ders sınavlarına dön' : 'Deneme sınavlarına dön'}</Link>
-    <header className="page-heading editor-heading"><div><span className="eyebrow">{isSubjectExam ? 'DERS SINAVI' : 'DENEME SINAVI'}</span><h1>{snapshot ? snapshot.title : isSubjectExam ? 'Yeni ders sınavı' : 'Yeni deneme sınavı'}</h1><p className="muted">{published ? `Yayımlandı: ${dateLabel(snapshot?.published_at)}. Künye, sıra ve soru listesi sabittir; soruları aşağıda düzenleyebilirsiniz.` : 'Soru sırası orijinal sınav sırasıdır. Kaydetmek sınavı öğrencilere açmaz.'}</p></div>{snapshot && <span className={`badge ${published ? 'green' : 'amber'}`}><span />{published ? 'Yayında' : 'Taslak'}</span>}</header>
+    <header className="page-heading editor-heading"><div><span className="eyebrow">{isSubjectExam ? 'DERS SINAVI' : 'DENEME SINAVI'}</span><h1>{snapshot ? examDisplayTitle(snapshot.title) : isSubjectExam ? 'Yeni ders sınavı' : 'Yeni deneme sınavı'}</h1><p className="muted">{published ? `Yayımlandı: ${dateLabel(snapshot?.published_at)}. Künye, sıra ve soru listesi sabittir; soruları aşağıda düzenleyebilirsiniz.` : 'Soru sırası orijinal sınav sırasıdır. Kaydetmek sınavı öğrencilere açmaz.'}</p></div>{snapshot && <span className={`badge ${published ? 'green' : 'amber'}`}><span />{published ? 'Yayında' : 'Taslak'}</span>}</header>
     {mutationError && <ErrorNotice error={mutationError} />}
     <form onSubmit={submit} className="editor-layout"><fieldset className="editor-main" disabled={busy || published}>
       <details className="card editor-card info-card" open={!published}><summary className="section-title"><span className="step-number">1</span><div><h2>Sınav bilgileri</h2><p className="muted small-text">{published ? 'Yayımlanmış künye değiştirilemez; görmek için açın.' : 'Sınav türü, yıl, dönem ve numara birlikte tekil olmalıdır.'}</p></div></summary><div className="form-grid">

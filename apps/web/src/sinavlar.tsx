@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, cursorFromLink } from '@oggaq/api-client';
 import type { components } from '@oggaq/shared-types';
-import { randomId, scoreBand, suggestedMinutes, vocabulary } from '@oggaq/study-core';
+import { examDisplayTitle, randomId, scoreBand, suggestedMinutes, vocabulary } from '@oggaq/study-core';
 import { api } from './api';
 import { Icon } from './icons';
 import { PageIntro, useStudyContext } from './App';
@@ -131,7 +131,7 @@ export function DersSinavlari() {
 function ResultRow({ exam, to }: { exam: Summary; to: string }) {
   const result = exam.result;
   const expired = Date.parse(exam.deadline_at) <= Date.parse(exam.server_time);
-  const title = exam.official_exam ? exam.official_exam.title : `${exam.question_count} soruluk deneme`;
+  const title = exam.official_exam ? examDisplayTitle(exam.official_exam.title) : `${exam.question_count} soruluk deneme`;
   const kind = exam.official_exam ? (/Ders Sınavı/.test(exam.official_exam.title) ? 'DERS SINAVI' : 'DENEME SINAVI') : 'DENEME';
   const tone = result ? scoreBand(result.score_percent) : 'pending';
   const minutes = Math.round((result ? result.elapsed_seconds : exam.duration_seconds) / 60);

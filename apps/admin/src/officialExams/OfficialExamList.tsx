@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import type { components } from '@oggaq/shared-types';
-import { vocabulary } from '@oggaq/study-core';
+import { examDisplayTitle, vocabulary } from '@oggaq/study-core';
 import { api, collect, loadCatalogs } from '../api';
 import { ErrorNotice, Icon, Loading } from '../ui';
 
@@ -26,7 +26,7 @@ export function groupWholeExams(exams: Exam[]): Group[] {
 
 function ExamCell({ exam, caption }: { exam?: Exam; caption?: string }) {
   if (!exam) return <span className="muted">—</span>;
-  return <Link className="exam-cell-link" to={`/official-exams/${exam.derived_from_id ?? exam.id}`} aria-label={`${exam.title} sınavını aç`}>
+  return <Link className="exam-cell-link" to={`/official-exams/${exam.derived_from_id ?? exam.id}`} aria-label={`${examDisplayTitle(exam.title)} sınavını aç`}>
     <span className={`badge ${exam.status === 'published' ? 'green' : 'amber'}`}><span />{exam.status === 'published' ? 'Yayında' : 'Taslak'}</span><strong>{exam.question_count} soru</strong>{caption && <span className="exam-cell-meta">{caption}</span>}
     {(exam.draft_question_count > 0 || exam.outdated_question_count > 0) && <span className="exam-cell-meta">{exam.draft_question_count > 0 && <span className="exam-attention">{exam.draft_question_count} taslak soru</span>}{exam.outdated_question_count > 0 && <span className="exam-attention">{exam.outdated_question_count} güncellenmemiş</span>}</span>}
   </Link>;

@@ -12,7 +12,7 @@ import {
 } from "./icons";
 import type { StudyContext, User } from "@oggaq/shared-types";
 import { Enter, ExpressivePressable } from "./expressive";
-import { vocabulary } from "@oggaq/study-core";
+import { examDisplayTitle, vocabulary } from "@oggaq/study-core";
 import { scoreTone, shape } from "./theme";
 import { api } from "./api";
 import { useResource, useOnReturn } from "./hooks";
@@ -118,7 +118,7 @@ export function Home({
         <Enter style={{ backgroundColor: palette.surface, borderRadius: shape.large, padding: layout.cardPadding, gap: 12, borderWidth: 1, borderColor: palette.primary }}>
           <Badge>Devam ediyor</Badge>
           <Text accessibilityRole="header" style={styles.heading}>Kaldığın yerden devam et</Text>
-          <Text style={styles.text}>{activeExam.official_exam?.title ?? `${activeExam.question_count} soruluk deneme`}</Text>
+          <Text style={styles.text}>{activeExam.official_exam ? examDisplayTitle(activeExam.official_exam.title) : `${activeExam.question_count} soruluk deneme`}</Text>
           <Text style={styles.muted}>{activeExam.question_count} soru · Süren işlemeye devam ediyor</Text>
           <Button icon={Play} onPress={() => exam(activeExam.id)}>Denemene devam et</Button>
           <TextLink onPress={deneme}>Diğer sınavları gör</TextLink>
@@ -249,7 +249,7 @@ export function Home({
           <ListRow
             key={e.id}
             icon={Clock3}
-            title={e.official_exam?.title ?? `${e.question_count} soruluk deneme`}
+            title={e.official_exam ? examDisplayTitle(e.official_exam.title) : `${e.question_count} soruluk deneme`}
             subtitle={new Date(e.started_at).toLocaleDateString("tr-TR")}
             onPress={() => exam(e.id)}
             badge={

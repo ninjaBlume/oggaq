@@ -4,7 +4,7 @@ import { Pressable, Text, View } from "react-native";
 import { newId } from "./ids";
 import { ApiError, cursorFromLink } from "@oggaq/api-client";
 import type { ExamAttempt, Page, StudyContext, components } from "@oggaq/shared-types";
-import { suggestedMinutes, vocabulary } from "@oggaq/study-core";
+import { examDisplayTitle, suggestedMinutes, vocabulary } from "@oggaq/study-core";
 import { api } from "./api";
 import { useOnReturn, useResource, useTask } from "./hooks";
 import {
@@ -291,7 +291,7 @@ function ResultCard({ attempt: e, open }: { attempt: Summary; open: () => void }
   const layout = useLayout();
   const live = e.status === "active" && Date.parse(e.deadline_at) > Date.parse(e.server_time);
   const result = e.result;
-  const title = e.official_exam?.title ?? `${e.question_count} soruluk deneme`;
+  const title = e.official_exam ? examDisplayTitle(e.official_exam.title) : `${e.question_count} soruluk deneme`;
   const kind = e.official_exam ? (/Ders Sınavı/.test(e.official_exam.title) ? "DERS SINAVI" : "DENEME SINAVI") : "DENEME";
   const tone = result ? scoreTone(result.score_percent, palette) : { backgroundColor: palette.softPrimary, color: palette.primary };
   const date = new Date(e.started_at).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" });
