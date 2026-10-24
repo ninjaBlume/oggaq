@@ -209,3 +209,9 @@ Profil → **Hesabım** kartı yığında yeni bir ekran açar (`src/account.tsx
 ## 24 Ekim 2026: Sınava son sorudan devam
 
 Sınav ekranı yeniden açılınca indis 0'a dönmesi düzeltildi. Web ile ortak `resumeQuestionIndex` ve `ExamPositionSaver` son görüntülenen soruyu API'den geri yükler; sıralı konum yazımı, kayıt hatası ve yeniden deneme uygulanır. Kaydedilmiş cevaplar korunur, süre uygulama dışında işlemeye devam eder. Yeni oturum/başka cihaz yalnız sunucudaki konum kaydını kullanır; cihaz deposuna yeni öğrenci verisi yazılmaz. Eski sınavlarda konum yoksa ilk cevapsız soru açılır. Ayrıntı ve sınırlar [EXAMS](EXAMS.md#son-sorudan-devam-etme-24-ekim-2026).
+
+## 24 Ekim 2026: Katalog ve cevap trafiği
+
+Deneme ekranı yalnız seçilen silah seçeneğinin tam sınavlarını, Ders ekranı yalnız seçilen dersin sınavlarını sunucudan ister. Ders seçimi için bütün sınavları indirmek yerine katalogdaki yayımlanmış sınav sayıları kullanılır. Merkezi katalog metaverisi en çok 12 anahtarlı, 60 saniyelik bellek cache'inde bağlam+filtre anahtarıyla tutulur; sekmeye geri dönmek aynı kataloğu yeniden indirmez. Kişisel geçmiş, sonuçlar, cevap anahtarları ve kimlik bilgileri bu cache'e girmez. Bağlam/hesap değişimi başka anahtar kullanır. Bu kalıcı çevrimdışı depolama değildir. Başarısız veya iptal edilmiş yükleme saklanmaz; süre dolduğunda yeniden sunucuya gidilir.
+
+Cevap yazmaları küçük kanonik seçim yanıtını kullanır; aynı sabit soru nesneleri korunur. Eski sürüm, bağlam karışması, eksik/tekrarlanan cevap kimliği ve süre dolması kontrolleri ortak modülde test edilir. Kayıt hatası ve başka cihazla çakışma akışları korunur. Tam deneme sonucu yine sunucudan değerlendirilir ve bütün sorular incelenebilir.

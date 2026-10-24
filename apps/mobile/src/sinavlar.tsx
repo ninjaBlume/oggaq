@@ -1,3 +1,4 @@
+import { CatalogCache } from "./catalog-cache";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { newId } from "./ids";
@@ -24,6 +25,8 @@ import { ChoiceGroup } from "./expressive";
 import { BookOpen, ChevronDown, ChevronRight, Clock3 } from "./icons";
 import { scoreTone, shape } from "./theme";
 import { useLayout, useTheme } from "./themeContext";
+
+const catalogCache = new CatalogCache();
 
 type OfficialExam = components["schemas"]["OfficialExam"];
 type Summary = components["schemas"]["ExamSummary"];
@@ -154,14 +157,16 @@ export function ExamList({
   const [weapon, setWeapon] = useState<"armed" | "unarmed">("armed");
   const [subject, setSubject] = useState<string | undefined>(initialSubject);
   const [picking, setPicking] = useState(false);
-  const exams = useResource(
-    (signal) => collect((cursor) => api.request("get", "/api/v1/official-exams", { signal, query: { per_page: 100, cursor } })),
-    [],
-  );
   const subjects = useResource(
-    (signal) => collect((cursor) => api.request("get", "/api/v1/subjects", { signal, query: { per_page: 100, cursor } })),
-    [],
-    kind === "ders",
+    (signal) => catalogCache.read(`${context.id}:subjects`, signal, () => collect((cursor) => api.request("get", "/api/v1/subjects", { signal, query: { per_page: 100, cursor, with_exam_counts: true } }))),
+    [context.id], kind === "ders",
+  );
+  const withExams = (subjects.data ?? []).filter((item) => (item.published_exam_count ?? 0) > 0);
+  const selected = withExams.find((item) => item.id === subject) ?? withExams[0];
+  const subjectId = kind === "ders" ? selected?.id : undefined;
+  const exams = useResource(
+    (signal) => catalogCache.read(`${context.id}:${kind}:${kind === "deneme" ? weapon : subjectId}`, signal, () => collect((cursor) => api.request("get", "/api/v1/official-exams", { signal, query: { per_page: 100, cursor, scope: kind === "deneme" ? "whole" : "subject", ...(kind === "deneme" ? { weapon_status: weapon } : { subject_id: subjectId }) } }))),
+    [context.id, kind, weapon, subjectId], kind === "deneme" || !!subjectId,
   );
   const attempts = useResource(
     (signal) =>
@@ -178,8 +183,6 @@ export function ExamList({
   const all = exams.data ?? [];
   const wholeExams = all.filter((exam) => !exam.subject && exam.weapon_status === weapon).sort(byNewest);
   const subjectExams = all.filter((exam) => exam.subject);
-  const withExams = (subjects.data ?? []).filter((item) => subjectExams.some((exam) => exam.subject?.id === item.id));
-  const selected = withExams.find((item) => item.id === subject) ?? withExams[0];
   const list = kind === "deneme" ? wholeExams : subjectExams.filter((exam) => exam.subject?.id === selected?.id).sort(byNewest);
   const loading = exams.loading || attempts.loading || (kind === "ders" && subjects.loading);
   const failure = exams.error ?? (kind === "ders" ? subjects.error : null);

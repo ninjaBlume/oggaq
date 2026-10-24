@@ -14,6 +14,9 @@ class CatalogResource extends JsonResource
         foreach (Catalog::FIELDS[$request->route('catalog')] as $field) {
             $result[$field] = $this->{$field};
         }
+        if ($request->route('catalog') === 'subjects' && isset($this->published_exam_count)) {
+            $result['published_exam_count'] = (int) $this->published_exam_count;
+        }
 
         return $result;
     }

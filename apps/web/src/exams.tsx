@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiError } from "@oggaq/api-client";
 import {
   anchorClock,
+  mergeExamAnswerState,
   resumeQuestionIndex,
   ExamPositionSaver,
   remainingSeconds,
@@ -137,15 +138,16 @@ function ExamContent({
     }
   }
   const save = useMutation({
-    mutationFn: (s: Save) =>
-      api.request(
-        "put",
-        "/api/v1/contexts/{context}/exam-attempts/{exam}/answers/{answer}",
-        {
-          params: { context: context.id, exam: exam.id, answer: s.row },
-          body: { base_version: s.revision, selected_option_id: s.option },
-        },
-      ),
+    mutationFn: async (s: Save) => {
+      const response = await api.request("put", "/api/v1/contexts/{context}/exam-attempts/{exam}/answers/{answer}", {
+        params: { context: context.id, exam: exam.id, answer: s.row },
+        query: { compact: true }, body: { base_version: s.revision, selected_option_id: s.option },
+      });
+      if ('questions' in response.data) return { data: response.data };
+      if (response.data.status === 'completed') return api.request('get', '/api/v1/contexts/{context}/exam-attempts/{exam}', { params: { context: context.id, exam: exam.id } });
+      const current = cache.getQueryData<{ data: ExamAttempt }>(['exam', context.id, exam.id])?.data ?? exam;
+      return { data: mergeExamAnswerState(current, response.data) };
+    },
     onSuccess: (response) => {
       accept(response);
       setSubmission(null);

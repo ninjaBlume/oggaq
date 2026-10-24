@@ -24,8 +24,8 @@ async function scrollToLastQuestion(page: Page) {
     await list.evaluate((node) => { node.scrollTop += 2200; });
     await expect.poll(async () => {
       await list.evaluate((node) => { node.scrollTop += 2200; });
-      return await page.getByTestId(/^result-question-/).last().getAttribute('data-testid');
-    }).not.toBe(before);
+      return (await last.count()) > 0 || (await page.getByTestId(/^result-question-/).last().getAttribute('data-testid')) !== before;
+    }).toBe(true);
   }
 }
 

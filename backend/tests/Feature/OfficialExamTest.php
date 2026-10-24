@@ -20,6 +20,21 @@ class OfficialExamTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_catalog_filters_whole_subject_and_weapon_and_counts_only_published_subject_exams(): void
+    {
+        $whole = $this->createExam(['weapon_status' => 'armed'], true);
+        $this->createExam(['exam_number' => '2', 'weapon_status' => 'unarmed'], true);
+        $subjectExam = $this->createExam(['exam_number' => '3', 'subject_id' => $this->subject->id], true);
+        $this->createExam(['exam_number' => '4', 'subject_id' => $this->subject->id]);
+        $this->asToken($this->createUser());
+        $this->getJson('/api/v1/official-exams?scope=whole&weapon_status=armed')->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $whole['id']);
+        $this->getJson('/api/v1/official-exams?scope=subject&subject_id='.$this->subject->id)->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $subjectExam['id']);
+        $this->getJson('/api/v1/subjects?with_exam_counts=true')->assertOk()->assertJsonPath('data.0.published_exam_count', 1);
+        $this->getJson('/api/v1/subjects')->assertOk()->assertJsonMissingPath('data.0.published_exam_count');
+        $this->getJson('/api/v1/official-exams?scope=bad')->assertUnprocessable();
+        $this->getJson('/api/v1/subjects?with_exam_counts=bad')->assertUnprocessable();
+    }
+
     private User $admin;
 
     private ExamType $type;

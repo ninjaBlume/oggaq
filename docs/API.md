@@ -112,3 +112,5 @@ Exams yolları ve tekrar/süre semantiği [EXAMS](EXAMS.md) içinde; tamamlanana
 ## ÖGG puanlama
 
 Dönem listesi, kayıtsız hesap önizlemesi, kişisel puan geçmişi, denemede ek atış hesabı ve platform yöneticisi kural/dönem uçları eklendi. Sınav kaynaklarında `scoring_available` ve nullable `score_result` vardır; mevcut doğru yüzdesi değiştirilmez. Uçlar ve giriş/çıktı örnekleri [EXAM_SCORING](EXAM_SCORING.md#api), dönem doğrulama sınırları [EXAM_SCORING_RULES](EXAM_SCORING_RULES.md) içindedir.
+
+24 Ekim 2026 performans ekleri: öğrenci `GET /official-exams` için `scope=whole|subject` ve mevcut seçenek/ders filtrelerini kullanır. `GET /subjects?with_exam_counts=true` yalnız yayımlanmış ders sınavlarını sayan isteğe bağlı `published_exam_count` alanını ekler. Cevap yazma uç noktasında `compact=true`, `ExamAnswerStateResponse` döndürür; varsayılan tam yanıt korunur. Ayrıntılar [EXAMS](EXAMS.md#cevap-kaydında-küçük-durum-yanıtı-24-ekim-2026).
