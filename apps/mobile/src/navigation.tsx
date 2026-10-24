@@ -35,6 +35,7 @@ import {
 import { vocabulary } from "@oggaq/study-core";
 import { motion, shape } from "./theme";
 import type { AppPalette } from "./theme";
+import { Briefcase } from "./icons";
 import { railWidth } from "./layout";
 import { TabIndicator } from "./expressive";
 import { useReducedMotion } from "./motion";
@@ -50,6 +51,7 @@ export const destinations = [
 ] as const;
 // Reachable from the side menu and home only; the tab bar / rail keeps its five primary tabs.
 export const extraDestinations = [
+  { id: "jobs", label: vocabulary.jobs.short, menuLabel: vocabulary.jobs.title, icon: Briefcase },
   { id: "review", label: vocabulary.review.short, menuLabel: vocabulary.review.title, icon: ListChecks },
   { id: "stats", label: vocabulary.stats.short, menuLabel: vocabulary.stats.title, icon: ChartColumn },
 ] as const;
@@ -83,7 +85,7 @@ export function MainHeader({
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Menüyü aç"
-        accessibilityHint="Tekrar ve başarı seçeneklerini gösterir"
+        accessibilityHint="Menü seçeneklerini gösterir"
         accessibilityState={{ expanded }}
         aria-expanded={expanded}
         onPress={() => {
@@ -286,7 +288,7 @@ export function SideMenu({
             showsVerticalScrollIndicator={false}
             contentContainerStyle={navStyles.menuBody}
           >
-            <Text style={navStyles.sectionLabel}>ÇALIŞMA ARAÇLARI</Text>
+            <Text style={navStyles.sectionLabel}>DİĞER SEÇENEKLER</Text>
             {extraDestinations.map(
               ({ id, menuLabel, icon: Icon }) => (
               <Pressable

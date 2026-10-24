@@ -42,6 +42,7 @@ import { Exam } from "./exams";
 import { ExamList, Results } from "./sinavlar";
 import { Home } from "./home";
 import { MotionProvider } from "./motion";
+import { Jobs } from "./jobs";
 import { vocabulary } from "@oggaq/study-core";
 import { AccountScreen } from "./account";
 import { Profile } from "./profile";
@@ -169,6 +170,8 @@ function MainTabs({
                 <Results context={context} openExam={exam} />
               ) : tab === "review" ? (
                 <Review context={context} openExam={exam} />
+              ) : tab === "jobs" ? (
+                <Jobs user={user} />
               ) : tab === "stats" ? (
                 <Stats context={context} />
               ) : (

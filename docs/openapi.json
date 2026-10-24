@@ -35,6 +35,10 @@
     {
       "name": "Operations",
       "description": "İşletim: örnek hazırlık durumu (izleme ve dağıtım betiği için)."
+    },
+    {
+      "name": "Jobs",
+      "description": "ÖGG iş ilanları ve kişisel başvurular; yalnız platform yöneticisi yönetir."
     }
   ],
   "security": [
@@ -4855,6 +4859,722 @@
           }
         }
       }
+    },
+    "/api/v1/job-postings": {
+      "get": {
+        "operationId": "listJobPostings",
+        "summary": "Başvuruya açık ÖGG ilanları",
+        "tags": [
+          "Jobs"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPostingList"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/job-postings/{job}": {
+      "get": {
+        "operationId": "showJobPosting",
+        "summary": "Başvuruya açık ilanı gör",
+        "tags": [
+          "Jobs"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/JobPosting"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/job-postings/{job}/applications": {
+      "post": {
+        "operationId": "applyForJob",
+        "summary": "İlana başvur; aynı başvuru tekrarında aynı kayıt döner",
+        "tags": [
+          "Jobs"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "201": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/JobApplication"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/JobApplication"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyForJobInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/job-applications": {
+      "get": {
+        "operationId": "listMyJobApplications",
+        "summary": "Yalnız kendi iş başvurularım",
+        "tags": [
+          "Jobs"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobApplicationList"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/job-postings": {
+      "get": {
+        "operationId": "listAdminJobPostings",
+        "summary": "Platform yöneticisi tüm ilanları görür",
+        "tags": [
+          "Jobs"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPostingList"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createJobPosting",
+        "summary": "Platform yöneticisi ilan ekler",
+        "tags": [
+          "Jobs"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "201": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/JobPosting"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveJobPostingInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/job-postings/{job}": {
+      "get": {
+        "operationId": "showAdminJobPosting",
+        "summary": "Platform yöneticisi ilan ayrıntısı",
+        "tags": [
+          "Jobs"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/JobPosting"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updateJobPosting",
+        "summary": "İlanı revision ile düzenle, yayımla veya kapat",
+        "tags": [
+          "Jobs"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/JobPosting"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateJobPostingInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/job-postings/{job}/applications": {
+      "get": {
+        "operationId": "listAdminJobApplications",
+        "summary": "Platform yöneticisi ilanın başvurularını inceler",
+        "tags": [
+          "Jobs"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobApplicationList"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/job-applications/{application}": {
+      "patch": {
+        "operationId": "reviewJobApplication",
+        "summary": "Platform yöneticisi başvuru durumunu günceller",
+        "tags": [
+          "Jobs"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/JobApplication"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewJobApplicationInput"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -8584,7 +9304,7 @@
       },
       "AccountExport": {
         "type": "object",
-        "description": "Yalnızca isteyen kullanıcının kendi verisi: profil, üyelikler, çalışma alanları, sınav denemeleri (soru metni, seçenekler, seçimi, doğru şık yalnızca biten denemede), eski alıştırmalar, favoriler, soru bildirimleri ve oturum özeti (token yok).",
+        "description": "Yalnızca isteyen kullanıcının kendi verisi: profil, üyelikler, çalışma alanları, sınav denemeleri (soru metni, seçenekler, seçimi, doğru şık yalnızca biten denemede), eski alıştırmalar, favoriler, soru bildirimleri, kişisel iş başvuruları ve oturum özeti (token yok).",
         "properties": {
           "exported_at": {
             "type": "string",
@@ -8642,6 +9362,61 @@
               "type": "object",
               "additionalProperties": true
             }
+          },
+          "job_applications": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "job",
+                "contact_name",
+                "contact_email",
+                "phone",
+                "cover_letter",
+                "status",
+                "created_at"
+              ],
+              "properties": {
+                "job": {
+                  "$ref": "#/components/schemas/JobSnapshot"
+                },
+                "contact_name": {
+                  "type": "string",
+                  "maxLength": 100,
+                  "minLength": 2
+                },
+                "contact_email": {
+                  "type": "string",
+                  "maxLength": 254,
+                  "format": "email"
+                },
+                "phone": {
+                  "type": "string",
+                  "maxLength": 30,
+                  "minLength": 7
+                },
+                "cover_letter": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 2000
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "submitted",
+                    "reviewing",
+                    "accepted",
+                    "rejected"
+                  ]
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
           }
         },
         "required": [
@@ -8653,7 +9428,8 @@
           "practice_attempts",
           "favorites",
           "question_reports",
-          "sessions"
+          "sessions",
+          "job_applications"
         ]
       },
       "ReadinessResponse": {
@@ -8707,6 +9483,436 @@
             }
           }
         }
+      },
+      "JobPosting": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "company_name",
+          "city",
+          "description",
+          "weapon_requirement",
+          "status",
+          "revision",
+          "expires_at",
+          "created_at",
+          "is_open",
+          "application_id",
+          "application_status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "company_name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 10000
+          },
+          "weapon_requirement": {
+            "type": "string",
+            "enum": [
+              "any",
+              "armed",
+              "unarmed"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "closed"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "is_open": {
+            "type": "boolean"
+          },
+          "application_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "application_status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "submitted",
+              "reviewing",
+              "accepted",
+              "rejected",
+              null
+            ]
+          },
+          "applications_count": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "JobSnapshot": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "company_name",
+          "city",
+          "description",
+          "weapon_requirement"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "company_name": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 10000
+          },
+          "weapon_requirement": {
+            "type": "string",
+            "enum": [
+              "any",
+              "armed",
+              "unarmed"
+            ]
+          }
+        }
+      },
+      "JobApplication": {
+        "type": "object",
+        "required": [
+          "id",
+          "job_posting_id",
+          "job",
+          "contact_name",
+          "contact_email",
+          "phone",
+          "cover_letter",
+          "status",
+          "revision",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_posting_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job": {
+            "$ref": "#/components/schemas/JobSnapshot"
+          },
+          "contact_name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 2
+          },
+          "contact_email": {
+            "type": "string",
+            "maxLength": 254,
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 30,
+            "minLength": 7
+          },
+          "cover_letter": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "submitted",
+              "reviewing",
+              "accepted",
+              "rejected"
+            ]
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "JobPostingList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JobPosting"
+            }
+          },
+          "links": {
+            "$ref": "#/components/schemas/CursorLinks"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/CursorMeta"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "JobApplicationList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JobApplication"
+            }
+          },
+          "links": {
+            "$ref": "#/components/schemas/CursorLinks"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/CursorMeta"
+          }
+        },
+        "required": [
+          "data",
+          "links",
+          "meta"
+        ]
+      },
+      "ApplyForJobInput": {
+        "type": "object",
+        "required": [
+          "contact_name",
+          "contact_email",
+          "phone"
+        ],
+        "properties": {
+          "contact_name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 2
+          },
+          "contact_email": {
+            "type": "string",
+            "maxLength": 254,
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 30,
+            "minLength": 7
+          },
+          "cover_letter": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000
+          }
+        },
+        "additionalProperties": false
+      },
+      "SaveJobPostingInput": {
+        "type": "object",
+        "required": [
+          "title",
+          "company_name",
+          "city",
+          "description",
+          "weapon_requirement",
+          "status"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 240,
+            "minLength": 1
+          },
+          "company_name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 10000,
+            "minLength": 1
+          },
+          "weapon_requirement": {
+            "type": "string",
+            "enum": [
+              "any",
+              "armed",
+              "unarmed"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "closed"
+            ]
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateJobPostingInput": {
+        "type": "object",
+        "required": [
+          "title",
+          "company_name",
+          "city",
+          "description",
+          "weapon_requirement",
+          "status",
+          "base_version"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 240,
+            "minLength": 1
+          },
+          "company_name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 10000,
+            "minLength": 1
+          },
+          "weapon_requirement": {
+            "type": "string",
+            "enum": [
+              "any",
+              "armed",
+              "unarmed"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "closed"
+            ]
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "base_version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReviewJobApplicationInput": {
+        "type": "object",
+        "required": [
+          "status",
+          "base_version"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "submitted",
+              "reviewing",
+              "accepted",
+              "rejected"
+            ]
+          },
+          "base_version": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false
       }
     },
     "responses": {

@@ -26,6 +26,8 @@ Mobil tasarım daha sonra Material 3 Expressive yaklaşımına uyarlandı: merke
 
 PostgreSQL/Redis otomatik testleri ve gerçek HTTP kimlik akışı doğrulandı. GitHub Actions yapılandırması hazır; uzak CI sonucu GitHub Actions üzerinden izlenir.
 
+24 Ekim 2026: **İş Başvuruları** eklendi. Platform yöneticisi ilan ekler, yayımlar/kapatır ve başvuruları değerlendirir. Öğrenci web ve mobil yan menüden ilanları görür; ad, e-posta, telefon ve isteğe bağlı kısa ön yazıyla uygulama içinde başvurur, Başvurularım sekmesinde durumunu takip eder. Kişisel başvurular kurumlara açılmaz; hesap dışa aktarma/silme kapsamındadır. [Kullanım, API, veri modeli ve doğrulama sınırları](docs/JOBS.md).
+
 ## Hedef yapı
 
 ```text
@@ -56,6 +58,7 @@ docs/                     Türkçe teknik belgeler
 | [Güvenlik](docs/SECURITY.md) | Oturumlar, KVKK, mevzuat ve güvenlik gereksinimleri |
 | [API](docs/API.md) | Çalışan REST uçları, hata standardı ve sonraki sözleşmeler |
 | [Soru bankası](docs/QUESTION_BANK.md) | Taslak, sürüm, yayımlama, filtreler ve API kullanım örneği |
+| [İş Başvuruları](docs/JOBS.md) | Admin ilan yönetimi, uygulama içi başvuru ve kişisel değerlendirme takibi |
 | [İçe aktarma](docs/IMPORTING.md) | SQL/PDF inceleme, doğrulama ve yayınlama süreci |
 | [Testler](docs/TESTING.md) | Kritik senaryolar ve doğrulama yöntemi |
 | [Yol haritası](docs/ROADMAP.md) | Aşamalar, bağımlılıklar ve tamamlanma kapıları |

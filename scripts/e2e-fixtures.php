@@ -35,7 +35,7 @@ if (config('database.default') !== 'pgsql' || config('database.connections.pgsql
     throw new RuntimeException('Browser fixtures require the isolated oggaq_test PostgreSQL database.');
 }
 $operation = $argv[1] ?? '';
-if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'subject-exam', 'more-subject-exams', 'favorite', 'cleanup'], true)) {
+if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'cleanup'], true)) {
     throw new InvalidArgumentException('Expected setup or cleanup.');
 }
 if (in_array($operation, ['verification-link', 'reset-link'], true)) {
@@ -128,6 +128,13 @@ if ($operation === 'more-subject-exams') {
             'term' => '1. dönem', 'exam_number' => '1', 'question_version_ids' => $versions,
         ]);
         app(PublishOfficialExam::class)->execute($admin, $exam);
+    }
+    exit;
+}
+if ($operation === 'jobs') {
+    $admin = User::where('email', 'e2e-admin@example.test')->firstOrFail();
+    foreach (['published', 'draft', 'closed'] as $status) {
+        app(\App\Modules\Jobs\Actions\SaveJobPosting::class)->execute($admin, ['title' => 'Sentetik ÖGG ilanı '.$status, 'company_name' => 'Sentetik güvenlik firması', 'city' => 'İstanbul', 'description' => 'Yalnız otomatik test için oluşturulmuş ilan. Gerçek iş ilanı değildir.', 'weapon_requirement' => 'any', 'status' => $status, 'expires_at' => null]);
     }
     exit;
 }

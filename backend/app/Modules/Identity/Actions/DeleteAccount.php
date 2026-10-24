@@ -57,6 +57,7 @@ class DeleteAccount
 
     private function erase(User $user): void
     {
+        DB::table('job_applications')->where('user_id', $user->id)->delete();
         $contexts = DB::table('study_contexts')->where('user_id', $user->id)->pluck('id')->all();
         $attempts = DB::table('exam_attempts')->whereIn('study_context_id', $contexts)->select('id');
         // Reports are about the question: the link to the person and their free text go, the rest stays.

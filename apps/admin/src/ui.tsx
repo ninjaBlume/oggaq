@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { ApiError } from '@oggaq/api-client';
 
 const icons = {
+  briefcase: 'M3 7h18v14H3zM8 7V3h8v4M3 12c6 3 12 3 18 0M12 12v4',
   book: 'M4 4h6a3 3 0 0 1 3 3v14a4 4 0 0 0-4-3H4V4Zm9 3a3 3 0 0 1 3-3h5v14h-5a3 3 0 0 0-3 3',
   grid: 'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z',
   plus: 'M12 5v14M5 12h14', arrow: 'm9 5 7 7-7 7', back: 'm15 5-7 7 7 7',

@@ -326,3 +326,16 @@ tbody tr:hover { background: var(--c-surface-container); }
 .report-resolution-note { flex-basis: 100%; font-size: 13px; }
 .report-dialog-stem { margin-top: 10px; padding: 10px 12px; background: var(--c-surface-container); border-radius: 8px; font-size: 13px; overflow-wrap: anywhere; }
 .report-more { display: flex; justify-content: center; padding: 6px 0; }
+
+.job-admin-list,.job-applications { display:grid; gap:16px; margin-top:24px }
+.job-editor,.job-admin-row,.job-applications > .card { padding:24px }
+.job-admin-row { display:flex; align-items:center; justify-content:space-between; gap:20px; overflow-wrap:anywhere }
+.job-admin-row h2 { font-size:20px; margin:8px 0 }
+.job-editor { max-width:760px }
+.job-form-grid { display:grid; grid-template-columns:minmax(0,1fr); gap:0 20px }
+.job-application { display:grid; gap:10px; min-width:0; overflow-wrap:anywhere }
+.job-application .actions { align-items:end }
+.job-application select { display:block; margin-top:6px }
+.job-description { white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.7 }
+@media(min-width:840px) { .job-form-grid { grid-template-columns:repeat(2,minmax(0,1fr)) } }
+@media(max-width:599px) { .job-editor,.job-admin-row,.job-applications > .card { padding:16px } .job-admin-row { flex-direction:column; align-items:flex-start } }

@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Modules\Import\Commands\LegacyImportCommit;
 use App\Modules\Import\Commands\LegacyImportPreview;
+use App\Modules\Jobs\Models\JobPosting;
+use App\Modules\Jobs\Policies\JobPostingPolicy;
 use App\Modules\QuestionBank\Models\Question;
 use App\Modules\QuestionBank\Policies\QuestionPolicy;
 use App\Modules\Tenancy\Models\StudyContext;
@@ -38,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Tenant::class, TenantPolicy::class);
         Gate::policy(StudyContext::class, StudyContextPolicy::class);
         Gate::policy(Question::class, QuestionPolicy::class);
+        Gate::policy(JobPosting::class, JobPostingPolicy::class);
         URL::forceRootUrl(config('app.url'));
         if ($this->app->environment('production')) {
             config(['session.secure' => true]);
@@ -54,6 +57,7 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinute(15)->by('password-ip:'.$request->ip()),
         ]);
         RateLimiter::for('verification', fn (Request $request) => Limit::perMinute(6)->by('verify:'.$request->user()?->id));
+        RateLimiter::for('job-applications', fn (Request $request) => Limit::perHour(20)->by('job-applications:'.$request->user()?->id));
         RateLimiter::for('reports', fn (Request $request) => Limit::perHour(20)->by('reports:'.$request->user()?->id));
         // Password-confirmed account actions: a stolen session must not be able to guess the password.
         RateLimiter::for('account', fn (Request $request) => Limit::perMinute(10)->by('account:'.$request->user()?->id));

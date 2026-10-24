@@ -1337,3 +1337,17 @@ input::placeholder { color:var(--c-muted); opacity:1 }
   .sinav-action { margin-top:6px }
 }
 @media(prefers-reduced-motion:reduce) { .button { transition:none } }
+
+/* Jobs share the student card and form system; listing text remains plain and readable. */
+.job-grid { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; margin:20px 0 }
+.job-card { display:flex; flex-direction:column; align-items:flex-start; gap:12px; min-width:0; overflow-wrap:anywhere }
+.job-card h2 { font-size:21px; line-height:28px }
+.job-card .button { margin-top:auto; width:100% }
+.job-detail { max-width:720px; display:grid; gap:18px; margin-top:18px; overflow-wrap:anywhere }
+.job-description { white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.7 }
+.job-detail form { border-top:1px solid var(--c-line); padding-top:22px }
+.job-detail h3 { margin-bottom:18px }
+.job-sharing { margin:0 0 18px; font-size:14px }
+.job-detail textarea { width:100%; min-height:110px; padding:14px; border:1px solid var(--edge); border-radius:16px; background:var(--c-paper); color:var(--c-ink); font:inherit; resize:vertical }
+.job-card summary { min-height:44px; display:flex; align-items:center; cursor:pointer; color:var(--c-primary); font-weight:600 }
+@media(min-width:840px) { .job-grid { grid-template-columns:repeat(2,minmax(0,1fr)) } }

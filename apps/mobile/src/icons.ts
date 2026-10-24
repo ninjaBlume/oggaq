@@ -28,3 +28,5 @@ export { default as UserRound } from "lucide-react-native/icons/user-round";
 export { default as X } from "lucide-react-native/icons/x";
 export { default as ChartColumn } from "lucide-react-native/icons/chart-column";
 export { default as Star } from "lucide-react-native/icons/star";
+
+export { default as Briefcase } from "lucide-react-native/icons/briefcase-business";

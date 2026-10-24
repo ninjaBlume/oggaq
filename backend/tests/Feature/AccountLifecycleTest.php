@@ -341,7 +341,7 @@ class AccountLifecycleTest extends TestCase
         $raw = $this->post('/api/v1/me/export', ['current_password' => self::PASSWORD], ['Accept' => 'application/json'])->assertOk()->streamedContent();
         $data = json_decode($raw, true, flags: JSON_THROW_ON_ERROR);
         $this->assertCount(60, $data['exam_attempts']);
-        $this->assertSame(['exported_at', 'profile', 'memberships', 'study_contexts', 'exam_attempts', 'practice_attempts', 'favorites', 'question_reports', 'sessions'], array_keys($data));
+        $this->assertSame(['exported_at', 'profile', 'memberships', 'study_contexts', 'job_applications', 'exam_attempts', 'practice_attempts', 'favorites', 'question_reports', 'sessions'], array_keys($data));
         $this->post('/api/v1/me/export', ['current_password' => self::PASSWORD])->assertOk()->streamedContent();
         $this->post('/api/v1/me/export', ['current_password' => self::PASSWORD])->assertOk()->streamedContent();
         // Wrong passwords never spend the allowance; the fourth real export is refused.
@@ -520,19 +520,19 @@ SQL);
             // deleted with the person
             'memberships(user_id) -> users', 'study_contexts(user_id) -> users', 'sessions(user_id) -> users',
             'exam_attempts(study_context_id) -> study_contexts', 'practice_attempts(study_context_id) -> study_contexts', 'favorite_questions(study_context_id) -> study_contexts',
-            'exam_answers(exam_attempt_id) -> exam_attempts', 'exam_bookmarks(exam_attempt_id) -> exam_attempts', 'study_contexts(membership_id,tenant_id,user_id) -> memberships',
+            'exam_answers(exam_attempt_id) -> exam_attempts', 'exam_bookmarks(exam_attempt_id) -> exam_attempts', 'job_applications(user_id) -> users', 'study_contexts(membership_id,tenant_id,user_id) -> memberships',
             // link severed, row kept
             'audit_events(actor_id) -> users', 'question_reports(user_id) -> users', 'question_reports(exam_attempt_id) -> exam_attempts',
             // only platform admins author these, and platform admins cannot delete themselves
             'questions(created_by) -> users', 'official_exams(created_by) -> users', 'import_batches(created_by) -> users', 'import_batches(approved_by) -> users',
-            'official_exam_question_changes(actor_id) -> users', 'question_reports(resolved_by) -> users',
+            'official_exam_question_changes(actor_id) -> users', 'job_postings(created_by) -> users', 'question_reports(resolved_by) -> users',
         ];
         sort($handled);
         $this->assertSame($handled, $found, 'A table now references users, study contexts, memberships or exam attempts: handle it in DeleteAccount (and ExportAccountData), then list it here.');
 
         // Personal data held without a foreign key.
         $columns = collect(DB::select("SELECT table_name || '.' || column_name AS name FROM information_schema.columns WHERE table_schema = 'public' AND (column_name IN ('email', 'user_id', 'actor_id', 'ip_address', 'user_agent') OR column_name LIKE '%\\_by' ESCAPE '\\') ORDER BY 1"))->pluck('name')->all();
-        $known = ['audit_events.actor_id', 'import_batches.approved_by', 'import_batches.created_by', 'memberships.user_id', 'official_exam_question_changes.actor_id', 'official_exams.created_by',
+        $known = ['audit_events.actor_id', 'import_batches.approved_by', 'import_batches.created_by', 'job_applications.user_id', 'job_postings.created_by', 'memberships.user_id', 'official_exam_question_changes.actor_id', 'official_exams.created_by',
             'password_reset_tokens.email', 'question_reports.resolved_by', 'question_reports.user_id', 'questions.created_by', 'sessions.ip_address', 'sessions.user_agent', 'sessions.user_id',
             'study_contexts.user_id', 'users.email'];
         $this->assertSame($known, $columns, 'A column that can hold personal data is new: decide how deletion and export treat it, then list it here.');

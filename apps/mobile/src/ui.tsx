@@ -335,6 +335,7 @@ export function Field({
   password = false,
   numeric = false,
   email = false,
+  phone = false,
   editable = true,
   multiline = false,
   maxLength,
@@ -349,6 +350,7 @@ export function Field({
   password?: boolean;
   numeric?: boolean;
   email?: boolean;
+  phone?: boolean;
   editable?: boolean;
   multiline?: boolean;
   maxLength?: number;
@@ -387,9 +389,7 @@ export function Field({
           value={value}
           onChangeText={onChange}
           secureTextEntry={password && !reveal}
-          keyboardType={
-            numeric ? "number-pad" : email ? "email-address" : "default"
-          }
+          keyboardType={phone ? "phone-pad" : numeric ? "number-pad" : email ? "email-address" : "default"}
           autoCapitalize={email || password ? "none" : "sentences"}
           autoCorrect={!email && !password}
           editable={editable}
@@ -410,9 +410,9 @@ export function Field({
                 ]
               : styles.input
           }
-          autoComplete={email ? "email" : password ? newPassword ? "new-password" : "current-password" : undefined}
+          autoComplete={phone ? "tel" : email ? "email" : password ? newPassword ? "new-password" : "current-password" : undefined}
           textContentType={
-            email ? "emailAddress" : password ? newPassword ? "newPassword" : "password" : undefined
+            phone ? "telephoneNumber" : email ? "emailAddress" : password ? newPassword ? "newPassword" : "password" : undefined
           }
         />
         {password && (

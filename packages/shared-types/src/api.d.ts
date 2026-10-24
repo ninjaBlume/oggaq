@@ -1340,6 +1340,144 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/job-postings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Başvuruya açık ÖGG ilanları */
+        get: operations["listJobPostings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/job-postings/{job}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Başvuruya açık ilanı gör */
+        get: operations["showJobPosting"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/job-postings/{job}/applications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** İlana başvur; aynı başvuru tekrarında aynı kayıt döner */
+        post: operations["applyForJob"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/job-applications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Yalnız kendi iş başvurularım */
+        get: operations["listMyJobApplications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/job-postings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Platform yöneticisi tüm ilanları görür */
+        get: operations["listAdminJobPostings"];
+        put?: never;
+        /** Platform yöneticisi ilan ekler */
+        post: operations["createJobPosting"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/job-postings/{job}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Platform yöneticisi ilan ayrıntısı */
+        get: operations["showAdminJobPosting"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** İlanı revision ile düzenle, yayımla veya kapat */
+        patch: operations["updateJobPosting"];
+        trace?: never;
+    };
+    "/api/v1/admin/job-postings/{job}/applications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Platform yöneticisi ilanın başvurularını inceler */
+        get: operations["listAdminJobApplications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/job-applications/{application}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Platform yöneticisi başvuru durumunu günceller */
+        patch: operations["reviewJobApplication"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2307,7 +2445,7 @@ export interface components {
                 message: string;
             };
         };
-        /** @description Yalnızca isteyen kullanıcının kendi verisi: profil, üyelikler, çalışma alanları, sınav denemeleri (soru metni, seçenekler, seçimi, doğru şık yalnızca biten denemede), eski alıştırmalar, favoriler, soru bildirimleri ve oturum özeti (token yok). */
+        /** @description Yalnızca isteyen kullanıcının kendi verisi: profil, üyelikler, çalışma alanları, sınav denemeleri (soru metni, seçenekler, seçimi, doğru şık yalnızca biten denemede), eski alıştırmalar, favoriler, soru bildirimleri, kişisel iş başvuruları ve oturum özeti (token yok). */
         AccountExport: {
             /** Format: date-time */
             exported_at: string;
@@ -2335,6 +2473,18 @@ export interface components {
             sessions: {
                 [key: string]: unknown;
             }[];
+            job_applications: {
+                job: components["schemas"]["JobSnapshot"];
+                contact_name: string;
+                /** Format: email */
+                contact_email: string;
+                phone: string;
+                cover_letter: string | null;
+                /** @enum {string} */
+                status: "submitted" | "reviewing" | "accepted" | "rejected";
+                /** Format: date-time */
+                created_at: string;
+            }[];
         };
         ReadinessResponse: {
             data: {
@@ -2348,6 +2498,105 @@ export interface components {
                     scheduler: boolean;
                 };
             };
+        };
+        JobPosting: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            company_name: string;
+            city: string;
+            description: string;
+            /** @enum {string} */
+            weapon_requirement: "any" | "armed" | "unarmed";
+            /** @enum {string} */
+            status: "draft" | "published" | "closed";
+            revision: number;
+            /** Format: date-time */
+            expires_at: string | null;
+            /** Format: date-time */
+            created_at: string;
+            is_open: boolean;
+            /** Format: uuid */
+            application_id: string | null;
+            /** @enum {string|null} */
+            application_status: "submitted" | "reviewing" | "accepted" | "rejected" | null;
+            applications_count?: number;
+        };
+        JobSnapshot: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            company_name: string;
+            city: string;
+            description: string;
+            /** @enum {string} */
+            weapon_requirement: "any" | "armed" | "unarmed";
+        };
+        JobApplication: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            job_posting_id: string;
+            job: components["schemas"]["JobSnapshot"];
+            contact_name: string;
+            /** Format: email */
+            contact_email: string;
+            phone: string;
+            cover_letter: string | null;
+            /** @enum {string} */
+            status: "submitted" | "reviewing" | "accepted" | "rejected";
+            revision: number;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        JobPostingList: {
+            data: components["schemas"]["JobPosting"][];
+            links: components["schemas"]["CursorLinks"];
+            meta: components["schemas"]["CursorMeta"];
+        };
+        JobApplicationList: {
+            data: components["schemas"]["JobApplication"][];
+            links: components["schemas"]["CursorLinks"];
+            meta: components["schemas"]["CursorMeta"];
+        };
+        ApplyForJobInput: {
+            contact_name: string;
+            /** Format: email */
+            contact_email: string;
+            phone: string;
+            cover_letter?: string | null;
+        };
+        SaveJobPostingInput: {
+            title: string;
+            company_name: string;
+            city: string;
+            description: string;
+            /** @enum {string} */
+            weapon_requirement: "any" | "armed" | "unarmed";
+            /** @enum {string} */
+            status: "draft" | "published" | "closed";
+            /** Format: date-time */
+            expires_at?: string | null;
+        };
+        UpdateJobPostingInput: {
+            title: string;
+            company_name: string;
+            city: string;
+            description: string;
+            /** @enum {string} */
+            weapon_requirement: "any" | "armed" | "unarmed";
+            /** @enum {string} */
+            status: "draft" | "published" | "closed";
+            /** Format: date-time */
+            expires_at?: string | null;
+            base_version: number;
+        };
+        ReviewJobApplicationInput: {
+            /** @enum {string} */
+            status: "submitted" | "reviewing" | "accepted" | "rejected";
+            base_version: number;
         };
     };
     responses: {
@@ -4645,6 +4894,329 @@ export interface operations {
             401: components["responses"]["Problem"];
             403: components["responses"]["Problem"];
             404: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    listJobPostings: {
+        parameters: {
+            query?: {
+                per_page?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobPostingList"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    showJobPosting: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobPosting"];
+                    };
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    applyForJob: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApplyForJobInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobApplication"];
+                    };
+                };
+            };
+            /** @description Başarılı işlem. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobApplication"];
+                    };
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    listMyJobApplications: {
+        parameters: {
+            query?: {
+                per_page?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobApplicationList"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    listAdminJobPostings: {
+        parameters: {
+            query?: {
+                per_page?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobPostingList"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    createJobPosting: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveJobPostingInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobPosting"];
+                    };
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    showAdminJobPosting: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobPosting"];
+                    };
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    updateJobPosting: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateJobPostingInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobPosting"];
+                    };
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    listAdminJobApplications: {
+        parameters: {
+            query?: {
+                per_page?: number;
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                job: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobApplicationList"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    reviewJobApplication: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                application: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewJobApplicationInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobApplication"];
+                    };
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
             422: components["responses"]["Problem"];
             429: components["responses"]["Problem"];
         };

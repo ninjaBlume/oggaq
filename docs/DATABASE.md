@@ -120,3 +120,7 @@ Identity/Tenancy/QuestionBank FK/CHECK/unique, transaction ve yayımlanmış iç
 `import_batches` (kaynak SHA-256, eşleme hash'i, onay raporu, durum) ve `import_records` (kaynak sistem/tablo/anahtar → hedef kayıt, birincil anahtarı yeniden çalıştırmada çoğalmayı önler) içe aktarmayı izler; ayrıntı [IMPORTING](IMPORTING.md).
 
 `exam_bookmarks(exam_attempt_id, position)` öğrencinin aktif sınavda son görüntülediği soru konumudur. `exam_attempt_id` PK ve `exam_attempts.id` için `CASCADE` FK'dır; `(exam_attempt_id, position)` aynı sınavın gerçek `exam_answers(exam_attempt_id, position)` unique çiftine `CASCADE` FK ile bağlıdır. Böylece mevcut olmayan bir soru konumu yazılamaz ve hesap/deneme/cevap silinince konum da silinir. Yeni denemede 1 kaydedilir, eski denemede satır yoksa API `resume_position=null` döndürür. Konum ayrı tabloda olduğundan cevap revision'ını ve değişmez soru/süre/sonuç ayarlarını değiştirmez. Ayrıntı [EXAMS](EXAMS.md#son-sorudan-devam-etme-24-ekim-2026).
+
+## İş ilanları ve başvurular (uygulandı)
+
+`job_postings` merkezi ilanları; `job_applications` kullanıcıya ait başvuruları saklar. Kullanıcı+ilan unique, durum/revision CHECK, kullanıcı silmede CASCADE ve ilan silmede RESTRICT FK ile korunur. Başvurunun iletişim/ön yazı alanları encrypted cast kullanır; `job_snapshot` başvuru anındaki ilan içeriğidir. Alanlar, indeksler, erişim ve migration ayrıntıları [JOBS](JOBS.md#yetki-ve-veri-modeli) içindedir. Başvurular çalışma/kurum bağlamından bağımsız kişisel veridir; hesap dışa aktarma ve silme kapsamındadır.

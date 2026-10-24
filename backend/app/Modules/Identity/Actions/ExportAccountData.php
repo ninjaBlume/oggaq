@@ -3,6 +3,7 @@
 namespace App\Modules\Identity\Actions;
 
 use App\Models\User;
+use App\Modules\Jobs\Models\JobApplication;
 use Closure;
 use Generator;
 use Illuminate\Http\Request;
@@ -37,6 +38,10 @@ class ExportAccountData
         $this->section($out, 'study_contexts', array_map(fn ($context) => [
             'id' => $context->id, 'kind' => $context->tenant_id === null ? 'personal' : 'tenant', 'tenant' => $context->tenant_name, 'created_at' => $context->created_at,
         ], $contexts));
+        $this->section($out, 'job_applications', JobApplication::where('user_id', $user->id)->orderBy('id')->lazyById(self::CHUNK)->map(fn ($application) => [
+            'job' => $application->job_snapshot, 'contact_name' => $application->contact_name, 'contact_email' => $application->contact_email,
+            'phone' => $application->phone, 'cover_letter' => $application->cover_letter, 'status' => $application->status, 'created_at' => $application->created_at->toISOString(),
+        ]));
         $this->section($out, 'exam_attempts', $this->examAttempts($contextIds));
         $this->section($out, 'practice_attempts', $this->practiceAttempts($contextIds));
         $this->section($out, 'favorites', DB::table('favorite_questions as f')->whereIn('f.study_context_id', $contextIds)->orderBy('f.created_at')

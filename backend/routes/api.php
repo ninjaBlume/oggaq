@@ -5,6 +5,8 @@ use App\Modules\Exams\Http\Controllers\ExamAttemptController;
 use App\Modules\Identity\Http\Controllers\AccountController;
 use App\Modules\Identity\Http\Controllers\AuthController;
 use App\Modules\Identity\Http\Controllers\ProfileController;
+use App\Modules\Jobs\Http\Controllers\AdminJobController;
+use App\Modules\Jobs\Http\Controllers\JobController;
 use App\Modules\QuestionBank\Http\Controllers\AdminOfficialExamController;
 use App\Modules\QuestionBank\Http\Controllers\AdminQuestionController;
 use App\Modules\QuestionBank\Http\Controllers\AdminQuestionReportController;
@@ -42,6 +44,17 @@ Route::prefix('v1')->group(function () {
         Route::delete('me', [AccountController::class, 'destroy'])->middleware('throttle:account');
 
         Route::middleware('email.verified')->group(function () {
+            Route::get('job-postings', [JobController::class, 'index']);
+            Route::get('job-postings/{job}', [JobController::class, 'show'])->whereUuid('job');
+            Route::post('job-postings/{job}/applications', [JobController::class, 'apply'])->whereUuid('job')->middleware('throttle:job-applications');
+            Route::get('me/job-applications', [JobController::class, 'applications']);
+            Route::get('admin/job-postings', [AdminJobController::class, 'index']);
+            Route::post('admin/job-postings', [AdminJobController::class, 'store']);
+            Route::get('admin/job-postings/{job}', [AdminJobController::class, 'show'])->whereUuid('job');
+            Route::patch('admin/job-postings/{job}', [AdminJobController::class, 'update'])->whereUuid('job');
+            Route::get('admin/job-postings/{job}/applications', [AdminJobController::class, 'applications'])->whereUuid('job');
+            Route::patch('admin/job-applications/{application}', [AdminJobController::class, 'review'])->whereUuid('application');
+
             foreach (['subjects', 'exam-types'] as $catalog) {
                 Route::get($catalog, [CatalogController::class, 'index'])->defaults('catalog', $catalog);
             }

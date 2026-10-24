@@ -27,6 +27,7 @@ Laravel modüler monolit başlangıç karmaşıklığını sınırlar; PostgreSQ
 | Tenancy | Şirket, davet, üyelik, bağlam ve erişim denetimi |
 | QuestionBank | Ders, konu, sürümlü soru/seçenek/görsel ve kaynak |
 | Exams | Sınav, şablon sürümü, deneme, cevap ve değerlendirme |
+| Jobs | Merkezi ÖGG iş ilanları, kişisel başvurular ve platform yöneticisi değerlendirmesi |
 | Study | Favori, yanlışlar, çalışma geçmişi ve ilerleme projeksiyonları |
 | Offline | Paket yayını, içerik değişiklikleri, senkronizasyon ve tekrar güvenliği |
 | Imports | Kaynak analizi, staging, doğrulama, onay ve aktarım |
@@ -65,3 +66,7 @@ Dağıtım, yedek ve geri yükleme [DEPLOYMENT](DEPLOYMENT.md) belgesinde ve `de
 ## Uygulanan süreli deneme ve mobil
 
 [EXAMS](EXAMS.md) gerçek `exam_attempts`/`exam_answers` şemasını, yetki, sabit sürüm, revision, sunucu süresi ve değişmez sonucu anlatır. Önceki genel `attempts`/şablon/rapor tabloları gelecekteki tasarımdır. Expo istemcisinin native paket/test sınırları [MOBILE](MOBILE.md) içinde ayrıca raporlanır.
+
+## Uygulanan iş başvuruları
+
+Jobs modülü admin, öğrenci web ve Expo istemcisini aynı gerçek API ile bağlar. Yetkilendirme Policy, doğrulama FormRequest, kritik yazmalar transaction kullanan Actions, yanıtlar açık alan listeli Resource içindedir. Başvurular kurum bağlamına taşınmaz; yalnız başvuru sahibi ve platform yöneticisi görebilir. [JOBS](JOBS.md) kullanım, veri modeli ve doğrulama sınırlarını açıklar.

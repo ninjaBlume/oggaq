@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 
 const paths = {
+  briefcase: 'M3 7h18v14H3zM8 7V3h8v4M3 12c6 3 12 3 18 0M12 12v4',
   shield: 'M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7l-9-4Zm-4 9 3 3 5-6',
   mail: 'M3 5h18v14H3zM3 6l9 7 9-7',
   lock: 'M5 10h14v11H5zM8 10V6a4 4 0 0 1 8 0v4M12 14v3',
