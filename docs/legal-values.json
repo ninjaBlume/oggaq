@@ -10,8 +10,8 @@
     "yururluk-tarihi": "",
     "verbis": "",
     "barindirma-konumu": "Türkiye (İstanbul); barındırma sağlayıcısı Hosting Dünyam Bilişim Teknolojileri Tic. Ltd. Şti.",
-    "eposta-saglayicisi": "",
-    "yurt-disi-aktarim": "Verilerin saklandığı sunucu Türkiye'dedir. Siteye ve uygulamaya erişim trafiği, güvenlik ve performans için Cloudflare, Inc. (ABD) ağı üzerinden iletilir.",
+    "eposta-saglayicisi": "Codentum tarafından işletilen Exim, Hosting Dünyam sunucusu, Türkiye",
+    "yurt-disi-aktarim": "Verilerin saklandığı sunucu Türkiye'dedir. Siteye ve uygulamaya erişim trafiği, güvenlik ve performans için Cloudflare, Inc. (ABD) ağı üzerinden iletilir. Doğrulama ve parola sıfırlama bildirimleri kullanıcının belirttiği e-posta adresinin hizmet sağlayıcısına iletilir.",
     "uygulanacak-hukuk": "",
     "hukuki-sebep": "Hesabı ve sınav hizmetini sunmak, sonuçlarını saklamak ve iş ilanı başvurusunu işleme almak için sözleşmenin kurulması veya ifasıyla doğrudan ilgili olması (KVKK m.5/2-c); güvenliği sağlamak ve hataları gidermek için veri sorumlusunun meşru menfaati (KVKK m.5/2-f).",
     "yanit-suresi": "en geç 30 gün",
@@ -22,9 +22,13 @@
   },
   "_oneriler": {
     "veri-sorumlusu-unvan": "Öneri: platformu işleten ve amaç/araçlara karar veren tüzel kişi. Şirket adı, ticari unvanıyla ve varsa MERSİS numarasıyla.",
-    "verbis": "Öneri: KVKK Kurumu sitesinden güncel istisna ölçütlerine bakın. Yükümlü değilseniz: 'VERBİS kayıt yükümlülüğünden istisnadır'; yükümlüyse kayıt numarası.",
+    "verbis": "Codentum ABD’de yerleşik bir tüzel kişidir. Kurum rehberinde yurt dışında yerleşik veri sorumluları için genel kuralın VERBİS kaydı olduğu belirtilir. İstisna, temsilci ve mevcut kayıt durumu ayrıca doğrulanmadan bu alana muafiyet yazılmamalıdır.",
     "yurt-disi-aktarim": "Dikkat: Cloudflare Tunnel/proxy trafiği (giriş parolası dahil) Cloudflare ağından geçer; bunu yurt dışı aktarım sayıp saymayacağınıza ve KVKK m.9 gereğini nasıl karşılayacağınıza siz karar verin. Yazılı metin yalnızca olgusal durumu söylüyor. Ayrıca veri sorumlusu ABD şirketi (Codentum L.L.C.) ise bu da aktarım/temsilci sorusunu doğurur.",
-    "uygulanacak-hukuk": "Öneri: 'Türkiye Cumhuriyeti hukuku uygulanır; <şehir> mahkemeleri ve icra daireleri yetkilidir.'",
+    "uygulanacak-hukuk": "Codentum’un ABD şirketi olması ve kullanıcı kitlesi birlikte değerlendirilerek hukuki incelemeyle kararlaştırılacak. Henüz ülke/mahkeme seçilmedi; teknik hazırlık bu kararı otomatik doldurmaz.",
     "yayinci-adi": "Mağazadaki yayıncı adıyla birebir aynı yazın (Apple/Google hesabındaki ad)."
+  },
+  "_kaynaklar": {
+    "verbis": "https://verbis.kvkk.gov.tr/sharedFolder/sorularla-verbis.pdf",
+    "kontrol-tarihi": "2026-10-25"
   }
 }

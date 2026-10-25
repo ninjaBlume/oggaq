@@ -1,8 +1,8 @@
 # App Store ve Play Store yayın hazırlığı
 
-Durum (24 Ekim 2026): **yayına hazır değil.** Kod tarafında hesap silme, sorun bildirme, takip SDK'sı olmaması ve HTTPS-yalnızca iletişim gibi mağaza kurallarının teknik şartları karşılanıyor. Eksik olanlar: hukuki metinlerin son hâli, yayıncı ve veri sorumlusu kararı, soru içeriğinin hak teyidi, puanlama uzman onayı, nihai marka ikonu, derleme ve mağaza hesapları. Bu belge neyin hazır, neyin kimde olduğunu ve adım adım ne yapılacağını anlatır. Otomatik ön kontrol: `npm run check:store` (engel varsa çıkış kodu 1).
+Durum (25 Ekim 2026): **yayına hazır değil.** Kod tarafında hesap silme, sorun bildirme, takip SDK'sı olmaması ve HTTPS-yalnızca iletişim gibi mağaza kurallarının teknik şartları karşılanıyor. Eksik olanlar: hukuki metinlerin son hâli, yayıncı ve veri sorumlusu kararı, soru içeriğinin hak teyidi, puanlama uzman onayı, nihai marka ikonu, derleme ve mağaza hesapları. Bu belge neyin hazır, neyin kimde olduğunu ve adım adım ne yapılacağını anlatır. Otomatik ön kontrol: `npm run check:store` (engel varsa çıkış kodu 1).
 
-**Hiçbir mağaza adımı çalıştırılmadı.** Apple Developer, App Store Connect, Play Console, EAS Build ve herhangi bir gönderim yapılmadı; hesap bilgisi, anahtar veya gizli değer bu depoda yok.
+**Hesap işlemleri ile paket gönderimi ayrıdır.** Kullanıcı Google Play kayıt ödemesini ve iletişim doğrulamasını tamamladığını bildirdi; Apple için Codentum Organization/DSA süreci ayrıca yürütüldü. Bu oturumda panellerin son onay durumu yeniden doğrulanmadı; EAS derlemesi veya mağazaya paket gönderimi yapılmadı. Anahtar ve inceleme hesabı parolası depoda tutulmaz.
 
 ## 1. Hazırlık tablosu
 
@@ -12,13 +12,13 @@ Durum (24 Ekim 2026): **yayına hazır değil.** Kod tarafında hesap silme, sor
 | Hesap silme için herkese açık web sayfası (Google) | Taslak hazır: `/legal/hesap-silme.html` | Hukukçu + e-posta adresi |
 | Gizlilik politikası / KVKK aydınlatma metni | **Taslak**: `/legal/gizlilik.html` | Hukukçu |
 | Kullanım koşulları | **Taslak**: `/legal/kosullar.html` | Hukukçu |
-| Destek sayfası ve iletişim | **Taslak**: `/legal/destek.html`, e-posta yok | Kullanıcı |
+| Destek sayfası ve iletişim | `hello@codentum.net` bağlı; sayfa yürürlük tarihi/onay bekliyor | Kullanıcı |
 | Uygulama içinde yasal bağlantılar | Hazır: web altbilgisi, giriş/kayıt, mobil Profil → Yasal ve destek, giriş ekranı | — |
 | "Resmî kurum değildir" uyarısı | Hazır: web altbilgisi, giriş, mobil Profil; kullanım koşullarında | — |
 | "Hesaplama resmî sonuç değildir" notu | Hazır: puan hesaplama ekranları (web, mobil) | — |
 | Uygulama ikonu, uyumlu (adaptive) ikon, açılış simgesi, favicon | **Geçici** marka: `apps/mobile/assets/` | Kullanıcı (nihai logo) |
-| Yerel açılış ekranı (native splash) | Yok: `expo-splash-screen` kurulu değil | Onay gerekir (paket) |
-| Derleme yapılandırması | Hazır ama çalıştırılmadı: `apps/mobile/eas.json` | Kullanıcı (Expo hesabı) |
+| Yerel açılış ekranı (native splash) | SDK 58 uyumlu eklentiyle mevcut simge, mavi zemin ve koyu tema hazır; iki native proje üretimi doğrulandı | Yeni release paketinde görsel kontrol |
+| Derleme yapılandırması | `eas.json` hazır; üretim adresi kullanıcı kararıyla ayrı belirlenecek | Kalıcı üretim adresi + paket doğrulama |
 | Paket kimliği | **Geçici**: `net.harunaltay.oggaq` | Kullanıcı (yayıncı kararı) |
 | Takip, reklam, analitik SDK'sı | Yok (gizlilik beyanı basit) | — |
 | Üçüncü taraf girişi (Apple ile Giriş zorunluluğu) | Yok | — |
@@ -28,7 +28,7 @@ Durum (24 Ekim 2026): **yayına hazır değil.** Kod tarafında hesap silme, sor
 | Soru içeriğinin hak teyidi | **Engel** | Kullanıcı + hukukçu |
 | Puanlama kurallarının uzman onayı | **Engel** | Kullanıcı + uzman |
 | Veri sorumlusu, VERBİS, yurt dışı aktarım | **Engel** | Kullanıcı + hukukçu |
-| Gerçek e-posta sağlayıcısı | Yok (sunucuda Mailpit) | Kullanıcı |
+| Gerçek e-posta gönderimi | Proje ağına özel Exim/DKIM aktif; doğrudan ve kuyruktan Gmail SMTP teslimi doğrulandı, klasör teyidi bekleniyor | Codex |
 | Yedekleme | Betikler hazır, sunucuda çalıştırılmadı | Kullanıcı |
 | Apple DSA (AB tüccar) doğrulaması | Sürüyor (Codentum hesabı) | Kullanıcı / Apple |
 
@@ -72,11 +72,11 @@ Not: dolu gelen öneriler hukuki görüş değildir; sorumluluk metni onaylayan�
 
 `apps/mobile/eas.json`: `development` ve `preview` (içeride dağıtım, Android APK; API ve web adresi geliştirme sunucusu), `production` (mağaza paketi). **Üretim adresleri bilerek yer tutucudur** (`https://alan-adi-belirlenmedi.invalid`); gerçek alan adı belli olunca `EXPO_PUBLIC_API_URL` ve `EXPO_PUBLIC_WEB_URL` değerlerini HTTPS olarak yazın (`check:store` yer tutucuyu engel sayar). `development` profili bir geliştirme istemcisi değildir (`expo-dev-client` kurulu değil); geliştirme API'sine bağlı bir sürüm paketidir.
 
-EAS kullanmak **sizin Expo hesabınızı** gerektirir ve ücretsiz plan sınırları geçerlidir; bu çalışmada hesap açılmadı, `eas-cli` kurulmadı, derleme yapılmadı. Sırayla (kendi makinenizde): `eas login`, `eas build --platform android --profile preview` ile deneme APK'sı, sonra `eas build --platform all --profile production`, `eas submit`. iOS imzalı derleme için Apple Developer hesabı gerekir. Bu Mac'te tam Xcode yoktur; imzalı iOS derlemesini EAS yapar.
+EAS kullanmak **sizin Expo hesabınızı** gerektirir ve ücretsiz plan sınırları geçerlidir; bu çalışmada hesap açılmadı, `eas-cli` kurulmadı, derleme yapılmadı. Sırayla (kendi makinenizde): `eas login`, `eas build --platform android --profile preview` ile deneme APK'sı, sonra `eas build --platform all --profile production`, `eas submit`. iOS imzalı derleme için Apple Developer hesabı gerekir. İmzalı iOS derlemesi için Xcode/EAS, doğru Apple takım kimliği ve imzalama yetkisi ayrıca doğrulanmalıdır; bu oturumda imzalı paket üretilmedi.
 
 `expo prebuild` ile çıkan yerel yapılandırma gözle kontrol edildi (geçici klasörde): Android izinleri yalnızca `INTERNET` ve `VIBRATE`; Expo şablonunun eklediği `READ/WRITE_EXTERNAL_STORAGE` ve `SYSTEM_ALERT_WINDOW` `blockedPermissions` ile kaldırıldı. iOS `Info.plist` içinde kullanım açıklaması (Face ID vb.) yok; `ITSAppUsesNonExemptEncryption=false` yazılı, çünkü uygulama yalnızca sistemin HTTPS'ini ve anahtar zincirini (`expo-secure-store`) kullanır, kendi şifreleme kodu yoktur (`expo-crypto` yalnızca rastgele kimlik üretir). İhracat uyumluluğu sorularını App Store Connect'te yine de dürüstçe yanıtlayın. iOS App Icon katalogunda 1024×1024 ve alfa kanalsız PNG üretildi.
 
-**Açılış ekranı:** SDK 58'de `splash` anahtarı yoktur; yerel açılış ekranı `expo-splash-screen` eklentisiyle ayarlanır. Paket kurulu değil ve paket eklemek onayınızı ister (`npx expo install expo-splash-screen`, sonra eklenti ayarına `assets/splash-icon.png` ve lacivert arka plan). Hazır görsel: `apps/mobile/assets/splash-icon.png`.
+**Açılış ekranı (25 Ekim):** SDK 58 ile uyumlu `expo-splash-screen@58.0.11` kuruldu. Config plugin mevcut `assets/splash-icon.png` görselini 200 genişlikle, ortak paletin lacivert zemini ve koyu tema zeminiyle üretir. Yapay bekleme veya ağ isteğini bekleyen splash kilidi eklenmedi. Android XML ve iOS storyboard/renk varlıkları geçici projede doğrulandı; normal kaynak ağacında native klasör/node_modules kopyası oluşturulmadı. [Expo belgesine](https://docs.expo.dev/versions/latest/sdk/splash-screen/) göre Expo Go nihai açılış ekranını tam yansıtmaz; görünüm yeni release paketinde kontrol edilmelidir.
 
 **Simgeler (geçici):** `node apps/mobile/scripts/generate-icons.mjs` tasarım jetonlarından lacivert zeminde beyaz kalkan + açık kitap üretir (Playwright'ın Chromium'unu kullanır). Nihai logo gelince aynı boyutlarda dosyaları değiştirin: `icon.png` 1024×1024 alfa kanalsız, `adaptive-icon.png` 1024×1024 saydam (güvenli bölge: ortadaki yaklaşık %66), `splash-icon.png`, `favicon.png`.
 
@@ -134,6 +134,8 @@ Hedef kitle: özel güvenlik görevlisi adayları ve görevlileri, **18 yaş üs
 
 ## 8. Mağaza metni taslağı (Türkçe; yalnızca gerçek özellikler)
 
+Güncel kopyalanabilir metinler [store-metadata.tr.json](store-metadata.tr.json) içinde: Apple ad/alt başlık/tanıtım/açıklama/anahtar kelime; Play başlık/kısa ve uzun açıklama; iki mağazanın inceleme adımları ve yasal sayfa yolları. Resmî [Apple](https://developer.apple.com/app-store/product-page/) ve [Google](https://support.google.com/googleplay/android-developer/answer/13393723) uzunluk sınırları kontrol edildi. Kimlik bilgisi içermez. `productionBaseUrl: null`, kullanıcının kalıcı adresi ayrıca belirleme kararını gösterir; metinler taslaktır, mağazada adın kullanılabilirliği kontrol edilmedi.
+
 - **Ad:** OGGAQ · ÖGG Soru Cevap Platformu (Apple ad sınırı 30 karakter: "OGGAQ" yeterli olabilir; sınırı App Store Connect'te kontrol edin)
 - **Alt başlık (Apple):** Özel güvenlik sınavlarına hazırlan
 - **Kısa açıklama (Google, en çok 80 karakter):** Özel güvenlik sınavlarına deneme ve ders sınavlarıyla hazırlan.
@@ -188,7 +190,7 @@ Mağaza kuralları sık değişir; bu belgedeki bilgi 24 Ekim 2026 tarihli okuma
 - Apple yönergelerinin son bölümü (metnin yaklaşık son 14 bin karakteri) okunamadı; hükûmet veya sınav uygulamalarına özel bir kural görülmedi ama okunmayan kısımda olabilir.
 - Google Data safety formunun güncel alanları ve Google Play politikalarının tam metni okunmadı; yalnızca hesap silme, test şartı ve hükûmet bilgisi sayfaları okundu.
 - Ekran görüntüsü ölçüleri, Apple ad/alt başlık/anahtar kelime sınırları ve Play'in güncel hedef API düzeyi yükleme ekranlarından doğrulanmalı.
-- EAS derlemesi, TestFlight, Play iç testi, gerçek iPhone/iPad/Android cihaz ve Expo Go denemeleri yapılmadı.
+- Ürün sahibi gerçek cihaz denemelerini yürüttüğünü bildirdi. Ayrıntılı sonuçlar bu belgeye henüz işlenmedi; tüm senaryolar tamamlanmış sayılmaz. Bu oturumda yeni EAS/release paketi, TestFlight veya Play iç test dağıtımı yapılmadı.
 - Apple "App Privacy" ve Google "Data safety" kategorileri taslaktır; son seçim sizindir.
 
 ## Elle kontrol
@@ -198,7 +200,7 @@ Mağaza kuralları sık değişir; bu belgedeki bilgi 24 Ekim 2026 tarihli okuma
 - [ ] Soru veritabanının ve EGM yayınlarının kullanım hakkı yazılı teyit edildi
 - [ ] Puanlama kuralları uzman tarafından resmî metinlerle karşılaştırıldı
 - [ ] Veri sorumlusu, VERBİS durumu ve yurt dışı aktarım kararı yazıldı
-- [ ] Geçici ikon nihai logoyla değiştirildi (yerel açılış ekranı için `expo-splash-screen` onayı verildi)
+- [ ] Geçici ikon nihai logoyla değiştirildi ve yapılandırılmış yerel açılış ekranı release paketinde kontrol edildi
 - [ ] Gerçek e-posta sağlayıcısı kuruldu; doğrulama ve parola yenileme e-postaları gerçek adrese ulaşıyor
 - [ ] İnceleme demo hesabı sunucuda oluşturuldu, e-postası doğrulandı; sunucu inceleme boyunca açık
 - [ ] Apple gizlilik etiketleri ve Google Data safety formu bu belgedeki taslakla karşılaştırılıp dolduruldu

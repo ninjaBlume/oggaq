@@ -38,7 +38,7 @@ docker compose --env-file "$OGGAQ_ENV_FILE" -f deploy/server-development/compose
 - PostgreSQL, Redis ve PHP-FPM portları host üzerinde yayınlanmaz. Compose ağı `172.30.88.0/24` olarak ayrılmıştır; kurulum öncesi diğer Docker ağlarıyla çakışmadığı doğrulanmalıdır.
 - nginx `CF-Connecting-IP` başlığına yalnızca bu ağdan güvenir. Tunnel bu ağa katılacaksa ağdaki diğer servisler güvenilir olmalıdır. Yerel hosta erişebilen kullanıcılar da loopback servisine erişebilir.
 - Cloudflare kuralında API/CSRF/HTML yanıtlarını önbelleğe almayın. nginx sayfaları `noindex` ile sunar; bu bir erişim engeli değildir.
-- E-postalar dışarıya gönderilmez: Mailpit yalnızca `127.0.0.1:18025` üzerindedir. SSH yönlendirmesiyle posta kutusuna erişilebilir. SMTP sağlayıcısı bağlanana kadar hesap doğrulama/reset bağlantıları buradan alınır.
+- Uygulama e-postaları 25 Ekim itibarıyla aşağıdaki özel Exim relay üzerinden dışarı gönderilir. Mailpit geliştirme aracıdır ve `127.0.0.1:18025` üzerinde kalır; artık uygulamanın aktif gönderim hedefi değildir.
 - Cloudflare Access eklenmez; uygulama girişi test ekibinin erişim yöntemidir.
 
 Cloudflare'de ayrı `oggaq-development` tüneli ve yalnızca `oggsorubankasi.codentum.net` için `http://web:8080` yönlendirmesi kullanılır. Tünel token'ı kaynak kod dışında 0600 izinli `.tunnel-token` dosyasına yazılır; komut satırına veya depoya eklenmez. Token dosyası hazır olduktan sonra:
@@ -53,6 +53,34 @@ docker compose --env-file "$OGGAQ_ENV_FILE" \
 Tünel konteyneri token dosyasının sahibi olan dağıtım kullanıcısının UID/GID'siyle çalışır (bu sunucuda `1000:1000`; başka sunucu için `OGGAQ_UID`/`OGGAQ_GID` ayarlanır). Yalnızca proje ağına ve kendi token dosyasına erişir; host ağı veya Docker socket'i bağlanmaz. [Cloudflare token-file belgesi](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/run-parameters/).
 
 ## E-posta: gerçek gönderim
+
+### 25 Ekim 2026: uygulamaya özel Exim gönderimi
+
+Kullanıcı e-posta işini Codex'e devretti. Hestia/Dovecot onarılmadan, mevcut Exim'e yalnız `172.30.88.0/24` Compose ağı ve `codentum.net` zarf/Header From alanı için kontrollü gönderim eklendi. Diğer projelerin kimlik doğrulaması/anahtarları ve alanları korunur. DKIM anahtarı **`/etc/exim4/oggaq-dkim/codentum.net.pem`** içindedir; `/etc/exim4/domains/` altına konmaz, aksi halde alan adı yerel alıcı alanı sayılıp Cloudflare MX teslimi bozulur. Dizin `root:Debian-exim 0750`, anahtar `0640`; özel anahtar sunucudan çıkarılmadı. Codentum postası imzalanamazsa gönderilmez, kuyrukta bekler.
+
+`exim_relay.py` şablon yapısını ve gerçek Docker ağını denetler; beklenmeyen yapılandırmada durur. Korumalı yedek, aday `exim4 -C ... -bV` doğrulaması ve Exim reload/geri alma vardır. Başka alanların mevcut DKIM lookup ve strictness davranışı korunur.
+
+```sh
+# Sunucuda root, iki betik aynı dizinde:
+bash setup-exim-relay.sh --check --existing-spf 'v=spf1 include:_spf.mx.cloudflare.net ip4:212.68.34.90 ~all'
+bash setup-exim-relay.sh --existing-spf 'v=spf1 include:_spf.mx.cloudflare.net ip4:212.68.34.90 ~all'
+# Uygulama kullanıcısı; gerçek deneme alıcısını operatör seçer:
+bash configure-app-mail.sh --relay --to '<deneme-alıcısı>'
+```
+
+Kullanıcının açık onayıyla Cloudflare'e `mail._domainkey.codentum.net` TXT ve mevcut tek SPF'ye `ip4:212.68.34.90` eklendi. Mevcut Cloudflare MX'leri ve `v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s` aynen korundu; Resend/diğer mevcut kayıtlar değiştirilmedi. `1.1.1.1` üzerinden DKIM açık anahtarı sunucuyla birebir eşleştirildi.
+
+Uygulama, worker ve scheduler `MAIL_FROM_ADDRESS=no-reply@codentum.net`, `MAIL_URL=smtp://172.30.88.1:25?auto_tls=false` ile bağlandı. Parolasız/şifresiz bağlantı yalnız mevcut özel Docker köprüsündedir; dış SMTP aktarımının TLS sonucu ayrıca kontrol edildi. Dışarıdan relay ve özel ağdan yanlış gönderici canlı `exim4 -bh` denemelerinde reddedildi. Bu bir herkese açık SMTP relay değildir.
+
+İlk denemede `umask 077` dizin geçiş iznini kaldırdığından imza hatası kuyrukta kaldı; izin düzeltildi ve regresyon testi eklendi. App yeniden yaratılınca nginx eski FastCGI adresi nedeniyle geçici `502` verdi; yalnız proje nginx'i reload edildi. Yapılandırma betiği artık nginx reload ve sınırlı `/up` beklemesini uygular; başarısız sağlık/gönderimde `.env` geri alınır. Veritabanı, Redis, tünel ve host nginx değiştirilmez.
+
+**Teslim kanıtı (25 Ekim):** doğrudan uygulama postası ve gerçek Laravel/Horizon kuyruğundan ikinci deneme Gmail'in sunucusunca TLS 1.3 / `CV=yes` ile `250 2.0.0 OK` kabul edildi ve Exim `Completed` yazdı. API hazırlık ucu DB/Redis/migration/queue/scheduler için `ok` döndürdü. Bu kayıt Gmail'in hangi klasöre koyduğunu göstermez; alıcının gelen kutusu/spam teyidi ayrıca alınır. Son kullanıcıyla kayıt-doğrulama/parola sıfırlama bağlantısına tıklama akışı bu operasyon smoke'unda yapılmadı; önceki API/E2E testlerinden ayrıdır.
+
+Yerel regresyonlar: `python3 -m unittest discover -s deploy/server-development/mail -p 'test_exim_relay.py' -v` (9 test); `bash deploy/server-development/mail/test-configure.sh` (eski MAIL_URL temizliği, gizli değer çıktısı, SMTP/web hatasında geri alma). CI'a eklendi. Göndericiyle ilgisiz SMTP günlükleri veya e-posta içerikleri depoya alınmaz.
+
+DKIM anahtarı uygulama `.env` dosyasının dışındadır; geri yüklemede `/etc/exim4/oggaq-dkim/` ve ilgili Exim yapılandırması da gerekir. Yedekleme betikleri bu işte değiştirilmedi (bu alan Claude’da); mevcut yedeklerin bu yeni anahtarı kapsadığı ayrıca doğrulanmalıdır.
+
+### Önceki Hestia / harici SMTP sağlayıcısı incelemesi (tarihsel)
 
 **25 Ekim 2026 sonucu: sunucudaki Hestia posta yığını çalışır durumda değil; Hestia yolu bırakıldı.** Root ile salt okunur bakıldı: `hestia` servisi `inactive`; `/usr/local/hestia/conf` ve `data` dizinleri yok, `v-*` komutları çalışmıyor; Exim, silinmiş `/usr/local/hestia/ssl/certificate.crt` sertifikasını arıyor ve bağlantılarda "TLS error (cert/key setup)" veriyor (yani 587/465 üzerinde TLS ile kimlik doğrulamalı gönderim kurulamaz); Dovecot `failed`; `/home/admin/mail` boş; ters DNS (PTR) başka bir projenin alan adını gösteriyor. Bunu onarmak, başka projelerin de kullandığı paylaşımlı posta yığınını root ile yeniden kurmak demektir; risk/fayda uygun değil. Yol: ücretsiz bir SMTP sağlayıcısı (Brevo: günde 300 e-posta, kredi kartı yok). `setup-hestia-mail.sh` yalnızca Hestia onarılırsa kullanılır.
 

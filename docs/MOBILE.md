@@ -2,6 +2,10 @@
 
 `apps/mobile`, React Native 0.88.0 / Expo SDK 58.0.19 ile iOS/Android native bileşenleri kullanır. Kayıt/giriş, doğrulama e-postasını yeniden gönderme ve kontrol etme, parola yenileme e-postası, kişisel/aktif kurum seçimi, ders/konu ve yayımlanmış soru çalışması, geçmiş, süreli deneme/sonuç uygulanmıştır. HTML/web ekranı native içine gömülmez. Ortak API sözleşmesi ve saf sayaç kodu web ile paylaşılır. Uygulamaların React sürümü SDK'nın renderer sürümü 19.3.0'a eşitlendi; güncel geçiş kontrolleri aşağıdadır. Tarihsel doğrulamalar ilgili eski sürümlerini anlatır.
 
+## 25 Ekim 2026: mağaza için yerel açılış ekranı
+
+Kullanıcının mağaza hazırlığını tamamlama isteğiyle SDK 58 uyumlu `expo-splash-screen@58.0.11` kuruldu. Mevcut simge ve ortak mavi/koyu palet config plugin ile Android/iOS açılış ekranına bağlandı; yeni marka veya yapay açılış gecikmesi eklenmedi. Geçici native projede Android açık/koyu renk XML'leri, iOS storyboard ve renk varlıkları doğrulandı; mevcut node_modules yalnız symlink ile kullanıldı. Expo Doctor 20/20, strict tip, mobil 27/token 63, mağaza 14 ve araç zinciri 19 testleri; Android/iOS/web export geçti. Expo Go nihai splash görünümünü tam göstermez; yeni release paketinde kontrol gerekir. Ürün sahibi gerçek cihaz kontrollerini yürütüyor; bu oturumda yeni imzalı paket oluşturulmadı. Mağaza metinleri ve kalan kararlar [STORE_RELEASE](STORE_RELEASE.md) içinde.
+
 ## 25 Ekim 2026: araç zinciri güvenliği
 
 SDK 58 korunarak Expo `58.0.19` / CLI `58.1.15` yama sürümlerine geçildi; CLI altındaki Zod `4.6.6` sürümüne sabitlendi. Gerçek Expo şemaları ve kaynak tüketimi regresyonu geçiyor. Yayımlanmış düzeltmesi bulunmayan `node-forge@1.4.0` için kaynak hash'iyle korunan dar yerel yama eklendi. `npm run audit` yama bütünlüğünü ve gerçek imza davranışını sınar; **ham npm audit upstream forge sürümünü hâlâ listeler**. Kurulum, 19 araç zinciri testi, CI ve geçici çözümün kaldırılma şartları [SECURITY](SECURITY.md#javascript-bağımlılık-güvenliği--25-ekim-2026) içinde. Aşağıdaki eski audit başarısızlıkları bu düzeltmeden önceki tarihsel kayıtlardır.

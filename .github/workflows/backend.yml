@@ -43,6 +43,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Betik testleri (mobil önizleme HTTP gövdesi, SQL dump inceleyici)
         run: python3 -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Posta kurulumunun çevrimdışı kontrolleri
+        run: |
+          python3 -m unittest discover -s deploy/server-development/mail -p 'test_exim_relay.py' -v
+          bash deploy/server-development/mail/test-configure.sh
       - uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"

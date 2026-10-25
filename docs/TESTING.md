@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## Son doğrulama — 25 Ekim 2026, posta akışı ve mağaza hazırlığı
+
+- Posta yapılandırması: **9 Python testi** ve çevrimdışı kabuk kontrolleri geçti. Özel ağ/gönderen kapsamı, yerel alıcı alanı oluşturmama, mevcut DKIM/SPF davranışını koruma, özel umask altında Exim okuma izni, eski MAIL_URL temizliği, SMTP/web hatasında geri alma ve benzersiz korumalı yedekler sınandı. CI'a eklendi.
+- Gerçek sunucu: özel ağdan geçerli gönderim kabul; yanlış gönderici ve dışarıdan relay reddi (`exim4 -bh`). SPF/DKIM, kullanıcı onayından sonra Cloudflare'de yayımlandı ve genel DNS'den doğrulandı; mevcut MX/DMARC aynı kaldı. Doğrudan ve gerçek Horizon kuyruğundan iki test Gmail'e TLS 1.3 / `CV=yes` / `250 OK` ile teslim edildi, Exim `Completed` kaydetti. İlk dizin izin hatası ve nginx eski upstream nedeniyle oluşan geçici 502 düzeltildi; tekrarını önleyen izin testi ve reload/hazır olma beklemesi eklendi. Canlı HTTPS hazırlık ucu tüm kontrollerde `ok`. Bu SMTP teslim kanıtıdır; alıcının gelen kutusu/spam teyidi ve son kullanıcıyla doğrulama/reset bağlantısı tıklama denemesi ayrı tutulur.
+- Mağaza: SDK 58 uyumlu splash eklentisiyle Android açık/koyu XML ve iOS storyboard/renk varlıkları geçici native projede doğrulandı. Strict TypeScript, **27 mobil + 63 token**, **14 mağaza + 19 araç zinciri** testi, Expo Doctor **20/20**, Android/iOS/web export ve web build geçti. Mağaza metinlerinin resmî karakter sınırları ayrıca kontrol edildi.
+- Gerçek API ile **6 ilgili Chromium E2E** (yasal sayfalar, açık/koyu/dar ekran, web/mobil bağlantılar) geçti; yalnız `oggaq_test`, ayrı `5186` önizlemesi kullanıldı. Backend kodu değişmedi; önceki **237 backend / 137 Vitest / 102 tam E2E** sonucu aşağıdadır, bu teslimde bütün paket yeniden çalıştırılmadı.
+- Ürün sahibi gerçek cihaz kontrollerini yürütüyor. Yeni imzalı APK/IPA, mağaza gönderimi veya push yapılmadı. Splash'ın son görünümü release paketinde kontrol edilmelidir. `check:store`, kalan hukuki/üretim adresi kararları nedeniyle hâlâ engel bildirir; yeni teknik test hatası olarak sunulmaz. Yasal taslakta üç boş değer kaldı.
+
 ## Güncel doğrulama — 25 Ekim 2026, güvenlik ve oturum
 
 - PHP 8.4 / PostgreSQL üzerinde `composer test`: **237 backend testi, 2.640 assertion** geçti. `composer lint`, `composer validate --strict`, `composer audit` başarılı (PATH'te Composer olmadığı için resmî SHA256 ile doğrulanmış geçici PHAR kullanıldı).
