@@ -1,5 +1,9 @@
 # Expo mobil uygulaması
 
+## 26 Ekim 2026: sayısal ayların Türkçe gösterimi
+
+Deneme ve Ders kartlarında `08 2026` yerine **Ağustos 2026**, diğer sayısal aylarda da Türkçe ay adı gösterilir. Ortak `examPeriodLabel` web ve mobilde aynı sonucu üretir; hazır ay adları ve `1. dönem` gibi etiketler korunur. Bu bir görünüm dönüşümüdür, yayımlanmış sınav künyesi/veritabanı değiştirilmez. Web `930613c` paketiyle yayındadır; mobil için mevcut Expo Go projesini yenilemek yeterlidir. Fiziksel cihaz bu teslimde ayrıca denenmedi; doğrulama ve dar kapsamlı web yayını [TESTING](TESTING.md) içinde.
+
 ## 26 Ekim 2026: Deneme sınavlarında Temel/Yenileme
 
 Deneme ekranında önce Temel eğitim / Yenileme eğitimi, ardından silahlı/silahsız seçilir. Ders ekranına eğitim seçimi eklenmez. Önbellek anahtarı eğitim türünü de kapsar; farklı eğitimin hazır verisi diğer listede gösterilmez. Aynı kullanıcı/bağlamda sekmeye dönüş seçimi korur. Yeni backend alanı geçiş sırasında yoksa mevcut temel arşiv gösterilmeye devam eder. Yenileme kayıtlarını yönetmek için [EXAMS](EXAMS.md) içindeki migration/API gerekir. Kullanıcı onayıyla yalnız yerel `oggaq` migration'ı 26 Ekim 2026'da uygulandı; 98. yenileme aktarımında gerekli sunucu migration/kod güncellemesi de tamamlandı. `https://oggsor.com` API'sinde **83–98. yenilemenin tümü ve 122. temel**, her biri silahlı 125 / silahsız 100 soru olarak yayındadır. Yenilemelerin 176 ders sınavı ve 122. temelin 11 dersi ortak Ders listesine eklendi; eski boş katalog önbelleği varsa Expo Go projesini bir kez yenilemek gerekir. Bu yayında fiziksel Expo Go kontrolü ayrıca yapılmadı.
