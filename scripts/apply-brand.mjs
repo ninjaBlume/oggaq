@@ -1,5 +1,6 @@
 // Runtime clients read config/brand.json directly. These static/build-time surfaces are generated from it.
 import { readFileSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -14,6 +15,8 @@ export function brandFiles(root) {
   for (const key of ['supportEmail', 'mailFromAddress']) if (brand[key] !== '' && !brand[key].endsWith(`@${brand.domain}`)) throw new Error(`${key} marka alan adını kullanmalı.`);
   if (!brand.mailFromAddress) throw new Error('Sistem bildirimi göndereni boş olamaz.');
   const files = new Map();
+  // A new content URL also refreshes browser/CDN favicon caches after a logo change.
+  const faviconHref = `/favicon.png?v=${createHash('sha256').update(readFileSync(join(root, 'apps/mobile/assets/favicon.png'))).digest('hex').slice(0, 12)}`;
   for (const app of ['web', 'admin']) {
     const path = `apps/${app}/index.html`;
     const title = app === 'web' ? brand.displayName : `${brand.name} · Yönetim`;
@@ -21,6 +24,7 @@ export function brandFiles(root) {
     let source = read(path).replace(/<title>[\s\S]*?<\/title>/, `<title>${html(title)}</title>`)
       .replace(/<meta name="description" content="[^"]*"\s*\/>/, `<meta name="description" content="${html(description)}" />`);
     if (!source.includes('rel="icon"')) source = source.replace('</head>', '<link rel="icon" type="image/png" href="/favicon.png" /></head>');
+    source = source.replace(/href="\/favicon\.png(?:\?[^"]*)?"/g, `href="${faviconHref}"`);
     files.set(path, source);
     files.set(`apps/${app}/public/favicon.png`, readFileSync(join(root, 'apps/mobile/assets/favicon.png')));
     files.set(`apps/${app}/public/brand-logo.png`, readFileSync(join(root, 'apps/mobile/assets/brand-logo.png')));
@@ -38,6 +42,7 @@ export function brandFiles(root) {
       .replace(/(<span data-brand="deletionSubject">)[\s\S]*?(<\/span>)/g, `$1${html(deletionSubject)}$2`)
       .replace(/(data-(?:placeholder|filled)="destek-eposta-baglantisi" href="mailto:[^"?]*\?subject=)[^"]*/g, `$1${encodeURIComponent(deletionSubject)}`);
     if (!source.includes('rel="icon"')) source = source.replace('</head>', '<link rel="icon" type="image/png" href="/favicon.png" /></head>');
+    source = source.replace(/href="\/favicon\.png(?:\?[^"]*)?"/g, `href="${faviconHref}"`);
     files.set(path, source);
   }
   const metadata = JSON.parse(read('docs/store-metadata.tr.json'));
