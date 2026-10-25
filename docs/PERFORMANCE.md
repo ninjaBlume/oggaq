@@ -1,5 +1,14 @@
 # Sınav yükleme ve cevap kaydı performansı
 
+## 25 Ekim 2026: soru açılışı, gezinme ve geçiş beklemesi
+
+- Zorunlu 400 ms mobil sayfa geçişi kaldırıldı. Logo yalnız gerçek ilk veri yüklemesi 120 ms'yi aşınca gösterilir; veri/hata ulaşınca hemen kapanır. Hazır sayfaya yapay süre eklenmez. Arka plan yenilemeleri logo açmaz.
+- Yeni sınavın POST yanıtı zaten bütün sabit soru sürümlerini içeriyordu. Mobil yalnız kimliği sonraki ekrana iletiyor, web ise doldurulmuş cache'e rağmen her açılışta tam GET şartı uyguluyordu. Yeni başlatma yanıtı ilk açılışta bir kez kullanılır. Webde tek kullanımlık kayıt QueryClient ve bağlamla sınırlıdır; çıkışta cache temizlendiyse kullanılamaz. Normal Devam/geçmiş açılışı sunucudaki güncel konumu ve cevapları almaya devam eder.
+- Cevap kaydı sürerken bütün Önceki/Sonraki/soru haritası kontrolleri kilitleniyordu. Artık eldeki sorular arasında gezinmek ağ yanıtını beklemez. Yazma doğrulanana kadar diğer cevap yazmaları ve bitirme korunur; kayıp yanıt, çakışma ve tekrar davranışları değiştirilmedi. Sonuçları istemci hesaplamaz ve kayıt başarısızlığı gizlenmez.
+- Ortak sayaç `HH:MM:SS` gösterir: 120 dk `02:00:00`, 150 dk `02:30:00`; bir saatin altına inince de alan sayısı değişmez. Süreye, deadline'a ve sunucu değerlendirmesine müdahale edilmez.
+
+Bu turda genel HTTPS `/up` isteği 200 ile yaklaşık 446 ms sürdü. Bu, sınavın kimlikli API süresi veya tüm cihazlarda gecikmesiz çalışma kanıtı değildir. Ağın ilk yanıtı hâlâ gerekir; kaldırılanlar gereksiz tam indirme ve istemci beklemeleridir. Otomatik kontroller [TESTING](TESTING.md) içinde; mobil değişiklik Metro tarafından izlenir, web production yayını için sunucu operasyonu iş bölümü geçerlidir.
+
 ## 25 Ekim 2026: durum kontrolü, sonuç ekranı ve takılan istekler
 
 Hem web hem mobilde genel yavaşlık bildirimi üzerine üç somut nokta düzeltildi:

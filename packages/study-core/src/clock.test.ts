@@ -22,8 +22,13 @@ describe("server deadline display", () => {
     expect(remainingSeconds({ remainingMs: 1001, receivedAt: 0 }, 1002)).toBe(
       0,
     );
-    expect(timeLabel(125)).toBe("02:05");
+    expect(timeLabel(125)).toBe("00:02:05");
   });
+  it.each([[7200, "02:00:00"], [9000, "02:30:00"], [3600, "01:00:00"], [3599, "00:59:59"], [60, "00:01:00"], [0, "00:00:00"], [-1, "00:00:00"]])(
+    "formats %i seconds as %s without changing at the hour boundary", (seconds, label) => {
+      expect(timeLabel(seconds)).toBe(label);
+    },
+  );
 });
 
 import { examLabel, examSummary, examTypeShort } from './index';

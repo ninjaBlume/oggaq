@@ -15,6 +15,7 @@ import { api } from "./api";
 import { PageIntro, useStudyContext } from "./App";
 import { CompletedExam } from "./exam-results";
 import { ErrorNotice, Loading } from "./ui";
+import { takeExamLaunch } from "./exam-launch";
 
 export function Exam() {
   const context = useStudyContext();
@@ -29,6 +30,11 @@ export function Exam() {
     // Do not initialize the question from an otherwise fresh TanStack cache entry.
     refetchOnMount: 'always',
     queryFn: async ({ signal }) => {
+      const launch = takeExamLaunch(cache, context.id, id);
+      if (launch) {
+        opened.current = attemptKey;
+        return { data: launch };
+      }
       const current = () => cache.getQueryData<{ data: ExamAttempt }>(['exam', context.id, id]);
       // First opening always reads the full authoritative bookmark; later polls reuse fixed questions.
       if (supportsState.current && opened.current === attemptKey && current()?.data.status === 'active') {
@@ -192,6 +198,7 @@ function ExamContent({
     submission !== null ||
     finishSubmission !== null;
   const locked = done || blocked || awaitingResult;
+  const navigationBlocked = finish.isPending || finishSubmission !== null;
   const row = exam.questions[index];
   const answered = exam.questions.filter(
     (q) => q.selected_option_id !== null,
@@ -330,14 +337,14 @@ function ExamContent({
           <div className="answer-actions">
             <button
               className="button secondary"
-              disabled={index === 0 || blocked}
+              disabled={index === 0 || navigationBlocked}
               onClick={() => goTo(index - 1)}
             >
               Önceki soru
             </button>
             <button
               className="button secondary"
-              disabled={index === exam.question_count - 1 || blocked}
+              disabled={index === exam.question_count - 1 || navigationBlocked}
               onClick={() => goTo(index + 1)}
             >
               Sonraki soru
@@ -364,7 +371,7 @@ function ExamContent({
                   className={`button secondary ${q.selected_option_id ? "answered" : ""}`}
                   aria-label={`Soru ${i + 1}`}
                   aria-current={i === index ? "step" : undefined}
-                  disabled={blocked}
+                  disabled={navigationBlocked}
                   onClick={() => goTo(i)}
                 >
                   {i + 1}

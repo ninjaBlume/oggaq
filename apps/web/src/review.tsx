@@ -1,3 +1,4 @@
+import { stageExamLaunch } from './exam-launch';
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -37,7 +38,7 @@ function ReviewExam({ kind, count }: { kind: (typeof kinds)[number]; count: numb
   const start = useMutation({
     mutationFn: (body: StartInput) => api.request('post', '/api/v1/contexts/{context}/exam-attempts', { params: { context: context.id }, body }),
     onSuccess: (response) => {
-      cache.setQueryData(['exam', context.id, response.data.id], response);
+      stageExamLaunch(cache, context.id, response);
       void cache.invalidateQueries({ queryKey: ['exams', context.id] });
       navigate(`/study/${context.id}/exams/${response.data.id}`);
     },

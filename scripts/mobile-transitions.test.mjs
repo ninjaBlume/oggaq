@@ -26,15 +26,18 @@ for (const [width, reducedMotion, colorScheme] of [[390, "no-preference", "light
     try {
       const page = await browser.newPage({ viewport: { width, height: 900 }, reducedMotion, colorScheme });
       const errors = [];
+      let releaseCatalog;
+      const catalogReady = new Promise(resolve => { releaseCatalog = resolve; });
       page.on("pageerror", error => errors.push(error.message));
       const user = { id: "transition-user", name: "Test Öğrenci", email: "transition@example.test", email_verified_at: "2026-01-01T00:00:00Z", platform_role: "student", pending_email: null };
       await page.route("**/api/**", async route => {
         const path = new URL(route.request().url()).pathname;
-        let data = { data: [], meta: { current_page: 1, last_page: 1, total: 0 } };
+        let data = { data: [], links: { next: null }, meta: { current_page: 1, last_page: 1, total: 0 } };
         let status = 200;
         if (path.endsWith("/mobile-tokens")) data = { data: { token: "synthetic-test-token", expires_at: "2099-01-01T00:00:00Z", user } };
         else if (path.endsWith("/contexts")) data = { data: [{ id: "personal", kind: "personal", name: "Kişisel", role: "student" }] };
         else if (path.endsWith("/stats")) { status = 500; data = { message: "Sentetik test hatası" }; }
+        if (path.endsWith("/official-exams")) await catalogReady;
         await route.fulfill({ status, contentType: "application/json", headers: { "access-control-allow-origin": "*", "access-control-allow-headers": "*" }, body: JSON.stringify(data) });
       });
       await page.goto(`http://127.0.0.1:${server.address().port}`);
@@ -46,12 +49,17 @@ for (const [width, reducedMotion, colorScheme] of [[390, "no-preference", "light
       await expect(overlay).toHaveCount(0);
       await page.clock.install();
       await page.clock.pauseAt(new Date());
+      const requested = page.waitForRequest(request => new URL(request.url()).pathname.endsWith("/official-exams"));
       await page.getByRole("tab", { name: "Deneme", exact: true }).click();
+      await requested;
+      await page.clock.runFor(130);
       await expect(overlay).toBeVisible();
-      await expect(page.getByRole("tab", { name: "Profil", exact: true })).toHaveCount(0);
+      // Loading content never locks the app's navigation.
+      await expect(page.getByRole("tab", { name: "Profil", exact: true })).toBeVisible();
       const logo = overlay.locator("img");
       const bounds = await logo.boundingBox();
-      assert.ok(bounds && Math.abs(bounds.x + bounds.width / 2 - width / 2) < 2, "logo is centered");
+      const area = await overlay.boundingBox();
+      assert.ok(bounds && area && Math.abs(bounds.x + bounds.width / 2 - (area.x + area.width / 2)) < 2, "logo is centered in the content area");
       const animatedLogo = overlay.locator(":scope > div").first();
       const before = await animatedLogo.evaluate(el => getComputedStyle(el).transform);
       await page.clock.runFor(210);
@@ -59,16 +67,17 @@ for (const [width, reducedMotion, colorScheme] of [[390, "no-preference", "light
       const after = await animatedLogo.evaluate(el => getComputedStyle(el).transform);
       if (reducedMotion === "reduce") assert.equal(before, after, "reduced motion stays still");
       else assert.notEqual(before, after, "logo pulses during the transition");
-      await page.clock.runFor(210);
+      // Release real work before the old artificial 400ms duration. The overlay
+      // must disappear without advancing the frozen clock another millisecond.
+      releaseCatalog();
       await expect(overlay).toHaveCount(0);
       // Same destination scrolls to the top without replaying the overlay.
       await page.getByRole("tab", { name: "Deneme", exact: true }).click();
       await expect(overlay).toHaveCount(0);
       await page.getByRole("tab", { name: "Profil", exact: true }).click();
-      await page.clock.runFor(420);
+      await expect(overlay).toHaveCount(0);
       await page.getByRole("button", { name: "Hesabım: e-posta, parola, cihazlar, verilerin, hesabı sil", exact: true }).click();
-      await expect(overlay).toBeVisible();
-      await page.clock.runFor(420);
+      await page.getByText("E-posta adresini değiştir", { exact: true }).waitFor();
       await expect(overlay).toHaveCount(0);
       await page.getByRole("button", { name: "Geri dön", exact: true }).click();
       await page.clock.runFor(500);

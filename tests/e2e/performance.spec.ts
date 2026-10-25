@@ -19,3 +19,46 @@ test('mobil sekmeye dönüşte katalog yeniden indirilmez; cevap küçük yanıt
  await page.getByRole('tab',{name:'Ana sayfa',exact:true}).click();await expect(page.getByText('Merhaba, E2E.',{exact:true})).toBeVisible();await page.getByRole('tab',{name:'Deneme',exact:true}).click();await expect(page.getByText('1. Deneme Sınavı',{exact:true})).toBeVisible();expect(catalogs).toHaveLength(1);
  await page.getByRole('button',{name:'Sınava gir',exact:true}).click();await page.getByRole('button',{name:'Sınavı başlat',exact:true}).click();const saved=page.waitForResponse(r=>new URL(r.url()).pathname.includes('/answers/')&&r.request().method()==='PUT');await page.getByRole('radio').first().click();const response=await saved;expect(new URL(response.url()).searchParams.get('compact')).toBe('true');const data=(await response.json()).data;expect(data.questions).toBeUndefined();expect(data.answers).toHaveLength(3);await expect(page.getByText('Cevaplar sunucuda kayıtlı',{exact:true})).toBeVisible();
 });
+
+for (const mobile of [false, true]) {
+ test(`${mobile ? 'mobil' : 'web'} başlangıç sorularını tekrar indirmez; cevap ağı beklerken soru geçişi anlıktır`, async ({ page }) => {
+  const detailRequests: string[] = [];
+  page.on('request', request => {
+   if (request.method() === 'GET' && /\/exam-attempts\/[^/]+$/.test(new URL(request.url()).pathname)) detailRequests.push(request.url());
+  });
+  if (mobile) {
+   await page.setViewportSize({width:390,height:844});
+   await page.goto(mobilePreviewUrl);
+   await page.getByLabel('E-posta adresi',{exact:true}).fill('e2e-student@example.test');
+   await page.getByLabel('Parola',{exact:true}).fill('Synthetic-Browser-42!');
+   await page.getByRole('button',{name:'Giriş yap',exact:true}).click();
+   await page.getByRole('tab',{name:'Deneme',exact:true}).click();
+   await page.getByRole('button',{name:'Sınava gir',exact:true}).click();
+   await page.getByLabel('Süre (dakika)',{exact:true}).fill('150');
+   await page.getByRole('button',{name:'Sınavı başlat',exact:true}).click();
+  } else { await login(page); await enterDeneme(page, '120'); }
+  await expect(page.getByText('Soru 1 / 3',{exact:true})).toBeVisible();
+  await expect(page.getByLabel('Kalan süre',{exact:true}).first()).toHaveText(mobile ? /^(02:30:00|02:29:5\d)$/ : /^(02:00:00|01:59:5\d)$/);
+  expect(detailRequests).toHaveLength(0);
+  let release!: () => void;
+  let entered!: () => void;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  const writing = new Promise<void>(resolve => { entered = resolve; });
+  await page.route('**/exam-attempts/*/answers/*', async route => {
+   entered(); await gate; await route.continue();
+  });
+  try {
+   await page.getByRole('radio', {name:/Sentetik A/}).click();
+   await writing;
+   const position = page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/position'));
+   await page.getByRole('button',{name:'Sonraki soru',exact:true}).click();
+   await expect(page.getByText('Soru 2 / 3',{exact:true})).toBeVisible();
+   await expect(page.getByRole('radio', {name:/Sentetik A/})).toBeDisabled();
+   await position;
+  } finally { release(); }
+  await expect(page.getByText('Cevaplar sunucuda kayıtlı',{exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'Önceki soru',exact:true}).click();
+  await expect(page.getByRole('radio', {name:/Sentetik A/})).toBeChecked();
+  expect(detailRequests).toHaveLength(0);
+ });
+}

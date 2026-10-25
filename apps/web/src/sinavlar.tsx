@@ -8,6 +8,7 @@ import { api } from './api';
 import { Icon } from './icons';
 import { PageIntro, useStudyContext } from './App';
 import { dateLabel, ErrorNotice, Field, Loading, percent } from './ui';
+import { stageExamLaunch } from './exam-launch';
 
 type OfficialExam = components['schemas']['OfficialExam'];
 type Summary = components['schemas']['ExamSummary'];
@@ -57,7 +58,7 @@ function ExamRow({ exam, title, attempts }: { exam: OfficialExam; title: string;
   const start = useMutation({
     mutationFn: (body: StartInput) => api.request('post', '/api/v1/contexts/{context}/exam-attempts', { params: { context: context.id }, body }),
     onSuccess: (response) => {
-      cache.setQueryData(['exam', context.id, response.data.id], response);
+      stageExamLaunch(cache, context.id, response);
       void cache.invalidateQueries({ queryKey: ['exams', context.id] });
       navigate(`/study/${context.id}/exams/${response.data.id}`);
     },

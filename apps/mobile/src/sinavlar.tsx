@@ -70,7 +70,7 @@ function ExamEntry({
   exam: OfficialExam;
   title: string;
   attempts: Summary[];
-  open: (id: string) => void;
+  open: (id: string, initialExam?: ExamAttempt) => void;
 }) {
   const { styles, palette } = useTheme();
   const [expanded, setExpanded] = useState(false);
@@ -93,7 +93,7 @@ function ExamEntry({
         }),
       (response) => {
         submission.current = null;
-        open(response.data.id);
+        open(response.data.id, response.data);
       },
     );
   }
@@ -150,7 +150,7 @@ export function ExamList({
 }: {
   context: StudyContext;
   kind: "deneme" | "ders";
-  open: (id: string) => void;
+  open: (id: string, initialExam?: ExamAttempt) => void;
   initialSubject?: string;
 }) {
   const { palette } = useTheme();

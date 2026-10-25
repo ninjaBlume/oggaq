@@ -1,5 +1,14 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, soru hızı ve saat biçimi
+
+- Önceki 400 ms zorunlu geçiş kaldırıldı. Logo yalnız gerçek ilk veri isteği 120 ms'yi aşınca açılır, veri/hata ulaşınca minimum süre olmadan kapanır. Ana menü ve sekmeler örtünün dışında kalır. Yeni sınavın POST yanıtı ilk açılışa doğrudan aktarılır; normal Devam/geçmiş açılışı sunucudaki güncel konumu almaya devam eder. Cevap kaydı beklerken soru gezinmesi açıktır; başka cevap yazma/bitirme korumaları sürer.
+- **73 ilgili Vitest** (32 core, 31 mobil, 10 web), strict TypeScript, web production build ve Android/iOS/web Metro export geçti. Yeni 7 saat sınırı testi 120/150 dakika, tam saat, bir saatin altına iniş, 1 dakika, sıfır ve negatif giriş gösterimini doğrular. 4 web başlatma aktarımı testi tek kullanım, normal cache'in kullanılmaması, bağlam/istemci ayrımı ve çıkışta cache temizlenmesini kapsar.
+- **3 sentetik tarayıcı senaryosu** geçti: telefon normal/azaltılmış hareket ve koyu tablet. Yavaş katalog yanıtı kontrollü bekletildi; logo içerikte ortalandı ve animasyon tercihi doğrulandı. Yanıt 400 ms dolmadan serbest bırakıldığında donmuş test saati ilerletilmeden örtü kapandı. Hazır profil sayfasında örtü yok, yükleme sırasında gezinme görünür; hata sonrası ekran kullanılabilir.
+- Gerçek Laravel/PostgreSQL ile ilk **31 ilgili E2E** koşumunda **29 geçti**. Bir yan menü Escape kapanışı takıldı; yeni web hız testinin ilk `radio` seçicisi de soru yerine tema kontrolünü seçtiği için bekledi. Örtü içerik alanıyla sınırlandı, test seçicisi sentetik soru metnine bağlandı. Menü ve iki yeni hız senaryosu son export ile tekrar çalıştırıldı: **3/3 geçti**; toplam 31 farklı senaryo doğrulandı, tek temiz tam koşum iddiası değildir.
+- Yeni iki gerçek API senaryosu webde 120 dk `02:00:00`, mobilde 150 dk `02:30:00` başlangıcını (geçen saniyeyi hesaba katarak), ilk açılışta **0 ilave tam ayrıntı GET'i**, cevap ağı beklerken 2. soruya geçişi, yazma kilidinin korunmasını ve yanıt sonrası önceki sorudaki seçimin saklanmasını doğrular. Mevcut kayıp yanıt/çakışma/süre sonu/kaldığı sorudan devam testleri geçti.
+- Ortak DB için başka PHPUnit/E2E süreci ve 8001/5183/5184 portları kontrol edildi. Testler yalnız `oggaq_test`, mobil önizlemede ayrı **5186** portunu kullandı; 8081/8002/5175/5176/5185 geliştirme servisleri durdurulmadı. Backend/API/DB şeması değişmedi; PHPUnit ve tam API paketi yeniden çalıştırılmadı. Fiziksel iOS/Android performans ölçümü yapılmadı. Yeni mağaza paketi, deploy ve push yapılmadı.
+
 ## Güncel doğrulama — 25 Ekim 2026, mobil sayfa geçişi
 
 - Sekme/menü, sınav ve hesap sayfasında 400 ms merkezî logo örtüsü; hareket azaltma tercihi, dokunma/erişilebilirlik engeli ve zamanlayıcı/animasyon temizliği eklendi. Mevcut logo ve tema kullanılır. Soru geçişleri ve veri istekleri geciktirilmez; ağ hatası ekranın kendi hata görünümüne bırakılır.

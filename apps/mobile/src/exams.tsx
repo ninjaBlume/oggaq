@@ -109,19 +109,26 @@ function TimerBadge({
   );
 }
 type Save = { row: string; option: string | null; revision: number };
-export function Exam({ context, id }: { context: StudyContext; id: string }) {
+export function Exam({ context, id, initialExam }: { context: StudyContext; id: string; initialExam?: ExamAttempt }) {
   const { palette, styles } = useTheme();
   const layout = useLayout();
   const body = useBody();
   // Expanded windows keep the question map and the clock in a side panel next to the question.
   const wide = layout.cls === "expanded";
   const latest = useRef<ExamAttempt | null>(null);
+  const launched = useRef(initialExam?.id === id ? initialExam : undefined);
   const supportsState = useRef(true);
   const scroll = useRef<ScrollViewInstance>(null);
   const insets = useSafeAreaInsets();
   const [overview, setOverview] = useState(false);
   const query = useResource(
     async (signal) => {
+      if (launched.current) {
+        const data = launched.current;
+        launched.current = undefined;
+        latest.current = data;
+        return { data };
+      }
       if (supportsState.current && latest.current?.status === 'active') {
         try {
           const state = await api.request('get', '/api/v1/contexts/{context}/exam-attempts/{exam}/state', {
@@ -281,6 +288,7 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
   if (done) return <CompletedExam exam={exam} context={context} updateQuestion={updateQuestion} error={query.error} reload={() => { void query.reload(); }} />;
   const blocked = task.pending || submission !== null || finishing !== null;
   const locked = done || blocked || seconds === 0;
+  const navigationBlocked = finishing !== null;
   const row = exam.questions[index];
   const answered = exam.questions.filter(
     (q) => q.selected_option_id !== null,
@@ -314,7 +322,7 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
         <QuestionMap
           questions={exam.questions}
           index={index}
-          blocked={blocked}
+          blocked={navigationBlocked}
           choose={choose}
         />
       </Sheet>
@@ -529,14 +537,14 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
                     label: "Önceki soru",
                     text: "Önceki",
                     icon: ArrowLeft,
-                    disabled: index === 0 || blocked,
+                    disabled: index === 0 || navigationBlocked,
                     go: () => choose(index - 1),
                   },
                   {
                     label: "Sonraki soru",
                     text: "Sonraki",
                     icon: ArrowRight,
-                    disabled: index === exam.question_count - 1 || blocked,
+                    disabled: index === exam.question_count - 1 || navigationBlocked,
                     go: () => choose(index + 1),
                   },
                 ].map(({ label, text, icon: Icon, disabled, go }) => (
@@ -620,7 +628,7 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
             <QuestionMap
               questions={exam.questions}
               index={index}
-              blocked={blocked}
+              blocked={navigationBlocked}
               choose={choose}
             />
             {!done && (

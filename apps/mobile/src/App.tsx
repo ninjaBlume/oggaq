@@ -25,7 +25,7 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ArrowLeft } from "./icons";
-import type { StudyContext, User } from "@oggaq/shared-types";
+import type { ExamAttempt, StudyContext, User } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
 import { api, sessionExpiredHandler } from "./api";
 import { session, verifyPreviewStorage } from "./storage";
@@ -59,7 +59,7 @@ import { ThemeProvider, useBody, useLayout, useTheme } from "./themeContext";
 
 type Routes = {
   Main: undefined;
-  Exam: { id: string };
+  Exam: { id: string; initialExam?: ExamAttempt };
   Account: undefined;
 };
 const Stack = createNativeStackNavigator<Routes>();
@@ -79,7 +79,7 @@ function MainTabs({
   choose: (id: string) => void;
   logout: () => void;
   pending: boolean;
-  exam: (id: string) => void;
+  exam: (id: string, initialExam?: ExamAttempt) => void;
   account: () => void;
 }) {
   const { styles } = useTheme();
@@ -122,7 +122,7 @@ function MainTabs({
   // Lists and grids use the whole content area; forms (profile, review) stay a reading column.
   const body = useBody(["home", "deneme", "ders", "history", "stats"].includes(tab));
   return (
-    <PageTransition page={`${context.id}:${tab}:${tab === "ders" ? subject ?? "" : ""}`}>
+    <>
       <SafeAreaView
         style={styles.shell}
         edges={["top", "left", "right"]}
@@ -142,55 +142,57 @@ function MainTabs({
               menu={() => setMenuOpen(true)}
               profile={() => selectTab("profile")}
             />
-            <ScrollView
-              ref={content}
-              key={tab}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={body}
-            >
-              {tab === "home" ? (
-                <Home
-                  user={user}
-                  context={context}
-                  deneme={() => setTab("deneme")}
-                  ders={ders}
-                  history={() => setTab("history")}
-                  review={() => setTab("review")}
-                  stats={() => setTab("stats")}
-                  exam={exam}
-                />
-              ) : tab === "deneme" ? (
-                <ExamList context={context} kind="deneme" open={exam} />
-              ) : tab === "ders" ? (
-                <ExamList
-                  context={context}
-                  kind="ders"
-                  open={exam}
-                  initialSubject={subject}
-                />
-              ) : tab === "history" ? (
-                <Results context={context} openExam={exam} />
-              ) : tab === "review" ? (
-                <Review context={context} openExam={exam} />
-              ) : tab === "score" ? (
-                <ScoreCalculator />
-              ) : tab === "jobs" ? (
-                <Jobs user={user} />
-              ) : tab === "stats" ? (
-                <Stats context={context} />
-              ) : (
-                <Profile
-                  user={user}
-                  context={context}
-                  contexts={contexts}
-                  choose={choose}
-                  logout={logout}
-                  pending={pending}
-                  account={account}
-                />
-              )}
-            </ScrollView>
+            <PageTransition page={`${context.id}:${tab}:${tab === "ders" ? subject ?? "" : ""}`}>
+              <ScrollView
+                ref={content}
+                key={tab}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={body}
+              >
+                {tab === "home" ? (
+                  <Home
+                    user={user}
+                    context={context}
+                    deneme={() => setTab("deneme")}
+                    ders={ders}
+                    history={() => setTab("history")}
+                    review={() => setTab("review")}
+                    stats={() => setTab("stats")}
+                    exam={exam}
+                  />
+                ) : tab === "deneme" ? (
+                  <ExamList context={context} kind="deneme" open={exam} />
+                ) : tab === "ders" ? (
+                  <ExamList
+                    context={context}
+                    kind="ders"
+                    open={exam}
+                    initialSubject={subject}
+                  />
+                ) : tab === "history" ? (
+                  <Results context={context} openExam={exam} />
+                ) : tab === "review" ? (
+                  <Review context={context} openExam={exam} />
+                ) : tab === "score" ? (
+                  <ScoreCalculator />
+                ) : tab === "jobs" ? (
+                  <Jobs user={user} />
+                ) : tab === "stats" ? (
+                  <Stats context={context} />
+                ) : (
+                  <Profile
+                    user={user}
+                    context={context}
+                    contexts={contexts}
+                    choose={choose}
+                    logout={logout}
+                    pending={pending}
+                    account={account}
+                  />
+                )}
+              </ScrollView>
+            </PageTransition>
             {!layout.railed && !keyboardOpen && (
               <PrimaryNavigation tab={tab} select={selectTab} placement="bottom" />
             )}
@@ -210,7 +212,7 @@ function MainTabs({
           close={() => setMenuOpen(false)}
         />
       )}
-    </PageTransition>
+    </>
   );
 }
 function Workspace({
@@ -335,7 +337,7 @@ function Workspace({
               choose={setContextId}
               logout={logout}
               pending={pending}
-              exam={(id) => navigation.navigate("Exam", { id })}
+              exam={(id, initialExam) => navigation.navigate("Exam", { id, initialExam })}
               account={() => navigation.navigate("Account")}
             />
           )}
@@ -348,16 +350,16 @@ function Workspace({
           )}
         </Stack.Screen>
         <Stack.Screen name="Exam" options={{ title: "Sınav" }}>
-          {({ route }) => <ExamDetail context={context} id={route.params.id} />}
+          {({ route }) => <ExamDetail context={context} id={route.params.id} initialExam={route.params.initialExam} />}
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-function ExamDetail({ context, id }: { context: StudyContext; id: string }) {
+function ExamDetail({ context, id, initialExam }: { context: StudyContext; id: string; initialExam?: ExamAttempt }) {
   return (
     <PageTransition page={`exam:${context.id}:${id}`}>
-      <Exam key={id} context={context} id={id} />
+      <Exam key={id} context={context} id={id} initialExam={initialExam} />
     </PageTransition>
   );
 }

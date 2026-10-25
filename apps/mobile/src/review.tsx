@@ -53,7 +53,7 @@ export function Review({
   openExam,
 }: {
   context: StudyContext;
-  openExam: (id: string) => void;
+  openExam: (id: string, initialExam?: ExamAttempt) => void;
 }) {
   const summary = useResource(
     (signal) =>
@@ -106,7 +106,7 @@ function ReviewExam({
   context: StudyContext;
   kind: (typeof kinds)[number];
   count: number;
-  openExam: (id: string) => void;
+  openExam: (id: string, initialExam?: ExamAttempt) => void;
 }) {
   const { styles } = useTheme();
   const [expanded, setExpanded] = useState(false);
@@ -131,7 +131,7 @@ function ReviewExam({
         }),
       (response) => {
         submission.current = null;
-        openExam(response.data.id);
+        openExam(response.data.id, response.data);
       },
     );
   }

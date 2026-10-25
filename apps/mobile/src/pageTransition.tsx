@@ -1,27 +1,42 @@
-import { useLayoutEffect, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useLayoutEffect, useEffect, useRef, useState, type ReactNode } from "react";
 import { Animated, Platform, StyleSheet, View } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { BrandLogo } from "./brandLogo";
 import { useReducedMotion } from "./motion";
 import { useTheme } from "./themeContext";
+import { PageLoading } from "./pageLoading";
 
-// A short visual handover only: requests start immediately and keep their own
-// loading/error states. Question changes and background refreshes do not wait.
-const TRANSITION_MS = 400;
+// Fast pages are never covered. Show branding only for real foreground loads.
+const LOADING_THRESHOLD_MS = 120;
 
 export function PageTransition({ page, children }: { page: string; children: ReactNode }) {
   const focused = useIsFocused();
   const reduced = useReducedMotion();
   const { palette } = useTheme();
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
+  const [pending, setPending] = useState(0);
+  const mounted = useRef(false);
   const pulse = useRef(new Animated.Value(0)).current;
+  useLayoutEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; };
+  }, []);
+  const beginLoading = useCallback(() => {
+    let released = false;
+    setPending(count => count + 1);
+    return () => {
+      if (released) return;
+      released = true;
+      if (mounted.current) setPending(count => Math.max(0, count - 1));
+    };
+  }, []);
 
   useLayoutEffect(() => {
-    setVisible(focused);
-    if (!focused) return;
-    const timer = setTimeout(() => setVisible(false), TRANSITION_MS);
+    setVisible(false);
+    if (!focused || pending === 0) return;
+    const timer = setTimeout(() => setVisible(true), LOADING_THRESHOLD_MS);
     return () => clearTimeout(timer);
-  }, [page, focused]);
+  }, [page, focused, pending > 0]);
 
   useEffect(() => {
     pulse.setValue(0);
@@ -41,38 +56,40 @@ export function PageTransition({ page, children }: { page: string; children: Rea
   }, [visible, reduced, pulse]);
 
   return (
-    <View style={{ flex: 1 }}>
-      <View
-        style={{ flex: 1 }}
-        pointerEvents={visible ? "none" : "auto"}
-        accessibilityElementsHidden={visible}
-        importantForAccessibility={visible ? "no-hide-descendants" : "auto"}
-        aria-hidden={visible}
-      >
-        {children}
-      </View>
-      {visible && (
+    <PageLoading.Provider value={beginLoading}>
+      <View style={{ flex: 1 }}>
         <View
-          testID="page-transition"
-          accessibilityRole="progressbar"
-          accessibilityLabel="Sayfa yükleniyor"
-          accessibilityLiveRegion="polite"
-          accessibilityViewIsModal
-          style={[StyleSheet.absoluteFill, {
-            zIndex: 10,
-            backgroundColor: palette.paper,
-            alignItems: "center",
-            justifyContent: "center",
-          }]}
+          style={{ flex: 1 }}
+          pointerEvents={visible ? "none" : "auto"}
+          accessibilityElementsHidden={visible}
+          importantForAccessibility={visible ? "no-hide-descendants" : "auto"}
+          aria-hidden={visible}
         >
-          <Animated.View style={{
-            opacity: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1] }),
-            transform: [{ scale: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.94, 1] }) }],
-          }}>
-            <BrandLogo size={104} />
-          </Animated.View>
+          {children}
         </View>
-      )}
-    </View>
+        {visible && (
+          <View
+            testID="page-transition"
+            accessibilityRole="progressbar"
+            accessibilityLabel="Sayfa yükleniyor"
+            accessibilityLiveRegion="polite"
+            accessibilityViewIsModal
+            style={[StyleSheet.absoluteFill, {
+              zIndex: 10,
+              backgroundColor: palette.paper,
+              alignItems: "center",
+              justifyContent: "center",
+            }]}
+          >
+            <Animated.View style={{
+              opacity: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1] }),
+              transform: [{ scale: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.94, 1] }) }],
+            }}>
+              <BrandLogo size={104} />
+            </Animated.View>
+          </View>
+        )}
+      </View>
+    </PageLoading.Provider>
   );
 }

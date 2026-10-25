@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
+import { usePageLoading } from "./pageLoading";
 export function useOnReturn(callback: () => void) {
   const focused = useIsFocused();
   const blurred = useRef(false);
@@ -19,6 +20,7 @@ export function useResource<T>(
   dependencies: readonly unknown[],
   enabled = true,
 ) {
+  const beginLoading = usePageLoading();
   const active = useRef(enabled);
   active.current = enabled;
   const fn = useRef(loader);
@@ -50,8 +52,10 @@ export function useResource<T>(
   useEffect(() => {
     mounted.current = true;
     setData(null);
-    void reload();
+    const loaded = enabled ? beginLoading() : () => {};
+    void reload().finally(loaded);
     return () => {
+      loaded();
       mounted.current = false;
       controller.current?.abort();
     };

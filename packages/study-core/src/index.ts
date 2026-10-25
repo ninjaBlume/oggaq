@@ -26,9 +26,9 @@ export function remainingSeconds(
   );
 }
 export function timeLabel(seconds: number): string {
-  return `${Math.floor(seconds / 60)
-    .toString()
-    .padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`;
+  const total = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0;
+  return [Math.floor(total / 3600), Math.floor(total / 60) % 60, total % 60]
+    .map((part) => part.toString().padStart(2, "0")).join(":");
 }
 
 // A question's exams are shown apart from its subject. The exam type is Deneme (a whole exam) or Ders (one subject's
