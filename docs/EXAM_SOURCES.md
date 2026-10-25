@@ -1,6 +1,6 @@
 # Resmî sınav kaynağı hazırlığı — 26 Ekim 2026
 
-Durum: **kaynaklar indirildi ve inceleme çıktıları hazır; veritabanına aktarım/yayın yapılmadı.** Kullanıcı güncel kitapçıkların/cevapların toplanmasını istedi. Mevcut geliştirme DB ve hesaplarına dokunmama, sunucu operasyonunun Claude tarafından yürütülmesi talimatları korunur.
+Durum: **kaynaklar indirildi ve inceleme çıktıları hazır; veritabanına aktarım/yayın yapılmadı.** Kullanıcı güncel kitapçıkların/cevapların toplanmasını istedi. Gerçek soru aktarımı yapılmadı. Kullanıcı ayrıca yalnız eğitim ayrımı migration'ının yerel `oggaq` veritabanına uygulanmasını onayladı; 26 Ekim 2026'da uygulandı. Hesaplar ve soru/sonuç kayıtları korunur; sunucu operasyonu Claude tarafından yürütülür.
 
 ## Kaynak ve kapsam
 
@@ -43,4 +43,4 @@ python3 scripts/extract-exam-booklet.test.py
 1. EGM duyuru/özgün dosyası erişilebilirken aynaların bütünlüğünü doğrulamak.
 2. PDF görünümünü tüm sorular için incelemek; ders/konu eşlemesini, varsa görsel/özel karakterleri doğrulamak. Metin çıkarımı ve A-B tutarlılığı tek başına tam görsel inceleme değildir.
 3. Mevcut soru havuzuyla tekrar önizlemesi, kaynak/hak ve editör onayı sonrası normal API/domain işlemleriyle aktarım hazırlamak.
-4. Yeni eğitim ayrımı migration/API sürümünü operasyon sahibiyle yayına almak; ardından onaylı içerik aktarımı yapmak. Bu çalışma `deploy/` veya yedek betiklerini değiştirmez.
+4. Yerel eğitim ayrımı migration'ı uygulandı. Sunucuda migration/API sürümünü operasyon sahibiyle yayına almak; ardından onaylı içerik aktarımı yapmak. Bu çalışma `deploy/` veya yedek betiklerini değiştirmez.

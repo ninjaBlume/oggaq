@@ -1,5 +1,12 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, onaylı yerel eğitim migration'ı
+
+- Kullanıcının “Evet, yalnız bu migration’ı uygula” onayıyla yalnız `2026_10_26_000001_add_exam_education_type` yerel **oggaq / 127.0.0.1:55432** üzerinde uygulandı. Ortam/driver/host/port/DB kimliği yazmadan önce doğrulandı; migration kayıt farkının yalnız bu dosya olduğu kontrol edildi. Diğer bekleyen migration'lar çalıştırılmadı.
+- İşlem REPEATABLE READ transaction içinde, 5 saniye kilit / 30 saniye sorgu sınırıyla yürütüldü. Hesaplar, sorular/sürümler/seçenekler, sınavlar/soru ilişkileri, denemeler/cevaplar/konumlar ve puanlama bağlantıları/sonuçları olmak üzere **11 tablonun** satır sayısı ve içerik özetleri önce/sonra karşılaştırıldı; yeni `education_type` dışında değişiklik yok. Özetler veya kişisel satırlar çıktıya yazılmadı.
+- Commit sonrasında ayrı bağlantıda migration kaydı, NOT NULL alan, eğitim CHECK'i, eğitim içeren tekillik indeksi, filtre indeksi ve iki ertelenebilir tetikleyici doğrulandı. ORM sorguları **286 basic / 0 renewal** döndü. Gerçek yenileme sorusu aktarıldığı iddia edilmez; PDF önizlemesi hâlâ yayına kapalıdır.
+- Uygulama kodu değişmedi; önceki 240 backend, 68 arayüz birim ve 119 farklı E2E senaryosunun doğrulaması geçerlidir. Geliştirme DB üzerinde PHPUnit/E2E çalıştırılmadı, kullanıcı hesabına giriş veya kişisel veri yazması yapılmadı. Sunucu, deploy/yedek betikleri, geliştirme servisleri ve uzak Git değiştirilmedi.
+
 ## Güncel doğrulama — 26 Ekim 2026, Deneme eğitim türü ve PDF hazırlığı
 
 - Web/mobil Deneme ekranına Temel eğitim / Yenileme eğitimi, yönetici deneme editörüne eğitim alanı eklendi. Ders ekranları ortak kaldı. API filtresi, bağımsız sınav tekilliği, bağlı iki seçenekte eğitim koruması ve yanlış eğitim puanlama dönemini hem API hem PostgreSQL düzeyinde reddetme doğrulandı. Eski istemcinin taslak güncellemesi yenileme türünü ezmez.

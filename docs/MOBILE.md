@@ -2,7 +2,7 @@
 
 ## 26 Ekim 2026: Deneme sınavlarında Temel/Yenileme
 
-Deneme ekranında önce Temel eğitim / Yenileme eğitimi, ardından silahlı/silahsız seçilir. Ders ekranına eğitim seçimi eklenmez. Önbellek anahtarı eğitim türünü de kapsar; farklı eğitimin hazır verisi diğer listede gösterilmez. Aynı kullanıcı/bağlamda sekmeye dönüş seçimi korur. Yeni backend alanı geçiş sırasında yoksa mevcut temel arşiv gösterilmeye devam eder. Yenileme kayıtlarını yönetmek için [EXAMS](EXAMS.md) içindeki migration/API gerekir; ortak geliştirme ve sunucu DB'leri bu teslimde değiştirilmedi.
+Deneme ekranında önce Temel eğitim / Yenileme eğitimi, ardından silahlı/silahsız seçilir. Ders ekranına eğitim seçimi eklenmez. Önbellek anahtarı eğitim türünü de kapsar; farklı eğitimin hazır verisi diğer listede gösterilmez. Aynı kullanıcı/bağlamda sekmeye dönüş seçimi korur. Yeni backend alanı geçiş sırasında yoksa mevcut temel arşiv gösterilmeye devam eder. Yenileme kayıtlarını yönetmek için [EXAMS](EXAMS.md) içindeki migration/API gerekir. Kullanıcı onayıyla yalnız yerel `oggaq` migration'ı 26 Ekim 2026'da uygulandı; sunucu DB'sine uygulanmadı.
 
 `apps/mobile`, React Native 0.88.0 / Expo SDK 58.0.19 ile iOS/Android native bileşenleri kullanır. Kayıt/giriş, doğrulama e-postasını yeniden gönderme ve kontrol etme, parola yenileme e-postası, kişisel/aktif kurum seçimi, ders/konu ve yayımlanmış soru çalışması, geçmiş, süreli deneme/sonuç uygulanmıştır. HTML/web ekranı native içine gömülmez. Ortak API sözleşmesi ve saf sayaç kodu web ile paylaşılır. Uygulamaların React sürümü SDK'nın renderer sürümü 19.3.0'a eşitlendi; güncel geçiş kontrolleri aşağıdadır. Tarihsel doğrulamalar ilgili eski sürümlerini anlatır.
 
