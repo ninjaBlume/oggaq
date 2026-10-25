@@ -28,7 +28,7 @@ Durum (25 Ekim 2026): **yayına hazır değil.** Kod tarafında hesap silme, sor
 | Soru içeriğinin hak teyidi | **Engel** | Kullanıcı + hukukçu |
 | Puanlama kurallarının uzman onayı | **Engel** | Kullanıcı + uzman |
 | Veri sorumlusu, VERBİS, yurt dışı aktarım | **Engel** | Kullanıcı + hukukçu |
-| Gerçek e-posta gönderimi | Proje ağına özel Exim/DKIM aktif; doğrudan ve kuyruktan Gmail SMTP teslimi doğrulandı, klasör teyidi bekleniyor | Codex |
+| Gerçek e-posta gönderimi | Proje ağına özel Exim/DKIM aktif; SMTP teslimi ve SPF/DKIM/DMARC PASS; ilk testler Gmail spam klasöründe; A/PTR düzeltildi, DNS yayılımı ve yeni klasör testi bekleniyor | Codex |
 | Yedekleme | Betikler hazır, sunucuda çalıştırılmadı | Kullanıcı |
 | Apple DSA (AB tüccar) doğrulaması | Sürüyor (Codentum hesabı) | Kullanıcı / Apple |
 
