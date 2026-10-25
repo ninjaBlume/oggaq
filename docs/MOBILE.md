@@ -4,7 +4,7 @@
 
 ## 25 Ekim 2026: referanslara göre ana sayfa örneği
 
-Ana sayfa; belirgin mavi/lacivert başlangıç alanı, kişisel özet, Hızlı başla/Çalışmaların satır grupları, dersler ve son sınavlar olarak düzenlendi. Bütün araçlar ücretsizdir; ödeme/PRO/özellik kilidi yoktur. Soru/doğruluk/biten sınav değerleri mevcut gerçek Stats API'sinden gelir; yükleme ve hatada sayı uydurulmaz. Aynı üç veri isteği kullanılır, yeni bağımlılık veya bekleme animasyonu eklenmez. Aktif sınav öne alınır; mevcut başlatma/devam/tekrar/sonuç yolları korunur. Geniş tablette başlangıç/özet ve araç grupları yan yana, telefonda alt altadır.
+Ana sayfa; belirgin mavi/lacivert başlangıç alanı, üç küçük kişisel özet kutusu, Hızlı başla/Çalışmaların başlıkları altında aralıklı satır kartları, dersler ve son sınavlar olarak düzenlendi. Kullanıcının referansa yalnız hafifçe yaklaşma isteğiyle kutu ayrımı ve ikon zeminleri belirginleştirildi; genel yapı korundu. Bütün araçlar ücretsizdir; ödeme/PRO/özellik kilidi yoktur. Soru/doğruluk/biten sınav değerleri mevcut gerçek Stats API'sinden gelir; yükleme ve hatada sayı uydurulmaz. Aynı üç veri isteği kullanılır, yeni bağımlılık veya bekleme animasyonu eklenmez. Aktif sınav öne alınır; mevcut başlatma/devam/tekrar/sonuç yolları korunur. Geniş tablette başlangıç/özet ve araç grupları yan yana, telefonda alt altadır.
 
 Kullanıcının görselleri yalnız tasarım referansıdır; uygulamaya kopyalanmaz. Günlük hedef, seri, ücretli analiz, sınav takvimi gibi referanstaki ek özellikler oluşturulmadı. Bu örnek yalnız `apps/mobile` ana sayfasını değiştirir. Açık/koyu ve büyük yazı ekranları `artifacts/home-reference/` içinde; gerçek cihaz teyidi ayrıca gerekir.
 

@@ -102,7 +102,7 @@ export function Home({
       <View style={{ flexDirection: layout.columns === 2 ? "row" : "column", gap: 20 }}>
       <View testID="home-focus" style={{ flex: layout.columns === 2 ? 2 : undefined, backgroundColor: palette.navy, borderRadius: shape.large, padding: layout.cardPadding + 4, gap: 14, overflow: "hidden" }}>
         <View pointerEvents="none" accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"
-          style={{ position: "absolute", width: 210, height: 280, right: -120, top: -70, borderRadius: shape.extraLarge, backgroundColor: palette.primary, opacity: 0.18, transform: [{ rotate: "-18deg" }] }} />
+          style={{ position: "absolute", width: 210, height: 280, right: -120, top: -70, borderRadius: shape.extraLarge, backgroundColor: palette.primary, opacity: 0.24, transform: [{ rotate: "-18deg" }] }} />
         <View pointerEvents="none" accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"
           style={{ position: "absolute", width: 170, height: 170, right: -38, bottom: -115, borderRadius: 85, borderWidth: 1, borderColor: palette.decorativeLine }} />
         <View style={[styles.between, { flexWrap: "wrap" }]}>
@@ -141,16 +141,18 @@ export function Home({
         ) : null}
       </View>
 
-      <View testID="home-summary" style={{ flex: layout.columns === 2 ? 1 : undefined, justifyContent: "space-between", backgroundColor: palette.surface, borderRadius: shape.control, borderWidth: 1, borderColor: palette.line, padding: 14, gap: 12 }}>
+      <View testID="home-summary" style={{ flex: layout.columns === 2 ? 1 : undefined, justifyContent: "space-between", gap: 12 }}>
         <View style={styles.between}>
           <Text style={{ color: palette.ink, fontSize: 14, fontWeight: "600" }}>Genel durumun</Text>
           <TextLink onPress={stats}>Detayları gör</TextLink>
         </View>
-        <View style={{ flexDirection: "row", gap: 10 }}>
-          {metrics.map(({ label, accessible, value, icon: Icon }, index) => (
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          {metrics.map(({ label, accessible, value, icon: Icon }) => (
             <View key={label} accessible accessibilityLabel={`${accessible}: ${value ?? (summary.loading ? "yükleniyor" : "henüz yok")}`}
-              style={{ flex: 1, minWidth: 0, gap: 5, paddingLeft: index === 0 ? 0 : 10, borderLeftWidth: index === 0 ? 0 : 1, borderColor: palette.line }}>
-              <Icon size={17} color={palette.primary} strokeWidth={1.8} />
+              style={{ flex: 1, minWidth: 0, gap: 5, padding: 10, backgroundColor: palette.surface, borderWidth: 1, borderRadius: shape.control, borderColor: palette.line }}>
+              <View style={{ width: 28, height: 28, borderRadius: shape.small, alignItems: "center", justifyContent: "center", backgroundColor: palette.softPrimary }}>
+                <Icon size={17} color={palette.primary} strokeWidth={1.8} />
+              </View>
               <Text style={{ color: palette.ink, fontSize: 22, lineHeight: 29, fontWeight: "700", fontVariant: ["tabular-nums"] }}>{value ?? "—"}</Text>
               <Text style={{ color: palette.muted, fontSize: 12, lineHeight: 18 }}>{label}</Text>
             </View>
@@ -164,7 +166,7 @@ export function Home({
       <View style={{ flex: layout.columns === 2 ? 1 : undefined, gap: 12 }}>
       <SectionTitle>Hızlı başla</SectionTitle>
       <HomeGroup>
-        <HomeRow icon={BookOpen} title={vocabulary.ders.title} description="Dersini seç, ilgili sınavlara ulaş" onPress={() => ders()} divider />
+        <HomeRow icon={BookOpen} title={vocabulary.ders.title} description="Dersini seç, ilgili sınavlara ulaş" onPress={() => ders()} />
         <HomeRow icon={ListChecks} title={vocabulary.review.title} description="Yanlış, boş ve favori sorularından sınav yap"
           accessibilityLabel={`${vocabulary.review.title} ekranını aç`} onPress={review} />
       </HomeGroup>
@@ -172,7 +174,7 @@ export function Home({
       <View style={{ flex: layout.columns === 2 ? 1 : undefined, gap: 12 }}>
       <SectionTitle>Çalışmaların</SectionTitle>
       <HomeGroup>
-        <HomeRow icon={History} title={vocabulary.results.title} description="Girdiğin sınavları ve cevaplarını incele" onPress={history} divider />
+        <HomeRow icon={History} title={vocabulary.results.title} description="Girdiğin sınavları ve cevaplarını incele" onPress={history} />
         <HomeRow icon={ChartColumn} title={vocabulary.stats.title}
           description={typeof accuracy === "number" ? `Doğruluk %${accuracy.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}` : "İlerlemeni ve derslere göre durumunu gör"}
           accessibilityLabel={`${vocabulary.stats.title} ekranını aç`} onPress={stats} />
@@ -189,9 +191,9 @@ export function Home({
         <EmptyState icon={GraduationCap} title="Dersler hazırlanıyor" message="Dersler yayımlandığında buradan kolayca ulaşabilirsin." />
       ) : (
         <HomeGroup>
-          {subjects.data?.data.map((subject, index, all) => (
+          {subjects.data?.data.map(subject => (
             <HomeRow key={subject.id} icon={BookOpen} title={subject.name} accessibilityLabel={`${subject.name} dersini aç`}
-              onPress={() => ders(subject.id)} divider={index < all.length - 1} />
+              onPress={() => ders(subject.id)} />
           ))}
         </HomeGroup>
       )}
@@ -203,7 +205,7 @@ export function Home({
         <ErrorNotice title="Son sınavların yüklenemedi" error={recentExams.error} retry={() => void recentExams.reload()} />
       ) : recentExams.data?.data.length === 0 ? (
         <HomeGroup>
-          <View style={{ padding: 16, gap: 8 }}>
+          <View style={{ padding: 16, gap: 8, backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.line, borderRadius: shape.control }}>
             <Text style={[styles.text, { fontWeight: "600" }]}>İlk sınavın burada</Text>
             <Text style={styles.muted}>Girdiğin deneme ve ders sınavlarını burada görebilirsin.</Text>
             <TextLink onPress={deneme}>Deneme sınavlarına git</TextLink>
@@ -211,14 +213,14 @@ export function Home({
         </HomeGroup>
       ) : (
         <HomeGroup>
-          {recentExams.data?.data.map((attempt, index, all) => {
+          {recentExams.data?.data.map(attempt => {
             const title = attempt.official_exam ? examDisplayTitle(attempt.official_exam.title) : `${attempt.question_count} soruluk deneme`;
             const status = attempt.status === "active"
               ? Date.parse(attempt.deadline_at) > Date.parse(attempt.server_time) ? "Devam ediyor" : "Süresi doldu"
               : attempt.result ? `%${attempt.result.score_percent} doğru` : "Sonuç bekleniyor";
             return <HomeRow key={attempt.id} icon={Clock3} title={title}
               description={new Date(attempt.started_at).toLocaleDateString("tr-TR")}
-              accessibilityLabel={`${title}, ${status}`} onPress={() => exam(attempt.id)} divider={index < all.length - 1}
+              accessibilityLabel={`${title}, ${status}`} onPress={() => exam(attempt.id)}
               badge={<Badge tone={attempt.status === "completed" && attempt.result ? scoreTone(attempt.result.score_percent, palette).badge : "primary"}>{status}</Badge>} />;
           })}
         </HomeGroup>
@@ -228,24 +230,22 @@ export function Home({
 }
 
 function HomeGroup({ children }: { children: ReactNode }) {
-  const { palette } = useTheme();
-  return <View style={{ backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.line, borderRadius: shape.control, overflow: "hidden" }}>{children}</View>;
+  return <View style={{ gap: 10 }}>{children}</View>;
 }
 
-function HomeRow({ icon: Icon, title, description, accessibilityLabel, onPress, divider = false, badge }: {
+function HomeRow({ icon: Icon, title, description, accessibilityLabel, onPress, badge }: {
   icon: LucideIcon;
   title: string;
   description?: string;
   accessibilityLabel?: string;
   onPress: () => void;
-  divider?: boolean;
   badge?: ReactNode;
 }) {
   const { palette } = useTheme();
   return <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? `${title} ekranını aç`} onPress={onPress}
-    style={({ pressed }) => [{ minHeight: 72, padding: 14, flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: pressed ? palette.softPrimary : palette.surface },
-      divider && { borderBottomWidth: 1, borderBottomColor: palette.line }]}>
-    <View style={{ width: 40, height: 40, borderRadius: shape.controlPressed, alignItems: "center", justifyContent: "center", backgroundColor: palette.softPrimary }}>
+    style={({ pressed }) => ({ minHeight: 76, padding: 14, flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: pressed ? palette.softPrimary : palette.surface,
+      borderWidth: 1, borderColor: palette.line, borderRadius: shape.control })}>
+    <View style={{ width: 44, height: 44, borderRadius: shape.control, alignItems: "center", justifyContent: "center", backgroundColor: palette.softPrimary }}>
       <Icon size={21} color={palette.primary} strokeWidth={1.8} />
     </View>
     <View style={{ flex: 1, minWidth: 0, gap: 4 }}>

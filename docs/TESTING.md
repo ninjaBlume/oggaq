@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, referansa küçük görsel yakınlaştırma
+
+- Kullanıcının hafif yakınlaştırma isteğiyle yalnız mobil ana sayfa görünümü ayarlandı: üç bağımsız özet kutusu, 10 px aralıklı satır kartları, 44 px ikon zeminleri ve biraz daha belirgin mavi dekoratif vurgu. Genel hiyerarşi, renk rolleri, gerçek sayılar ve ücretsiz araçlar korundu. API isteği, iş kuralı, bağımlılık ve bekleme eklenmedi.
+- Ortak strict TypeScript, mevcut **42 mobil Vitest**, Android/iOS/web Metro export ve ilgili **10 Chromium E2E tek koşumda geçti**. Mevcut ana sayfa/açık-koyu 320–1280 px görünüm, büyük yazı/hata/yeniden deneme, telefon/tablet marka bağlantısı, aktif denemeye devam ve tercih kalıcılığı kontrolleri kullanıldı; sunum değişikliğini taklit eden yeni birim testi eklenmedi.
+- Önceki/güncel 390 px görüntüler ve güncel 320 px büyük yazı `artifacts/home-refinement/` içinde; koyu telefon ve büyük yazı görüntüleri gözle incelendi. Fiziksel iOS/Android bu görsel düzenleme için denenmedi. Backend/DB/API, tam E2E/PHUnit ve sunucu yayını değişmedi; testler yalnız `oggaq_test` ve ayrı 5186 portuyla sırayla çalıştı. Ortak geliştirme servisleri durdurulmadı, push yapılmadı.
+
 ## Güncel doğrulama — 25 Ekim 2026, ücretsiz ana sayfa tasarım örneği
 
 - Kullanıcının üç görselinden bölümleme/odak hiyerarşisi alınarak mobil ana sayfa düzenlendi: lacivert/mavi başlat-devam alanı, gerçek kişisel özet, gruplandırılmış araç/ders/geçmiş satırları. Bütün özellikler ücretsiz; PRO/abonelik/ödeme ile açılan özellik yoktur. Bu kalıcı ürün kararı `prompt.md` ve DESIGN içinde açıklaştırıldı. Referans görseller uygulamaya dahil edilmedi.
