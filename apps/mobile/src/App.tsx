@@ -1,3 +1,4 @@
+import { BrandWordmark, loadBrandFont } from "./wordmark";
 import { BrandLogo } from "./brandLogo";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ScrollViewInstance } from "react-native";
@@ -25,7 +26,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ArrowLeft } from "./icons";
 import type { StudyContext, User } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
-import brand from "../../../config/brand.json";
 import { api, sessionExpiredHandler } from "./api";
 import { session, verifyPreviewStorage } from "./storage";
 import { Login, Verify } from "./auth";
@@ -445,7 +445,7 @@ function Application() {
           }}
         >
           <BrandLogo size={88} />
-          <Text style={styles.heading}>{brand.name}</Text>
+          <BrandWordmark style={styles.heading} />
           <Loading />
         </View>
       ) : user?.email_verified_at ? (
@@ -481,12 +481,16 @@ function Application() {
 }
 function Root() {
   const { styles } = useTheme();
+  const fontTask = useTask<void>();
+  function loadFont() { void fontTask.run(loadBrandFont, () => {}); }
+  useEffect(loadFont, []);
   return (
     <MotionProvider>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.shell}
       >
+        {fontTask.error ? <View style={{ padding: 12 }}><ErrorNotice error={fontTask.error} retry={loadFont} /></View> : null}
         <Application />
       </KeyboardAvoidingView>
     </MotionProvider>

@@ -1,6 +1,6 @@
-# Ogg Sor - Soru Bankası
+# ÖGG SOR - Soru Bankası
 
-Türkiye'deki özel güvenlik görevlisi adayları için ücretsiz sınav hazırlık platformu. Marka **Ogg Sor - Soru Bankası**, ana alan adı **oggsor.com**, yayıncı **Codentum L.L.C.** GitHub depo adı `oggaq` ve teknik proje adı `security-exam-platform` korunur. Marka değerleri `config/brand.json` üzerinden yönetilir; [marka ve alan adı geçişi](docs/BRAND.md).
+Türkiye'deki özel güvenlik görevlisi adayları için ücretsiz sınav hazırlık platformu. Marka **ÖGG SOR - Soru Bankası**, ana alan adı **oggsor.com**, yayıncı **Codentum L.L.C.** GitHub depo adı `oggaq` ve teknik proje adı `security-exam-platform` korunur. Marka değerleri `config/brand.json` üzerinden yönetilir; [marka ve alan adı geçişi](docs/BRAND.md).
 
 ## Mevcut durum
 

@@ -1,5 +1,6 @@
 @import "@oggaq/design-tokens/tokens.css";
 @import "tailwindcss";
+@import "../../mobile/assets/fonts/wordmark.css";
 /* Every colour is a role from design-tokens (var(--c-*)); light and dark come from tokens.css.
    --edge is a control border derived from roles: strong enough (about 3:1) to find an input or an option. */
 :root {

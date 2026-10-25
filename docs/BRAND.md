@@ -1,11 +1,11 @@
-# Ogg Sor marka ve alan adı geçişi
+# ÖGG SOR marka ve alan adı geçişi
 
 Ürün sahibinin 25 Ekim 2026 kararı:
 
 | Kullanım | Değer |
 | --- | --- |
-| Kısa marka | Ogg Sor |
-| Uygulama ve mağaza adı | Ogg Sor - Soru Bankası |
+| Kısa marka | ÖGG SOR |
+| Uygulama ve mağaza adı | ÖGG SOR - Soru Bankası |
 | Ana web/API kökü | https://oggsor.com |
 | Yönetim paneli | https://oggsor.com/yonetim/ |
 | Destek | destek@oggsor.com |
@@ -41,3 +41,7 @@ Doğrudan Horizon kuyruğundan Gmail’e gönderilen yeni markalı test ulaştı
 25 Ekim logo yayını: seçilen görsel `logo-9d4aa2e` paketinde uygulama servislerine alındı; favicon önbellek düzeltmesiyle güncel yayın bağlantısı `releases/logo-76000da` oldu. Son düzeltmede yalnız web yenilendi; backend imajı aynı içeriktedir. Web/yönetim logo ve sürümlü favicon dosyaları canlı HTTPS yanıtlarında eşleşti; kök/www readiness başarılı. Önceki sürümler ve korumalı `manage` geri alma kopyaları saklandı. Yeni imzalı mobil paket bu işlemde üretilmedi.
 
 Son logo değişikliği: kullanıcı önceki görselden vazgeçerek yıldız/ay-yıldız ve ÖGG SOR yazılı görseli seçti. Güncel canlı yayın `releases/emblem-db86f34`; yalnız web yenilendi, backend aynı imaj içeriğini kullanır. Web/yönetim/yasal sayfa logoları ve faviconlar canlı yanıtlarda yeni dosyayla doğrulandı. Önceki logo yayınları yalnız geri alma/geçmiş kaydıdır.
+
+Marka yazısı güncellemesi: ürün sahibinin isteğiyle kısa ad **ÖGG SOR**, tam ad **ÖGG SOR - Soru Bankası** oldu. Marka yazıları (giriş, başlık, menü, yükleme, profil ve altbilgi; web/yönetim/yasal sayfalar dahil) **League Spartan Bold 700** kullanır; diğer metin stilleri korunur. `config/brand.json` → `wordmarkFontFamily` ortak aile adıdır. Fontun kendi deposundaki sabit Bold TTF/WOFF2 ve SIL OFL 1.1 dosyaları `config/fonts/` içinde tutulur; kaynak revizyonu ve doğrulama bilgisi aynı klasörün README’sindedir. `brand:apply` mobil/web/yönetim font kopyalarını ve CSS'ini eşitler. Web WOFF2'si yaklaşık 32 KB, mobil TTF yaklaşık 79 KB; font için dış CDN çağrısı yapılmaz. Native pakete OFL metninin JSON kopyası da dahil edilir; Metro yapılandırması veya çalışan geliştirme sunucusu değiştirilmez.
+
+Mobil font çalışma anında, Expo Go ile uyumlu `expo-font` üzerinden yalnız 700 yüzüyle yüklenir. Zaten kurulu SDK 58 modülü (`58.0.10`) doğrudan bağımlılık olarak tanımlandı; ikinci bir node_modules kopyası oluşturulmadı. Font hatası uygulamayı kapatmaz; mevcut merkezi hata görünümü yeniden denemeye izin verir. Expo web'in başarısız indirmeden önce CSS yüzünü kaydetmesi nedeniyle yeniden denemede yalnız bu fontun hatalı kaydı temizlenir. Ekrandaki `Ö` dahil yedi glifin gerçek `LeagueSpartan-Bold` yüzünden çizildiği Chromium tarafından doğrulandı.

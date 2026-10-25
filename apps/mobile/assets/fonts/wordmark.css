@@ -1,0 +1,3 @@
+/* Generated from config/brand.json and config/fonts; SIL OFL 1.1. */
+@font-face { font-family: "League Spartan"; src: url("./LeagueSpartan-Bold.woff2?v=908bcbc3dd31") format("woff2"); font-style: normal; font-weight: 700; font-display: swap; }
+.brand-wordmark { font-family: "League Spartan", sans-serif; font-weight: 700; font-style: normal; letter-spacing: .04em; }

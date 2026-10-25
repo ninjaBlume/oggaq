@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, ÖGG SOR marka yazısı
+
+- Marka adı **ÖGG SOR** / **ÖGG SOR - Soru Bankası**; marka yazı tipi **League Spartan Bold (700)** olarak merkezi kaynağa işlendi. Sabit TTF'nin OS/2 ağırlığı 700 doğrulandı; TTF/WOFF2 dosyaları ve lisans upstream `27341b9bf93a2c7faa140538a64ce342486c5fb5` sürümünden alındı. Başka fontların/soru metninin stilleri değişmedi.
+- **49 ilgili Vitest** (web 6 / admin 16 / mobil 27), **17 mağaza betiği testi**, **19 araç zinciri/güvenlik testi**, ortak strict TypeScript, `check:brand`, web/admin build, Android/iOS/web Metro export ve PHP marka yapılandırmasının sözdizimi kontrolü geçti. Expo SDK için zaten kurulu `expo-font@58.0.10` doğrudan bağımlılık yapıldı; lock yalnız bu workspace satırında değişti.
+- Altı sentetik Chromium görünümünde ve bir statik yasal sayfada hesaplanan ağırlık **700** ve gerçekten çizilen yüz **LeagueSpartan-Bold** doğrulandı; `ÖGG SOR` metninin **7 glifi** özel fonttan, sistem fontuna düşmeden çizildi. Telefon açık mobil ve masaüstü web görüntüleri gözle incelendi. Yatay taşma/JavaScript hatası yok; ekranlar ve rapor git dışı `artifacts/wordmark-review/` içindedir.
+- İlk font hata/yeniden deneme kontrolü, Expo web'in başarısız indirmeye rağmen CSS kaydını yüklü sayabildiğini ortaya çıkardı. Yalnız bu yüzün başarısız kaydı yeniden denemeden önce temizlendi; aynı gerçek tarayıcı kontrolü geçti: indirme kesilince giriş formu kullanılabilir, hata görünür, yeniden denemeyle gerçek Bold yüz yüklenir.
+- Ortak DB, PHPUnit ve tam API E2E bu sunum değişikliğinde kullanılmadı; backend iş kuralı/API/migration değişmedi. Fiziksel cihaz açılışı ve imzalı APK/IPA bu teslimde yapılmadı. `check:store` mevcut **8 hukuki engel / 1 sürüm uyarısı** nedeniyle 1 döner; marka/font doğrulama hatası değildir. Push yapılmadı.
+
 ## Güncel doğrulama — 25 Ekim 2026, yeni logo seçimi
 
 - Ürün sahibinin yeni yıldız/ay-yıldız ve ÖGG SOR yazılı görseli öncekinin yerine doğrudan ana kaynak olarak alındı; yeni çizim veya yapay zekâ üretimi yapılmadı. Mobil simge, Android güvenli alanı, splash, favicon ve 256 px / yaklaşık 56 KB uygulama içi logo yeniden üretildi.

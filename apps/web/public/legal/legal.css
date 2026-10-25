@@ -2,6 +2,7 @@
    Renkler tokens.css'teki rollerden gelir (bu klasördeki tokens.css, packages/design-tokens/tokens.css'in kopyasıdır;
    eşitliği apps/web testi denetler). Açık/koyu tema cihazı izler; kullanıcı seçimi theme-init.js ile uygulanır. */
 @import url("tokens.css");
+@import url("/fonts/wordmark.css?v=f115a5bb52e1");
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {

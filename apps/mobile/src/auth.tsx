@@ -1,3 +1,4 @@
+import { BrandWordmark } from "./wordmark";
 import { BrandLogo } from "./brandLogo";
 import { useState } from "react";
 import { Linking, Platform, Text, View } from "react-native";
@@ -108,7 +109,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
           <BrandLogo size={84} />
           <View style={{ flex: 1, gap: 3 }}>
-            <Text style={{ color: palette.onNavy, fontSize: 21, lineHeight: 27, fontWeight: "800", letterSpacing: 1.2 }}>{brand.name}</Text>
+            <BrandWordmark style={{ color: palette.onNavy, fontSize: 21, lineHeight: 27 }} />
             <Text style={{ color: palette.onNavyMuted, fontSize: 12, lineHeight: 18 }}>{brand.subtitle}</Text>
           </View>
         </View>

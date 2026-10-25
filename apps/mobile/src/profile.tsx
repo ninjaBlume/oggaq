@@ -1,3 +1,4 @@
+import { BrandWordmark } from "./wordmark";
 import { Pressable, Text, View } from "react-native";
 import {
   Building2,
@@ -191,7 +192,7 @@ export function Profile({
       <View style={[styles.row, { justifyContent: "center", paddingTop: 12 }]}>
         <ShieldCheck size={15} color={palette.muted} />
         <Text style={[styles.muted, { fontSize: 11 }]}>
-          {brand.displayName}
+          <BrandWordmark />{` - ${brand.subtitle}`}
         </Text>
       </View>
     </>

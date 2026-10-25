@@ -1,3 +1,4 @@
+import { brand } from './config';
 import brandLogo from '../../mobile/assets/brand-logo.png';
 import { createContext, useContext, useEffect, useId, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
@@ -76,4 +77,8 @@ export function dateLabel(value: string | null | undefined): string {
 // The adjacent wordmark provides the accessible brand name.
 export function BrandLogo() {
   return <img className="brand-logo" src={brandLogo} width={48} height={48} alt="" decoding="async" />;
+}
+
+export function BrandWordmark() {
+  return <span className="brand-wordmark">{brand.name}</span>;
 }

@@ -1,7 +1,7 @@
 // Runtime clients read config/brand.json directly. These static/build-time surfaces are generated from it.
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const html = (value) => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('"', '&quot;');
@@ -15,6 +15,17 @@ export function brandFiles(root) {
   for (const key of ['supportEmail', 'mailFromAddress']) if (brand[key] !== '' && !brand[key].endsWith(`@${brand.domain}`)) throw new Error(`${key} marka alan adını kullanmalı.`);
   if (!brand.mailFromAddress) throw new Error('Sistem bildirimi göndereni boş olamaz.');
   const files = new Map();
+  const webFontVersion = createHash('sha256').update(readFileSync(join(root, 'config/fonts/LeagueSpartan-Bold.woff2'))).digest('hex').slice(0, 12);
+  const fontCss = `/* Generated from config/brand.json and config/fonts; SIL OFL 1.1. */
+@font-face { font-family: ${JSON.stringify(brand.wordmarkFontFamily)}; src: url("./LeagueSpartan-Bold.woff2?v=${webFontVersion}") format("woff2"); font-style: normal; font-weight: 700; font-display: swap; }
+.brand-wordmark { font-family: ${JSON.stringify(brand.wordmarkFontFamily)}, sans-serif; font-weight: 700; font-style: normal; letter-spacing: .04em; }
+`;
+  for (const directory of ['apps/mobile/assets/fonts', 'apps/web/public/fonts', 'apps/admin/public/fonts']) {
+    files.set(`${directory}/wordmark.css`, fontCss);
+    for (const file of ['LeagueSpartan-Bold.woff2', 'OFL.txt']) files.set(`${directory}/${file}`, readFileSync(join(root, 'config/fonts', file)));
+  }
+  files.set('apps/mobile/assets/fonts/LeagueSpartan-Bold.ttf', readFileSync(join(root, 'config/fonts/LeagueSpartan-Bold.ttf')));
+  files.set('apps/mobile/assets/fonts/OFL.json', `${JSON.stringify({ license: read('config/fonts/OFL.txt') }, null, 2)}\n`);
   // A new content URL also refreshes browser/CDN favicon caches after a logo change.
   const faviconHref = `/favicon.png?v=${createHash('sha256').update(readFileSync(join(root, 'apps/mobile/assets/favicon.png'))).digest('hex').slice(0, 12)}`;
   const logoHref = `/brand-logo.png?v=${createHash('sha256').update(readFileSync(join(root, 'apps/mobile/assets/brand-logo.png'))).digest('hex').slice(0, 12)}`;
@@ -30,12 +41,17 @@ export function brandFiles(root) {
     files.set(`apps/${app}/public/favicon.png`, readFileSync(join(root, 'apps/mobile/assets/favicon.png')));
     files.set(`apps/${app}/public/brand-logo.png`, readFileSync(join(root, 'apps/mobile/assets/brand-logo.png')));
   }
+  const fontCssVersion = createHash('sha256').update(fontCss).digest('hex').slice(0, 12);
+  const legalCss = read('apps/web/public/legal/legal.css').replace(/@import url\("\/fonts\/wordmark\.css(?:\?[^"]*)?"\);/, `@import url("/fonts/wordmark.css?v=${fontCssVersion}");`);
+  files.set('apps/web/public/legal/legal.css', legalCss);
+  const legalCssHref = `/legal/legal.css?v=${createHash('sha256').update(legalCss).digest('hex').slice(0, 12)}`;
   const titles = { gizlilik: 'Gizlilik Politikası ve KVKK Aydınlatma Metni', kosullar: 'Kullanım Koşulları', destek: 'Destek', 'hesap-silme': 'Hesap silme' };
   for (const [page, title] of Object.entries(titles)) {
     const path = `apps/web/public/legal/${page}.html`;
     const deletionSubject = `${brand.name} hesap silme talebi`;
     let source = read(path).replace(/<title>[\s\S]*?<\/title>/, `<title>${title} · ${html(brand.name)}</title>`)
-      .replace(/<a class="brand" href="\/">[\s\S]*?<\/a>/, `<a class="brand" href="/"><img src="${logoHref}" width="48" height="48" alt=""><span>${html(brand.name)}<small>${html(brand.subtitle)}</small></span></a>`)
+      .replace(/href="\/legal\/legal\.css(?:\?[^"]*)?"/g, `href="${legalCssHref}"`)
+      .replace(/<a class="brand" href="\/">[\s\S]*?<\/a>/, `<a class="brand" href="/"><img src="${logoHref}" width="48" height="48" alt=""><span><span class="brand-wordmark">${html(brand.name)}</span><small>${html(brand.subtitle)}</small></span></a>`)
       .replaceAll('OGGAQ — ÖGG Soru Cevap Platformu', html(brand.displayName))
       .replaceAll('ÖGG Soru Cevap Platformu’nu', `${html(brand.displayName)} uygulamasını`)
       .replaceAll('OGGAQ hesap silme talebi', `${html(brand.name)} hesap silme talebi`)
@@ -51,8 +67,8 @@ export function brandFiles(root) {
   metadata.appStore.name = brand.displayName;
   metadata.googlePlay.title = brand.displayName;
   metadata.contact.email = brand.supportEmail;
-  metadata.notes = metadata.notes.filter((note) => !note.includes('Mevcut OGGAQ') && !note.includes('Kalıcı üretim adresi'));
-  const note = 'Ürün sahibi marka adını Ogg Sor - Soru Bankası ve üretim alan adını oggsor.com olarak belirledi. Mağazada adın kullanılabilirliği ve canlı alan adı/e-posta doğrulaması ayrıca kontrol edilir.';
+  metadata.notes = metadata.notes.filter((note) => !note.includes('Mevcut OGGAQ') && !note.includes('Kalıcı üretim adresi') && !note.startsWith('Ürün sahibi marka adını '));
+  const note = `Ürün sahibi marka adını ${brand.displayName} ve üretim alan adını ${brand.domain} olarak belirledi. Mağazada adın kullanılabilirliği ve canlı alan adı/e-posta doğrulaması ayrıca kontrol edilir.`;
   if (!metadata.notes.includes(note)) metadata.notes.unshift(note);
   files.set('docs/store-metadata.tr.json', `${JSON.stringify(metadata, null, 2)}\n`);
   const eas = JSON.parse(read('apps/mobile/eas.json'));
@@ -78,7 +94,7 @@ export function run(root, { check = false } = {}) {
     const expected = Buffer.from(content);
     if (!current.equals(expected)) {
       stale.push(path);
-      if (!check) writeFileSync(join(root, path), expected);
+      if (!check) { mkdirSync(dirname(join(root, path)), { recursive: true }); writeFileSync(join(root, path), expected); }
     }
   }
   console.log(stale.length ? `${check ? 'Güncel değil' : 'Güncellendi'}: ${stale.join(', ')}` : 'Marka dosyaları güncel.');

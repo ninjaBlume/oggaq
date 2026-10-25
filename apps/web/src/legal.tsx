@@ -1,3 +1,4 @@
+import { BrandWordmark } from './ui';
 import { legalPages, notOfficialNotice } from '@oggaq/study-core';
 import { brand } from './config';
 
@@ -10,7 +11,7 @@ export function LegalLinks() {
 export function SiteFooter() {
   return <footer className="site-footer">
     <LegalLinks />
-    <p>{brand.name} · {brand.subtitle}</p>
+    <p><BrandWordmark /> · {brand.subtitle}</p>
     <p className="legal-official">{notOfficialNotice}</p>
     {brand.supportEmail && <p><a href={`mailto:${brand.supportEmail}`}>{brand.supportEmail}</a></p>}
   </footer>;

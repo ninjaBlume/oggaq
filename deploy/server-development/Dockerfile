@@ -10,6 +10,7 @@ COPY apps/admin/ apps/admin/
 COPY apps/web/ apps/web/
 COPY config/brand.json config/brand.json
 COPY apps/mobile/assets/brand-logo.png apps/mobile/assets/brand-logo.png
+COPY apps/mobile/assets/fonts/ apps/mobile/assets/fonts/
 # Keep requests on the opened host: cookies also work on www and the transition hostname.
 RUN VITE_API_URL=/ npm run build:web \
     && VITE_API_URL=/ VITE_ADMIN_BASE_PATH=/yonetim/ npm run build:admin

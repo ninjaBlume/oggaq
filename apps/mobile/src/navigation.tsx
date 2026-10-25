@@ -1,3 +1,4 @@
+import { BrandWordmark } from "./wordmark";
 import { BrandLogo } from "./brandLogo";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
@@ -104,7 +105,7 @@ export function MainHeader({
       <View style={navStyles.brand}>
         <BrandLogo size={40} />
         <View style={{ flex: 1, gap: 2 }}>
-          <Text style={navStyles.wordmark}>{brand.name}</Text>
+          <BrandWordmark style={navStyles.wordmark} />
           <Text numberOfLines={1} style={navStyles.contextLabel}>
             {context.kind === "personal" ? brand.subtitle : context.name}
           </Text>
@@ -303,9 +304,7 @@ export function SideMenu({
             <View style={navStyles.between}>
               <View style={navStyles.brand}>
                 <BrandLogo size={54} />
-                <Text style={[navStyles.wordmark, { color: palette.onNavy }]}>
-                  {brand.name}
-                </Text>
+                <BrandWordmark style={[navStyles.wordmark, { color: palette.onNavy }]} />
               </View>
               <Pressable
                 accessibilityRole="button"
@@ -507,7 +506,7 @@ function makeNavStyles(palette: AppPalette) {
   brand: { flex: 1, flexDirection: "row", gap: 10, alignItems: "center" },
   wordmark: {
     fontSize: 17,
-    fontWeight: "800",
+    fontWeight: "700",
     letterSpacing: 1.8,
     color: palette.ink,
   },
