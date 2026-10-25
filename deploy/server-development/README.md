@@ -52,6 +52,20 @@ docker compose --env-file "$OGGAQ_ENV_FILE" \
 
 Tünel konteyneri token dosyasının sahibi olan dağıtım kullanıcısının UID/GID'siyle çalışır (bu sunucuda `1000:1000`; başka sunucu için `OGGAQ_UID`/`OGGAQ_GID` ayarlanır). Yalnızca proje ağına ve kendi token dosyasına erişir; host ağı veya Docker socket'i bağlanmaz. [Cloudflare token-file belgesi](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/run-parameters/).
 
+## E-posta: Hestia posta sunucusuyla gerçek gönderim (deneme)
+
+Şimdilik e-postalar yalnız Mailpit'e düşer; kullanıcılara ulaşmaz. İlk deneme, sunucudaki Hestia'nın Exim posta sunucusudur (ücretsiz, yurt içi). Gönderen `no-reply@codentum.net`. Başarı ölçütü: deneme e-postası Gmail **gelen kutusuna** düşer ve başlıklarda `spf=pass`, `dkim=pass`, `dmarc=pass` görünür; spam'e düşerse bir SMTP sağlayıcısına (ör. Brevo, günde 300 e-posta ücretsiz) geçilir.
+
+24 Ekim 2026'daki salt okunur ön kontrol (`harun` kullanıcısıyla; root gerektiren dosyalar okunamadı): Exim çalışıyor ve 25/465/587 dinliyor; sunucudan dışarı 25. port açık (Google karşıladı); IP 212.68.34.90 Spamhaus, Barracuda ve SpamCop'ta kayıtlı görünmüyor; **Dovecot `failed` durumda** (Hestia'nın SMTP kimlik doğrulaması Dovecot'a dayanıyorsa gönderim için çalışmalı; bunu panel yöneticisi `systemctl status dovecot` ile bakmalı); **ters DNS (PTR) `muhasebeciyesoralim.com`** döndürüyor, yani IP aynı sunucudaki başka bir projeye ait; HELO adıyla PTR uyuşmayabilir (teslim edilebilirliği düşürebilir, SPF/DKIM/DMARC geçerse çoğu alıcı kabul eder).
+
+Adımlar (Hestia paneli ve Cloudflare; parolaları kimseyle paylaşmayın):
+1. Hestia → Mail → **Alan ekle** `codentum.net` (DKIM açık). MX kaydını **Hestia'ya yönlendirmeyin**: `codentum.net` gelen postası (ör. `hello@`) Cloudflare E-posta Yönlendirme'de kalır; yalnız gönderim yapıyoruz. Not: Hestia bu alanı yerel sayar, bu yüzden uygulamadan `@codentum.net` alıcılarına giden postalar yerelde kalır.
+2. Hestia → **Hesap ekle** `no-reply` (güçlü rastgele parola; yalnız sunucudaki `.env` dosyasına yazılacak).
+3. Cloudflare DNS (hepsi "yalnız DNS", turuncu bulut kapalı): Hestia'nın gösterdiği `mail._domainkey` TXT (DKIM); tek bir SPF TXT: `v=spf1 include:_spf.mx.cloudflare.net ip4:212.68.34.90 ~all` (Cloudflare yönlendirme kullanılıyorsa ikisi **tek** kayıtta olmalı); `_dmarc` TXT: `v=DMARC1; p=none; rua=mailto:hello@codentum.net` (önce `none`, sonuçlar iyiyse sıkılaştırılır).
+4. Sunucudaki `.env` (0600): `MAIL_HOST=panel.harunaltay.net`, `MAIL_PORT=587`, `MAIL_USERNAME=no-reply@codentum.net`, `MAIL_PASSWORD=…`, `MAIL_FROM_ADDRESS=no-reply@codentum.net`, `MAIL_FROM_NAME=<uygulama adı>`; app, worker ve scheduler konteynerlerini `--no-deps` ile yenileyin.
+5. Deneme: `~/oggaq-development/manage exec app php artisan mail:test <adres>` (parolayı yazdırmaz). Önce `hello@codentum.net`'e (Cloudflare'den size yönlenir), sonra bir Gmail adresine gönderin; Gmail'de "Orijinali göster" ile SPF/DKIM/DMARC sonuçlarına bakın ve spam klasörünü kontrol edin. Başarısızsa komut hata iletisini yazar.
+6. Başarılıysa kayıt ve parola sıfırlama akışlarını bir deneme hesabıyla uçtan uca deneyin; gizlilik sayfasındaki `eposta-saglayicisi` ve `yurt-disi-aktarim` alanlarını güncelleyin (`docs/legal-values.json`).
+
 ## Kontroller
 
 Zamanlayıcının ilk dakikalık çalışmasından sonra `curl http://127.0.0.1:18080/api/v1/health/ready` yanıtı `ok` olmalıdır. Yanıt veritabanı, Redis, migration, kuyruk bağlantısı ve zamanlayıcı kalp atışını denetler. Posta kuyruğunun gerçekten işlendiği ayrıca kontrol edilmelidir.
