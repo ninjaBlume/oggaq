@@ -1,6 +1,5 @@
 import { BrandWordmark, loadBrandFont } from "./wordmark";
 import { BrandLogo } from "./brandLogo";
-import { PageTransition } from "./pageTransition";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ScrollViewInstance } from "react-native";
 import {
@@ -142,57 +141,55 @@ function MainTabs({
               menu={() => setMenuOpen(true)}
               profile={() => selectTab("profile")}
             />
-            <PageTransition page={`${context.id}:${tab}:${tab === "ders" ? subject ?? "" : ""}`}>
-              <ScrollView
-                ref={content}
-                key={tab}
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={body}
-              >
-                {tab === "home" ? (
-                  <Home
-                    user={user}
-                    context={context}
-                    deneme={() => setTab("deneme")}
-                    ders={ders}
-                    history={() => setTab("history")}
-                    review={() => setTab("review")}
-                    stats={() => setTab("stats")}
-                    exam={exam}
-                  />
-                ) : tab === "deneme" ? (
-                  <ExamList context={context} kind="deneme" open={exam} />
-                ) : tab === "ders" ? (
-                  <ExamList
-                    context={context}
-                    kind="ders"
-                    open={exam}
-                    initialSubject={subject}
-                  />
-                ) : tab === "history" ? (
-                  <Results context={context} openExam={exam} />
-                ) : tab === "review" ? (
-                  <Review context={context} openExam={exam} />
-                ) : tab === "score" ? (
-                  <ScoreCalculator />
-                ) : tab === "jobs" ? (
-                  <Jobs user={user} />
-                ) : tab === "stats" ? (
-                  <Stats context={context} />
-                ) : (
-                  <Profile
-                    user={user}
-                    context={context}
-                    contexts={contexts}
-                    choose={choose}
-                    logout={logout}
-                    pending={pending}
-                    account={account}
-                  />
-                )}
-              </ScrollView>
-            </PageTransition>
+            <ScrollView
+              ref={content}
+              key={tab}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={body}
+            >
+              {tab === "home" ? (
+                <Home
+                  user={user}
+                  context={context}
+                  deneme={() => setTab("deneme")}
+                  ders={ders}
+                  history={() => setTab("history")}
+                  review={() => setTab("review")}
+                  stats={() => setTab("stats")}
+                  exam={exam}
+                />
+              ) : tab === "deneme" ? (
+                <ExamList context={context} kind="deneme" open={exam} />
+              ) : tab === "ders" ? (
+                <ExamList
+                  context={context}
+                  kind="ders"
+                  open={exam}
+                  initialSubject={subject}
+                />
+              ) : tab === "history" ? (
+                <Results context={context} openExam={exam} />
+              ) : tab === "review" ? (
+                <Review context={context} openExam={exam} />
+              ) : tab === "score" ? (
+                <ScoreCalculator />
+              ) : tab === "jobs" ? (
+                <Jobs user={user} />
+              ) : tab === "stats" ? (
+                <Stats context={context} />
+              ) : (
+                <Profile
+                  user={user}
+                  context={context}
+                  contexts={contexts}
+                  choose={choose}
+                  logout={logout}
+                  pending={pending}
+                  account={account}
+                />
+              )}
+            </ScrollView>
             {!layout.railed && !keyboardOpen && (
               <PrimaryNavigation tab={tab} select={selectTab} placement="bottom" />
             )}
@@ -343,11 +340,7 @@ function Workspace({
           )}
         </Stack.Screen>
         <Stack.Screen name="Account" options={{ title: vocabulary.account.title }}>
-          {() => (
-            <PageTransition page={`account:${user.id}`}>
-              <AccountScreen user={user} refresh={refresh} finished={signedOut} />
-            </PageTransition>
-          )}
+          {() => <AccountScreen user={user} refresh={refresh} finished={signedOut} />}
         </Stack.Screen>
         <Stack.Screen name="Exam" options={{ title: "Sınav" }}>
           {({ route }) => <ExamDetail context={context} id={route.params.id} initialExam={route.params.initialExam} />}
@@ -357,11 +350,7 @@ function Workspace({
   );
 }
 function ExamDetail({ context, id, initialExam }: { context: StudyContext; id: string; initialExam?: ExamAttempt }) {
-  return (
-    <PageTransition page={`exam:${context.id}:${id}`}>
-      <Exam key={id} context={context} id={id} initialExam={initialExam} />
-    </PageTransition>
-  );
+  return <Exam key={id} context={context} id={id} initialExam={initialExam} />;
 }
 function Application() {
   const { styles } = useTheme();

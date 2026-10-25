@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, geçiş logosunun kaldırılması
+
+- Kullanıcının isteğiyle sayfa geçiş logosu, animasyon, gecikme zamanlayıcısı, yükleme sayacı/context'i ve ekran sarmalayıcıları kaldırıldı. Ekranların kendi yükleniyor/iskelet ve hata durumları korunur. Önceki soru yükleme/cevap gezinme hız düzeltmeleri ve `HH:MM:SS` sayaç değişmedi.
+- Ortak strict TypeScript, mevcut **31 mobil Vitest** ve Android/iOS/web Metro export başarılı. Kaynakta kaldırılan bileşenlere bağlantı kalmadığı doğrulandı. Yalnız kaldırılan özelliği test eden 3 senaryolu betik ve npm komutu silindi; aşağıdaki sonuçlar tarihsel kayıttır.
+- Yeni test eklenmedi; backend/DB/API değişmedi ve ortak PHPUnit/E2E yeniden çalıştırılmadı. Fiziksel cihaz bu küçük kaldırma için denenmedi. Geliştirme servisleri durdurulmadı; push/deploy yapılmadı.
+
 ## Güncel doğrulama — 25 Ekim 2026, soru hızı ve saat biçimi
 
 - Önceki 400 ms zorunlu geçiş kaldırıldı. Logo yalnız gerçek ilk veri isteği 120 ms'yi aşınca açılır, veri/hata ulaşınca minimum süre olmadan kapanır. Ana menü ve sekmeler örtünün dışında kalır. Yeni sınavın POST yanıtı ilk açılışa doğrudan aktarılır; normal Devam/geçmiş açılışı sunucudaki güncel konumu almaya devam eder. Cevap kaydı beklerken soru gezinmesi açıktır; başka cevap yazma/bitirme korumaları sürer.

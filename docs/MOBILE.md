@@ -2,11 +2,11 @@
 
 `apps/mobile`, React Native 0.88.0 / Expo SDK 58.0.19 ile iOS/Android native bileşenleri kullanır. Kayıt/giriş, doğrulama e-postasını yeniden gönderme ve kontrol etme, parola yenileme e-postası, kişisel/aktif kurum seçimi, ders/konu ve yayımlanmış soru çalışması, geçmiş, süreli deneme/sonuç uygulanmıştır. HTML/web ekranı native içine gömülmez. Ortak API sözleşmesi ve saf sayaç kodu web ile paylaşılır. Uygulamaların React sürümü SDK'nın renderer sürümü 19.3.0'a eşitlendi; güncel geçiş kontrolleri aşağıdadır. Tarihsel doğrulamalar ilgili eski sürümlerini anlatır.
 
-## 25 Ekim 2026: sayfa geçiş logosu
+## 25 Ekim 2026: sayfa geçiş logosu kaldırıldı
 
-İlk sürümdeki zorunlu 400 ms bekleme, kullanıcının hız önceliğiyle kaldırıldı. Mobil sekme, menü, sınav ve hesap sayfası kendi ilk verisini bekliyorsa mevcut marka logosu ortada gösterilir. 120 ms'den kısa yüklemede örtü hiç açılmaz; veri veya hata gelince minimum gösterim süresi beklenmeden kapanır. Logo hafif ölçek/opaklık hareketi yapar; sistemin hareketi azalt tercihi açıksa sabit kalır. Hazır sayfa, aynı sekmeyi yeniden seçme, tema değişimi, arka plan yenilemesi veya sınavda soru değiştirme yapay bekleme oluşturmaz.
+Kullanıcının isteğiyle sekme, menü, sınav ve hesap ekranlarındaki logo örtüsü, animasyon ve yükleme sayacı kaldırıldı. Ekranların mevcut iskelet/yükleniyor, hata ve yeniden deneme durumları kullanılır. Marka logosu normal arayüzde ve uygulamanın açılışında kalır. Yalnız kaldırılan örtüyü sınayan geçici tarayıcı test betiği ve npm komutu da silindi.
 
-Örtü içerik alanına dokunmaları engeller ve alttaki içeriği erişilebilirlik ağacından geçici çıkarır; ana ekran menüsü ve sekmeler yükleme sürerken kullanılabilir kalır. Zamanlayıcı odak/sayfa değişiminde temizlenir, animasyon gizlenince durur; ekranın form/sınav durumu yeniden oluşturulmaz. Yeni bağımlılık yoktur. Sentetik API kullanan, ortak DB'ye dokunmayan tarayıcı kontrolü: Expo web export sonrasında `MOBILE_EXPORT_DIR=/tmp/oggsor-speed-export npm run test:mobile:transitions`. Yeni deneme başlatma yanıtındaki sorular doğrudan ekrana aktarılır; aynı sorular açılış için tekrar GET ile istenmez. Sonraki açılışlar sunucudan güncel konumu alır. Cevap beklerken soru gezinmesi açık; yeni cevap ve bitirme, kaydın doğrulanmasını bekler. Saat biçimi web ile ortak `HH:MM:SS` (120 dk `02:00:00`, 150 dk `02:30:00`) kullanır. Sonuçlar ve cihaz doğrulama sınırı [TESTING](TESTING.md) içinde.
+Önceki hız düzeltmeleri korunur: yeni sınav başlatma yanıtındaki sorular doğrudan ekrana aktarılır; aynı sorular ilk açılışta yeniden indirilmez. Normal Devam açılışı sunucudaki konumu alır. Cevap kaydı beklerken soru gezinmesi açıktır. Ortak sayaç `HH:MM:SS` biçimindedir (120 dk `02:00:00`, 150 dk `02:30:00`). Güncel doğrulama [TESTING](TESTING.md) içinde.
 
 ## 25 Ekim 2026: Ogg Sor alan adı
 
