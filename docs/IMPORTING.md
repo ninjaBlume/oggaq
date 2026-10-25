@@ -4,17 +4,17 @@ Durum: ilk gerçek kaynak (`u987447310_asvip.sql`, kurum arşiv veritabanı dök
 
 Kaynak dosyalar değiştirilmez. Gerçek kaynak veri aktarımı kullanıcı onayı olmadan başlatılmaz; geliştirme onayı bu veri aktarım onayının yerine geçmez.
 
-26 Ekim 2026: kullanıcı yeni resmî sınav kitapçıkları ve cevaplarının bulunup çıkarılmasını istedi. İlk 122/98 A-B PDF hazırlığı, kaynak doğrulama eksikleri ve inceleme dosyaları [EXAM_SOURCES](EXAM_SOURCES.md) içinde. Bu dosyalar henüz hiçbir veritabanına aktarılmadı; SQL adapter'ının gerçek PDF desteği varmış gibi sunulmaz.
+26 Ekim 2026: kullanıcı yeni resmî sınav kitapçıkları ve cevaplarının bulunup çıkarılmasını istedi. İlk 122/98 A-B PDF hazırlığı, kaynak doğrulama eksikleri ve inceleme dosyaları [EXAM_SOURCES](EXAM_SOURCES.md) içinde. 122. temel ve 98. yenileme daha sonra ayrı incelenmiş JSON/PDF aktarımıyla sunucuda yayımlandı; SQL adapter'ının PDF ayrıştırdığı iddia edilmez.
 
 ## Güvenli iş akışı
 
 ### İncelenmiş kitapçık JSON'u — 26 Ekim 2026
 
-`import:booklet <json> <pdf> <ikinci-pdf> --by=<platform-admin>` yalnız önizleme kaydı oluşturur. Aynı komuta `--commit=<batch> --approve=<12-haneli-kod>` eklenince onaylı snapshot tek transaction içinde aktarılır. İki farklı hosttan alınmış aynı PDF'nin SHA-256 kanıtı, A/B 125 soru eşleşmesi, tamamlanmış görsel/ders incelemesi ve mevcut yayımlanmış dönem kuralları zorunludur. Bu yöntem doğrudan EGM dosyasına erişilmiş olduğu iddiasını üretmez; kullanılan aynalar ve doğrulama yöntemi rapora/kaynağa yazılır.
+`import:booklet <json> <pdf> <ikinci-pdf> --by=<platform-admin>` yalnız önizleme kaydı oluşturur. Aynı komuta `--commit=<batch> --approve=<12-haneli-kod>` eklenince onaylı snapshot tek transaction içinde aktarılır. Varsayılan kanıt iki farklı hosttan aynı PDF'nin SHA-256 eşleşmesidir. Arşivde ikinci belgenin PDF/Word biçimi veya dosya baytları farklıysa `evidence_sha256`, `evidence_format`, `evidence_reviewed` ve 125 soruluk içerik/cevap karşılaştırması ayrıca bağlanır; Word dosyasında OLE imzası kontrol edilir. A/B tam eşleşmeyen her soru için ayrı konum ve inceleme gerekçesi gerekir (`comparison_exceptions`); tam eşleşenler ve açıklanmış farkların toplamı 125 olmalıdır. Kaynak metni/anahtarı otomatik düzeltilmez. Görsel/ders incelemesi ve uygun yayımlanmış dönem kuralları zorunludur. Bu yöntem doğrudan EGM dosyasına erişilmiş olduğu iddiasını üretmez; kullanılan aynalar ve doğrulama yöntemi rapora/kaynağa yazılır.
 
 Dosya, PDF kanıtı veya onay raporu değişirse onay geçersizdir. Rapor özeti JSONB anahtar sırasından bağımsızdır; işlem sonucu onaylı snapshot'ın dışında eklenir. Her soru için sıra, beş farklı dolu seçenek, tek doğru cevap, ders kodu ve son 25 sorunun silah dersi olması doğrulanır. Sadece aynı ders/metin/seçenek sırası/doğru cevaba sahip tek yayımlanmış sürüm yeniden kullanılır; belirsiz eşleşme durdurulur. Mevcut soru sürümleri değiştirilmez.
 
-125 soruluk silahlı ana kayıt ilk 100 sorusunu paylaşan silahsız seçeneği üretir; ders sınavı oluşturulmaz. Eksik dönem kaydı yalnız belirtilmiş uygun yayımlanmış kuralla eklenir; mevcut tarih/kural ezilmez. İşlem ve sınav kimliği tekrarları ikinci soru/sınav üretmez; farklı onaylı içerikle aynı sınavı değiştirmeye izin verilmez. Hata; kaynak, dönem, soru ve sınav yazmalarını birlikte geri alır. Araç doğrudan öğrenci hesabına veya geçmiş çözümlere yazmaz.
+125 soruluk silahlı ana kayıt ilk 100 sorusunu paylaşan silahsız seçeneği üretir. Kullanıcının güncel isteğiyle ders bölümleri de aşağıdaki ikinci komutla oluşturulur; eski aktarım snapshotları değiştirilmez. Eksik dönem kaydı yalnız belirtilmiş uygun yayımlanmış kuralla eklenir; mevcut tarih/kural ezilmez. İşlem ve sınav kimliği tekrarları ikinci soru/sınav üretmez; farklı onaylı içerikle aynı sınavı değiştirmeye izin verilmez. Hata; kaynak, dönem, soru ve sınav yazmalarını birlikte geri alır. Araç doğrudan öğrenci hesabına veya geçmiş çözümlere yazmaz.
 
 1. Platform yöneticisi dosyayı yükler. Dosya boyutu, MIME/içerik, hash ve kaynak/hak bilgisi kaydedilir; kaynak özel karantinaya alınır.
 2. Analiz işi sınırlı süre/bellek ve uygulama/üretim veritabanına erişemeyen ortamda çalışır. SQL uygulama connection'ında yürütülmez. SQL için önce lexer/parser veya gerekiyorsa izole geçici inceleme ortamı değerlendirilir.
@@ -80,3 +80,10 @@ Hata raporu kaynak sayfa/satır, kararlı hata kodu, eksik alan ve önerilen dü
 Test kapsamı: kötü SQL/DDL, aşırı dosya boyutu, parser süre aşımı, bozuk PDF, eksik cevap anahtarı, yanlış seçenek eşlemesi, encoding, görsel kaybı, mükerrer aday, onay sonrası içerik değişikliği ve kesilmiş import'u tekrar yürütme.
 
 Gerçek kaynakların örnekleri ve telif/yeniden kullanım belgeleri sağlanınca adapter kararı, tam mapping ve başarı ölçütleri güncellenir. Kaynak yapısı görülene kadar herhangi bir sabit kolon şeması veya yüzde yüz otomatik PDF doğruluğu taahhüt edilmez.
+
+### Yayımlanmış kitapçıktan ders sınavları
+
+`import:booklet-subjects <ana-silahlı-sınav-id> --by=<platform-admin>` sabit yayımlanmış sürümleri derslere ayırıp onay kodu üretir. `--approve=<kod>` aynı önizlemeyi tek transaction içinde yayımlar. Yeni soru/sürüm oluşturmaz; her dersin soruları ana kitapçık sırasını ve sürümlerini korur. Temel/Yenileme kaynak alanı korunur, Ders ekranı ortak kalır. Kısmi ders sınavına tam sınavın puanlama dönemi bağlanmaz.
+
+Yalnız platform yöneticisi, yayımlanmış 125 soruluk ana silahlı kaydı kullanabilir. Öğrenci, silahsız türev veya farklı onay kodu reddedilir. Aynı künye/kaynak/sürümlü yayımlanmış ders tekrar kullanılır; farklı veya taslak kayıt otomatik ezilmez. Geç aşamadaki çakışma bütün yeni dersleri geri alır. İşlem denetlenir; tekrarında yeni soru/sınav oluşmaz. Mevcut 98. yenileme ve 122. temel gibi daha önce yüklenen kitapçıklara da uygulanabilir.
+

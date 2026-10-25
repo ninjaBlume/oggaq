@@ -149,6 +149,13 @@ if ($operation === 'renewal-exams') {
         ]);
         app(PublishOfficialExam::class)->execute($admin, $exam);
     }
+    $lesson = app(SaveOfficialExam::class)->execute($admin, [
+        'exam_type_id' => ExamType::where('code', 'synthetic-subject')->firstOrFail()->id,
+        'subject_id' => Subject::firstOrFail()->id, 'education_type' => 'renewal', 'title' => 'Sentetik yenileme ders sınavı',
+        'year' => 2024, 'term' => '1. dönem', 'exam_number' => '98', 'question_version_ids' => $versions,
+    ]);
+    app(PublishOfficialExam::class)->execute($admin, $lesson);
+    echo $lesson->id;
     exit;
 }
 if ($operation === 'subject-exam') {

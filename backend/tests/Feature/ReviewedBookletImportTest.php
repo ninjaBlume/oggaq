@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Modules\Import\ImportBatch;
 use App\Modules\Import\ReviewedBookletImport;
+use App\Modules\Import\SubjectExamImport;
 use App\Modules\QuestionBank\Actions\PublishQuestion;
 use App\Modules\QuestionBank\Actions\SaveOfficialExam;
 use App\Modules\QuestionBank\Actions\SaveQuestion;
@@ -37,6 +38,7 @@ class ReviewedBookletImportTest extends TestCase
         Subject::create(['code' => 'synthetic-general', 'name' => 'Synthetic general']);
         Subject::create(['code' => 'silah-bilgisi-ve-atis', 'name' => 'Synthetic weapons']);
         ExamType::create(['code' => 'ogg-deneme', 'name' => 'Synthetic whole exam']);
+        ExamType::create(['code' => 'ogg-ders', 'name' => 'Synthetic lesson exam']);
         foreach (['armed', 'unarmed'] as $weapon) {
             $armed = $weapon === 'armed';
             ScoringRule::create(['code' => 'synthetic-renewal-'.$weapon, 'version' => 1, 'title' => 'Synthetic level rule', 'education_type' => 'renewal',
@@ -207,5 +209,99 @@ class ReviewedBookletImportTest extends TestCase
         $batch->forceFill(['report' => array_replace($batch->report, ['exam_number' => 99])])->save();
         $this->expectExceptionMessage('önizlemeyle');
         $this->commit($batch);
+    }
+
+    public function test_reviewed_archive_exceptions_and_word_evidence_are_bound_to_the_snapshot(): void
+    {
+        file_put_contents($this->files[2], "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1synthetic Word evidence");
+        $this->plan += ['evidence_sha256' => hash_file('sha256', $this->files[2]), 'evidence_format' => 'doc', 'evidence_reviewed' => true, 'evidence_matching_questions' => 125];
+        $this->plan['ab_matching_questions'] = 124;
+        $this->plan['comparison_exceptions'] = [['position' => 3, 'reason' => 'Synthetic punctuation difference manually reviewed against both documents.']];
+        $this->writePlan();
+        $batch = $this->preview();
+        $this->assertCount(1, $batch->report['comparison_exceptions']);
+        $this->assertSame(125, $this->commit($batch)['armed_questions']);
+        file_put_contents($this->files[2], "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1changed evidence");
+        $this->expectExceptionMessage('PDF kanıtı');
+        $this->preview();
+    }
+
+    public function test_unexplained_archive_difference_cannot_be_approved(): void
+    {
+        $this->plan['ab_matching_questions'] = 124;
+        $this->writePlan();
+        $this->expectExceptionMessage('ayrı inceleme');
+        $this->preview();
+    }
+
+    public function test_subject_exams_share_versions_and_are_idempotent_without_whole_exam_scoring(): void
+    {
+        $whole = $this->commit($this->preview());
+        $root = OfficialExam::findOrFail($whole['armed_exam_id']);
+        $import = app(SubjectExamImport::class);
+        $plan = $import->preview($this->admin, $root);
+        $result = $import->commit($this->admin, $root, $plan['approval']);
+        $this->assertSame(2, $result['created_subject_exams']);
+        $this->assertSame([100, 25], array_column($result['exams'], 'question_count'));
+        $retry = $import->commit($this->admin, $root, $plan['approval']);
+        $this->assertSame(0, $retry['created_subject_exams']);
+        $this->assertSame(2, $retry['reused_subject_exams']);
+        $this->assertSame(array_column($result['exams'], 'id'), array_column($retry['exams'], 'id'));
+        $this->assertDatabaseCount('questions', 125);
+        $this->assertDatabaseCount('question_versions', 125);
+        $this->assertDatabaseCount('official_exams', 4);
+        $this->assertDatabaseCount('official_exam_scoring', 2);
+        $sourceVersions = $root->questions()->pluck('question_version_id')->all();
+        $lessonVersions = [];
+        foreach ($result['exams'] as $r) {
+            $lesson = OfficialExam::findOrFail($r['id']);
+            $this->assertSame('renewal', $lesson->education_type);
+            $this->assertNotNull($lesson->published_at);
+            $this->assertNull($lesson->scoringLink);
+            array_push($lessonVersions, ...$lesson->questions()->pluck('question_version_id')->all());
+        }
+        $this->assertSame($sourceVersions, $lessonVersions);
+        $this->asToken($this->createUser());
+        $this->getJson('/api/v1/official-exams?scope=subject')->assertOk()->assertJsonCount(2, 'data');
+    }
+
+    public function test_subject_import_rejects_student_wrong_approval_and_unarmed_root(): void
+    {
+        $whole = $this->commit($this->preview());
+        $root = OfficialExam::findOrFail($whole['armed_exam_id']);
+        $import = app(SubjectExamImport::class);
+        try {
+            $import->preview($this->createUser(), $root);
+            $this->fail('Student could preview management import');
+        } catch (AuthorizationException) {
+            $this->assertDatabaseCount('official_exams', 2);
+        }
+        try {
+            $import->commit($this->admin, $root, 'wrong');
+            $this->fail('Wrong approval accepted');
+        } catch (\RuntimeException) {
+            $this->assertDatabaseCount('official_exams', 2);
+        }
+        $this->expectExceptionMessage('ana silahlı');
+        $import->preview($this->admin, OfficialExam::findOrFail($whole['unarmed_exam_id']));
+    }
+
+    public function test_late_subject_collision_rolls_back_all_new_lessons(): void
+    {
+        $whole = $this->commit($this->preview());
+        $root = OfficialExam::findOrFail($whole['armed_exam_id']);
+        $import = app(SubjectExamImport::class);
+        $plan = $import->preview($this->admin, $root);
+        app(SaveOfficialExam::class)->execute($this->admin, ['education_type' => 'renewal', 'exam_type_id' => ExamType::where('code', 'ogg-ders')->sole()->id,
+            'source_id' => $root->source_id, 'title' => 'Synthetic conflicting draft', 'year' => $root->year, 'term' => $root->term, 'exam_number' => $root->exam_number,
+            'subject_id' => $plan['groups'][1]['subject_id'], 'question_version_ids' => $plan['groups'][1]['versions']]);
+        try {
+            $import->commit($this->admin, $root, $plan['approval']);
+            $this->fail('Conflicting draft overwritten');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('üzerine yazılmadı', $e->getMessage());
+        }
+        $this->assertDatabaseCount('official_exams', 3);
+        $this->assertDatabaseCount('official_exam_scoring', 2);
     }
 }

@@ -17,6 +17,25 @@ def sample():
 
 
 class BookletTest(unittest.TestCase):
+    def test_archive_dates_are_parsed_without_guessing_or_accepting_conflicts(self):
+        for text in ['24/02/2024', '24.02.2024', '24 Şubat 2024']:
+            self.assertEqual(booklet.exam_date(text), '2024-02-24')
+        for text in ['24.02.2024 25 Şubat 2024', '31.02.2024', 'no date']:
+            with self.assertRaises(ValueError):
+                booklet.exam_date(text)
+
+    def test_dark_red_keys_are_recognized_without_treating_other_colors_as_answers(self):
+        for color in [0xC00000, 0xEE0000, 0xFF2600]:
+            self.assertEqual(list(booklet.split_colored_line([{'text': 'A) Answer', 'color': color}])), [('A) Answer', True)])
+        for color in [0, 0x333333, 0x00B050, 0x0000FF]:
+            self.assertEqual(list(booklet.split_colored_line([{'text': 'A) Answer', 'color': color}])), [('A) Answer', False)])
+
+    def test_article_number_inside_last_option_is_not_a_new_question(self):
+        lines = sample()
+        lines.insert(6, ('24.maddesinde belirtilen koşullar', False, 1))
+        questions = booklet.parse_lines(lines)
+        self.assertIn('24.maddesinde', questions[0]['options'][4]['text'])
+
     def test_sections_and_printed_number_restart_preserve_original_order(self):
         questions = booklet.parse_lines(sample())
         self.assertEqual([q["position"] for q in questions], list(range(1, 126)))

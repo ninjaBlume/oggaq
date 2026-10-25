@@ -3,7 +3,8 @@ import { mkdirSync } from 'node:fs';
 import { fixture } from './student';
 import { mobilePreviewUrl } from '../../playwright.config';
 
-test.beforeEach(() => { fixture('setup-study'); fixture('official-exam'); fixture('subject-exam'); fixture('renewal-exams'); });
+let renewalLessonId: string;
+test.beforeEach(() => { fixture('setup-study'); fixture('official-exam'); fixture('subject-exam'); renewalLessonId = fixture('renewal-exams'); });
 test.afterAll(() => fixture('cleanup'));
 
 for (const mobile of [false, true]) {
@@ -53,6 +54,14 @@ for (const mobile of [false, true]) {
    await expect(page.getByRole('heading',{name:'Ders sınavları',exact:true})).toBeVisible();
    await expect(renewal).not.toBeVisible();
    await expect(page.getByRole('heading',{name:'1. Ders Sınavı',exact:true})).toBeVisible();
+   const lessonHeading = page.getByRole('heading',{name:'98. Ders Sınavı',exact:true});
+   await expect(lessonHeading).toBeVisible();
+   const lesson = mobile ? lessonHeading.locator('..') : page.locator('.sinav-row').filter({has:lessonHeading});
+   await lesson.getByRole('button',{name:'Sınava gir',exact:true}).click();
+   const lessonStarted = page.waitForResponse(r => r.request().method() === 'POST' && new URL(r.url()).pathname.endsWith('/exam-attempts'));
+   await lesson.getByRole('button',{name:'Sınavı başlat',exact:true}).click();
+   expect((await (await lessonStarted).json()).data.official_exam.id).toBe(renewalLessonId);
+   await expect(page.getByRole('heading',{name:mobile ? 'Sınav' : 'Denemen devam ediyor',exact:true})).toBeVisible();
   });
  }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Modules\Import\Commands\BookletSubjects;
 use App\Modules\Import\Commands\LegacyImportCommit;
 use App\Modules\Import\Commands\LegacyImportPreview;
 use App\Modules\Import\Commands\ReviewedBooklet;
@@ -37,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
-            $this->commands([LegacyImportPreview::class, LegacyImportCommit::class, ReviewedBooklet::class, InstallVerifiedScoring::class]);
+            $this->commands([LegacyImportPreview::class, LegacyImportCommit::class, ReviewedBooklet::class, BookletSubjects::class, InstallVerifiedScoring::class]);
         }
         Gate::policy(Tenant::class, TenantPolicy::class);
         Gate::policy(StudyContext::class, StudyContextPolicy::class);

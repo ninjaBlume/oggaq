@@ -44,7 +44,9 @@ class ReviewedBookletImport
             'report' => ['education_type' => $plan['education_type'], 'exam_number' => $plan['exam_number'], 'exam_date' => $plan['exam_date'],
                 'question_count' => 125, 'reusable_questions' => $reusable, 'new_question_candidates' => 125 - $reusable,
                 'pdf_sha256' => $plan['pdf_sha256'], 'source_url' => $plan['source_url'], 'evidence_url' => $plan['evidence_url'],
-                'verification' => 'Identical PDF bytes from two hosts, A/B answer comparison and visual/subject review.',
+                'verification' => isset($plan['evidence_sha256']) ? 'Two source documents with reviewed content/answer comparison.' : 'Identical PDF bytes from two hosts, A/B answer comparison and visual/subject review.',
+                'evidence_sha256' => $plan['evidence_sha256'] ?? $plan['pdf_sha256'],
+                'ab_matching_questions' => $plan['ab_matching_questions'], 'comparison_exceptions' => $plan['comparison_exceptions'] ?? [],
                 'primary_source_verified' => false, 'subjects' => array_count_values(array_column($plan['questions'], 'subject_code'))],
             'status' => 'previewed', 'created_by' => $actor->id,
         ]);
@@ -156,19 +158,28 @@ class ReviewedBookletImport
         Validator::make($plan, [
             'education_type' => 'required|in:basic,renewal', 'exam_number' => 'required|integer|min:1|max:10000', 'exam_date' => 'required|date_format:Y-m-d',
             'source_url' => 'required|url:https|max:2048', 'evidence_url' => 'required|url:https|max:2048', 'pdf_sha256' => 'required|regex:/^[a-f0-9]{64}$/',
-            'visual_reviewed' => 'required|accepted', 'subjects_reviewed' => 'required|accepted', 'ab_matching_questions' => 'required|integer|in:125',
+            'visual_reviewed' => 'required|accepted', 'subjects_reviewed' => 'required|accepted', 'ab_matching_questions' => 'required|integer|between:100,125',
+            'comparison_exceptions' => 'sometimes|array|list|max:25', 'comparison_exceptions.*.position' => 'required|integer|distinct|between:1,125',
+            'comparison_exceptions.*.reason' => 'required|string|min:20|max:2000',
+            'evidence_sha256' => 'sometimes|required|regex:/^[a-f0-9]{64}$/', 'evidence_format' => 'required_with:evidence_sha256|in:pdf,doc',
+            'evidence_reviewed' => 'exclude_without:evidence_sha256|required|accepted', 'evidence_matching_questions' => 'required_with:evidence_sha256|integer|in:125',
             'scoring_rule_codes.armed' => 'required|string|max:80', 'scoring_rule_codes.unarmed' => 'required|string|max:80',
             'questions' => 'required|array|list|size:125', 'questions.*.position' => 'required|integer|distinct|between:1,125',
             'questions.*.subject_code' => 'required|string|max:80', 'questions.*.stem' => 'required|string|max:20000',
             'questions.*.options' => 'required|array|list|size:5', 'questions.*.options.*' => 'required|string|max:10000',
             'questions.*.correct_option_position' => 'required|integer|between:1,5',
         ])->validate();
+        if ($plan['ab_matching_questions'] + count($plan['comparison_exceptions'] ?? []) !== 125) {
+            throw new RuntimeException('A/B farklarının her biri ayrı inceleme notuyla açıklanmalı.');
+        }
         if (parse_url($plan['source_url'], PHP_URL_HOST) === parse_url($plan['evidence_url'], PHP_URL_HOST)) {
             throw new RuntimeException('İkinci PDF farklı bir sunucudan gelmeli.');
         }
-        foreach ([$pdf, $evidence] as $path) {
-            if (! is_file($path) || filesize($path) > 20 * 1024 * 1024 || file_get_contents($path, false, null, 0, 5) !== '%PDF-'
-                || ! hash_equals($plan['pdf_sha256'], hash_file('sha256', $path))) {
+        foreach ([$pdf, $evidence] as $i => $path) {
+            $magic = $i === 1 && ($plan['evidence_format'] ?? 'pdf') === 'doc' ? "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1" : '%PDF-';
+            $hash = $i === 1 ? ($plan['evidence_sha256'] ?? $plan['pdf_sha256']) : $plan['pdf_sha256'];
+            if (! is_file($path) || filesize($path) > 20 * 1024 * 1024 || file_get_contents($path, false, null, 0, strlen($magic)) !== $magic
+                || ! hash_equals($hash, hash_file('sha256', $path))) {
                 throw new RuntimeException('PDF kanıtı onaylı dosyayla aynı değil.');
             }
         }

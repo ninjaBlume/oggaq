@@ -6,6 +6,7 @@ import hashlib
 import json
 import re
 import unicodedata
+from datetime import date
 from pathlib import Path
 
 
@@ -16,7 +17,19 @@ def split_colored_line(spans):
     cuts = starts if starts and not text[:starts[0]].strip() else [0]
     for start, end in zip(cuts, cuts[1:] + [len(text)]):
         part = text[start:end]
-        yield part.strip(), any(c == 0xFF0000 and ch.strip() for ch, c in zip(part, colors[start:end]))
+        yield part.strip(), any((c >> 16) >= 180 and ((c >> 8) & 255) <= 64 and (c & 255) <= 64 and ch.strip() for ch, c in zip(part, colors[start:end]))
+
+
+def exam_date(header):
+    months = {name: i + 1 for i, name in enumerate(['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'])}
+    dates = set()
+    for day, month, year in re.findall(r'\b(\d{2})[./](\d{2})[./](\d{4})\b', header):
+        dates.add(date(int(year), int(month), int(day)).isoformat())
+    for day, month, year in re.findall(r'\b(\d{1,2})\s+(' + '|'.join(months) + r')\s+(\d{4})\b', header):
+        dates.add(date(int(year), months[month], int(day)).isoformat())
+    if len(dates) != 1:
+        raise ValueError('Missing or ambiguous exam date')
+    return dates.pop()
 
 
 def parse_lines(lines):
@@ -27,9 +40,10 @@ def parse_lines(lines):
         text = " ".join(text.split())
         if not text or "ÖZEL GÜVENLİK" in text or "Diğer sayfaya" in text:
             continue
-        if current is not None and current["position"] == 100 and len(current["options"]) == 5 and text == text.upper() and any(token in text for token in ["ADAYLAR", "CEVAPLARINIZI", "KONTROL EDİNİZ", "SORULARINI", "CEVAPLAYINIZ", "SİLAH BİLGİSİ SORULARI"]):
+        notice = text.upper().replace('İ', 'I').replace(' ', '')
+        if current is not None and current["position"] == 100 and len(current["options"]) == 5 and any(token in notice for token in ["ADAYLAR", "CEVAPLARINIZI", "KONTROLEDINIZ", "SORULARINI", "CEVAPLAYINIZ", "SILAHBILGISISORULARI"]):
             continue
-        match = re.match(r"^(\d{1,3})\.\s*(.*)$", text)
+        match = re.match(r"^(\d{1,3})\.(?:\s+|$)(.*)$", text)
         if match and (current is None or len(current["options"]) == 5):
             expected = len(questions) + 1
             printed = expected if expected <= 100 else expected - 100
@@ -110,16 +124,15 @@ def extract(path, education, number, group):
     expected = "TEMEL" if education == "basic" else "YENİLEME"
     if not re.search(rf"{number}\.\s*{expected}", header) or f"({group} GRUBU)" not in header:
         raise ValueError("Booklet heading does not match the requested education, number and group")
-    dates = re.findall(r"\b\d{2}\.\d{2}\.\d{4}\b", header)
-    if len(set(dates)) != 1:
-        raise ValueError("Missing or ambiguous exam date")
+    found_date = exam_date(header)
     for page_index, page in enumerate(document):
         for left, right in [(0, page.rect.width / 2), (page.rect.width / 2, page.rect.width)]:
             found = []
             for block in page.get_text("dict")["blocks"]:
                 for line in block.get("lines", []):
                     x0, y0, x1, y1 = line["bbox"]
-                    if line["dir"] != (1.0, 0.0) or not left <= x0 < right:
+                    # Some archived question numbers hang just left of the central gutter.
+                    if line["dir"] != (1.0, 0.0) or not left <= (x0 + x1) / 2 < right:
                         continue
                     text = "".join(span["text"] for span in line["spans"]).strip()
                     if y0 < 90 or y1 > page.rect.height - 90:
@@ -131,7 +144,7 @@ def extract(path, education, number, group):
             for _, _, text, red, page_number in sorted(found):
                 lines.append((text, red, page_number))
     return {"education_type": education, "exam_number": number, "booklet_group": group,
-            "exam_date": "-".join(reversed(dates[0].split("."))),
+            "exam_date": found_date,
             "pdf_sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "page_count": len(document),
             "status": "awaiting_source_and_editor_review", "publishable": False,
             "questions": parse_lines(lines)}
