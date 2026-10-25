@@ -49,6 +49,12 @@ export function examTypeShort(name: string): string {
 export function examDisplayTitle(title: string): string {
   return title.replace(/\s*\((?:\d{1,2}[./-]\d{1,2}[./-]\d{4}|\d{4}-\d{2}-\d{2})\)/gu, '').trim();
 }
+const monthLabels = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'] as const;
+export function examPeriodLabel(exam: { term: string | null; year: number }): string {
+  const term = exam.term?.trim();
+  const label = term && /^(?:0?[1-9]|1[0-2])$/.test(term) ? monthLabels[Number(term) - 1] : term;
+  return [label, String(exam.year)].filter(Boolean).join(' ');
+}
 export function examLabel(exam: ExamMembership): string {
   const subject = exam.subject_name ? (exam.subject_name.length > 24 ? `${exam.subject_name.slice(0, 23)}…` : exam.subject_name) : null;
   return [`${exam.exam_number ?? exam.year}. ${examTypeShort(exam.exam_type_name)}`, subject, exam.weapon_status ? weaponLabels[exam.weapon_status] : null].filter(Boolean).join(' · ');

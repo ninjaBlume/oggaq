@@ -30,6 +30,7 @@ for (const mobile of [false, true]) {
    expect(data[0].education_type).toBe('renewal');
    await expect(renewal).toHaveAttribute(mobile ? 'aria-selected' : 'aria-pressed','true');
    await expect(page.getByRole('heading',{name:'1. Deneme Sınavı',exact:true})).toBeVisible();
+   await expect(page.getByText('Ağustos 2026',{exact:false})).toBeVisible();
    const unarmedResponse = page.waitForResponse(r => {
     const u=new URL(r.url());
     return u.pathname === '/api/v1/official-exams' && u.searchParams.get('education_type') === 'renewal' && u.searchParams.get('weapon_status') === 'unarmed';

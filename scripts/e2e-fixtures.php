@@ -145,7 +145,7 @@ if ($operation === 'renewal-exams') {
         $exam = app(SaveOfficialExam::class)->execute($admin, [
             'exam_type_id' => ExamType::where('code', 'synthetic-whole')->firstOrFail()->id,
             'education_type' => 'renewal', 'weapon_status' => $weapon, 'title' => 'Sentetik yenileme sınavı',
-            'year' => 2023, 'term' => '1. dönem', 'exam_number' => '1', 'question_version_ids' => $versions,
+            'year' => 2026, 'term' => '08', 'exam_number' => '1', 'question_version_ids' => $versions,
         ]);
         app(PublishOfficialExam::class)->execute($admin, $exam);
     }

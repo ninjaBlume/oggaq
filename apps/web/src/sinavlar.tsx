@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, cursorFromLink } from '@oggaq/api-client';
 import type { components } from '@oggaq/shared-types';
-import { examDisplayTitle, randomId, scoreBand, suggestedMinutes, vocabulary } from '@oggaq/study-core';
+import { examDisplayTitle, examPeriodLabel, randomId, scoreBand, suggestedMinutes, vocabulary } from '@oggaq/study-core';
 import { api } from './api';
 import { Icon } from './icons';
 import { PageIntro, useStudyContext } from './App';
@@ -74,7 +74,7 @@ function ExamRow({ exam, title, attempts }: { exam: OfficialExam; title: string;
   return <article className="card sinav-row">
     <div className="sinav-main">
       <div className="sinav-title"><span className="exam-mark"><Icon name="book" size={22} /></span><h2>{title}</h2></div>
-      <p>{[exam.term ? `${exam.term} ${exam.year}` : String(exam.year), `${exam.question_count} soru`, `önerilen süre ${suggestedMinutes(exam)} dk`].join(' · ')}</p>
+      <p>{[examPeriodLabel(exam), `${exam.question_count} soru`, `önerilen süre ${suggestedMinutes(exam)} dk`].join(' · ')}</p>
       <p className="sinav-progress">{progress.runs === 0 && !progress.open ? 'Henüz girmedin' : [progress.open ? (expired ? 'Süresi dolmuş deneme var' : 'Devam eden denemen var') : null, progress.runs > 0 ? `${progress.runs} kez tamamlandı · en iyi %${progress.best}` : null].filter(Boolean).join(' · ')}</p>
     </div>
     <div className="sinav-action">

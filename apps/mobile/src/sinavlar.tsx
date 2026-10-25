@@ -5,7 +5,7 @@ import { Pressable, View } from "react-native";
 import { newId } from "./ids";
 import { ApiError, cursorFromLink } from "@oggaq/api-client";
 import type { ExamAttempt, Page, StudyContext, components } from "@oggaq/shared-types";
-import { examDisplayTitle, suggestedMinutes, vocabulary } from "@oggaq/study-core";
+import { examDisplayTitle, examPeriodLabel, suggestedMinutes, vocabulary } from "@oggaq/study-core";
 import { api } from "./api";
 import { useOnReturn, useResource, useTask } from "./hooks";
 import {
@@ -108,7 +108,7 @@ function ExamEntry({
     <View style={{ padding: 14, gap: 10, borderRadius: shape.large, backgroundColor: palette.surface, borderWidth: 1, borderColor: progress.open && !expired ? palette.primary : palette.line }}>
       <Text accessibilityRole="header" style={[styles.heading, { fontSize: 17, lineHeight: 24 }]}>{title}</Text>
       <Text style={styles.muted}>
-        {[exam.term ? `${exam.term} ${exam.year}` : String(exam.year), `${exam.question_count} soru`, `önerilen süre ${suggestedMinutes(exam)} dk`].join(" · ")}
+        {[examPeriodLabel(exam), `${exam.question_count} soru`, `önerilen süre ${suggestedMinutes(exam)} dk`].join(" · ")}
       </Text>
       <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
         <View style={{ flexGrow: 1, flexBasis: 100 }}>
