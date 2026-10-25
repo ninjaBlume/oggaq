@@ -1,6 +1,6 @@
 # SQL ve PDF soru içe aktarma
 
-Durum: ilk gerçek kaynak (`u987447310_asvip.sql`, kurum arşiv veritabanı dökümü) için **adapter `asvip-1` uygulandı ve 18 Ekim 2026'da geliştirme veritabanına aktarıldı** (aşağıda). SQL dışındaki kaynaklar (PDF) ve diğer şemalar için süreç tasarımı geçerlidir; kaynak şema bilinmeden başka adapter yazılmaz.
+Durum: ilk gerçek kaynak (`u987447310_asvip.sql`, kurum arşiv veritabanı dökümü) için **adapter `asvip-1` uygulandı ve 18 Ekim 2026'da geliştirme veritabanına aktarıldı** (aşağıda). PDF kitapçıkları için aşağıdaki incelenmiş JSON/kanıt akışı uygulanır; diğer SQL şemaları için kaynak görülmeden adapter yazılmaz.
 
 Kaynak dosyalar değiştirilmez. Gerçek kaynak veri aktarımı kullanıcı onayı olmadan başlatılmaz; geliştirme onayı bu veri aktarım onayının yerine geçmez.
 
@@ -27,6 +27,12 @@ Dosya, PDF kanıtı veya onay raporu değişirse onay geçersizdir. Rapor özeti
 ## Kaynak dosyayı güvenle inceleme
 
 `python3 scripts/inspect_sql_dump.py DUMP.sql` MySQL/MariaDB dökümünü **çalıştırmadan, hiçbir veritabanına bağlanmadan** metin olarak çözümler ve JSON rapor yazar: dosya SHA-256'sı, tablolar, kolon tanımları, anahtarlar, motor/karakter kümesi, INSERT satır sayıları, ifade türü sayıları ve riskli ifadeler (`GRANT`, `DROP` (IF EXISTS dışı), `CREATE USER/TRIGGER/PROCEDURE`, `LOAD DATA`, `INTO OUTFILE` vb.). Satır örnekleri varsayılan olarak kapalıdır; `--samples N` her tablo için en çok N kısaltılmış satırı yalnız terminale yazar. Rapor, adapter ve eşleme kararı için ham girdidir; import değildir ve onay yerine geçmez. `/*! ... */` koşullu yorumları atlanır (ör. `SET NAMES`); karakter kümesi raporda ayrıca kontrol edilmelidir. Sınırları: tek dosya akışı, tam MySQL ayrıştırıcısı değildir (örn. `DELIMITER` ile tanımlanan gövdeler riskli olarak işaretlenir ama çözümlenmez).
+
+### Yayımlanmış kitapçıktan ders sınavları
+
+`import:booklet-subjects <ana-silahlı-sınav-id> --by=<platform-admin>` sabit yayımlanmış sürümleri derslere ayırıp onay kodu üretir. `--approve=<kod>` aynı önizlemeyi tek transaction içinde yayımlar. Yeni soru/sürüm oluşturmaz; her dersin soruları ana kitapçık sırasını ve sürümlerini korur. Temel/Yenileme kaynak alanı korunur, Ders ekranı ortak kalır. Kısmi ders sınavına tam sınavın puanlama dönemi bağlanmaz.
+
+Yalnız platform yöneticisi, yayımlanmış 125 soruluk ana silahlı kaydı kullanabilir. Öğrenci, silahsız türev veya farklı onay kodu reddedilir. Aynı künye/kaynak/sürümlü yayımlanmış ders tekrar kullanılır; farklı veya taslak kayıt otomatik ezilmez. Geç aşamadaki çakışma bütün yeni dersleri geri alır. İşlem denetlenir; tekrarında yeni soru/sınav oluşmaz. Mevcut 98. yenileme ve 122. temel gibi daha önce yüklenen kitapçıklara da uygulanabilir.
 
 ## Uygulanan adapter: `asvip-1` (kurum arşiv dökümü)
 
@@ -80,10 +86,3 @@ Hata raporu kaynak sayfa/satır, kararlı hata kodu, eksik alan ve önerilen dü
 Test kapsamı: kötü SQL/DDL, aşırı dosya boyutu, parser süre aşımı, bozuk PDF, eksik cevap anahtarı, yanlış seçenek eşlemesi, encoding, görsel kaybı, mükerrer aday, onay sonrası içerik değişikliği ve kesilmiş import'u tekrar yürütme.
 
 Gerçek kaynakların örnekleri ve telif/yeniden kullanım belgeleri sağlanınca adapter kararı, tam mapping ve başarı ölçütleri güncellenir. Kaynak yapısı görülene kadar herhangi bir sabit kolon şeması veya yüzde yüz otomatik PDF doğruluğu taahhüt edilmez.
-
-### Yayımlanmış kitapçıktan ders sınavları
-
-`import:booklet-subjects <ana-silahlı-sınav-id> --by=<platform-admin>` sabit yayımlanmış sürümleri derslere ayırıp onay kodu üretir. `--approve=<kod>` aynı önizlemeyi tek transaction içinde yayımlar. Yeni soru/sürüm oluşturmaz; her dersin soruları ana kitapçık sırasını ve sürümlerini korur. Temel/Yenileme kaynak alanı korunur, Ders ekranı ortak kalır. Kısmi ders sınavına tam sınavın puanlama dönemi bağlanmaz.
-
-Yalnız platform yöneticisi, yayımlanmış 125 soruluk ana silahlı kaydı kullanabilir. Öğrenci, silahsız türev veya farklı onay kodu reddedilir. Aynı künye/kaynak/sürümlü yayımlanmış ders tekrar kullanılır; farklı veya taslak kayıt otomatik ezilmez. Geç aşamadaki çakışma bütün yeni dersleri geri alır. İşlem denetlenir; tekrarında yeni soru/sınav oluşmaz. Mevcut 98. yenileme ve 122. temel gibi daha önce yüklenen kitapçıklara da uygulanabilir.
-

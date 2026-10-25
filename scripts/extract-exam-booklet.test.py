@@ -36,6 +36,14 @@ class BookletTest(unittest.TestCase):
         questions = booklet.parse_lines(lines)
         self.assertIn('24.maddesinde', questions[0]['options'][4]['text'])
 
+    def test_mixed_uppercase_notice_does_not_remove_a_normal_option_continuation(self):
+        lines = sample()
+        lines.insert(600, ('SiLAHLI ADAYLAR,', False, 10))
+        lines.insert(600, ('Adaylar için normal seçenek devamı', False, 10))
+        questions = booklet.parse_lines(lines)
+        self.assertIn('normal seçenek devamı', questions[99]['options'][4]['text'])
+        self.assertNotIn('SiLAHLI', questions[99]['options'][4]['text'])
+
     def test_sections_and_printed_number_restart_preserve_original_order(self):
         questions = booklet.parse_lines(sample())
         self.assertEqual([q["position"] for q in questions], list(range(1, 126)))

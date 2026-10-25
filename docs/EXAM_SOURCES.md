@@ -1,6 +1,39 @@
 # Resmî sınav kaynağı hazırlığı — 26 Ekim 2026
 
-Durum: **122. temel ve 98. yenileme eğitimi, her biri silahlı 125 ve silahsız 100 soru olarak oggsor.com üzerinde yayımlandı.** 122. temel, kullanıcının açık aktarım talimatıyla ayrıca tamamlandı. Yerel eğitim migration'ı önce ayrı onayla tamamlandı. 98. yenileme aktarımında telefonun API'si olan sunucudaki gerekli migration/kod güncellemesi de kullanıcıya bildirilerek dar kapsamda yapıldı. Normal sunucu operasyonu/backup sorumluluğu Claude'da kalır; deploy ve backup betikleri değiştirilmedi.
+Durum: **83–98. yenileme arşivi ve 122. temel, deneme ve ders sınavlarıyla oggsor.com üzerinde yayında.** 122. temel, kullanıcının açık aktarım talimatıyla ayrıca tamamlandı. Yerel eğitim migration'ı önce ayrı onayla tamamlandı. 98. yenileme aktarımında telefonun API'si olan sunucudaki gerekli migration/kod güncellemesi de kullanıcıya bildirilerek dar kapsamda yapıldı. Normal sunucu operasyonu/backup sorumluluğu Claude'da kalır; deploy ve backup betikleri değiştirilmedi.
+
+## 2024–2026 yenileme arşivi ve ders sınavları — tamamlandı
+
+Kullanıcının güncel talimatıyla **83–98. yenilemenin tamamı** yayımlandı: **16 dönem, 2.000 soru kaydı, 32 silahlı/silahsız deneme seçeneği ve 176 yenileme ders sınavı**. Önceden yüklü 98 tekrar çoğaltılmadı. Eksik 15 dönemin 1.875 soru kaydında **819 yeni soru** oluşturuldu, **1.056 yayımlanmış sürüm** yeniden kullanıldı. Bunlara ek olarak 122. temelin **11 ders sınavı** tamamlandı; bu işlemde toplam **187 ders sınavı** eklendi. Ders ekranları ortak kalır; eğitim metaverisi ve sabit sürümler korunur. Aşağıdaki eski “ders oluşturulmadı” kayıtları ilk aktarım anını anlatır; güncel karar bu bölümdür.
+
+| Yenileme | Sınav tarihi | Yeni soru / kullanılan sürüm | Ders sınavı |
+| --- | --- | --- | --- |
+| 83 | 2024-02-24 | 55 / 70 | 11 |
+| 84 | 2024-04-27 | 58 / 67 | 11 |
+| 85 | 2024-06-29 | 49 / 76 | 11 |
+| 86 | 2024-08-25 | 60 / 65 | 11 |
+| 87 | 2024-10-20 | 60 / 65 | 11 |
+| 88 | 2024-12-15 | 53 / 72 | 11 |
+| 89 | 2025-02-09 | 64 / 61 | 11 |
+| 90 | 2025-04-12 | 50 / 75 | 11 |
+| 91 | 2025-06-29 | 50 / 75 | 11 |
+| 92 | 2025-08-24 | 33 / 92 | 11 |
+| 93 | 2025-10-19 | 50 / 75 | 11 |
+| 94 | 2025-12-14 | 61 / 64 | 11 |
+| 95 | 2026-02-22 | 60 / 65 | 11 |
+| 96 | 2026-05-03 | 59 / 66 | 11 |
+| 97 | 2026-07-05 | 57 / 68 | 11 |
+| 98 | 2026-08-29 | Önceden yüklü 125 soru | 11 |
+
+**Kaynaklar ve inceleme:** [Akademi Güvenlik arşivi](https://www.guvenlikegitimi.com/yenileme-egitim-sinav-soru-ve-cevaplari/), [Efeler Güvenlik arşivi](https://efelerozelguvenlik.com/cikmis-sinav-sorulari/), [Alo Güvenlik arşivi](https://www.guvenlikkursu.com/sinav/cikmis-sorular) ve 91 için [ikinci kurumun A/B belgeleri](https://ozelguvenlik.sinavinahazirlaniyorum.com/category/ders-notlari/) karşılaştırıldı. 14 dönemin A PDF'leri iki hostta bayt düzeyinde aynıdır. 90'da farklı PDF baytları aynı 125 metin/seçenek/cevabı taşır. 96'da yayımlanan Word A/B belgeleri PDF kopyasıyla karşılaştırıldı; her soru içinde doğru cevap rengi de doğrulandı. HTML dönüştürmede kaybolan otomatik Roma madde numaraları PDF sayfa 13 ile ayrıca kontrol edildi. Dosyalar/hashler, karşılaştırmalar, ders adetleri ve inceleme notları `artifacts/renewal-archive-2024/manifest.json` ve dönem alt klasörlerindedir. 224 sayfa genel görünümde incelendi, çıkarım/kaynak anahtarı farkları ayrıntılı sayfalarda kontrol edildi; soru diyagramı atlanmadı. 2024'ün 83–87. dönemlerinde ders sınırları yeni dönemlerden farklıdır; 92'nin cihaz/ilk yardım sınırı ve 94'ün gaz sorusu ayrıca ayrıldı.
+
+**A/B farkları:** Noktalama, harf büyüklüğü ve bir Word liste dönüşümü dahil toplam **13 soru için açıklanmış karşılaştırma farkı** vardır; 125/125 harfiyen A/B eşleşmesi varmış gibi işaretlenmedi. 91 A79/B24 ve A85/B10'da B kitapçığının seçenek sırası farklı olduğu halde işaretli harf aynı kalmış, doğru cevap metinleri çelişmektedir. İki bağımsız eş A kopyasında görülen **A anahtarı aynen korundu**; B anahtarı A'ya taşınmadı, resmî düzeltme ilan edildiği iddia edilmedi. İçe aktarıcı her istisnanın konumunu/gerekçesini onay hash'ine bağlar. EGM asıl dosyasına doğrudan erişim hâlâ doğrulanmadı; 99 için doğrulanmış kitapçık bulunamadığı için soru/cevap üretilmedi veya yayımlanmadı.
+
+**Puanlama ve koruma:** 83–91 yenileme dönemleri mevcut `verified_legacy_renewal_armed/unarmed`, 92–98 ise `verified_guide_2026_renewal_armed/unarmed` kurallarına, kitapçık tarihleriyle bağlandı. Yenileme karar türü `level` kalır. Kısmi ders sınavlarına tam sınav puanlama bağlantısı eklenmez. Her kitapçık ve dersleri tek transaction içinde önizleme/onayla yayımlandı; 19 tablonun önceden var olan satırları korundu, tam/derse bölünmüş kayıtların tekrarında kimlikler çoğalmadı. Sunucudaki 2.000 yenileme ve 122. temelin 125 sorusu metin/seçenek sırası/anahtar/ders bakımından snapshotlarla karşılaştırıldı. Mevcut sürümlerde yalnız satır sonu/boşluk farkı kabul edildi (trim ve boşlukları birleştirme); noktalama, sayılar ve harf büyüklüğü korundu. İlk 83 aktarımı, katı karakter eşitliğinin mevcut sürümdeki satır sonu farkını reddetmesiyle bütünüyle geri alındı; aktarım aracının zaten kullandığı bu boşluk normalizasyonu doğrulamaya da uygulanınca tamamlandı.
+
+**Canlı kontrol:** Normal öğrenci oturumunda API tüm 16 silahlı 125 / 16 silahsız 100 seçeneği ve her dönemin 11 dersini döndürdü; 122'nin 11 dersi de görünür. 390/1280 px'de yenileme listesi ve ortak ders listesi kontrol edildi. Sınav başlatılmadı veya cevap/geçmiş yazılmadı; yalnız kontrol oturumu kapatıldı. Fiziksel Expo Go ayrıca denenmedi. Kaynak incelemesi `artifacts/renewal-archive-2024/review.html`; receipt, ekran ve kontrol raporları aynı klasördedir. Sunucu kalıcı kanıtı `storage/app/private/imports/renewal-archive-2024/` altındadır.
+
+**Operasyon sınırı:** `040d5b0` ile test edilmiş iki import sınıfı, yalnız bu veri işleminin CLI yürütücüsünde özel storage yolundan yüklendi; çalışan HTTP uygulaması/imajı/servisleri değiştirilmedi. Yeni migration, imaj yayını veya yeniden başlatma yok. Kaynak sınıfları, manifest, özgün belgeler, yürütücü ve 17 işlem receipt'i özel storage içinde yeniden denetim için tutulur. Yerel ortak `oggaq` içerik veritabanına yazılmadı; deploy/backup betikleri, Claude'un geliştirme servisleri ve diğer siteler değiştirilmedi. Git push yapılmadı.
 
 ## Tamamlanan 122. temel aktarımı
 

@@ -41,7 +41,9 @@ def parse_lines(lines):
         if not text or "ÖZEL GÜVENLİK" in text or "Diğer sayfaya" in text:
             continue
         notice = text.upper().replace('İ', 'I').replace(' ', '')
-        if current is not None and current["position"] == 100 and len(current["options"]) == 5 and any(token in notice for token in ["ADAYLAR", "CEVAPLARINIZI", "KONTROLEDINIZ", "SORULARINI", "CEVAPLAYINIZ", "SILAHBILGISISORULARI"]):
+        letters = [char for char in text if char.isalpha()]
+        notice_style = letters and sum(char.isupper() for char in letters) / len(letters) >= .8
+        if current is not None and current["position"] == 100 and len(current["options"]) == 5 and notice_style and any(token in notice for token in ["ADAYLAR", "CEVAPLARINIZI", "KONTROLEDINIZ", "SORULARINI", "CEVAPLAYINIZ", "SILAHBILGISISORULARI"]):
             continue
         match = re.match(r"^(\d{1,3})\.(?:\s+|$)(.*)$", text)
         if match and (current is None or len(current["options"]) == 5):
