@@ -155,6 +155,7 @@ export function ExamList({
   initialSubject?: string;
 }) {
   const { palette } = useTheme();
+  const [education, setEducation] = useState<"basic" | "renewal">("basic");
   const [weapon, setWeapon] = useState<"armed" | "unarmed">("armed");
   const [subject, setSubject] = useState<string | undefined>(initialSubject);
   const [picking, setPicking] = useState(false);
@@ -166,8 +167,8 @@ export function ExamList({
   const selected = withExams.find((item) => item.id === subject) ?? withExams[0];
   const subjectId = kind === "ders" ? selected?.id : undefined;
   const exams = useResource(
-    (signal) => catalogCache.read(`${context.id}:${kind}:${kind === "deneme" ? weapon : subjectId}`, signal, () => collect((cursor) => api.request("get", "/api/v1/official-exams", { signal, query: { per_page: 100, cursor, scope: kind === "deneme" ? "whole" : "subject", ...(kind === "deneme" ? { weapon_status: weapon } : { subject_id: subjectId }) } }))),
-    [context.id, kind, weapon, subjectId], kind === "deneme" || !!subjectId,
+    (signal) => catalogCache.read(`${context.id}:${kind}:${kind === "deneme" ? `${education}:${weapon}` : subjectId}`, signal, () => collect((cursor) => api.request("get", "/api/v1/official-exams", { signal, query: { per_page: 100, cursor, scope: kind === "deneme" ? "whole" : "subject", ...(kind === "deneme" ? { education_type: education, weapon_status: weapon } : { subject_id: subjectId }) } }))),
+    [context.id, kind, education, weapon, subjectId], kind === "deneme" || !!subjectId,
   );
   const attempts = useResource(
     (signal) =>
@@ -184,7 +185,8 @@ export function ExamList({
     void subjects.reload();
   });
   const all = exams.data ?? [];
-  const wholeExams = all.filter((exam) => !exam.subject && exam.weapon_status === weapon).sort(byNewest);
+  // The existing archive is basic education; keep it visible during a rolling API update.
+  const wholeExams = all.filter((exam) => !exam.subject && exam.weapon_status === weapon && (exam.education_type ?? "basic") === education).sort(byNewest);
   const subjectExams = all.filter((exam) => exam.subject);
   const list = kind === "deneme" ? wholeExams : subjectExams.filter((exam) => exam.subject?.id === selected?.id).sort(byNewest);
   const loading = (exams.loading && !exams.data) || (attempts.loading && !attempts.data)
@@ -200,6 +202,16 @@ export function ExamList({
             : "Dersini seç, geçmiş sınavlarla çalış."
         }
       />
+      {kind === "deneme" && (
+        <ChoiceGroup
+          choices={[
+            { value: "basic", label: "Temel eğitim", accessibilityLabel: "Temel eğitim sınavları" },
+            { value: "renewal", label: "Yenileme eğitimi", accessibilityLabel: "Yenileme eğitimi sınavları" },
+          ]}
+          value={education}
+          onChange={setEducation}
+        />
+      )}
       {kind === "deneme" && (
         <ChoiceGroup
           choices={[
@@ -266,7 +278,7 @@ export function ExamList({
         <EmptyState
           icon={Clock3}
           title={kind === "deneme" ? "Henüz deneme sınavı yok" : "Henüz ders sınavı yok"}
-          message="Yayımlanmış bir sınav olduğunda burada görünür."
+          message={kind === "deneme" ? `Seçtiğin ${education === "basic" ? "temel" : "yenileme"} eğitimi için yayımlanmış sınav olduğunda burada görünür.` : "Yayımlanmış bir sınav olduğunda burada görünür."}
         />
       ) : (
         <>

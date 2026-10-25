@@ -16,7 +16,7 @@ class OfficialExamController extends Controller
         if ($request->has('scope')) {
             $request->validated('scope') === 'whole' ? $query->whereNull('subject_id') : $query->whereNotNull('subject_id');
         }
-        foreach (['exam_type_id', 'year', 'term', 'weapon_status', 'subject_id'] as $filter) {
+        foreach (['education_type', 'exam_type_id', 'year', 'term', 'weapon_status', 'subject_id'] as $filter) {
             if ($request->has($filter)) {
                 $query->where($filter, $request->validated($filter));
             }

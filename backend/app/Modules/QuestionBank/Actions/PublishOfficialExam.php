@@ -67,7 +67,7 @@ class PublishOfficialExam
 
     private function publishUnarmed(User $actor, OfficialExam $source): void
     {
-        $identity = $source->only(['exam_type_id', 'source_id', 'year', 'term', 'exam_number']);
+        $identity = $source->only(['education_type', 'exam_type_id', 'source_id', 'year', 'term', 'exam_number']);
         $child = new OfficialExam;
         $title = preg_replace('/\s*[—–-]\s*Silahlı\s*$/ui', '', $source->title);
         $child->forceFill($identity + [

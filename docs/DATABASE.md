@@ -1,5 +1,11 @@
 # Veritabanı tasarımı
 
+## Uygulanan eğitim ayrımı — 26 Ekim 2026
+
+`official_exams.education_type`: NOT NULL, `basic|renewal` CHECK, varsayılan `basic`. Mevcut arşivin tamamı kullanıcı tarafından temel eğitim olarak doğrulandı; yeni alan varsayılanla eklenir, yayımlanmış soru/sınav içeriği veya geçmiş cevaplar değiştirilmez. Sınav tekilliği `(exam_type_id, education_type, year, term, exam_number, weapon_status, subject_id) NULLS NOT DISTINCT` olur. Tam sınavlar için eğitim/silah/yıl indeksi vardır. Ders ekranı eğitim türüne göre ayrılmaz.
+
+Ertelenebilir `official_exam_education_guard` bağlı iki seçeneğin eğitim türünü; `official_exam_scoring_education_guard` puanlama döneminin eğitim türüyle eşleşmesini doğrular. Yayımlanmış künye değişmezliği önceki trigger ile korunur. Migration yalnız test DB'de doğrulandı; ortak geliştirme/üretim DB'sine uygulanması bu kod tesliminden ayrıdır. İki eğitimde aynı künye oluşmuşsa eski tekillik indeksine geri dönmek çakışmayı silmek yerine hata verir.
+
 Durum: `users`, `password_reset_tokens`, `sessions`, `personal_access_tokens`, `tenants`, `memberships`, `study_contexts`, `audit_events`; merkezi `subjects`, `topics`, `exam_types`, `question_sources`, `questions`, `question_versions`, `question_options`, `practice_attempts`, `exam_attempts`, `exam_answers` migration ile oluşturuldu. Laravel cache/jobs/batch/failed-job altyapı tabloları da vardır. İçerik görselleri, geçmiş sınavlar, resmî sınav şablonu/import/yönetişim/offline tabloları aşağıda **öneri** olarak anlatılır; henüz uygulanmadı. Alanlar İngilizce, zamanlar UTC `timestamptz`; API ISO 8601 döndürür. UUID kimlikler kullanılır. Yayımlanmış içerik fiziksel olarak güncellenmez; yeni sürüm eklenir.
 
 Tek soru alıştırmasında sabit sürüm, selected option, sunucu sonucu ve bağlam `practice_attempts` içinde saklanır; composite FK/CHECK/trigger tamamlanmış sonucu korur. Ayrıntılar [STUDY](STUDY.md) içindedir.

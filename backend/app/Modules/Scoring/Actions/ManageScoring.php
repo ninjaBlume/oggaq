@@ -130,9 +130,9 @@ class ManageScoring
         $p = ScoringPeriod::with('rule')->findOrFail($periodId);
         $config = $p->rule->configuration;
         $count = DB::table('official_exam_questions')->where('official_exam_id', $exam->id)->count();
-        if ($exam->subject_id !== null || $p->weapon_status !== $exam->weapon_status || $p->exam_date->year !== $exam->year || (string) $p->number !== $exam->exam_number
+        if ($p->education_type !== $exam->education_type || $exam->subject_id !== null || $p->weapon_status !== $exam->weapon_status || $p->exam_date->year !== $exam->year || (string) $p->number !== $exam->exam_number
            || ($exam->published_at !== null && $count !== $config['general_count'] + $config['weapon_count'])) {
-            throw ValidationException::withMessages(['scoring_period_id' => ['Puanlama dönemi tam sınavın yılı, numarası, seçeneği ve soru sayısıyla eşleşmeli.']]);
+            throw ValidationException::withMessages(['scoring_period_id' => ['Puanlama dönemi tam sınavın eğitim türü, yılı, numarası, seçeneği ve soru sayısıyla eşleşmeli.']]);
         }
         DB::table('official_exam_scoring')->updateOrInsert(['official_exam_id' => $exam->id], ['scoring_period_id' => $periodId]);
         $exam->unsetRelation('scoringLink');

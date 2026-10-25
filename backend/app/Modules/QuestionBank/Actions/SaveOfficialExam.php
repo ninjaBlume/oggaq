@@ -46,6 +46,7 @@ class SaveOfficialExam
                     throw ValidationException::withMessages(['question_version_ids' => ['İki seçenek için en fazla 125 soru eklenebilir.']]);
                 }
                 $exam->forceFill([
+                    'education_type' => $attributes['education_type'] ?? $exam->education_type ?? 'basic',
                     'exam_type_id' => $attributes['exam_type_id'], 'source_id' => $attributes['source_id'] ?? null,
                     'title' => $attributes['title'], 'year' => $attributes['year'],
                     'term' => $attributes['term'] ?? null, 'exam_number' => $attributes['exam_number'] ?? null, 'weapon_status' => $attributes['weapon_status'] ?? null, 'subject_id' => $attributes['subject_id'] ?? null,

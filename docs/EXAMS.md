@@ -1,5 +1,15 @@
 # Süreli deneme
 
+## 26 Ekim 2026: denemede eğitim türü
+
+Web ve mobil **Deneme sınavları** ekranında Temel eğitim / Yenileme eğitimi seçilir; silahlı/silahsız seçimi bunun altında bağımsızdır. Web adresindeki `egitim=basic|renewal` ile mobil katalog önbelleği bu ayrımı korur. Ders sınavlarında eğitim seçimi veya ayrı liste eklenmez. Eğitim değişimi soru/sonuç kopyalamaz; seçilen yayımlanmış sınav kimliğini mevcut deneme akışına gönderir. Boş/hata/yükleniyor durumları korunur.
+
+`official_exams.education_type` (`basic|renewal`) Deneme/Ders kategorisinden ayrıdır. Mevcut arşivin temel eğitim olduğu ürün sahibi tarafından doğrulandığından migration eski kayıtlara `basic` varsayılanını ekler; soru sürümü, sıra, cevap ve çözüm geçmişi güncellenmez. Yeni sınav editöründe eğitim seçilir; temel ve yenilemenin aynı numaralı kayıtları ayrı kimliktir. Eğitim, birleşik tekillik indeksine ve filtre indeksine dahildir. Bağlı silahlı/silahsız kayıtlar eğitim türünü korur. Puanlama dönemi aynı eğitim türüne ait olmalıdır; API ve PostgreSQL tetikleyicileri yanlış eşleşmeyi reddeder. Eğitim türü yayımlanmış sınav künyesinin değişmez parçasıdır.
+
+API listelemesi isteğe bağlı `education_type` filtresi, sınav kaydı ise eğitim alanını taşır. Eğitim türü göndermeyen eski istemcilerin yeni kayıtları temel eğitim olur; alan göndermeyen taslak güncellemesi kayıtlı eğitim türünü korur. API geçişi sırasında eski yanıtların temel arşivi istemcide görünür kalır. Yenileme yönetimi için yeni migration/API birlikte uygulanmalıdır. Bu teslim migration'ı yalnız `oggaq_test` üzerinde doğrular; ortak `oggaq` veritabanı ve sunucuda çalıştırmaz. Sunucu yayını/değişiklikleri Claude'un operasyon kapsamındadır.
+
+Yeni PDF kaynakları ve aktarımın gerçek durumu [EXAM_SOURCES](EXAM_SOURCES.md) içindedir.
+
 Exams modülü, web `Deneme` ekranı ve Expo mobil uygulaması gerçek PostgreSQL/API kaydını paylaşır. Kullanıcı rastgele denemede 1–100 soru (çıkmış sınav şablonu en fazla 200 soru) ve 60–10800 saniye (silahlı çıkmış sınav için 150 dk gerekir) seçer. Webde ders/konu filtresi uygulanabilir. Rastgele sorular merkezi havuzun o anda yayımlanmış sürümlerinden, tekrar olmadan seçilir; seçim tek SQL ifadesiyle yapılır ve yayımlanmış sürümler değişmez olduğundan soru satırı kilidi alınmaz (yayımlama beklemez). Yeterli soru yoksa 422 döner; yarım kayıt oluşmaz.
 
 **İstemciler.** Web ve mobil öğrenci arayüzleri yalnızca yayımlanmış çıkmış sınavları ve tekrar sınavını başlatır: *Deneme Sınavı* (konusuz tam sınav) ve *Ders Sınavı* (`subject` dolu). Rastgele deneme ve tek soru çalışması API'de durur ancak arayüzde sunulmaz; tekrar, `review_kind` ile başlatılan bir sınavdır (yanlış, boş veya favori sorulardan; bkz. [STUDY](STUDY.md)). Önerilen süre silahlı 150, silahsız 120 dakika (EGM sınav talimatı 4.3), ders sınavı soru başına 1,2 dakikadır; süre öğrencinin seçimidir.

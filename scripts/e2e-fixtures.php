@@ -35,7 +35,7 @@ if (config('database.default') !== 'pgsql' || config('database.connections.pgsql
     throw new RuntimeException('Browser fixtures require the isolated oggaq_test PostgreSQL database.');
 }
 $operation = $argv[1] ?? '';
-if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'long-result', 'paired-exam-draft', 'scoring', 'scored-exam-draft', 'cleanup'], true)) {
+if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'renewal-exams', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'long-result', 'paired-exam-draft', 'scoring', 'scored-exam-draft', 'cleanup'], true)) {
     throw new InvalidArgumentException('Expected setup or cleanup.');
 }
 if (in_array($operation, ['verification-link', 'reset-link'], true)) {
@@ -136,6 +136,19 @@ if ($operation === 'official-exam') {
     ]);
     app(PublishOfficialExam::class)->execute($admin, $exam);
     echo $exam->id;
+    exit;
+}
+if ($operation === 'renewal-exams') {
+    $admin = User::where('email', 'e2e-admin@example.test')->firstOrFail();
+    $versions = Question::whereHas('latestVersion', fn ($version) => $version->where('stem', 'like', 'Sentetik % soru'))->orderBy('id')->pluck('published_version_id')->all();
+    foreach (['armed', 'unarmed'] as $weapon) {
+        $exam = app(SaveOfficialExam::class)->execute($admin, [
+            'exam_type_id' => ExamType::where('code', 'synthetic-whole')->firstOrFail()->id,
+            'education_type' => 'renewal', 'weapon_status' => $weapon, 'title' => 'Sentetik yenileme sınavı',
+            'year' => 2023, 'term' => '1. dönem', 'exam_number' => '1', 'question_version_ids' => $versions,
+        ]);
+        app(PublishOfficialExam::class)->execute($admin, $exam);
+    }
     exit;
 }
 if ($operation === 'subject-exam') {

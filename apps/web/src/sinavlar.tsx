@@ -28,7 +28,7 @@ async function collect<T>(fetchPage: (cursor?: string) => Promise<{ data: T[]; l
 }
 
 // The two kinds of exam of the institution: a Deneme Sınavı is a whole exam (no subject), a Ders Sınavı belongs to one subject.
-function useOfficialExams(filters: { scope: 'whole' | 'subject'; weapon_status?: 'armed' | 'unarmed'; subject_id?: string }, enabled = true) {
+function useOfficialExams(filters: { education_type?: 'basic' | 'renewal'; scope: 'whole' | 'subject'; weapon_status?: 'armed' | 'unarmed'; subject_id?: string }, enabled = true) {
   return useQuery({ queryKey: ['official-exams', filters], enabled, queryFn: ({ signal }) => collect((cursor) => api.request('get', '/api/v1/official-exams', { signal, query: { ...filters, per_page: 100, cursor } })) });
 }
 function useSubjects() {
@@ -98,13 +98,15 @@ function byNewest(a: OfficialExam, b: OfficialExam) {
 export function DenemeSinavlari() {
   const attempts = useRecentAttempts();
   const [params, setParams] = useSearchParams();
+  const education = params.get('egitim') === 'renewal' ? 'renewal' : 'basic';
   const weapon = params.get('silah') === 'unarmed' ? 'unarmed' : 'armed';
-  const exams = useOfficialExams({ scope: 'whole', weapon_status: weapon });
-  const list = (exams.data ?? []).filter((exam) => !exam.subject && exam.weapon_status === weapon).sort(byNewest);
+  const exams = useOfficialExams({ scope: 'whole', education_type: education, weapon_status: weapon });
+  const list = (exams.data ?? []).filter((exam) => !exam.subject && exam.weapon_status === weapon && (exam.education_type ?? 'basic') === education).sort(byNewest);
   return <>
     <PageIntro eyebrow="SINAVA GİR" title={vocabulary.deneme.title}><p>Geçmiş sınavın tamamını gerçek sınav düzeninde ve süreyle çöz. Silahlı sınav 125, silahsız sınav 100 sorudur; sonuçların kaydedilir.</p></PageIntro>
-    <nav className="tab-bar" aria-label="Silah durumu">{([['armed', 'Silahlı sınav'], ['unarmed', 'Silahsız sınav']] as const).map(([value, label]) => <button key={value} type="button" className={`tab-button${weapon === value ? ' active' : ''}`} aria-pressed={weapon === value} onClick={() => setParams({ silah: value })}>{label}</button>)}</nav>
-    {exams.isPending ? <Loading /> : exams.isError ? <ErrorNotice error={exams.error} retry={() => { void exams.refetch(); }} /> : list.length === 0 ? <section className="card empty"><h2>Henüz deneme sınavı yok</h2><p>Yayımlanmış bir deneme sınavı olduğunda burada görünür.</p></section>
+    <nav className="tab-bar" aria-label="Eğitim türü">{([['basic', 'Temel eğitim'], ['renewal', 'Yenileme eğitimi']] as const).map(([value, label]) => <button key={value} type="button" className={`tab-button${education === value ? ' active' : ''}`} aria-pressed={education === value} onClick={() => setParams({ egitim: value, silah: weapon })}>{label}</button>)}</nav>
+    <nav className="tab-bar" aria-label="Silah durumu">{([['armed', 'Silahlı sınav'], ['unarmed', 'Silahsız sınav']] as const).map(([value, label]) => <button key={value} type="button" className={`tab-button${weapon === value ? ' active' : ''}`} aria-pressed={weapon === value} onClick={() => setParams({ egitim: education, silah: value })}>{label}</button>)}</nav>
+    {exams.isPending ? <Loading /> : exams.isError ? <ErrorNotice error={exams.error} retry={() => { void exams.refetch(); }} /> : list.length === 0 ? <section className="card empty"><h2>Henüz deneme sınavı yok</h2><p>Seçtiğin {education === 'basic' ? 'temel' : 'yenileme'} eğitimi için yayımlanmış sınav olduğunda burada görünür.</p></section>
       : <>{attempts.isError && <ErrorNotice error={attempts.error} retry={() => { void attempts.refetch(); }} />}<div className="sinav-list">{list.map((exam) => <ExamRow key={exam.id} exam={exam} title={`${exam.exam_number ? `${exam.exam_number}. ` : ''}Deneme Sınavı`} attempts={attempts.data?.data ?? []} />)}</div></>}
   </>;
 }

@@ -29,6 +29,27 @@ class ScoringTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_exam_cannot_link_a_different_education_period_even_with_matching_number_and_year(): void
+    {
+        $admin = $this->createUser(['platform_role' => 'platform_admin']);
+        $period = $this->period($admin, ['decision_mode' => 'level', 'minimums' => []], ['education_type' => 'renewal']);
+        $type = ExamType::create(['name' => 'Sentetik deneme', 'code' => 'synthetic-education']);
+        $exam = new OfficialExam;
+        $exam->forceFill(['exam_type_id' => $type->id, 'title' => 'Sentetik temel', 'year' => 2023, 'exam_number' => '104', 'weapon_status' => 'armed', 'education_type' => 'basic'])->save();
+        $this->asToken($admin);
+        $this->putJson('/api/v1/admin/official-exams/'.$exam->id.'/scoring', ['scoring_period_id' => $period->id])->assertUnprocessable()->assertJsonValidationErrors('scoring_period_id');
+        $this->assertDatabaseMissing('official_exam_scoring', ['official_exam_id' => $exam->id]);
+        try {
+            DB::transaction(function () use ($exam, $period) {
+                DB::table('official_exam_scoring')->insert(['official_exam_id' => $exam->id, 'scoring_period_id' => $period->id]);
+                DB::statement('SET CONSTRAINTS official_exam_scoring_education_guard IMMEDIATE');
+            });
+            $this->fail('The database accepted a different education type.');
+        } catch (QueryException $error) {
+            $this->assertSame('23514', $error->getCode());
+        }
+    }
+
     private function config(string $kind = 'armed'): array
     {
         $u = $kind === 'unarmed';

@@ -2286,6 +2286,11 @@ export interface components {
                 id: string;
                 name: string;
             } | null;
+            /**
+             * @description Eğitim türü; Deneme/Ders kategorisi ve silah durumundan bağımsızdır. Eski içerik temel eğitimdir.
+             * @enum {string}
+             */
+            education_type: "basic" | "renewal";
         };
         AdminOfficialExamQuestion: {
             position: number;
@@ -2352,6 +2357,11 @@ export interface components {
             derived_from_id: string | null;
             /** Format: uuid */
             scoring_period_id: string | null;
+            /**
+             * @description Eğitim türü; Deneme/Ders kategorisi ve silah durumundan bağımsızdır. Eski içerik temel eğitimdir.
+             * @enum {string}
+             */
+            education_type: "basic" | "renewal";
         };
         OfficialExamInput: {
             /** Format: uuid */
@@ -2381,6 +2391,11 @@ export interface components {
             generate_unarmed: boolean;
             /** Format: uuid */
             scoring_period_id?: string | null;
+            /**
+             * @description Eğitim türü; Deneme/Ders kategorisi ve silah durumundan bağımsızdır. Eski içerik temel eğitimdir.
+             * @enum {string}
+             */
+            education_type?: "basic" | "renewal";
         };
         OfficialExamResponse: {
             data: components["schemas"]["OfficialExam"];
@@ -4622,6 +4637,8 @@ export interface operations {
                 subject_id?: string;
                 /** @description Tam deneme veya ders sınavı filtresi. */
                 scope?: "whole" | "subject";
+                /** @description Eğitim türü; deneme sınavı listesinde kullanılır. */
+                education_type?: "basic" | "renewal";
             };
             header?: never;
             path?: never;
@@ -4686,6 +4703,8 @@ export interface operations {
                 weapon_status?: "armed" | "unarmed";
                 /** @description Yalnız bu dersin Ders Sınavları. */
                 subject_id?: string;
+                /** @description Eğitim türü; deneme sınavı listesinde kullanılır. */
+                education_type?: "basic" | "renewal";
             };
             header?: never;
             path?: never;

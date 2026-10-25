@@ -4,7 +4,7 @@ Durum: Bu belge web, yönetim paneli ve mobil uygulamanın ortak görsel ve etki
 
 ## 1. Ürün ilkeleri
 
-1. **İki sınav türü vardır:** Deneme Sınavı (tüm sınav) ve Ders Sınavı (bir dersin sınavı). Soru bankası, tek soru çözme, “temel/yenileme” ayrımı hiçbir ekranda yoktur. Tekrar da bir sınavdır.
+1. **İki sınav kategorisi vardır:** Deneme Sınavı (tüm sınav) ve Ders Sınavı (bir dersin sınavı). Deneme ekranında ayrıca Temel eğitim/Yenileme eğitimi ve bağımsız silahlı/silahsız seçilir. Ders sınavları ortak listede kalır; eğitim türü seçimi gösterilmez. Soru bankası veya tek soru alıştırması ayrı menü öğesi değildir. Tekrar da bir sınavdır.
 2. **Yönetim sınav bazlıdır:** sorular sınavın içinde, alt alta ve yerinde düzenlenir. Soru bazlı liste yoktur.
 3. **Üç uygulama aynı yapıdadır:** aynı sözlük, aynı sınav türleri, aynı sıra. Platformun doğal gezinmesi korunur; native bileşenler HTML/CSS ile taklit edilmez.
 4. **Çalışma ekranı sakin, özet ekranı ifadelidir:** soru ve sınav ekranında seçenekler yer değiştirmez, ölçeklenmez, süsleme yoktur. Ana sayfa ve sonuç ekranı daha belirgin olabilir.

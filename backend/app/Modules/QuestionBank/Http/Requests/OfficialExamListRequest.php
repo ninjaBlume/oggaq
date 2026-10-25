@@ -9,6 +9,7 @@ class OfficialExamListRequest extends PaginationRequest
     public function rules(): array
     {
         return parent::rules() + [
+            'education_type' => ['sometimes', 'in:basic,renewal'],
             'scope' => ['sometimes', 'in:whole,subject'],
             'exam_type_id' => ['sometimes', 'uuid'], 'year' => ['sometimes', 'integer', 'between:1990,2200'],
             'term' => ['sometimes', 'string', 'max:80'], 'weapon_status' => ['sometimes', 'in:armed,unarmed'], 'subject_id' => ['sometimes', 'uuid'],

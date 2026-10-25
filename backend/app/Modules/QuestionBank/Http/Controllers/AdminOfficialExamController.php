@@ -24,7 +24,7 @@ class AdminOfficialExamController extends Controller
     {
         Gate::authorize('manage', Question::class);
         $query = OfficialExam::with('source', 'examType', 'subject')->withCount('questions');
-        foreach (['exam_type_id', 'year', 'term', 'weapon_status', 'subject_id'] as $filter) {
+        foreach (['education_type', 'exam_type_id', 'year', 'term', 'weapon_status', 'subject_id'] as $filter) {
             if ($request->has($filter)) {
                 $query->where($filter, $request->validated($filter));
             }

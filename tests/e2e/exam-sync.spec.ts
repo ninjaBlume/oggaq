@@ -55,9 +55,9 @@ for (const platform of ['web', 'mobile'] as const) {
       const fullReads: string[] = [];
       page.on('request', r => { if (r.method() === 'GET' && /\/exam-attempts\/[^/]+$/.test(new URL(r.url()).pathname)) fullReads.push(r.url()); });
       const { exam, headers, url } = await enter(page);
-      // Development StrictMode can start and cancel an extra opening read. Count only subsequent polls.
+      // New attempts use the complete start response; opening must not download the questions again.
       const openingReads = fullReads.length;
-      expect(openingReads).toBeGreaterThan(0);
+      expect(openingReads).toBe(0);
       await expect.poll(() => page.evaluate(() => (window as unknown as { examTimerCount: () => number }).examTimerCount())).toBe(1);
       const selected = exam.questions[0].question.options[1].id;
       const saved = await page.request.put(`${url}/answers/${exam.questions[0].id}?compact=true`, { headers, data: { base_version: exam.revision, selected_option_id: selected } });

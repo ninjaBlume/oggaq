@@ -11,6 +11,7 @@ class OfficialExamResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'education_type' => $this->education_type,
             'id' => $this->id, 'title' => $this->title, 'exam_type_id' => $this->exam_type_id,
             'exam_type' => $this->examType === null ? null : ['id' => $this->examType->id, 'name' => $this->examType->name],
             'weapon_status' => $this->weapon_status,

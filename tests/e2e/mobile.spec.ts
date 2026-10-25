@@ -132,7 +132,7 @@ test("mobil sekmeler gerçek Bearer API ile deneme sınavı, sonuçlar ve çık�
   await expect(page.getByRole("tab", { name: "Soru çöz" })).toHaveCount(0);
   await page.getByRole("tab", { name: "Deneme", exact: true }).click();
   await expect(
-    page.getByText("Deneme sınavları", { exact: true }),
+    page.getByRole("heading", { name: "Deneme sınavları", exact: true }),
   ).toBeVisible();
   await expect(page.getByText("1. Deneme Sınavı", { exact: true })).toBeVisible();
   await expect(page.getByText(/önerilen süre 150 dk/)).toBeVisible();
@@ -300,7 +300,7 @@ test("sınav yokken gerçek API ile boş durum açıklanır ve örnek sınav gö
   fixture("setup");
   await login(page);
   await expect(
-    page.getByText("Dersler hazırlanıyor", { exact: true }),
+    page.getByText("İlk sınavın burada", { exact: true }),
   ).toBeVisible();
   await page.getByRole("tab", { name: "Deneme", exact: true }).click();
   await expect(
@@ -522,7 +522,7 @@ test("Expressive düğme ve seçim grupları eylemleri korur ve küçük ekrana 
   await expect(page.getByText("Merhaba, E2E.", { exact: true })).toBeVisible();
   await page.mouse.up();
   await expect(
-    page.getByText("Deneme sınavları", { exact: true }),
+    page.getByRole("heading", { name: "Deneme sınavları", exact: true }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Silahsız sınavlar", exact: true })
@@ -567,7 +567,7 @@ test("sistem hareket azaltma tercihi canlı değişince Expressive hareket kapan
   await expect.poll(scale).toBe(1);
   await page.mouse.up();
   await expect(
-    page.getByText("Deneme sınavları", { exact: true }),
+    page.getByRole("heading", { name: "Deneme sınavları", exact: true }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
   const menu = page.getByLabel("Uygulama menüsü", { exact: true });

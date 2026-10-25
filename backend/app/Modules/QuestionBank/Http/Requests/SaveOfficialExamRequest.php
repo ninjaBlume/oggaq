@@ -17,6 +17,7 @@ class SaveOfficialExamRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'education_type' => ['sometimes', 'required', Rule::in(['basic', 'renewal'])],
             'exam_type_id' => ['required', 'uuid', Rule::exists('exam_types', 'id')],
             'source_id' => ['nullable', 'uuid', Rule::exists('question_sources', 'id')],
             'title' => ['required', 'string', 'max:240'],

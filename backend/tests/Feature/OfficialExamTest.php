@@ -20,6 +20,43 @@ class OfficialExamTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_education_types_have_independent_identity_and_filters_and_preserve_draft_edits(): void
+    {
+        $basic = $this->createExam(['weapon_status' => 'armed'], true);
+        $renewal = $this->createExam(['weapon_status' => 'armed', 'education_type' => 'renewal'], true);
+        $this->assertSame('basic', $basic['education_type']);
+        $this->assertSame('renewal', $renewal['education_type']);
+        $this->postJson('/api/v1/admin/official-exams', $this->payload(['weapon_status' => 'armed', 'education_type' => 'renewal']))->assertConflict();
+        $this->postJson('/api/v1/admin/official-exams', $this->payload(['education_type' => 'invalid']))->assertUnprocessable();
+        $draft = $this->createExam(['exam_number' => 'draft', 'education_type' => 'renewal']);
+        $this->putJson('/api/v1/admin/official-exams/'.$draft['id'], $this->payload(['exam_number' => 'draft']))->assertOk()->assertJsonPath('data.education_type', 'renewal');
+        $this->getJson('/api/v1/admin/official-exams?education_type=renewal')->assertOk()->assertJsonCount(2, 'data');
+        $this->asToken($this->createUser());
+        $this->getJson('/api/v1/official-exams?scope=whole&education_type=basic')->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $basic['id']);
+        $this->getJson('/api/v1/official-exams?scope=whole&education_type=renewal')->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $renewal['id']);
+        $this->getJson('/api/v1/official-exams?education_type=invalid')->assertUnprocessable();
+        $this->postJson('/api/v1/admin/official-exams', $this->payload(['education_type' => 'renewal']))->assertForbidden();
+    }
+
+    public function test_renewal_pair_keeps_education_type_and_database_rejects_mismatch(): void
+    {
+        $draft = $this->pairedDraft();
+        $this->putJson('/api/v1/admin/official-exams/'.$draft['id'], $this->payload(['education_type' => 'renewal', 'weapon_status' => 'armed', 'generate_unarmed' => true, 'question_version_ids' => $this->versionIds(range(0, 124))]))->assertOk();
+        $this->postJson('/api/v1/admin/official-exams/'.$draft['id'].'/publish')->assertOk()->assertJsonPath('data.education_type', 'renewal');
+        $child = DB::table('official_exams')->where('derived_from_id', $draft['id'])->first();
+        $this->assertSame('renewal', $child->education_type);
+        $this->assertPairConstraints();
+        $other = $this->createExam(['exam_number' => 'other', 'education_type' => 'renewal', 'weapon_status' => 'armed', 'generate_unarmed' => true]);
+        $this->assertRejectedByDatabase(function () use ($other) {
+            DB::table('official_exams')->insert([
+                'id' => Str::uuid(), 'exam_type_id' => $this->type->id, 'title' => 'Sentetik farklı eğitim', 'year' => 2023,
+                'exam_number' => 'mismatch', 'education_type' => 'basic', 'weapon_status' => 'unarmed',
+                'derived_from_id' => $other['id'], 'created_at' => now(), 'updated_at' => now(),
+            ]);
+            DB::statement('SET CONSTRAINTS official_exam_education_guard IMMEDIATE');
+        });
+    }
+
     public function test_catalog_filters_whole_subject_and_weapon_and_counts_only_published_subject_exams(): void
     {
         $whole = $this->createExam(['weapon_status' => 'armed'], true);
@@ -228,7 +265,7 @@ class OfficialExamTest extends TestCase
         $this->assertSame($published['published_at'], $again['published_at']);
         $this->asToken($this->createUser());
         $list = $this->getJson('/api/v1/official-exams')->assertOk()->assertJsonCount(1, 'data')->json('data');
-        $this->assertSame(['id', 'title', 'exam_type_id', 'exam_type', 'weapon_status', 'subject', 'year', 'term', 'exam_number', 'question_count', 'source', 'published_at'], array_keys($list[0]));
+        $this->assertSame(['education_type', 'id', 'title', 'exam_type_id', 'exam_type', 'weapon_status', 'subject', 'year', 'term', 'exam_number', 'question_count', 'source', 'published_at'], array_keys($list[0]));
         $this->getJson('/api/v1/official-exams/'.$draft['id'])->assertOk()->assertJsonPath('data.question_count', 3)->assertJsonMissingPath('data.questions');
         $this->getJson('/api/v1/official-exams?year=2023')->assertOk()->assertJsonCount(1, 'data');
         $this->getJson('/api/v1/official-exams?year=2020')->assertOk()->assertJsonCount(0, 'data');

@@ -3382,6 +3382,19 @@
               ]
             },
             "description": "Tam deneme veya ders sınavı filtresi."
+          },
+          {
+            "name": "education_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "basic",
+                "renewal"
+              ]
+            },
+            "description": "Eğitim türü; deneme sınavı listesinde kullanılır."
           }
         ]
       }
@@ -3563,6 +3576,19 @@
               "format": "uuid"
             },
             "description": "Yalnız bu dersin Ders Sınavları."
+          },
+          {
+            "name": "education_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "basic",
+                "renewal"
+              ]
+            },
+            "description": "Eğitim türü; deneme sınavı listesinde kullanılır."
           }
         ]
       },
@@ -8852,6 +8878,14 @@
               }
             ],
             "description": "Ders sınavında dersin kendisi; Deneme (tam) sınavda null."
+          },
+          "education_type": {
+            "type": "string",
+            "enum": [
+              "basic",
+              "renewal"
+            ],
+            "description": "Eğitim türü; Deneme/Ders kategorisi ve silah durumundan bağımsızdır. Eski içerik temel eğitimdir."
           }
         },
         "required": [
@@ -8866,7 +8900,8 @@
           "published_at",
           "exam_type",
           "weapon_status",
-          "subject"
+          "subject",
+          "education_type"
         ]
       },
       "AdminOfficialExamQuestion": {
@@ -9092,6 +9127,14 @@
               "null"
             ],
             "format": "uuid"
+          },
+          "education_type": {
+            "type": "string",
+            "enum": [
+              "basic",
+              "renewal"
+            ],
+            "description": "Eğitim türü; Deneme/Ders kategorisi ve silah durumundan bağımsızdır. Eski içerik temel eğitimdir."
           }
         },
         "required": [
@@ -9114,7 +9157,8 @@
           "subject",
           "generate_unarmed",
           "derived_from_id",
-          "scoring_period_id"
+          "scoring_period_id",
+          "education_type"
         ]
       },
       "OfficialExamInput": {
@@ -9195,6 +9239,14 @@
               "null"
             ],
             "format": "uuid"
+          },
+          "education_type": {
+            "type": "string",
+            "enum": [
+              "basic",
+              "renewal"
+            ],
+            "description": "Eğitim türü; Deneme/Ders kategorisi ve silah durumundan bağımsızdır. Eski içerik temel eğitimdir."
           }
         },
         "required": [
