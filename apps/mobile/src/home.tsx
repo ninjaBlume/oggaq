@@ -8,7 +8,6 @@ import {
   ChartColumn,
   ChevronRight,
   Clock3,
-  GraduationCap,
   History,
   ListChecks,
   Play,
@@ -22,7 +21,6 @@ import { api } from "./api";
 import { useResource, useOnReturn } from "./hooks";
 import {
   Badge,
-  EmptyState,
   ErrorNotice,
   Loading,
   SectionTitle,
@@ -50,14 +48,6 @@ export function Home({
 }) {
   const { palette, styles } = useTheme();
   const layout = useLayout();
-  const subjects = useResource(
-    (signal) =>
-      api.request("get", "/api/v1/subjects", {
-        signal,
-        query: { per_page: 4 },
-      }),
-    [],
-  );
   // Reuse the real summary; missing data is never displayed as invented zeros.
   const summary = useResource(
     (signal) =>
@@ -163,10 +153,11 @@ export function Home({
       </View>
 
       <View style={{ flexDirection: layout.columns === 2 ? "row" : "column", gap: 20 }}>
-      <View style={{ flex: layout.columns === 2 ? 1 : undefined, gap: 12 }}>
+      <View testID="home-quick-start" style={{ flex: layout.columns === 2 ? 1 : undefined, gap: 12 }}>
       <SectionTitle>Hızlı başla</SectionTitle>
       <HomeGroup>
         <HomeRow icon={BookOpen} title={vocabulary.ders.title} description="Dersini seç, ilgili sınavlara ulaş" onPress={() => ders()} />
+        <HomeRow icon={Clock3} title={vocabulary.deneme.title} description="Silahlı veya silahsız sınavını seç" onPress={deneme} />
         <HomeRow icon={ListChecks} title={vocabulary.review.title} description="Yanlış, boş ve favori sorularından sınav yap"
           accessibilityLabel={`${vocabulary.review.title} ekranını aç`} onPress={review} />
       </HomeGroup>
@@ -181,22 +172,6 @@ export function Home({
       </HomeGroup>
       </View>
       </View>
-
-      <SectionTitle action="Tüm dersler" onPress={() => ders()}>Derslerini keşfet</SectionTitle>
-      {subjects.loading && !subjects.data ? (
-        <Loading layout="list" label="Dersler yükleniyor" />
-      ) : subjects.error ? (
-        <ErrorNotice title="Dersler yüklenemedi" error={subjects.error} retry={() => void subjects.reload()} />
-      ) : subjects.data?.data.length === 0 ? (
-        <EmptyState icon={GraduationCap} title="Dersler hazırlanıyor" message="Dersler yayımlandığında buradan kolayca ulaşabilirsin." />
-      ) : (
-        <HomeGroup>
-          {subjects.data?.data.map(subject => (
-            <HomeRow key={subject.id} icon={BookOpen} title={subject.name} accessibilityLabel={`${subject.name} dersini aç`}
-              onPress={() => ders(subject.id)} />
-          ))}
-        </HomeGroup>
-      )}
 
       <SectionTitle action="Tümünü gör" onPress={history}>Son sınavların</SectionTitle>
       {recentExams.loading && !recentExams.data ? (

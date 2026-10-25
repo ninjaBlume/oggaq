@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, ana sayfa hızlı başla sırası
+
+- Mobil Hızlı başla **Ders sınavları → Deneme sınavları → Tekrar sınavı** olarak düzenlendi. “Derslerini keşfet” ve ona ait ders listesi isteği kaldırıldı; ders seçimi mevcut Ders sınavları ekranında korunur. Ana sayfa iki veri isteği kullanır.
+- Ortak strict TypeScript, mevcut **42 mobil Vitest**, Android/iOS/web Metro export ve **7 ilgili Chromium E2E tek koşumda geçti**. Mevcut testler sıralamayı, kısayol hedeflerini, ders sınavını çözmeyi/bağlam ayrımını, aktif sınava devamı, gereksiz ders isteğinin olmamasını ve hazır formun korunmasını doğrular. Açık/koyu 320–1280 px, büyük yazı ve özet hatası kontrolleri de kapsandı; geniş ekran görüntüsü gözle incelendi.
+- Testler yalnız `oggaq_test` ve mobil 5186 kullandı; başka PHPUnit/E2E süreci ve ortak portlar önceden kontrol edildi. Fiziksel iOS/Android denenmedi; backend/API değişmediğinden PHPUnit ve tam E2E yeniden çalıştırılmadı. Ortak geliştirme servisleri, deploy ve sunucu yedekleri değiştirilmedi; push yok.
+
 ## Güncel doğrulama — 25 Ekim 2026, referansa küçük görsel yakınlaştırma
 
 - Kullanıcının hafif yakınlaştırma isteğiyle yalnız mobil ana sayfa görünümü ayarlandı: üç bağımsız özet kutusu, 10 px aralıklı satır kartları, 44 px ikon zeminleri ve biraz daha belirgin mavi dekoratif vurgu. Genel hiyerarşi, renk rolleri, gerçek sayılar ve ücretsiz araçlar korundu. API isteği, iş kuralı, bağımlılık ve bekleme eklenmedi.

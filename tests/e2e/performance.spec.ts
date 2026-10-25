@@ -63,7 +63,7 @@ for (const mobile of [false, true]) {
  });
 }
 
-test('mobil sekmeye dönüşte hazır form ve liste yavaş yenilemeyi beklemez; ana sayfa tekrar kurulmaz', async ({page}) => {
+test('mobil sekmeye dönüşte hazır form beklemez; ana sayfa gereksiz ders isteği yapmaz', async ({page}) => {
  await page.setViewportSize({width:390,height:844});
  let homeSubjectRequests = 0;
  page.on('request', request => {
@@ -92,5 +92,5 @@ test('mobil sekmeye dönüşte hazır form ve liste yavaş yenilemeyi beklemez; 
  } finally { release(); }
  await page.getByRole('tab',{name:'Ana sayfa',exact:true}).click();
  await expect(page.getByText('Merhaba, E2E.',{exact:true})).toBeVisible();
- expect(homeSubjectRequests).toBe(1);
+ expect(homeSubjectRequests).toBe(0);
 });

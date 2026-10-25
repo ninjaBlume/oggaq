@@ -198,7 +198,7 @@ test("ders sınavı dersine göre bulunur ve çözülür; çalışma alanı değ
 }) => {
   await login(page);
   await page
-    .getByRole("button", { name: "Sentetik çalışma dersi dersini aç" })
+    .getByRole("button", { name: "Ders sınavları ekranını aç" })
     .click();
   await expect(page.getByRole("heading", { name: "Ders sınavları", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Ders seçimi" })).toContainText(

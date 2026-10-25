@@ -24,9 +24,12 @@ for (const colorScheme of ["light","dark"] as const) {
   await expect(summary.getByLabel(`Tamamlanan sınav: ${data.exams.completed.toLocaleString("tr-TR")}`,{exact:true})).toBeVisible();
   await expect(page.getByText("Tamamen ücretsiz",{exact:true})).toBeVisible();
   await expect(page.getByText(/\bPRO\b|premium|abonelik|yükselt|₺/i)).toHaveCount(0);
-  for (const name of ["Ders sınavları ekranını aç","Tekrar sınavı ekranını aç","Sonuçlarım ekranını aç","Başarı durumum ekranını aç"]) {
+  for (const name of ["Ders sınavları ekranını aç","Deneme sınavları ekranını aç","Tekrar sınavı ekranını aç","Sonuçlarım ekranını aç","Başarı durumum ekranını aç"]) {
    await expect(page.getByRole("button",{name,exact:true})).toBeEnabled();
   }
+  expect(await page.getByTestId("home-quick-start").getByRole("button").evaluateAll(buttons => buttons.map(button => button.getAttribute("aria-label"))))
+    .toEqual(["Ders sınavları ekranını aç","Deneme sınavları ekranını aç","Tekrar sınavı ekranını aç"]);
+  await expect(page.getByText("Derslerini keşfet",{exact:true})).toHaveCount(0);
   mkdirSync("artifacts/home-reference",{recursive:true});
   for (const width of [320,390,834,1280]) {
    await page.setViewportSize({width,height:900});
@@ -37,8 +40,11 @@ for (const colorScheme of ["light","dark"] as const) {
   const quick = await page.getByRole("heading",{name:"Hızlı başla",exact:true}).boundingBox();
   const work = await page.getByRole("heading",{name:"Çalışmaların",exact:true}).boundingBox();
   expect(work!.x).toBeGreaterThan(quick!.x + 200);
-  await page.getByRole("heading",{name:"Derslerini keşfet",exact:true}).scrollIntoViewIfNeeded();
+  await page.getByRole("heading",{name:"Son sınavların",exact:true}).scrollIntoViewIfNeeded();
   await page.screenshot({path:`artifacts/home-reference/${colorScheme}-1280-lists.png`});
+  await page.getByRole("button",{name:"Deneme sınavları ekranını aç",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Deneme sınavları",exact:true})).toBeVisible();
+  await page.getByRole("tab",{name:"Ana sayfa",exact:true}).click();
   await page.getByRole("button",{name:"Tekrar sınavı ekranını aç",exact:true}).click();
   await expect(page.getByRole("heading",{name:"Tekrar sınavı",exact:true})).toBeVisible();
  });
