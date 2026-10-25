@@ -1,5 +1,15 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, güvenlik ve oturum
+
+- PHP 8.4 / PostgreSQL üzerinde `composer test`: **237 backend testi, 2.640 assertion** geçti. `composer lint`, `composer validate --strict`, `composer audit` başarılı (PATH'te Composer olmadığı için resmî SHA256 ile doğrulanmış geçici PHAR kullanıldı).
+- **137 Vitest**: admin 16, web 6, mobil 27, `study-core` 25, `design-tokens` 63. Mağaza betiklerinin **14 Node testi** ve yeni araç zinciri/güvenlik kapısının **19 Node testi** geçti. Strict TypeScript, API lint/tip üretimi (üretilen sözleşme değişmedi), web/admin production build başarılı.
+- Zod `4.6.6`: CLI'nin gerçek şemaları ve elemanları işlemeden büyük array/set/map reddi. Forge: yamasız kaynağın kabul ettiği bozuk iç ASN.1, yama sonrası reddedilir; geçerli RSA/NULL/PSS korunur. Kaynak/sürüm değişikliği, eksik yama, yeni advisory ve beklenmeyen bağımlılık yolu başarısız olur. `npm run audit` geçer; **ham npm audit aynı upstream forge advisory'sini dört ilişkili paket için hâlâ listeler**. Bu bir temiz ham audit raporu değildir; [yerel yama ve sınırları](SECURITY.md#javascript-bağımlılık-güvenliği--25-ekim-2026).
+- Son Expo yaması ve güvenlik koduyla **102 Chromium E2E**, tek tam koşuda geçti (3,9 dakika). Admin/web/mobil giriş, hesap yönetimi, sınav/puanlama/sonuç, gecikmiş yanıt ve kurum ayrımı dahil. PHPUnit ile E2E sırayla, yalnız `oggaq_test` üzerinde; mobil önizleme ayrı export ve `E2E_MOBILE_PORT=5186` ile çalıştı.
+- Mobil eski `/me` yanıtı önce gerçek API E2E ile hatayı üretti; oturum kontrolünden sonra geciken 200/401/403 yeni hesabı etkilemiyor (`tests/e2e/session-race.spec.ts`, üç senaryo).
+- Expo `58.0.17` ile sürüm kontrolü **19/20** kaldı; önerilen `58.0.19` / CLI `58.1.15` yamasından ve Expo kopyalarının tekilleştirilmesinden sonra **Expo Doctor 20/20** geçti. SDK 58 / React Native 0.88 korunur. Android/iOS/web Metro export, ayrı geçici dizinde iki native prebuild (`--no-install`; tek mevcut node_modules'a symlink) ve ayrı `8082` Metro üzerinden gerçek Expo Go manifesti başarılı. Başlatılan Metro durduruldu.
+- Fiziksel Android/iPhone/iPad ve yeni APK/IPA derlemesi yapılmadı. Çalışan ortak Metro/API servisleri durdurulmadı; sunucuya dağıtım ve push yapılmadı. Yeniden kurulum/yama adımları CI'a eklendi; uzak CI bu yerel kontrolde çalıştırılmadı.
+
 ## Önceki doğrulama — 25 Ekim 2026, performans ve hata düzeltmeleri
 
 - PHP 8.4 / PostgreSQL: **235 backend testi, 2.634 assertion** geçti (`composer test`; PATH'te Composer bulunmadığı için resmî SHA256'sı doğrulanmış geçici Composer PHAR ile aynı script çalıştırıldı). `composer lint`, `composer validate --strict` ve `composer audit` başarılı.

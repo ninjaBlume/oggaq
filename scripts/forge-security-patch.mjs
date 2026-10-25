@@ -20,8 +20,8 @@ export function patchedForgeSource(source, version) {
   return patched;
 }
 function installedForges() {
-  const rootRequire = createRequire(import.meta.url);
-  const expoRequire = createRequire(rootRequire.resolve('expo/package.json'));
+  const mobileRequire = createRequire(new URL('../apps/mobile/package.json', import.meta.url));
+  const expoRequire = createRequire(mobileRequire.resolve('expo/package.json'));
   const cliRequire = createRequire(expoRequire.resolve('@expo/cli/package.json'));
   const signingRequire = createRequire(cliRequire.resolve('@expo/code-signing-certificates/package.json'));
   const files = new Map();

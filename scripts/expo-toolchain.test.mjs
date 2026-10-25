@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createRequire } from 'node:module';
 
-const rootRequire = createRequire(import.meta.url);
-const expoRequire = createRequire(rootRequire.resolve('expo/package.json'));
+const mobileRequire = createRequire(new URL('../apps/mobile/package.json', import.meta.url));
+const expoRequire = createRequire(mobileRequire.resolve('expo/package.json'));
 const cliRequire = createRequire(expoRequire.resolve('@expo/cli/package.json'));
 const { z } = cliRequire('zod');
 const { PluginSchema, DevToolsPluginOutputSchema } = cliRequire('./build/src/start/server/DevToolsPlugin.schema.js');
@@ -17,7 +17,9 @@ const plugin = {
   ] },
 };
 
-test('Expo CLI resolves the fixed Zod version through its actual dependency path', () => {
+test('the mobile workspace resolves the reviewed Expo CLI and fixed Zod version', () => {
+  assert.equal(mobileRequire('expo/package.json').version, mobileRequire('./package.json').dependencies.expo);
+  assert.equal(expoRequire('@expo/cli/package.json').version, '58.1.15');
   assert.equal(cliRequire('zod/package.json').version, '4.6.6');
 });
 test('real Expo plugin schema accepts valid config and rejects invalid command types', () => {

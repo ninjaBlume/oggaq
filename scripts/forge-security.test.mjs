@@ -3,8 +3,8 @@ import { test } from 'node:test';
 import { createRequire } from 'node:module';
 import { constants, createHash, generateKeyPairSync, privateEncrypt, sign } from 'node:crypto';
 
-const rootRequire = createRequire(import.meta.url);
-const expoRequire = createRequire(rootRequire.resolve('expo/package.json'));
+const mobileRequire = createRequire(new URL('../apps/mobile/package.json', import.meta.url));
+const expoRequire = createRequire(mobileRequire.resolve('expo/package.json'));
 const cliRequire = createRequire(expoRequire.resolve('@expo/cli/package.json'));
 const forge = cliRequire('node-forge');
 // Fresh synthetic keys exist only in memory. They are never used by the app or saved as fixtures.

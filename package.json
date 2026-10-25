@@ -42,7 +42,7 @@
     "openapi-typescript": "7.13.0"
   },
   "overrides": {
-    "@expo/cli@58.1.14": {
+    "@expo/cli@58.1.15": {
       "zod": "4.6.6"
     },
     "xcode": {
