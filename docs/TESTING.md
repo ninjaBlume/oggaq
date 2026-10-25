@@ -5,6 +5,10 @@
 - Ürün sahibinin yeni yıldız/ay-yıldız ve ÖGG SOR yazılı görseli öncekinin yerine doğrudan ana kaynak olarak alındı; yeni çizim veya yapay zekâ üretimi yapılmadı. Mobil simge, Android güvenli alanı, splash, favicon ve 256 px / yaklaşık 56 KB uygulama içi logo yeniden üretildi.
 - Web/yönetim logoları Vite’ın içerik hash’li adresiyle, yasal sayfa logosu ve faviconlar SHA-256 sürümlü adresle yüklenir. Eski logo/favikonu tutan tarayıcı/CDN önbelleği yeni adrese taşınmaz.
 - **49 ilgili Vitest** (web 6 / admin 16 / mobil 27), **17 mağaza betiği testi**, ortak strict TypeScript, `check:brand`, web/admin build ve Android/iOS/web Metro export geçti. Backend/DB/API davranışı değişmedi; ortak test DB’si, PHPUnit ve tam API E2E kullanılmadı. Yeni imzalı APK/IPA veya mağaza yüklemesi yapılmadı.
+- Altı sentetik Chromium düzeninde (web/admin/Expo web, açık/koyu, telefon/tablet) yeni logo yüklendi; yatay taşma veya JavaScript hatası yok. Telefon açık mobil ve koyu web ekranları gözle incelendi; güncel önizlemeler `artifacts/logo-review/` içinde. Geçici sunucular boş portlarda çalışıp kapandı; ortak servisler kullanılmadı.
+- İlk Docker web derlemesi yeni importun kaynak PNG'si frontend aşamasına kopyalanmadığı için başarısız oldu; `COPY apps/mobile/assets/brand-logo.png` eklenince sunucu app/web imajları başarıyla üretildi. Yeni `emblem-db86f34` sürümünde yalnız web konteyneri yenilendi; backend imaj içeriği ve diğer proje konteyner kimlikleri değişmedi, `.env` aynı kaldı.
+- Canlı kök ve `/yonetim/` paketlerindeki hash’li logo ile favicon yanıtları yeni PNG SHA-256 değerleriyle eşleşti; yasal sayfanın sürümlü logosu da doğrulandı. Kök/www readiness tüm kontrollerde `ok`. Önceki sürüm geri alma için korundu; push yapılmadı.
+
 
 ## Güncel doğrulama — 25 Ekim 2026, seçilen logo
 
