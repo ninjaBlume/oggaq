@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, Ö harfinin üst boşluğu
+
+- Marka JSON'u ve çalışan iOS Expo Go ortamı **ÖGG SOR** döndürüyor; ilk karakter **U+00D6 (214)**, League Spartan yerel kaydı yüklü. Font dosyasında Ö'nün üst sınırı 1694, typographic ascender 1400 (em 2000). Görsel kırpılma riskini önlemek için marka bileşenine font boyutuyla orantılı satır yüksekliği/üst boşluk ve Android font padding eklendi. Font dosyası/ağırlık/aile ve marka metni değiştirilmedi.
+- **42 mobil Vitest**, `check:brand`, son strict TypeScript ve Android/iOS/web Metro export başarılı. İlk strict kontrolünde padding tipinin sayı/metin birleşimi için daraltma gerekti; sayı kontrolü eklendikten sonra geçti. Yeni test eklenmedi; mevcut telefon/tablet marka bağlantıları ve dört yazı boyutu senaryosu son export ile **6/6 geçti**. İlk başlatılan E2E koşumu kullanıcı mesajıyla kesildiğinden başarı sayılmadı; geride kalan yalnız bu koşuma ait test sunucuları belirli PID'lerle kapatıldı, sonra temiz koşum yapıldı.
+- Native kontrolde yalnız genel marka/font bilgisi okundu; hesap/token alınmadı. Düzeltmeden sonraki fiziksel iOS/Android piksel görünümü bu oturumda doğrulanmadı. Başka tasarım değişikliği yapılmadı. Ortak geliştirme servisleri durdurulmadı; testler yalnız `oggaq_test` ve mobil 5186 kullandı. Backend/API, deploy, mağaza paketi veya push yok.
+
 ## Güncel doğrulama — 25 Ekim 2026, markadan ana sayfaya dönüş
 
 - Mobil üst başlık ve yan menüdeki logo/marka yazısı ile Profil altındaki marka, mevcut bağlamdaki Ana sayfa sekmesini açar. Yan menü önce kapanır. Erişilebilir düğme adı ve en az 44 px hedef kullanılır; başlık düğmesi klavyeyle de çalışır.
