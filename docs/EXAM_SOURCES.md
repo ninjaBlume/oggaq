@@ -1,8 +1,26 @@
 # Resmî sınav kaynağı hazırlığı — 26 Ekim 2026
 
-Durum: **kaynaklar indirildi ve inceleme çıktıları hazır; veritabanına aktarım/yayın yapılmadı.** Kullanıcı güncel kitapçıkların/cevapların toplanmasını istedi. Gerçek soru aktarımı yapılmadı. Kullanıcı ayrıca yalnız eğitim ayrımı migration'ının yerel `oggaq` veritabanına uygulanmasını onayladı; 26 Ekim 2026'da uygulandı. Hesaplar ve soru/sonuç kayıtları korunur; sunucu operasyonu Claude tarafından yürütülür.
+Durum: **98. yenileme eğitimi, silahlı 125 ve silahsız 100 soru olarak oggsor.com üzerinde yayımlandı.** Kullanıcı review.html açıkken aktarımın tamamlanmasını istedi. 122. temel kitapçığı bu aktarımın dışında, önizleme durumundadır. Yerel eğitim migration'ı önce ayrı onayla tamamlandı. Bu aktarımda telefonun API'si olan sunucudaki gerekli migration/kod güncellemesi de kullanıcıya bildirilerek dar kapsamda yapıldı. Normal sunucu operasyonu/backup sorumluluğu Claude'da kalır; deploy ve backup betikleri değiştirilmedi.
 
-## Kaynak ve kapsam
+## Tamamlanan 98. yenileme aktarımı
+
+- Ek bağımsız kaynak: [Akademi Güvenlik 98. yenileme PDF](https://www.guvenlikegitimi.com/wp-content/uploads/2026/09/98.-Yenileme-Sinavi.pdf). İndirilen dosya, Alo Güvenlik kopyasıyla **birebir aynı SHA-256** değerini verdi: `062643ead5b3d9add2b3a0d11dce61d0dc6b24e253d01cb2a96b38b271e9bda5`. EGM asıl dosyasına doğrudan erişilmiş gibi işaretlenmedi; kanıt iki ayna, 125/125 A-B karşılaştırması ve 14 sayfanın görsel kontrolüdür. Önceki “asıl dosya hash'i olmadan bekle” yaklaşımı, bu ek kanıt ve inceleme tamamlanınca aktarımın önünde tutulmadı.
+- 125 sorunun 11 ders grubuna eşleştirmesi tamamlandı. İncelenmiş snapshot `renewal-98-reviewed-import.json`; SHA-256: `4e2dcd1d5790c4a43cf07244b0c9cd4f0646eb6426a839f8b374a8a2d9c02377`. Son kullanıcı talimatı, açık önizlemenin bu kapsamda aktarım onayı olarak uygulandı.
+- **123 yeni soru** oluşturuldu, aynı ders/metin/seçenek sırası/doğru cevaba sahip **2 yayımlanmış soru** yeniden kullanıldı. Mevcut soru sürümleri değiştirilmedi. Tek silahlı kaynak, ilk 100 sabit soru sürümünü paylaşan silahsız seçeneği üretti. Yeni ders sınavı oluşturulmadı.
+- İki 98. yenileme dönemi, `29.08.2026` tarihiyle mevcut yayımlanmış `verified_guide_2026_renewal_armed` / `unarmed` kurallarına bağlandı. Karar türü `level`; mevcut puanlama kuralları veya eski hesaplar değiştirilmedi.
+- Aktarım batch: `01a17518-4a3c-72b8-83aa-54befcf4592e`; silahlı sınav: `01a17518-7ea1-719b-870f-7980396c022f`; silahsız sınav: `01a17518-80d0-734a-8684-03cf49f262cb`. Aynı batch tekrarının aynı sonucu verdiği doğrulandı. İşlem 26 Ekim 2026 **01:05 Türkiye saati** civarında tamamlandı (makine kaydı `2026-10-25T22:05:03Z`).
+- REPEATABLE READ transaction içinde **19 tablonun önceden var olan satırlarının** özetleri korundu. Hesaplar, eski sorular/sınavlar, cevaplar, konumlar, puan sonuçları ve kural kayıtları değiştirilmedi. Eski **286 temel sınav** korundu; iki yenileme seçeneği eklendi. Bu işlem yerel geliştirme `oggaq` veritabanına gerçek içerik yazmadı.
+- Commit sonrasında sunucuda 125 sorunun metin, seçenek, doğru cevap ve ders kodu incelenmiş JSON ile birebir karşılaştırıldı. Silahsız sürüm ilk 100 sürümü paylaşır, iki dönem bağlantısı yenileme/seviye modelidir. `oggsor.com` webinde kayıtlı geliştirme öğrencisiyle yalnız giriş/liste görüntüleme/çıkış yapıldı: 390/1280 px'de 125/100 soru görünür, eğitim seçimi silah değişiminde korunur. Sınav başlatılmadı veya cevap/geçmiş yazılmadı; kontrolün kendi oturumu kapatıldı. Expo Go API'si aynı hosttur; fiziksel telefon bu teslimde ayrıca kullanılmadı.
+
+## Sınırlı sunucu güncellemesi
+
+`eedc82f` import aracı ve daha önce test edilmiş eğitim ayrımı dosyaları, mevcut `font-fa7c255` imajlarından türetilen `oggaq-development-app:renewal98-eedc82f` / `oggaq-development-web:renewal98-eedc82f` imajlarına alındı. Önceki AppServiceProvider tabanı yerel HEAD ile SHA-256 eşleşti. Yalnız 12 backend dosyası ve hazırlanmış öğrenci/admin dosyaları eklendi; eski hashli web varlıkları imajda kaldı. Paket bağımlılıkları/config/secrets değiştirilmedi. Yalnız adlandırılmış eğitim migration'ı çalıştırıldı.
+
+Aktif kaynak `/home/harun/oggaq-development/releases/renewal98-eedc82f`; `manage` aynı release etiketiyle güncellendi. app/worker/scheduler/web yeniden oluşturuldu; PostgreSQL, Redis, posta ve tünel servisleri ile diğer siteler korunur. Önceki release/imajlar tutulur. Yeniden üretilebilir yayın girdileri `publication/` altında saklanır. Sunucu kayıtları `app-build.log`, `web-build.log`, `migration.log`, `activation.log` ve `renewal-manifest.json`; önceki manage betiği `manage.before` içinde. Hiçbir `deploy/` veya backup betiği değiştirilmedi.
+
+İçerik kanıtı/snapshot ve receipt sunucu özel storage alanında `storage/app/private/imports/renewal-98-eedc82f/` altında. Yerel kontrol kanıtları `artifacts/renewal98-live/` içinde; gerçek credential/cookie/token kayda alınmadı. Git push yapılmadı.
+
+## İlk hazırlığın kaynak ve kapsam kaydı
 
 [EGM 122. temel / 98. yenileme duyurusu](https://egm.gov.tr/ozelguvenlik/ozel-guvenlik-122-temel-egitim-ve-98-yenileme-egitimi-sinavina-ait-soru-kitapciklari-ve-cevap-anahtarlari-yayimlanmistir) arama dizininde dört kitapçığı listeliyor. Duyuruya doğrudan erişim `egm.gov.tr` ve `www.egm.gov.tr` üzerinden HTTP 500 döndü. Bu yüzden orijinal EGM dosyasıyla SHA-256 karşılaştırması yapılamadı. Dosyalar [kaynağı gösterilen ayna sayfasından](https://www.guvenlikkursu.com/sinav/cikmis-sorular/122-temel-98-yenileme) indirildi; henüz birincil kaynağı doğrulanmış sayılmaz.
 
@@ -38,11 +56,11 @@ python3 scripts/extract-exam-booklet.test.py
 
 20 MiB / 40 sayfa sınırı, doğru başlık/eğitim/dönem/kitapçık kontrolü, 1–100 ardından 1–25 sıra kontrolü, tam beş seçenek, tek işaretli cevap, aynı satırdaki renkli seçenekleri ayırma ve atış bölümü öncesindeki talimatları ayıklama vardır. Farklı soru sayısı/biçim OCR veya resim içeriği otomatik yayımlanmaz. Script veritabanına bağlanmaz.
 
-## Kalan işler
+## İlk hazırlıkta kalanlar ve güncel sınır
 
-26 Ekim tekrar kontrolü: EGM duyurusu iki alan adında da yeniden HTTP 500 döndü. Yerel `oggaq` üzerinde açıkça READ ONLY transaction ile yalnız yayımlanmış 2.759 soru/sürüm/seçenek ve ders bilgisi karşılaştırıldı; hesap verisi okunmadı ve içerik yazılmadı. Unicode NFC/boşluk normalizasyonuyla metin, seçenek sırası ve doğru cevap birlikte eşleştirildi. 98 yenileme A kitapçığında **2 birebir yayımlanmış eşleşme, 123 editör incelemesi gerektiren kayıt** var. 122 temel A için de sonuç 2/123. Eşleşmeyen soru aynı metin veya kaynak numarası varsayımıyla otomatik birleştirilmedi. Raporlar `renewal-98-mapping-preview.json` / `basic-122-mapping-preview.json`; bunlar da `publishable: false` durumundadır. Sınav içeriği aktarımı hâlâ tamamlanmadı.
+26 Ekim tekrar kontrolü: EGM duyurusu iki alan adında da yeniden HTTP 500 döndü. Yerel `oggaq` üzerinde açıkça READ ONLY transaction ile yalnız yayımlanmış 2.759 soru/sürüm/seçenek ve ders bilgisi karşılaştırıldı; hesap verisi okunmadı ve içerik yazılmadı. Unicode NFC/boşluk normalizasyonuyla metin, seçenek sırası ve doğru cevap birlikte eşleştirildi. 98 yenileme A kitapçığında **2 birebir yayımlanmış eşleşme, 123 editör incelemesi gerektiren kayıt** var. 122 temel A için de sonuç 2/123. Eşleşmeyen soru aynı metin veya kaynak numarası varsayımıyla otomatik birleştirilmedi. Raporlar `renewal-98-mapping-preview.json` / `basic-122-mapping-preview.json`; bunlar da `publishable: false` durumundadır. Bu tarihsel kontrolün ardından yukarıdaki bağımsız PDF/görsel kontrolü tamamlandı ve 98. yenileme aktarımı yapıldı.
 
-1. EGM duyuru/özgün dosyası erişilebilirken aynaların bütünlüğünü doğrulamak.
-2. PDF görünümünü tüm sorular için incelemek; ders/konu eşlemesini, varsa görsel/özel karakterleri doğrulamak. Metin çıkarımı ve A-B tutarlılığı tek başına tam görsel inceleme değildir.
-3. Mevcut soru havuzuyla tekrar önizlemesi, kaynak/hak ve editör onayı sonrası normal API/domain işlemleriyle aktarım hazırlamak.
-4. Yerel eğitim ayrımı migration'ı uygulandı. Sunucuda migration/API sürümünü operasyon sahibiyle yayına almak; ardından onaylı içerik aktarımı yapmak. Bu çalışma `deploy/` veya yedek betiklerini değiştirmez.
+1. Doğrudan EGM dosyası tekrar erişilebilir olduğunda ek birincil kaynak kontrolü yapılabilir; mevcut 98. yenileme yayını, kayda alınan ayna karşılaştırması/görsel kontrolüyle tamamlandı.
+2. 98. yenilemenin 14 sayfası ve ders eşleştirmesi incelendi. 122. temel için tam görsel/ders incelemesi ve aktarım bu teslimin kapsamında tamamlanmış sayılmaz.
+3. 98. yenileme için tekrar önizlemesi ve onaylı domain aktarımı tamamlandı. 122. temel snapshot'ı halen önizlemedir; otomatik aktarım veya güncel tüm tarihsel dönemlerin yüklendiği iddia edilmez.
+4. Yerel ve sunucu eğitim migration'ı/API sürümü uygulandı; canlı API/web okuma kontrolü tamamlandı. Sunucu/yedek betikleri ve diğer projeler değiştirilmedi.
