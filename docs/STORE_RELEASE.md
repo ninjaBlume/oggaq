@@ -19,7 +19,7 @@ Durum (25 Ekim 2026): **yayına hazır değil.** Kod tarafında hesap silme, sor
 | Uygulama ikonu, uyumlu (adaptive) ikon, açılış simgesi, favicon | **Geçici** marka: `apps/mobile/assets/` | Kullanıcı (nihai logo) |
 | Yerel açılış ekranı (native splash) | SDK 58 uyumlu eklentiyle mevcut simge, mavi zemin ve koyu tema hazır; iki native proje üretimi doğrulandı | Yeni release paketinde görsel kontrol |
 | Derleme yapılandırması | `eas.json` üç profilde `https://oggsor.com`; canlı HTTPS/API ve oturum doğrulandı, yasal taslak onayı bekleniyor | Alan adı bağlantısı + paket doğrulama |
-| Paket kimliği | **Geçici**: `net.harunaltay.oggaq` | Kullanıcı (yayıncı kararı) |
+| Paket kimliği | **`net.codentum.oggsor`** (Android/iOS ortak marka kimliği); mağaza kaydı ve imzalama yeni kimlikle doğrulanacak | Paket gönderimi öncesi |
 | Takip, reklam, analitik SDK'sı | Yok (gizlilik beyanı basit) | — |
 | Üçüncü taraf girişi (Apple ile Giriş zorunluluğu) | Yok | — |
 | Ödeme / uygulama içi satın alma | Yok | — |
@@ -54,7 +54,7 @@ Sayfalar JavaScript olmadan çalışan statik HTML'dir; web uygulamasıyla aynı
 ## 2. Kimlik kararları (gönderimden önce)
 
 - **Yayıncı:** mağazada görünen satıcı/yayıncı adı. Gizlilik politikasındaki veri sorumlusuyla uyumlu olmalı. Karar kullanıcıdadır.
-- **Paket kimliği:** `apps/mobile/app.config.ts` içinde tek yerdedir (`OGGAQ_BUNDLE_ID` ortam değişkeni, varsayılan `net.harunaltay.oggaq`). İki platformu birlikte değiştirir. İlk App Store Connect / Play Console yüklemesinden sonra değiştirilemez; yayıncı belli olmadan karar verilmemeli.
+- **Paket kimliği:** Ortak kaynak `config/brand.json` → `bundleIdentifier: "net.codentum.oggsor"`; `apps/mobile/app.config.ts` iki platformda bu kimliği kullanır. `OGGAQ_BUNDLE_ID` profil değişkeni yalnız bilinçli ayrı test uygulaması için kullanılabilir. Önceki `net.harunaltay.oggaq` geliştirme kimliğidir; yeni paket ayrı kurulur ve yeniden giriş ister. Mağaza kaydı, imzalama ve ilk gönderim yeni kimlikle doğrulanmalıdır. [Apple](https://developer.apple.com/documentation/xcode/changing-the-bundle-identifier) ilk build gönderildikten sonra mevcut kaydın Bundle ID’sini değiştirmez; [Google](https://support.google.com/googleplay/android-developer/answer/9859152) paket adını kalıcı kabul eder. Bu değişiklik mağazada kayıt veya paket yüklemesi yapmaz.
 - **Sürüm:** `version` `0.1.0`; `ios.buildNumber` ve `android.versionCode` `1`. EAS `production` profili derleme numaralarını `autoIncrement` ile artırır.
 
 ## 2a. Yasal sayfa değerlerini tek dosyadan doldurma

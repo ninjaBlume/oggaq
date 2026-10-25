@@ -1,5 +1,12 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, mobil paket kimliği
+
+- Android/iOS ortak kimliği `config/brand.json` → `bundleIdentifier: net.codentum.oggsor` oldu. Expo yapılandırması ortak değeri okur; native açılış CI'ı kimliği APK/Info.plist içinden alır.
+- **17 mağaza betiği testi**, **27 mobil Vitest**, ortak strict TypeScript, `check:brand` ve üretilmiş PHP marka yapılandırmasının sözdizimi kontrolü geçti. Mağaza kontrolü eksik/bozuk kimliği ve production profilinin geçersiz kimlik override'ını reddeder.
+- Tek mevcut `node_modules` dizinine symlink kullanan geçici projede Android/iOS `expo prebuild --no-install` başarılı. Android `namespace`/`applicationId` ve iOS Debug/Release `PRODUCT_BUNDLE_IDENTIFIER` yeni kimlikle; görünen ad ve iki URL şeması (`oggsor`, `oggaq`) doğrulandı. Native smoke YAML ve shell sözdizimi kontrol edildi; uzak CI veya gerçek cihaz açılışı bu teslimde çalıştırılmadı.
+- İmzalı APK/IPA, mağaza kaydı/yüklemesi, sunucu dağıtımı veya push yapılmadı. Backend davranışı/DB/API değişmedi; PHPUnit ve E2E bu yapılandırma değişikliğinde yeniden çalıştırılmadı. `check:store` mevcut **8 hukuki engel** ve **1 sürüm uyarısı** nedeniyle 1 döner; geçici paket kimliği uyarısı kalktı. Geçici native proje temizlendi.
+
 ## Son canlı doğrulama — 25 Ekim 2026, onaylanan alan adı ve posta geçişi
 
 - Kullanıcının açık onayıyla Squarespace NS'leri Cloudflare `nova` / `yichun` olarak değiştirildi; `.com` üst bölgesinde yalnız yeni NS'ler doğrulandı. DNSSEC yeni Cloudflare DS ile tekrar kuruldu; üst bölge DS eşleşmesi ve Quad9 yanıtında **AD** bayrağı doğrulandı. Bazı çözümleyicilerde eski NS/A/DS önbelleği sürüyordu; bu, yayılımın tüm ağlarda bittiği anlamına gelmez.

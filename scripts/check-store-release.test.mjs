@@ -22,10 +22,10 @@ function repo(mutate = () => {}) {
   writeFileSync(join(root, 'apps/mobile/assets/adaptive-icon.png'), pngHeader(1024, 1024, 6));
   writeFileSync(join(root, 'apps/mobile/assets/splash-icon.png'), pngHeader(1024, 1024, 6));
   writeFileSync(join(root, 'apps/mobile/assets/favicon.png'), pngHeader(196, 196, 2));
-  writeFileSync(join(root, 'config/brand.json'), JSON.stringify({ supportEmail: 'destek@alan.example.org' }));
+  writeFileSync(join(root, 'config/brand.json'), JSON.stringify({ supportEmail: 'destek@alan.example.org', bundleIdentifier: 'net.codentum.oggsor' }));
   writeFileSync(join(root, 'apps/web/src/config.ts'), "export const brand = { supportEmail: 'destek@alan.example.org' };");
   writeFileSync(join(root, 'apps/mobile/eas.json'), JSON.stringify({ build: { production: { env: { EXPO_PUBLIC_API_URL: 'https://soru.gercek.net', EXPO_PUBLIC_WEB_URL: 'https://soru.gercek.net' } } } }));
-  writeFileSync(join(root, 'apps/mobile/app.config.ts'), 'const bundleId = process.env.OGGAQ_BUNDLE_ID ?? "com.sirket.uygulama";\nconst c = { version: "1.0.0" };');
+  writeFileSync(join(root, 'apps/mobile/app.config.ts'), 'const bundleId = process.env.OGGAQ_BUNDLE_ID ?? brand.bundleIdentifier;\nconst c = { version: "1.0.0" };');
   writeFileSync(join(root, 'apps/mobile/package.json'), '{"dependencies":{"expo-splash-screen":"1.0.0"}}');
   writeFileSync(join(root, 'docs/STORE_RELEASE.md'), '# x\n\n## Elle kontrol\n\n- [x] Yapıldı\n\n## Sonraki\n');
   mutate(root);
@@ -59,7 +59,7 @@ test('assets: wrong size, alpha in the store icon and missing files', () => {
 });
 test('shared support e-mail must be configured', () => {
   const { blockers } = run((root) => {
-    writeFileSync(join(root, 'config/brand.json'), JSON.stringify({ supportEmail: '' }));
+    writeFileSync(join(root, 'config/brand.json'), JSON.stringify({ supportEmail: '', bundleIdentifier: 'net.codentum.oggsor' }));
     writeFileSync(join(root, 'apps/web/src/config.ts'), "export const brand = { supportEmail: '' };");
   });
   assert.equal(blockers.length, 1);
@@ -73,7 +73,10 @@ test('the production profile needs real HTTPS addresses', () => {
   assert.match(run((root) => writeFileSync(join(root, 'apps/mobile/eas.json'), '{}')).blockers[0], /production profili yok/);
 });
 test('placeholder bundle id and version are warnings, not blockers', () => {
-  const result = run((root) => writeFileSync(join(root, 'apps/mobile/app.config.ts'), 'const bundleId = process.env.OGGAQ_BUNDLE_ID ?? "net.harunaltay.oggaq";\nconst c = { version: "0.1.0" };'));
+  const result = run((root) => {
+    writeFileSync(join(root, 'config/brand.json'), JSON.stringify({ supportEmail: 'destek@alan.example.org', bundleIdentifier: 'net.harunaltay.oggaq' }));
+    writeFileSync(join(root, 'apps/mobile/app.config.ts'), 'const c = { version: "0.1.0" };');
+  });
   assert.deepEqual(result.blockers, []);
   assert.equal(result.warnings.length, 2);
 });
@@ -85,4 +88,19 @@ test('unchecked "Elle kontrol" items are listed as reminders', () => {
   const { blockers, manual } = run((root) => writeFileSync(join(root, 'docs/STORE_RELEASE.md'), '## Elle kontrol\n\n- [ ] Soru içeriği hakkı yazılı teyit\n- [x] Demo hesap\n- [ ] Uzman puanlama onayı\n\n## Başka\n- [ ] Bu liste dışı\n'));
   assert.deepEqual(blockers, []);
   assert.deepEqual(manual, ['Soru içeriği hakkı yazılı teyit', 'Uzman puanlama onayı']);
+});
+
+
+test('missing or malformed app identity blocks a store release', () => {
+  for (const bundleIdentifier of [undefined, '', 'Ogg Sor', 'net.codentum.ogg-sor']) {
+    const result = run((root) => writeFileSync(join(root, 'config/brand.json'), JSON.stringify({ supportEmail: 'destek@alan.example.org', bundleIdentifier })));
+    assert.match(result.blockers.join('\n'), /Paket kimliği/);
+  }
+});
+
+test('the production profile override is checked instead of the default identity', () => {
+  const result = run((root) => writeFileSync(join(root, 'apps/mobile/eas.json'), JSON.stringify({ build: { production: { env: {
+    EXPO_PUBLIC_API_URL: 'https://soru.gercek.net', EXPO_PUBLIC_WEB_URL: 'https://soru.gercek.net', OGGAQ_BUNDLE_ID: 'invalid'
+  } } } })));
+  assert.match(result.blockers.join('\n'), /Paket kimliği/);
 });

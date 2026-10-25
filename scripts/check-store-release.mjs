@@ -57,9 +57,10 @@ export function checkRelease(root) {
     else if (placeholderHost.test(host)) blockers.push(`eas.json production: ${key} yer tutucu bir adrese bakıyor (${host}); gerçek alan adını yazın.`);
   }
 
-  // 5. Decisions that are not blockers by themselves.
+  // 5. App identity must be valid; temporary identity and version still need review.
   const appConfig = read(join(mobile, 'app.config.ts')) ?? '';
-  const bundle = /OGGAQ_BUNDLE_ID \?\? "([^"]+)"/.exec(appConfig)?.[1];
+  const bundle = eas.build?.production?.env?.OGGAQ_BUNDLE_ID ?? brand.bundleIdentifier;
+  if (typeof bundle !== 'string' || !/^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*){2,}$/i.test(bundle)) blockers.push('Paket kimliği config/brand.json içinde veya production profilinde geçerli ters alan adı biçiminde olmalı.');
   if (bundle === 'net.harunaltay.oggaq') warnings.push('Paket kimliği hâlâ geçici (net.harunaltay.oggaq). İlk yüklemeden sonra değiştirilemez; yayıncı kararı gerekir.');
   const version = /\bversion:\s*"([^"]+)"/.exec(appConfig)?.[1];
   if (version === '0.1.0') warnings.push('Sürüm hâlâ 0.1.0.');

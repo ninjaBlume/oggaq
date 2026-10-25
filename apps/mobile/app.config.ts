@@ -2,10 +2,9 @@ import { darkPalette, lightPalette } from "@oggaq/design-tokens";
 import brand from "../../config/brand.json";
 import type { ExpoConfig } from "expo/config";
 const localPreview = process.env.EXPO_PUBLIC_LOCAL_PREVIEW === "1";
-// The store identity lives here and nowhere else. PLACEHOLDER until the publisher decides (docs/STORE_RELEASE.md):
-// set OGGAQ_BUNDLE_ID in the EAS build profile (eas.json) to change both platforms at once. It cannot be changed after
-// the first App Store Connect / Play Console upload.
-const bundleId = process.env.OGGAQ_BUNDLE_ID ?? "net.harunaltay.oggaq";
+// Shared Android/iOS identity. Profile overrides are for deliberately separate test apps.
+// A store upload binds that app record to its identifier (docs/STORE_RELEASE.md).
+const bundleId = process.env.OGGAQ_BUNDLE_ID ?? brand.bundleIdentifier;
 const config: ExpoConfig = {
   name: localPreview ? `${brand.displayName} Önizleme` : brand.displayName,
   slug: "oggaq",

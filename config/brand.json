@@ -7,5 +7,6 @@
   "websiteUrl": "https://oggsor.com",
   "supportEmail": "destek@oggsor.com",
   "mailFromAddress": "no-reply@oggsor.com",
-  "exportPrefix": "oggsor-verilerim"
+  "exportPrefix": "oggsor-verilerim",
+  "bundleIdentifier": "net.codentum.oggsor"
 }

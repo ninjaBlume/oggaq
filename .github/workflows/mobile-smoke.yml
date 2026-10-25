@@ -43,7 +43,10 @@ jobs:
           script: |
             mkdir -p smoke
             adb install native-artifacts/app-release.apk
-            adb shell am start -n net.harunaltay.oggaq/.MainActivity
+            OGGAQ_AAPT=$(python3 -c "import os; from pathlib import Path; tools=sorted(Path(os.environ['ANDROID_HOME']).glob('build-tools/*/aapt')); assert tools; print(tools[-1])")
+            OGGAQ_ANDROID_ID=$("$OGGAQ_AAPT" dump badging native-artifacts/app-release.apk | sed -n "s/^package: name='\([^']*\)'.*/\1/p")
+            test -n "$OGGAQ_ANDROID_ID"
+            adb shell am start -n "$OGGAQ_ANDROID_ID/.MainActivity"
             sleep 5
             adb shell uiautomator dump /sdcard/oggaq-login.xml
             adb pull /sdcard/oggaq-login.xml smoke/android-login.xml
@@ -85,7 +88,9 @@ jobs:
           xcrun simctl bootstatus "$OGGAQ_SIMULATOR_ID" -b
           OGGAQ_IOS_APP=$(python3 -c "from pathlib import Path; apps=list(Path('native-artifacts/unpacked').glob('*.app')); assert len(apps)==1; print(apps[0])")
           xcrun simctl install "$OGGAQ_SIMULATOR_ID" "$OGGAQ_IOS_APP"
-          xcrun simctl launch "$OGGAQ_SIMULATOR_ID" net.harunaltay.oggaq > smoke/ios-launch.txt
+          OGGAQ_IOS_BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$OGGAQ_IOS_APP/Info.plist")
+          echo "OGGAQ_IOS_BUNDLE_ID=$OGGAQ_IOS_BUNDLE_ID" >> "$GITHUB_ENV"
+          xcrun simctl launch "$OGGAQ_SIMULATOR_ID" "$OGGAQ_IOS_BUNDLE_ID" > smoke/ios-launch.txt
           sleep 5
           OGGAQ_APP_PID=$(awk '{print $NF}' smoke/ios-launch.txt)
           echo "OGGAQ_APP_PID=$OGGAQ_APP_PID" >> "$GITHUB_ENV"
@@ -95,7 +100,7 @@ jobs:
         if: failure() && env.OGGAQ_SIMULATOR_ID != ''
         run: |
           mkdir -p smoke
-          xcrun simctl spawn "$OGGAQ_SIMULATOR_ID" log show --style compact --last 3m --predicate "processIdentifier == ${OGGAQ_APP_PID:-0} OR eventMessage CONTAINS \"net.harunaltay.oggaq\"" > smoke/ios-system.log || true
+          xcrun simctl spawn "$OGGAQ_SIMULATOR_ID" log show --style compact --last 3m --predicate "processIdentifier == ${OGGAQ_APP_PID:-0} OR eventMessage CONTAINS \"${OGGAQ_IOS_BUNDLE_ID:-unknown}\"" > smoke/ios-system.log || true
           xcrun simctl io "$OGGAQ_SIMULATOR_ID" screenshot smoke/ios-failure.png || true
       - uses: actions/upload-artifact@v4
         if: always() && env.OGGAQ_SIMULATOR_ID != ''

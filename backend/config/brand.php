@@ -11,4 +11,5 @@ return [
     'supportEmail' => 'destek@oggsor.com',
     'mailFromAddress' => 'no-reply@oggsor.com',
     'exportPrefix' => 'oggsor-verilerim',
+    'bundleIdentifier' => 'net.codentum.oggsor',
 ];
