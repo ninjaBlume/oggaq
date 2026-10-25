@@ -8,6 +8,14 @@ Kaynak dosyalar değiştirilmez. Gerçek kaynak veri aktarımı kullanıcı onay
 
 ## Güvenli iş akışı
 
+### İncelenmiş kitapçık JSON'u — 26 Ekim 2026
+
+`import:booklet <json> <pdf> <ikinci-pdf> --by=<platform-admin>` yalnız önizleme kaydı oluşturur. Aynı komuta `--commit=<batch> --approve=<12-haneli-kod>` eklenince onaylı snapshot tek transaction içinde aktarılır. İki farklı hosttan alınmış aynı PDF'nin SHA-256 kanıtı, A/B 125 soru eşleşmesi, tamamlanmış görsel/ders incelemesi ve mevcut yayımlanmış dönem kuralları zorunludur. Bu yöntem doğrudan EGM dosyasına erişilmiş olduğu iddiasını üretmez; kullanılan aynalar ve doğrulama yöntemi rapora/kaynağa yazılır.
+
+Dosya, PDF kanıtı veya onay raporu değişirse onay geçersizdir. Rapor özeti JSONB anahtar sırasından bağımsızdır; işlem sonucu onaylı snapshot'ın dışında eklenir. Her soru için sıra, beş farklı dolu seçenek, tek doğru cevap, ders kodu ve son 25 sorunun silah dersi olması doğrulanır. Sadece aynı ders/metin/seçenek sırası/doğru cevaba sahip tek yayımlanmış sürüm yeniden kullanılır; belirsiz eşleşme durdurulur. Mevcut soru sürümleri değiştirilmez.
+
+125 soruluk silahlı ana kayıt ilk 100 sorusunu paylaşan silahsız seçeneği üretir; ders sınavı oluşturulmaz. Eksik dönem kaydı yalnız belirtilmiş uygun yayımlanmış kuralla eklenir; mevcut tarih/kural ezilmez. İşlem ve sınav kimliği tekrarları ikinci soru/sınav üretmez; farklı onaylı içerikle aynı sınavı değiştirmeye izin verilmez. Hata; kaynak, dönem, soru ve sınav yazmalarını birlikte geri alır. Araç doğrudan öğrenci hesabına veya geçmiş çözümlere yazmaz.
+
 1. Platform yöneticisi dosyayı yükler. Dosya boyutu, MIME/içerik, hash ve kaynak/hak bilgisi kaydedilir; kaynak özel karantinaya alınır.
 2. Analiz işi sınırlı süre/bellek ve uygulama/üretim veritabanına erişemeyen ortamda çalışır. SQL uygulama connection'ında yürütülmez. SQL için önce lexer/parser veya gerekiyorsa izole geçici inceleme ortamı değerlendirilir.
 3. PDF'de metin/tablo/görsel yapısı incelenir. Metin katmanı yoksa OCR ihtiyacı ayrıca belirlenir; seçilmemiş üçüncü taraf servise içerik gönderilmez.
