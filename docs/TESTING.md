@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, yeni logo seçimi
+
+- Ürün sahibinin yeni yıldız/ay-yıldız ve ÖGG SOR yazılı görseli öncekinin yerine doğrudan ana kaynak olarak alındı; yeni çizim veya yapay zekâ üretimi yapılmadı. Mobil simge, Android güvenli alanı, splash, favicon ve 256 px / yaklaşık 56 KB uygulama içi logo yeniden üretildi.
+- Web/yönetim logoları Vite’ın içerik hash’li adresiyle, yasal sayfa logosu ve faviconlar SHA-256 sürümlü adresle yüklenir. Eski logo/favikonu tutan tarayıcı/CDN önbelleği yeni adrese taşınmaz.
+- **49 ilgili Vitest** (web 6 / admin 16 / mobil 27), **17 mağaza betiği testi**, ortak strict TypeScript, `check:brand`, web/admin build ve Android/iOS/web Metro export geçti. Backend/DB/API davranışı değişmedi; ortak test DB’si, PHPUnit ve tam API E2E kullanılmadı. Yeni imzalı APK/IPA veya mağaza yüklemesi yapılmadı.
+
 ## Güncel doğrulama — 25 Ekim 2026, seçilen logo
 
 - Kullanıcının verdiği güvenlik görevlisi/kitap görseli marka kaynağına alındı. Gömülü dama zemini şeffaflığa dönüştürüldü; platform boyutları, Android güvenli alanı ve opak RGB iOS simgesi üretildi. Uygulama içi logo yalnız 256 px / yaklaşık 101 KB; büyük ana görsel JS paketine alınmaz.

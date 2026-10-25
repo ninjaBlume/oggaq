@@ -1,3 +1,4 @@
+import brandLogo from '../../mobile/assets/brand-logo.png';
 import { createContext, useContext, useEffect, useId, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { ApiError } from '@oggaq/api-client';
@@ -74,5 +75,5 @@ export function dateLabel(value: string | null | undefined): string {
 
 // The adjacent wordmark provides the accessible brand name.
 export function BrandLogo() {
-  return <img className="brand-logo" src={`${import.meta.env.BASE_URL}brand-logo.png`} width={48} height={48} alt="" decoding="async" />;
+  return <img className="brand-logo" src={brandLogo} width={48} height={48} alt="" decoding="async" />;
 }

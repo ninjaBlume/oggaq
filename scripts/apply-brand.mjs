@@ -17,6 +17,7 @@ export function brandFiles(root) {
   const files = new Map();
   // A new content URL also refreshes browser/CDN favicon caches after a logo change.
   const faviconHref = `/favicon.png?v=${createHash('sha256').update(readFileSync(join(root, 'apps/mobile/assets/favicon.png'))).digest('hex').slice(0, 12)}`;
+  const logoHref = `/brand-logo.png?v=${createHash('sha256').update(readFileSync(join(root, 'apps/mobile/assets/brand-logo.png'))).digest('hex').slice(0, 12)}`;
   for (const app of ['web', 'admin']) {
     const path = `apps/${app}/index.html`;
     const title = app === 'web' ? brand.displayName : `${brand.name} · Yönetim`;
@@ -34,7 +35,7 @@ export function brandFiles(root) {
     const path = `apps/web/public/legal/${page}.html`;
     const deletionSubject = `${brand.name} hesap silme talebi`;
     let source = read(path).replace(/<title>[\s\S]*?<\/title>/, `<title>${title} · ${html(brand.name)}</title>`)
-      .replace(/<a class="brand" href="\/">[\s\S]*?<\/a>/, `<a class="brand" href="/"><img src="/brand-logo.png" width="48" height="48" alt=""><span>${html(brand.name)}<small>${html(brand.subtitle)}</small></span></a>`)
+      .replace(/<a class="brand" href="\/">[\s\S]*?<\/a>/, `<a class="brand" href="/"><img src="${logoHref}" width="48" height="48" alt=""><span>${html(brand.name)}<small>${html(brand.subtitle)}</small></span></a>`)
       .replaceAll('OGGAQ — ÖGG Soru Cevap Platformu', html(brand.displayName))
       .replaceAll('ÖGG Soru Cevap Platformu’nu', `${html(brand.displayName)} uygulamasını`)
       .replaceAll('OGGAQ hesap silme talebi', `${html(brand.name)} hesap silme talebi`)
