@@ -40,6 +40,8 @@ python3 scripts/extract-exam-booklet.test.py
 
 ## Kalan işler
 
+26 Ekim tekrar kontrolü: EGM duyurusu iki alan adında da yeniden HTTP 500 döndü. Yerel `oggaq` üzerinde açıkça READ ONLY transaction ile yalnız yayımlanmış 2.759 soru/sürüm/seçenek ve ders bilgisi karşılaştırıldı; hesap verisi okunmadı ve içerik yazılmadı. Unicode NFC/boşluk normalizasyonuyla metin, seçenek sırası ve doğru cevap birlikte eşleştirildi. 98 yenileme A kitapçığında **2 birebir yayımlanmış eşleşme, 123 editör incelemesi gerektiren kayıt** var. 122 temel A için de sonuç 2/123. Eşleşmeyen soru aynı metin veya kaynak numarası varsayımıyla otomatik birleştirilmedi. Raporlar `renewal-98-mapping-preview.json` / `basic-122-mapping-preview.json`; bunlar da `publishable: false` durumundadır. Sınav içeriği aktarımı hâlâ tamamlanmadı.
+
 1. EGM duyuru/özgün dosyası erişilebilirken aynaların bütünlüğünü doğrulamak.
 2. PDF görünümünü tüm sorular için incelemek; ders/konu eşlemesini, varsa görsel/özel karakterleri doğrulamak. Metin çıkarımı ve A-B tutarlılığı tek başına tam görsel inceleme değildir.
 3. Mevcut soru havuzuyla tekrar önizlemesi, kaynak/hak ve editör onayı sonrası normal API/domain işlemleriyle aktarım hazırlamak.
