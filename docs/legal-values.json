@@ -9,9 +9,9 @@
     "yayinci-adi": "Codentum L.L.C.",
     "yururluk-tarihi": "",
     "verbis": "",
-    "barindirma-konumu": "",
+    "barindirma-konumu": "Türkiye (İstanbul); barındırma sağlayıcısı Hosting Dünyam Bilişim Teknolojileri Tic. Ltd. Şti.",
     "eposta-saglayicisi": "",
-    "yurt-disi-aktarim": "",
+    "yurt-disi-aktarim": "Verilerin saklandığı sunucu Türkiye'dedir. Siteye ve uygulamaya erişim trafiği, güvenlik ve performans için Cloudflare, Inc. (ABD) ağı üzerinden iletilir.",
     "uygulanacak-hukuk": "",
     "hukuki-sebep": "Hesabı ve sınav hizmetini sunmak, sonuçlarını saklamak ve iş ilanı başvurusunu işleme almak için sözleşmenin kurulması veya ifasıyla doğrudan ilgili olması (KVKK m.5/2-c); güvenliği sağlamak ve hataları gidermek için veri sorumlusunun meşru menfaati (KVKK m.5/2-f).",
     "yanit-suresi": "en geç 30 gün",
@@ -23,7 +23,7 @@
   "_oneriler": {
     "veri-sorumlusu-unvan": "Öneri: platformu işleten ve amaç/araçlara karar veren tüzel kişi. Şirket adı, ticari unvanıyla ve varsa MERSİS numarasıyla.",
     "verbis": "Öneri: KVKK Kurumu sitesinden güncel istisna ölçütlerine bakın. Yükümlü değilseniz: 'VERBİS kayıt yükümlülüğünden istisnadır'; yükümlüyse kayıt numarası.",
-    "yurt-disi-aktarim": "Öneri: sunucu ve e-posta sağlayıcısı Türkiye'deyse 'Kişisel verilerin yurt dışına aktarılmıyor.'; değilse hangi ülkeye, hangi sağlayıcıya ve hangi güvenceyle (KVKK m.9) aktarıldığını yazın.",
+    "yurt-disi-aktarim": "Dikkat: Cloudflare Tunnel/proxy trafiği (giriş parolası dahil) Cloudflare ağından geçer; bunu yurt dışı aktarım sayıp saymayacağınıza ve KVKK m.9 gereğini nasıl karşılayacağınıza siz karar verin. Yazılı metin yalnızca olgusal durumu söylüyor. Ayrıca veri sorumlusu ABD şirketi (Codentum L.L.C.) ise bu da aktarım/temsilci sorusunu doğurur.",
     "uygulanacak-hukuk": "Öneri: 'Türkiye Cumhuriyeti hukuku uygulanır; <şehir> mahkemeleri ve icra daireleri yetkilidir.'",
     "yayinci-adi": "Mağazadaki yayıncı adıyla birebir aynı yazın (Apple/Google hesabındaki ad)."
   }
