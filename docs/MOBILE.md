@@ -2,6 +2,12 @@
 
 `apps/mobile`, React Native 0.88.0 / Expo SDK 58.0.19 ile iOS/Android native bileşenleri kullanır. Kayıt/giriş, doğrulama e-postasını yeniden gönderme ve kontrol etme, parola yenileme e-postası, kişisel/aktif kurum seçimi, ders/konu ve yayımlanmış soru çalışması, geçmiş, süreli deneme/sonuç uygulanmıştır. HTML/web ekranı native içine gömülmez. Ortak API sözleşmesi ve saf sayaç kodu web ile paylaşılır. Uygulamaların React sürümü SDK'nın renderer sürümü 19.3.0'a eşitlendi; güncel geçiş kontrolleri aşağıdadır. Tarihsel doğrulamalar ilgili eski sürümlerini anlatır.
 
+## 25 Ekim 2026: sayfa geçiş logosu
+
+Kullanıcının isteğiyle mobil sekme, menü, sınav ve hesap sayfası geçişlerinde ortada mevcut marka logosu 400 ms gösterilir. Logo hafif ölçek/opaklık hareketi yapar; sistemin hareketi azalt tercihi açıksa sabit kalır. Aynı sekmeyi yeniden seçmek yalnız yukarı kaydırır. Geri dönüşte geçiş yeniden gösterilir; tema değişimi, veri yenileme ve sınavda soru değiştirme tetiklemez. Ekran ve veri istekleri hemen başlar; bu kısa sunum süresinden sonra ekranın kendi yükleme/hata durumu geçerlidir. Logo gerçek ağ işleminin bittiğini iddia etmez.
+
+Örtü dokunmaları engeller ve alttaki içeriği erişilebilirlik ağacından geçici çıkarır. Zamanlayıcı odak/sayfa değişiminde temizlenir, animasyon gizlenince durur; ekranın form/sınav durumu yeniden oluşturulmaz. Yeni bağımlılık yoktur. Sentetik API kullanan, ortak DB'ye dokunmayan tarayıcı kontrolü: Expo web export sonrasında `MOBILE_EXPORT_DIR=/tmp/oggsor-transition-export npm run test:mobile:transitions`. Sonuçlar ve cihaz doğrulama sınırı [TESTING](TESTING.md) içinde.
+
 ## 25 Ekim 2026: Ogg Sor alan adı
 
 Marka **Ogg Sor - Soru Bankası**, güncel web/API kökü **https://oggsor.com**. EAS development/preview/production profilleri ve mobil örnek ortam dosyası yeni adresi kullanır. Sunucuya bağlı mevcut yerel mobil ortam dosyasındaki eski iki URL de güncellendi; Claude'un 8081 Metro süreci durdurulmadı. Eski geliştirme adresi geçişte desteklenir; DNS önbellekleri yenilenirken bazı ağlarda eski park sayfası görülebilir. Yerel API ve 8001 test önizlemesi ayrıca ortam değişkeniyle seçilebilir. Native kurulum adı Android/iOS prebuild'de doğrulandı; yeni APK/IPA üretilmedi. Ayrıntılı canlı kontroller [BRAND](BRAND.md) içinde.

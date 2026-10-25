@@ -1,5 +1,12 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, mobil sayfa geçişi
+
+- Sekme/menü, sınav ve hesap sayfasında 400 ms merkezî logo örtüsü; hareket azaltma tercihi, dokunma/erişilebilirlik engeli ve zamanlayıcı/animasyon temizliği eklendi. Mevcut logo ve tema kullanılır. Soru geçişleri ve veri istekleri geciktirilmez; ağ hatası ekranın kendi hata görünümüne bırakılır.
+- Ortak strict TypeScript, mevcut **31 mobil Vitest** ve Android/iOS/web Metro export başarılı. Yeni `npm run test:mobile:transitions` komutuyla **3 tarayıcı senaryosu** geçti: 390 px normal hareket, 390 px azaltılmış hareket ve 1024 px koyu tablet. Logo merkezde, normal harekette dönüşüm değişiyor, azaltılmış harekette sabit; 210 ms'de açık, 420 ms'de kapalı. Aynı sekme tekrarında örtü yok; hesap ekranı/geri dönüş ve API 500 hatasından sonra menü erişimi doğrulandı.
+- Tarayıcı testleri ayrı geçici export, OS tarafından verilen yerel portlar ve sentetik API yanıtları kullandı. İlk çalışmada animasyon iddiası içteki Image sarmalayıcısını ölçtüğü için başarısız oldu; doğrudan Animated kapsayıcı ölçülünce üçü de geçti. Bu testler fiziksel iOS/Android doğrulaması değildir; bu teslimde gerçek cihaz denenmedi.
+- Backend/API/DB değişmedi. PHPUnit/tam API E2E yeniden çalıştırılmadı; ortak DB ve geliştirme servisleri durdurulmadı. Mobil JS mevcut Metro tarafından izleniyor. Yeni mağaza paketi, sunucu deploy'u ve push yapılmadı.
+
 ## Güncel doğrulama — 25 Ekim 2026, Metro'nun eski marka JSON'u
 
 - Kalıcı neden gerçek Expo Go runtime'ından yakalandı: **ERR_ARGUMENT_CAST**; native String beklenen ilk argümana `undefined` geliyordu. Servis edilen marka JSON'unda ad hâlâ **Ogg Sor**, `wordmarkFontFamily` yoktu; diskteki kaynakta **ÖGG SOR** ve **League Spartan** vardı. Önceki tek-font API değişikliği bu önbellek sorununu çözmemiştir.

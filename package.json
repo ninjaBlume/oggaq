@@ -23,6 +23,7 @@
     "test:web": "npm run test --workspace @oggaq/web",
     "dev:mobile": "npm run dev --workspace @oggaq/mobile",
     "test:mobile": "npm run test --workspace @oggaq/mobile",
+    "test:mobile:transitions": "node --test scripts/mobile-transitions.test.mjs",
     "export:mobile": "npm run export --workspace @oggaq/mobile",
     "test:core": "npm run test --workspace @oggaq/study-core",
     "postinstall": "node scripts/forge-security-patch.mjs",

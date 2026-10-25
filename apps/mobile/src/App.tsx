@@ -1,5 +1,6 @@
 import { BrandWordmark, loadBrandFont } from "./wordmark";
 import { BrandLogo } from "./brandLogo";
+import { PageTransition } from "./pageTransition";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ScrollViewInstance } from "react-native";
 import {
@@ -121,7 +122,7 @@ function MainTabs({
   // Lists and grids use the whole content area; forms (profile, review) stay a reading column.
   const body = useBody(["home", "deneme", "ders", "history", "stats"].includes(tab));
   return (
-    <>
+    <PageTransition page={`${context.id}:${tab}:${tab === "ders" ? subject ?? "" : ""}`}>
       <SafeAreaView
         style={styles.shell}
         edges={["top", "left", "right"]}
@@ -209,7 +210,7 @@ function MainTabs({
           close={() => setMenuOpen(false)}
         />
       )}
-    </>
+    </PageTransition>
   );
 }
 function Workspace({
@@ -340,7 +341,11 @@ function Workspace({
           )}
         </Stack.Screen>
         <Stack.Screen name="Account" options={{ title: vocabulary.account.title }}>
-          {() => <AccountScreen user={user} refresh={refresh} finished={signedOut} />}
+          {() => (
+            <PageTransition page={`account:${user.id}`}>
+              <AccountScreen user={user} refresh={refresh} finished={signedOut} />
+            </PageTransition>
+          )}
         </Stack.Screen>
         <Stack.Screen name="Exam" options={{ title: "Sınav" }}>
           {({ route }) => <ExamDetail context={context} id={route.params.id} />}
@@ -350,7 +355,11 @@ function Workspace({
   );
 }
 function ExamDetail({ context, id }: { context: StudyContext; id: string }) {
-  return <Exam key={id} context={context} id={id} />;
+  return (
+    <PageTransition page={`exam:${context.id}:${id}`}>
+      <Exam key={id} context={context} id={id} />
+    </PageTransition>
+  );
 }
 function Application() {
   const { styles } = useTheme();
