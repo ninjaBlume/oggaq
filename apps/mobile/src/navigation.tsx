@@ -15,7 +15,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import type { StudyContext, User } from "@oggaq/shared-types";
-import brand from "../brand.json";
+import brand from "../../../config/brand.json";
 import {
   BookOpen,
   Building2,
@@ -104,7 +104,7 @@ export function MainHeader({
       <View style={navStyles.brand}>
         <ShieldCheck size={23} color={palette.primary} strokeWidth={1.8} />
         <View style={{ flex: 1, gap: 2 }}>
-          <Text style={navStyles.wordmark}>{brand.displayName}</Text>
+          <Text style={navStyles.wordmark}>{brand.name}</Text>
           <Text numberOfLines={1} style={navStyles.contextLabel}>
             {context.kind === "personal" ? brand.subtitle : context.name}
           </Text>
@@ -304,7 +304,7 @@ export function SideMenu({
               <View style={navStyles.brand}>
                 <ShieldCheck size={24} color={palette.accent} />
                 <Text style={[navStyles.wordmark, { color: palette.onNavy }]}>
-                  {brand.displayName}
+                  {brand.name}
                 </Text>
               </View>
               <Pressable

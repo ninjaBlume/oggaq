@@ -1,7 +1,7 @@
 import { Linking, Pressable, Text, View } from "react-native";
 import { legalPages, legalUrl, notOfficialNotice } from "@oggaq/study-core";
 import type { LegalPageId } from "@oggaq/study-core";
-import brand from "../brand.json";
+import brand from "../../../config/brand.json";
 import { frontendUrl } from "./api";
 import { useTask } from "./hooks";
 import { ExternalLink } from "./icons";

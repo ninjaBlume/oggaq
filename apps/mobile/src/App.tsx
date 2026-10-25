@@ -24,7 +24,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ArrowLeft, ShieldCheck } from "./icons";
 import type { StudyContext, User } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
-import brand from "../brand.json";
+import brand from "../../../config/brand.json";
 import { api, sessionExpiredHandler } from "./api";
 import { session, verifyPreviewStorage } from "./storage";
 import { Login, Verify } from "./auth";
@@ -444,7 +444,7 @@ function Application() {
           }}
         >
           <ShieldCheck size={42} color={palette.primary} />
-          <Text style={styles.heading}>{brand.displayName}</Text>
+          <Text style={styles.heading}>{brand.name}</Text>
           <Loading />
         </View>
       ) : user?.email_verified_at ? (

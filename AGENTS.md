@@ -2,7 +2,7 @@
 
 ## Kapsam ve kaynaklar
 
-Bu dosya deponun tamamı için geçerlidir. Önce mevcut kodu, [prompt.md](prompt.md), README ve ilgili `docs/` belgelerini oku. Kullanıcının açık talimatları önceliklidir. İstenen kapsamı onaysız genişletme. Depo adı `oggaq`, geçici teknik ad `security-exam-platform`; kalıcı marka üretme.
+Bu dosya deponun tamamı için geçerlidir. Önce mevcut kodu, [prompt.md](prompt.md), README ve ilgili `docs/` belgelerini oku. Kullanıcının açık talimatları önceliklidir. İstenen kapsamı onaysız genişletme. Depo adı `oggaq`, teknik proje adı `security-exam-platform` olarak korunur. Kullanıcının belirlediği marka **Ogg Sor - Soru Bankası**, alan adı **oggsor.com**; yayıncı **Codentum L.L.C.** Marka kaynağı `config/brand.json`; yeni marka uydurma.
 
 Güncel `prompt.md` ilk inceleme sonrasında yenilendi. Çevrimdışı çalışma zorunlu MVP kapsamı değildir; kurumlara özel içerik geleceğe yönelik tasarlanır, merkezi havuza otomatik katılmaz. Eski planı güncel yönerge yerine kullanma. Kullanıcının "Hadi devam et" talimatı backend altyapısı, kimlik doğrulama ve kurum izolasyonu geliştirmesini; sonraki "ee geliştiriyor musun" talimatı açıklanan merkezi soru bankası veri modeli/API/test geliştirmesini yetkilendirmiştir. Bu işler için yeniden onay isteme. Gerçek kaynak veri aktarımı ayrıca kullanıcı onayı gerektirir.
 

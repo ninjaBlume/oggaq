@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.2",
   "info": {
-    "title": "OGGAQ Backend API",
+    "title": "Ogg Sor API",
     "version": "0.3.0",
     "description": "Uygulanmış Identity, Tenancy ve merkezi QuestionBank API uçları. Arayüz, sınav/cevap değerlendirme, import ve offline uçları henüz yoktur."
   },

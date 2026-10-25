@@ -12,13 +12,13 @@ Durum (25 Ekim 2026): **yayına hazır değil.** Kod tarafında hesap silme, sor
 | Hesap silme için herkese açık web sayfası (Google) | Taslak hazır: `/legal/hesap-silme.html` | Hukukçu + e-posta adresi |
 | Gizlilik politikası / KVKK aydınlatma metni | **Taslak**: `/legal/gizlilik.html` | Hukukçu |
 | Kullanım koşulları | **Taslak**: `/legal/kosullar.html` | Hukukçu |
-| Destek sayfası ve iletişim | `hello@codentum.net` bağlı; sayfa yürürlük tarihi/onay bekliyor | Kullanıcı |
+| Destek sayfası ve iletişim | `destek@oggsor.com` yapılandırıldı; yeni alan adı için posta yönlendirme/teslim ve sayfa onayı bekleniyor | Kullanıcı |
 | Uygulama içinde yasal bağlantılar | Hazır: web altbilgisi, giriş/kayıt, mobil Profil → Yasal ve destek, giriş ekranı | — |
 | "Resmî kurum değildir" uyarısı | Hazır: web altbilgisi, giriş, mobil Profil; kullanım koşullarında | — |
 | "Hesaplama resmî sonuç değildir" notu | Hazır: puan hesaplama ekranları (web, mobil) | — |
 | Uygulama ikonu, uyumlu (adaptive) ikon, açılış simgesi, favicon | **Geçici** marka: `apps/mobile/assets/` | Kullanıcı (nihai logo) |
 | Yerel açılış ekranı (native splash) | SDK 58 uyumlu eklentiyle mevcut simge, mavi zemin ve koyu tema hazır; iki native proje üretimi doğrulandı | Yeni release paketinde görsel kontrol |
-| Derleme yapılandırması | `eas.json` hazır; üretim adresi kullanıcı kararıyla ayrı belirlenecek | Kalıcı üretim adresi + paket doğrulama |
+| Derleme yapılandırması | `eas.json` üretim adresi `https://oggsor.com`; yeni alan adının canlı API/yasal sayfa kontrolü bekleniyor | Alan adı bağlantısı + paket doğrulama |
 | Paket kimliği | **Geçici**: `net.harunaltay.oggaq` | Kullanıcı (yayıncı kararı) |
 | Takip, reklam, analitik SDK'sı | Yok (gizlilik beyanı basit) | — |
 | Üçüncü taraf girişi (Apple ile Giriş zorunluluğu) | Yok | — |
@@ -38,7 +38,7 @@ Durum (25 Ekim 2026): **yayına hazır değil.** Kod tarafında hesap silme, sor
 
 | Anahtar | Ne yazılacak |
 | --- | --- |
-| `destek-eposta`, `destek-eposta-baglantisi` | Destek e-posta adresi (ayrıca `apps/mobile/brand.json` ve `apps/web/src/config.ts` içindeki `supportEmail`) |
+| `destek-eposta`, `destek-eposta-baglantisi` | Destek e-posta adresi (ayrıca `config/brand.json` içindeki `supportEmail`) |
 | `veri-sorumlusu-unvan`, `veri-sorumlusu-adres`, `verbis` | Veri sorumlusunun unvanı, adresi, VERBİS durumu |
 | `yayinci-adi` | Mağazadaki yayıncı adı (Apple/Google kaydıyla birebir aynı) |
 | `hukuki-sebep` | KVKK m.5/6 hukuki sebepler (hukukçu belirler) |
@@ -62,7 +62,7 @@ Sayfalar JavaScript olmadan çalışan statik HTML'dir; web uygulamasıyla aynı
 Dört yasal sayfadaki ve uygulamalardaki boş alanlar `docs/legal-values.json` dosyasından doldurulur; HTML elle düzenlenmez.
 
 1. `docs/legal-values.json` içindeki `degerler` alanlarını doldurun. Dolu gelenler uygulamanın bugünkü davranışına göre yazılmış önerilerdir (hukuki sebep, saklama süreleri, başvuru süreci); doğruysa bırakın, değilse değiştirin. `_oneriler` bölümü boş alanlar için ne yazılabileceğini gösterir.
-2. `npm run legal:apply` sayfaları ve `supportEmail` değerini (`apps/mobile/brand.json`, `apps/web/src/config.ts`) günceller. Tekrar çalıştırmak güvenlidir; bir alanı boşaltmak işaretli yer tutucuyu geri getirir. `npm run legal:apply -- --check` yazmadan boş alanları listeler.
+2. `npm run legal:apply` sayfaları ve `supportEmail` değerini (`config/brand.json`; üç uygulama bu değeri okur) günceller. Tekrar çalıştırmak güvenlidir; bir alanı boşaltmak işaretli yer tutucuyu geri getirir. `npm run legal:apply -- --check` yazmadan boş alanları listeler.
 3. Metinleri onayladığınızda dosyanın başındaki `"taslak": true` değerini `false` yapıp tekrar çalıştırın; TASLAK bandı kalkar.
 4. `npm run check:store` kalan engelleri gösterir. Mağazadaki yayıncı adı, iletişim e-postası, veri sorumlusu ve yürürlük tarihi gerçek değerlerle dolmalıdır.
 
@@ -134,12 +134,12 @@ Hedef kitle: özel güvenlik görevlisi adayları ve görevlileri, **18 yaş üs
 
 ## 8. Mağaza metni taslağı (Türkçe; yalnızca gerçek özellikler)
 
-Güncel kopyalanabilir metinler [store-metadata.tr.json](store-metadata.tr.json) içinde: Apple ad/alt başlık/tanıtım/açıklama/anahtar kelime; Play başlık/kısa ve uzun açıklama; iki mağazanın inceleme adımları ve yasal sayfa yolları. Resmî [Apple](https://developer.apple.com/app-store/product-page/) ve [Google](https://support.google.com/googleplay/android-developer/answer/13393723) uzunluk sınırları kontrol edildi. Kimlik bilgisi içermez. `productionBaseUrl: null`, kullanıcının kalıcı adresi ayrıca belirleme kararını gösterir; metinler taslaktır, mağazada adın kullanılabilirliği kontrol edilmedi.
+Güncel kopyalanabilir metinler [store-metadata.tr.json](store-metadata.tr.json) içinde: Apple ad/alt başlık/tanıtım/açıklama/anahtar kelime; Play başlık/kısa ve uzun açıklama; iki mağazanın inceleme adımları ve yasal sayfa yolları. Resmî [Apple](https://developer.apple.com/app-store/product-page/) ve [Google](https://support.google.com/googleplay/android-developer/answer/13393723) uzunluk sınırları kontrol edildi. Kimlik bilgisi içermez. `productionBaseUrl: "https://oggsor.com"`, kullanıcının alan adı kararını gösterir; metinler taslaktır, mağazada adın kullanılabilirliği kontrol edilmedi.
 
-- **Ad:** OGGAQ · ÖGG Soru Cevap Platformu (Apple ad sınırı 30 karakter: "OGGAQ" yeterli olabilir; sınırı App Store Connect'te kontrol edin)
+- **Ad:** Ogg Sor - Soru Bankası (21 karakter; mağazada kullanılabilirliği ayrıca kontrol edilmeli)
 - **Alt başlık (Apple):** Özel güvenlik sınavlarına hazırlan
 - **Kısa açıklama (Google, en çok 80 karakter):** Özel güvenlik sınavlarına deneme ve ders sınavlarıyla hazırlan.
-- **Uzun açıklama:** "OGGAQ, özel güvenlik görevlisi adayları ve görevlileri için ücretsiz bir sınav hazırlık platformudur. Deneme Sınavı: geçmiş sınavların tamamını gerçek sınav düzeninde ve süreyle çöz. Ders Sınavı: bir dersin sorularını sınav olarak çöz. Sonuçlarını ve doğru/yanlış/boş dağılımını görürsün; yanlış ve boş bıraktığın sorulardan Tekrar sınavı kurarsın. Başarı durumunu derslere göre izlersin. Puan hesaplama aracıyla cevap sayılarından tahmini puanını hesaplarsın. Hatalı bir soru görürsen sonuç ekranından bildirirsin. Açık ve koyu tema; telefon ve tablet düzeni. Hesabını ve verilerini istediğin zaman uygulamadan silebilirsin. Bu uygulama resmî bir kurum uygulaması değildir; Emniyet Genel Müdürlüğü veya başka bir resmî kurumla bağlantılı değildir. Puan hesaplama bir tahmindir ve resmî sınav sonucu değildir."
+- **Uzun açıklama:** "Ogg Sor, özel güvenlik görevlisi adayları ve görevlileri için ücretsiz bir sınav hazırlık platformudur. Deneme Sınavı: geçmiş sınavların tamamını gerçek sınav düzeninde ve süreyle çöz. Ders Sınavı: bir dersin sorularını sınav olarak çöz. Sonuçlarını ve doğru/yanlış/boş dağılımını görürsün; yanlış ve boş bıraktığın sorulardan Tekrar sınavı kurarsın. Başarı durumunu derslere göre izlersin. Puan hesaplama aracıyla cevap sayılarından tahmini puanını hesaplarsın. Hatalı bir soru görürsen sonuç ekranından bildirirsin. Açık ve koyu tema; telefon ve tablet düzeni. Hesabını ve verilerini istediğin zaman uygulamadan silebilirsin. Bu uygulama resmî bir kurum uygulaması değildir; Emniyet Genel Müdürlüğü veya başka bir resmî kurumla bağlantılı değildir. Puan hesaplama bir tahmindir ve resmî sınav sonucu değildir."
 - **Anahtar kelimeler (Apple, en çok 100 karakter):** özel güvenlik,ÖGG,sınav,deneme sınavı,soru çöz,silahlı,silahsız,temel eğitim
 - **Kullanmayın:** "resmî", "garantili geçiş", kurum logoları ve adları (EGM logosu vb.), kurumun sınav adını başlıkta kendi markanız gibi kullanmak (Apple 2.3.7 ve 5.2; Google yanıltıcı beyan kuralı).
 

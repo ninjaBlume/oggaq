@@ -1,0 +1,11 @@
+{
+  "name": "Ogg Sor",
+  "displayName": "Ogg Sor - Soru Bankası",
+  "subtitle": "Soru Bankası",
+  "tagline": "Özel güvenlik sınavlarına hazırlan",
+  "domain": "oggsor.com",
+  "websiteUrl": "https://oggsor.com",
+  "supportEmail": "destek@oggsor.com",
+  "mailFromAddress": "no-reply@oggsor.com",
+  "exportPrefix": "oggsor-verilerim"
+}

@@ -95,7 +95,7 @@ test("web: veriler yalnızca kullanıcının kendi verisiyle JSON olarak iner", 
   await expect(form.getByText("Mevcut parola hatalı.")).toBeVisible();
   await form.getByLabel("Mevcut parola", { exact: true }).fill(password);
   const [download] = await Promise.all([page.waitForEvent("download"), form.getByRole("button", { name: "Verilerimi indir", exact: true }).click()]);
-  expect(download.suggestedFilename()).toMatch(/^oggaq-verilerim-\d{4}-\d{2}-\d{2}\.json$/);
+  expect(download.suggestedFilename()).toMatch(/^oggsor-verilerim-\d{4}-\d{2}-\d{2}\.json$/);
   const text = readFileSync((await download.path())!, "utf8");
   const data = JSON.parse(text);
   expect(data.profile.email).toBe(email);

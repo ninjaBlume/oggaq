@@ -34,7 +34,9 @@
     "generate:tokens": "npm run generate --workspace @oggaq/design-tokens",
     "check:store": "node scripts/check-store-release.mjs",
     "test:store": "node --test scripts/check-store-release.test.mjs scripts/apply-legal-values.test.mjs",
-    "legal:apply": "node scripts/apply-legal-values.mjs"
+    "legal:apply": "node scripts/apply-legal-values.mjs",
+    "brand:apply": "node scripts/apply-brand.mjs",
+    "check:brand": "node scripts/apply-brand.mjs --check"
   },
   "devDependencies": {
     "@redocly/cli": "2.60.0",

@@ -50,7 +50,7 @@ test('giriş beklerken parola ve mod kontrolleri kilitlenir; tek erişim alanın
   } finally { release(); }
   await expect(page.getByRole('heading', { name: 'Deneme sınavları', exact: true })).toBeVisible();
   await expect(page.getByLabel('Çalışma alanı', { exact: true })).toHaveCount(0);
-  await expect(page.locator('.site-header')).toContainText('ÖGG Soru Cevap Platformu');
+  await expect(page.locator('.site-header')).toContainText('Soru Bankası');
 });
 
 test('öğrenci deneme sınavına girer; cevaplar, sonuç ve geçmiş kalır', async ({ page }) => {

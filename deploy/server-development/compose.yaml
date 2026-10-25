@@ -42,8 +42,6 @@ services:
       context: ../..
       dockerfile: deploy/server-development/Dockerfile
       target: web
-      args:
-        APP_URL: ${APP_URL:?APP_URL gerekli}
     ports:
       - '127.0.0.1:${OGGAQ_HTTP_PORT:-18080}:8080'
     depends_on:

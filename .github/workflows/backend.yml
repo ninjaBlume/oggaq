@@ -79,6 +79,8 @@ jobs:
         run: |
           npm ci --ignore-scripts
           npm run security:prepare
+          npm run check:brand
+          npm run test:store
           npm run test:toolchain
           npm run lint:api
           npm run generate:api

@@ -1,3 +1,4 @@
+import brand from "../../../config/brand.json";
 import { useState } from "react";
 import { Platform, ScrollView, Share, Text, View } from "react-native";
 import type { User } from "@oggaq/shared-types";
@@ -229,7 +230,7 @@ function ExportData() {
             void task.run(
               async () => {
                 const data = await api.request("post", "/api/v1/me/export", { body: { current_password: password } });
-                await deliver(JSON.stringify(data, null, 2), `oggaq-verilerim-${new Date().toISOString().slice(0, 10)}.json`);
+                await deliver(JSON.stringify(data, null, 2), `${brand.exportPrefix}-${new Date().toISOString().slice(0, 10)}.json`);
               },
               () => {
                 setPassword("");

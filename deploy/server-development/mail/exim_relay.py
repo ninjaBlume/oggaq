@@ -1,4 +1,4 @@
-"""Scoped Codentum relay setup. Private DKIM keys never become local mail domains."""
+"""Scoped Ogg Sor relay setup with explicit domain migration. Keys never become local mail domains."""
 import argparse
 import grp
 import ipaddress
@@ -21,10 +21,40 @@ def validate(domain, subnet):
     if network.version != 4 or network.prefixlen < 24 or not any(network.subnet_of(block) for block in private):
         raise ValueError("Yalnız dar kapsamlı özel Docker IPv4 ağı kabul edilir")
 
-def patch_config(source, domain, subnet, key):
+def patch_config(source, domain, subnet, key, previous_domain=None):
     validate(domain, subnet)
     if key != f"/etc/exim4/oggaq-dkim/{domain}.pem":
         raise ValueError("DKIM anahtarı yalnız proje dizininde olabilir")
+    if previous_domain is not None:
+        validate(previous_domain, subnet)
+        if previous_domain == domain:
+            raise ValueError("Önceki ve yeni alan adları farklı olmalı")
+        old_key = f"/etc/exim4/oggaq-dkim/{previous_domain}.pem"
+        # Build exact known templates, so a partial/custom installation cannot silently widen relay access.
+        before = patch_config(SOURCE_BASE, previous_domain, subnet, old_key)
+        after = patch_config(SOURCE_BASE, domain, subnet, key)
+        old_key_line = next(line for line in before.splitlines() if line.startswith("DKIM_PRIVATE_KEY ="))
+        new_key_line = next(line for line in after.splitlines() if line.startswith("DKIM_PRIVATE_KEY ="))
+        migrated_key = new_key_line.replace("${if exists{DKIM_FILE}{DKIM_FILE}{0}}", old_key_line.split(" = ", 1)[1])
+        old_strict = f"  dkim_strict = ${{if eq{{${{lc:${{domain:$h_from:}}}}}}{{{previous_domain}}}{{1}}{{0}}}}"
+        new_strict = f"  dkim_strict = ${{if match_domain{{${{lc:${{domain:$h_from:}}}}}}{{{domain} : {previous_domain}}}{{1}}{{0}}}}"
+        old_rcpt = f"          !senders = *@{previous_domain}"
+        new_rcpt = f"          !senders = *@{domain} : *@{previous_domain}"
+        old_data = f"          condition = ${{if !eq{{${{lc:${{domain:$h_from:}}}}}}{{{previous_domain}}}{{yes}}{{no}}}}"
+        new_data = f"          condition = ${{if !match_domain{{${{lc:${{domain:$h_from:}}}}}}{{{domain} : {previous_domain}}}{{yes}}{{no}}}}"
+        replacements = [(old_key_line, migrated_key), (old_strict, new_strict), (old_rcpt, new_rcpt), (old_data, new_data)]
+        if all(new in source for old, new in replacements):
+            original = source
+            for old, new in replacements:
+                original = original.replace(new, old)
+            if patch_config(original, previous_domain, subnet, old_key) != original:
+                raise ValueError("Geçiş öncesi relay yapılandırması eksik")
+            return source
+        if patch_config(source, previous_domain, subnet, old_key) != source:
+            raise ValueError("Geçiş için önceki alan adının doğrulanmış relay yapılandırması gerekli")
+        for old, new in replacements:
+            source = source.replace(old, new)
+        return source
     key_line = "DKIM_PRIVATE_KEY = ${if eq{${lc:${domain:$h_from:}}}{"+domain+"}{"+key+"}{${if exists{DKIM_FILE}{DKIM_FILE}{0}}}}"
     strict = "  dkim_strict = ${if eq{${lc:${domain:$h_from:}}}{"+domain+"}{1}{0}}"
     rcpt = ("acl_check_rcpt:\n"+MARKER+"\n"
@@ -50,6 +80,10 @@ def patch_config(source, domain, subnet, key):
         source = source.replace(host[0], host[0]+" : "+subnet, 1)
     return source.replace(OLD_KEY, key_line, 1).replace("acl_check_rcpt:\n", rcpt, 1).replace("acl_check_data:\n", data, 1).replace("  dkim_strict = 0", strict)
 
+
+# Minimal structure used only to derive exact patch fragments; never installed as a real Exim configuration.
+SOURCE_BASE = "\n".join(["hostlist relay_from_hosts = 127.0.0.1", OLD_KEY, "acl_check_rcpt:", "acl_check_data:", "  dkim_strict = 0", "  dkim_strict = 0", ""])
+
 def spf_with_ip(value, address):
     ipaddress.IPv4Address(address)
     terms = value.split()
@@ -70,7 +104,8 @@ def run(*args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
-    parser.add_argument("--domain", default="codentum.net")
+    parser.add_argument("--domain", default="oggsor.com")
+    parser.add_argument("--previous-domain", help="Keep the previous project's sender/key during an explicit domain migration")
     parser.add_argument("--subnet", default="172.30.88.0/24")
     parser.add_argument("--public-ip", default="212.68.34.90")
     parser.add_argument("--existing-spf", required=True)
@@ -92,7 +127,7 @@ def main():
     run("systemctl", "is-active", "--quiet", "exim4")
     source = template.read_text()
     key = Path("/etc/exim4/oggaq-dkim")/(args.domain+".pem")
-    candidate = patch_config(source, args.domain, args.subnet, str(key))
+    candidate = patch_config(source, args.domain, args.subnet, str(key), args.previous_domain)
     if args.check:
         print("Ön kontrol başarılı; DKIM yerel mail domain'i oluşturmayacak. MX/DMARC değişmez.")
         return

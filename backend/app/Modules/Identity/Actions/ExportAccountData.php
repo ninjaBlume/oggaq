@@ -20,7 +20,7 @@ class ExportAccountData
 
     public function filename(): string
     {
-        return 'oggaq-verilerim-'.now()->format('Ymd').'.json';
+        return config('brand.exportPrefix').'-'.now()->format('Ymd').'.json';
     }
 
     public function write(User $user, Request $request, Closure $out): void

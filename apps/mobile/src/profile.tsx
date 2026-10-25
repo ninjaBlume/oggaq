@@ -9,7 +9,7 @@ import {
   UserRound,
 } from "./icons";
 import type { StudyContext, User } from "@oggaq/shared-types";
-import brand from "../brand.json";
+import brand from "../../../config/brand.json";
 import {
   Badge,
   Button,
@@ -191,7 +191,7 @@ export function Profile({
       <View style={[styles.row, { justifyContent: "center", paddingTop: 12 }]}>
         <ShieldCheck size={15} color={palette.muted} />
         <Text style={[styles.muted, { fontSize: 11 }]}>
-          {brand.displayName} · {brand.subtitle}
+          {brand.displayName}
         </Text>
       </View>
     </>

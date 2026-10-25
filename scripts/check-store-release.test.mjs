@@ -16,13 +16,13 @@ function pngHeader(width, height, colorType) {
 }
 function repo(mutate = () => {}) {
   const root = mkdtempSync(join(tmpdir(), 'store-check-'));
-  for (const dir of ['apps/web/public/legal', 'apps/web/src', 'apps/mobile/assets', 'docs']) mkdirSync(join(root, dir), { recursive: true });
+  for (const dir of ['apps/web/public/legal', 'apps/web/src', 'apps/mobile/assets', 'docs', 'config']) mkdirSync(join(root, dir), { recursive: true });
   for (const page of ['gizlilik', 'kosullar', 'destek', 'hesap-silme']) writeFileSync(join(root, 'apps/web/public/legal', `${page}.html`), '<main>Son metin</main>');
   writeFileSync(join(root, 'apps/mobile/assets/icon.png'), pngHeader(1024, 1024, 2));
   writeFileSync(join(root, 'apps/mobile/assets/adaptive-icon.png'), pngHeader(1024, 1024, 6));
   writeFileSync(join(root, 'apps/mobile/assets/splash-icon.png'), pngHeader(1024, 1024, 6));
   writeFileSync(join(root, 'apps/mobile/assets/favicon.png'), pngHeader(196, 196, 2));
-  writeFileSync(join(root, 'apps/mobile/brand.json'), JSON.stringify({ supportEmail: 'destek@alan.example.org' }));
+  writeFileSync(join(root, 'config/brand.json'), JSON.stringify({ supportEmail: 'destek@alan.example.org' }));
   writeFileSync(join(root, 'apps/web/src/config.ts'), "export const brand = { supportEmail: 'destek@alan.example.org' };");
   writeFileSync(join(root, 'apps/mobile/eas.json'), JSON.stringify({ build: { production: { env: { EXPO_PUBLIC_API_URL: 'https://soru.gercek.net', EXPO_PUBLIC_WEB_URL: 'https://soru.gercek.net' } } } }));
   writeFileSync(join(root, 'apps/mobile/app.config.ts'), 'const bundleId = process.env.OGGAQ_BUNDLE_ID ?? "com.sirket.uygulama";\nconst c = { version: "1.0.0" };');
@@ -57,12 +57,12 @@ test('assets: wrong size, alpha in the store icon and missing files', () => {
   assert.match(blockers.join('\n'), /adaptive-icon\.png 1024x1024/);
   assert.match(blockers.join('\n'), /favicon\.png yok/);
 });
-test('support e-mail must be configured for mobile and web', () => {
+test('shared support e-mail must be configured', () => {
   const { blockers } = run((root) => {
-    writeFileSync(join(root, 'apps/mobile/brand.json'), JSON.stringify({ supportEmail: '' }));
+    writeFileSync(join(root, 'config/brand.json'), JSON.stringify({ supportEmail: '' }));
     writeFileSync(join(root, 'apps/web/src/config.ts'), "export const brand = { supportEmail: '' };");
   });
-  assert.equal(blockers.length, 2);
+  assert.equal(blockers.length, 1);
 });
 test('the production profile needs real HTTPS addresses', () => {
   const insecure = run((root) => writeFileSync(join(root, 'apps/mobile/eas.json'), JSON.stringify({ build: { production: { env: { EXPO_PUBLIC_API_URL: 'http://soru.gercek.net', EXPO_PUBLIC_WEB_URL: 'https://soru.gercek.net' } } } })));

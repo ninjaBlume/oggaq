@@ -2,9 +2,9 @@
   "status": "draft",
   "locale": "tr-TR",
   "publisher": "Codentum L.L.C.",
-  "productionBaseUrl": null,
+  "productionBaseUrl": "https://oggsor.com",
   "appStore": {
-    "name": "OGGAQ - ÖGG Soru Bankası",
+    "name": "Ogg Sor - Soru Bankası",
     "subtitle": "Deneme çöz, gelişimini izle",
     "promotionalText": "Silahlı ve silahsız denemeler, ders sınavları, ayrıntılı sonuçlar ve puan hesaplama ile özel güvenlik sınavlarına hazırlan.",
     "description": "Özel güvenlik sınavlarına düzenli çalışmak için sorularını, denemelerini ve sonuçlarını bir arada tut.\n\nDENEME VE DERS SINAVLARI\nSilahlı ve silahsız deneme seçeneklerini incele. Ders sınavlarıyla belirli konulara odaklan. Yarım bıraktığın denemeye kaldığın sorudan devam et.\n\nSONUÇLAR VE TEKRAR\nBitirdiğin sınavın tüm sorularını, doğru ve yanlış cevaplarını, boşlarını ve açıklamalarını incele. Favorilerini ve tekrar listelerini kullan; sonuç geçmişinden gelişimini takip et. Hatalı olduğunu düşündüğün soruyu uygulamadan bildir.\n\nPUAN HESAPLA\nDoğru, yanlış ve isabetli atış sayılarını girerek silahlı ve silahsız puanlarını hesapla. Uygun denemelerde sonuç ekranından atış bilgisini ekle. Uygulama, hesapta kullanılan yöntemi ve kaynakları gösterir; eksik atış bilgisi varsa bunu belirtir.\n\nİŞ İLANLARI\nİsteğe bağlı İş İlanları bölümünde özel güvenlik ilanlarını incele; ad, e-posta, telefon ve kısa ön yazıyla uygulama içinden başvur. Başvurunun durumunu takip et.\n\nHESABIN SENİN KONTROLÜNDE\nHesap bilgilerini ve cihaz oturumlarını yönet, kişisel verilerini indir veya hesabını uygulama içinden sil. Açık ve koyu görünüm ile telefon ve tablet düzenlerini kullan.\n\nÖğrenciler için ücretsizdir. Sınavları ve kişisel geçmişini kullanmak için hesap ve internet bağlantısı gerekir.\n\nBu uygulama Emniyet Genel Müdürlüğü veya başka bir resmî kurumla bağlantılı değildir. Denemeler çalışma amaçlıdır; hesaplanan puanlar tahmindir ve resmî sınav sonucu ya da başarı garantisi değildir.",
@@ -13,14 +13,14 @@
     "reviewNotes": "Uygulama, özel güvenlik sınavlarına hazırlık için deneme ve ders sınavları sunar. Hesaba erişim için mağazanın inceleme bilgileri alanında paylaşılan öğrenci giriş bilgilerini kullanın.\n\nGirişten sonra Deneme veya Ders bölümünden sınav başlatın. Sonuçlar bölümünde tamamlanan denemenin tüm soruları ve değerlendirmesi görülür. Uygun silahlı denemelerin sonuçlarında isabetli atış sayısı eklenebilir. Menüde Puan hesapla ve isteğe bağlı İş İlanları bulunur.\n\nHesap silme: Profil → Hesabım → Hesabı sil. Mevcut parola ve silme onayı gerekir. Yasal sayfalar: Profil → Yasal ve destek. Yönetim işlevleri öğrenci hesabında gösterilmez.\n\nUygulama resmî bir kurum uygulaması değildir ve resmî sonuç üretmez."
   },
   "googlePlay": {
-    "title": "OGGAQ - ÖGG Soru Bankası",
+    "title": "Ogg Sor - Soru Bankası",
     "shortDescription": "ÖGG denemelerini çöz, sonuçlarını incele ve silahlı/silahsız puanını hesapla.",
     "fullDescription": "Özel güvenlik sınavlarına düzenli çalışmak için sorularını, denemelerini ve sonuçlarını bir arada tut.\n\nDENEME VE DERS SINAVLARI\nSilahlı ve silahsız deneme seçeneklerini incele. Ders sınavlarıyla belirli konulara odaklan. Yarım bıraktığın denemeye kaldığın sorudan devam et.\n\nSONUÇLAR VE TEKRAR\nBitirdiğin sınavın tüm sorularını, doğru ve yanlış cevaplarını, boşlarını ve açıklamalarını incele. Favorilerini ve tekrar listelerini kullan; sonuç geçmişinden gelişimini takip et. Hatalı olduğunu düşündüğün soruyu uygulamadan bildir.\n\nPUAN HESAPLA\nDoğru, yanlış ve isabetli atış sayılarını girerek silahlı ve silahsız puanlarını hesapla. Uygun denemelerde sonuç ekranından atış bilgisini ekle. Uygulama, hesapta kullanılan yöntemi ve kaynakları gösterir; eksik atış bilgisi varsa bunu belirtir.\n\nİŞ İLANLARI\nİsteğe bağlı İş İlanları bölümünde özel güvenlik ilanlarını incele; ad, e-posta, telefon ve kısa ön yazıyla uygulama içinden başvur. Başvurunun durumunu takip et.\n\nHESABIN SENİN KONTROLÜNDE\nHesap bilgilerini ve cihaz oturumlarını yönet, kişisel verilerini indir veya hesabını uygulama içinden sil. Açık ve koyu görünüm ile telefon ve tablet düzenlerini kullan.\n\nÖğrenciler için ücretsizdir. Sınavları ve kişisel geçmişini kullanmak için hesap ve internet bağlantısı gerekir.\n\nBu uygulama Emniyet Genel Müdürlüğü veya başka bir resmî kurumla bağlantılı değildir. Denemeler çalışma amaçlıdır; hesaplanan puanlar tahmindir ve resmî sınav sonucu ya da başarı garantisi değildir.",
     "category": "EDUCATION",
     "appAccessInstructions": "Uygulama, özel güvenlik sınavlarına hazırlık için deneme ve ders sınavları sunar. Hesaba erişim için mağazanın inceleme bilgileri alanında paylaşılan öğrenci giriş bilgilerini kullanın.\n\nGirişten sonra Deneme veya Ders bölümünden sınav başlatın. Sonuçlar bölümünde tamamlanan denemenin tüm soruları ve değerlendirmesi görülür. Uygun silahlı denemelerin sonuçlarında isabetli atış sayısı eklenebilir. Menüde Puan hesapla ve isteğe bağlı İş İlanları bulunur.\n\nHesap silme: Profil → Hesabım → Hesabı sil. Mevcut parola ve silme onayı gerekir. Yasal sayfalar: Profil → Yasal ve destek. Yönetim işlevleri öğrenci hesabında gösterilmez.\n\nUygulama resmî bir kurum uygulaması değildir ve resmî sonuç üretmez."
   },
   "contact": {
-    "email": "hello@codentum.net"
+    "email": "destek@oggsor.com"
   },
   "publicPaths": {
     "privacyPolicy": "/legal/gizlilik.html",
@@ -32,8 +32,7 @@
     "https://support.google.com/googleplay/android-developer/answer/13393723"
   ],
   "notes": [
-    "Metinler mevcut işlevlerden hazırlanmıştır; adın mağazada kullanılabilirliği kontrol edilmedi. Mevcut OGGAQ adı korunur.",
-    "Kalıcı üretim adresi kullanıcı tarafından ayrıca belirlenecek; geliştirme adresi production profiline taşınmaz.",
+    "Ürün sahibi marka adını Ogg Sor - Soru Bankası ve üretim alan adını oggsor.com olarak belirledi. Mağazada adın kullanılabilirliği ve canlı alan adı/e-posta doğrulaması ayrıca kontrol edilir.",
     "Ekran görüntüleri sentetik hesapla hazırlanmalı; parola ve token bu dosyaya eklenmez.",
     "Apple gizlilik ve Google Data safety beyanları gerçek e-posta sağlayıcısı kesinleştikten sonra tamamlanır."
   ]

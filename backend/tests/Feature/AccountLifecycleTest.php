@@ -293,7 +293,7 @@ class AccountLifecycleTest extends TestCase
         $theirs = $this->exam($other);
         $response = $this->asToken($user)->post('/api/v1/me/export', ['current_password' => self::PASSWORD], ['Accept' => 'application/json']);
         $response->assertOk()->assertHeader('Content-Disposition');
-        $this->assertStringContainsString('attachment; filename=oggaq-verilerim-', $response->headers->get('Content-Disposition'));
+        $this->assertStringContainsString('attachment; filename=oggsor-verilerim-', $response->headers->get('Content-Disposition'));
         $this->assertStringContainsString('application/json', $response->headers->get('Content-Type'));
         $raw = $response->streamedContent();
         $data = json_decode($raw, true, flags: JSON_THROW_ON_ERROR);

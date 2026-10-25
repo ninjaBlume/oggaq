@@ -11,6 +11,7 @@ MAIL_URL="smtp://old.invalid:1025"
 MAIL_USERNAME=synthetic-old-user
 MAIL_PASSWORD=synthetic-old-password
 MAIL_FROM_ADDRESS=old@example.test
+MAIL_FROM_NAME=OldName
 ENV
 cp "$work/shared/.env" "$work/original"
 cat >"$work/manage" <<'MANAGE'
@@ -26,7 +27,9 @@ fail() { echo "BAŞARISIZ: $*" >&2; exit 1; }
 out="$(bash "$here/configure-app-mail.sh" --relay --to probe@example.test)"
 grep -q '^APP_KEY=synthetic-test-key$' "$work/shared/.env" || fail "diğer ayar değişti"
 grep -q '^MAIL_URL="smtp://172.30.88.1:25?auto_tls=false"$' "$work/shared/.env" || fail "özel relay URL yok"
-grep -q '^MAIL_FROM_ADDRESS=no-reply@codentum.net$' "$work/shared/.env" || fail "gönderen yanlış"
+grep -q '^MAIL_FROM_ADDRESS=no-reply@oggsor.com$' "$work/shared/.env" || fail "gönderen yanlış"
+grep -q '^MAIL_FROM_NAME="Ogg Sor - Soru Bankası"$' "$work/shared/.env" || fail "eski gönderen adı kaldı"
+[ "$(grep -c '^MAIL_FROM_NAME=' "$work/shared/.env")" = 1 ] || fail "gönderen adı tekrar ediyor"
 [ "$(grep -c '^MAIL_URL=' "$work/shared/.env")" = 1 ] || fail "eski URL silinmedi"
 grep -q '^MAIL_PASSWORD=null$' "$work/shared/.env" || fail "eski parola kaldı"
 echo "$out" | grep -q synthetic-old-password && fail "parola çıktıya sızdı"

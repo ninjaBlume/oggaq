@@ -1,6 +1,6 @@
 # Tasarım ilkeleri
 
-Durum: Bu belge web, yönetim paneli ve mobil uygulamanın ortak görsel ve etkileşim kuralını tanımlar. Kalıcı marka henüz belirlenmedi; renk tonları geçici marka ile gelir, ancak yapı (rol, kontrast, koyu mod, pencere sınıfları) markadan bağımsızdır. Kod değerleri [packages/design-tokens](../packages/design-tokens/src/index.ts) içindedir; bu belge değerleri değil, kuralları ve nedenlerini anlatır.
+Durum: Bu belge web, yönetim paneli ve mobil uygulamanın ortak görsel ve etkileşim kuralını tanımlar. Marka Ogg Sor - Soru Bankası’dır; mevcut mavi palet korunur. Yapı (rol, kontrast, koyu mod, pencere sınıfları) markadan bağımsızdır. Kod değerleri [packages/design-tokens](../packages/design-tokens/src/index.ts) içindedir; bu belge değerleri değil, kuralları ve nedenlerini anlatır.
 
 ## 1. Ürün ilkeleri
 
@@ -33,7 +33,7 @@ Sınav başlıklarının parantez içindeki tarihleri gösterilmez: `ÖGG 104. D
 ## 2a. Metin tonu
 
 - **Slogan somut bilgi verir:** “Özel güvenlik sınavlarına hazırlan.” Genel motivasyon cümleleri (“bir adım daha”, “kendi hızında”) kullanılmaz; her metin kullanıcıya ne yapabileceğini veya ne olduğunu söyler.
-- **Marka metni tek yerde:** ad, alt başlık (“ÖGG Soru Cevap Platformu”) ve slogan mobilde `apps/mobile/brand.json`, webde ve yönetimde `src/config.ts` içindedir. Ekranlar bu değerleri okur; metni ekrana yazmak yerine yapılandırmadan alın.
+- **Marka metni tek yerde:** ad (Ogg Sor), tam uygulama adı (Ogg Sor - Soru Bankası), alt başlık (Soru Bankası), slogan ve iletişim değerleri `config/brand.json` içindedir. Web, yönetim paneli ve mobil bu dosyayı okur. `npm run brand:apply` statik başlıkları, yasal sayfa marka alanlarını, mağaza taslağını ve backend marka yapılandırmasını günceller; `npm run check:brand` sapmayı denetler. Ekranlar bu değerleri okur; metni ekrana yazmak yerine yapılandırmadan alın.
 - **Başlık altı etiketi:** bireysel kullanımda logonun altında platform alt başlığı görünür; kurumda kurumun adı görünür. Tek erişim alanı olan mobil ve web öğrencisine “kişisel çalışma alanı” etiketi veya seçici gösterilmez. Alan seçimi yalnız birden fazla seçenek olduğunda sunulur.
 
 ## 3. Renk

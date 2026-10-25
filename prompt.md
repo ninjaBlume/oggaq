@@ -1,4 +1,4 @@
-# OGGAQ — Codex Proje Başlangıç Talimatı
+# Ogg Sor — Codex Proje Başlangıç Talimatı
 
 ## 1. Projenin amacı
 

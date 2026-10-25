@@ -24,6 +24,24 @@ SOURCE = "\n".join([
 
 
 class EximRelayTest(unittest.TestCase):
+    def test_brand_domain_migration_preserves_previous_signature_and_other_domains(self):
+        initial = patch_config(SOURCE, DOMAIN, SUBNET, KEY)
+        result = patch_config(initial, "oggsor.com", SUBNET, "/etc/exim4/oggaq-dkim/oggsor.com.pem", DOMAIN)
+        self.assertIn("!senders = *@oggsor.com : *@codentum.net", result)
+        self.assertIn("/etc/exim4/oggaq-dkim/oggsor.com.pem", result)
+        self.assertIn(KEY, result)
+        self.assertIn("${if exists{DKIM_FILE}{DKIM_FILE}{0}}", result)
+        self.assertEqual(result.count("dkim_strict = ${if match_domain{${lc:${domain:$h_from:}}}{oggsor.com : codentum.net}{1}{0}}"), 2)
+        self.assertIn("domainlist local_domains = dsearch;/etc/exim4/domains/", result)
+        self.assertEqual(patch_config(result, "oggsor.com", SUBNET, "/etc/exim4/oggaq-dkim/oggsor.com.pem", DOMAIN), result)
+
+    def test_domain_migration_rejects_unexpected_or_incomplete_acl(self):
+        initial = patch_config(SOURCE, DOMAIN, SUBNET, KEY).replace("!senders", "senders")
+        with self.assertRaises(ValueError):
+            patch_config(initial, "oggsor.com", SUBNET, "/etc/exim4/oggaq-dkim/oggsor.com.pem", DOMAIN)
+        with self.assertRaises(ValueError):
+            patch_config(SOURCE, "oggsor.com", SUBNET, "/etc/exim4/oggaq-dkim/oggsor.com.pem", DOMAIN)
+
     def test_private_umask_still_allows_exim_to_traverse_the_key_directory(self):
         with tempfile.TemporaryDirectory() as root, patch("exim_relay.os.chown"):
             previous = os.umask(0o077)

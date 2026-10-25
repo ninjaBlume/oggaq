@@ -43,10 +43,8 @@ export function checkRelease(root) {
 
   // 3. Contact details configured (the legal pages carry the data controller and the privacy text).
   let brand = {};
-  try { brand = JSON.parse(read(join(mobile, 'brand.json')) ?? '{}'); } catch { blockers.push('apps/mobile/brand.json okunamadı.'); }
-  if (!brand.supportEmail) blockers.push('apps/mobile/brand.json: supportEmail boş (destek e-postası).');
-  const webConfig = read(join(web, 'src/config.ts')) ?? '';
-  if (!/supportEmail:\s*'[^']+@[^']+'/.test(webConfig)) blockers.push("apps/web/src/config.ts: supportEmail boş (destek e-postası).");
+  try { brand = JSON.parse(read(join(root, 'config/brand.json')) ?? '{}'); } catch { blockers.push('config/brand.json okunamadı.'); }
+  if (!brand.supportEmail) blockers.push('config/brand.json: supportEmail boş (destek e-postası).');
 
   // 4. Production build profile: HTTPS addresses of the real host (also the base of the privacy-policy URL).
   let eas = {};

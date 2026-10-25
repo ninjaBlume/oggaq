@@ -1,9 +1,13 @@
 {
-  "cli": { "appVersionSource": "remote" },
+  "cli": {
+    "appVersionSource": "remote"
+  },
   "build": {
     "development": {
       "distribution": "internal",
-      "android": { "buildType": "apk" },
+      "android": {
+        "buildType": "apk"
+      },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://oggsorubankasi.codentum.net",
         "EXPO_PUBLIC_WEB_URL": "https://oggsorubankasi.codentum.net"
@@ -11,7 +15,9 @@
     },
     "preview": {
       "distribution": "internal",
-      "android": { "buildType": "apk" },
+      "android": {
+        "buildType": "apk"
+      },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://oggsorubankasi.codentum.net",
         "EXPO_PUBLIC_WEB_URL": "https://oggsorubankasi.codentum.net"
@@ -20,10 +26,12 @@
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://alan-adi-belirlenmedi.invalid",
-        "EXPO_PUBLIC_WEB_URL": "https://alan-adi-belirlenmedi.invalid"
+        "EXPO_PUBLIC_API_URL": "https://oggsor.com",
+        "EXPO_PUBLIC_WEB_URL": "https://oggsor.com"
       }
     }
   },
-  "submit": { "production": {} }
+  "submit": {
+    "production": {}
+  }
 }

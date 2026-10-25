@@ -5,6 +5,7 @@ on:
     paths:
       - 'apps/mobile/**'
       - 'packages/**'
+      - 'config/brand.json'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/mobile.yml'
@@ -12,6 +13,7 @@ on:
     paths:
       - 'apps/mobile/**'
       - 'packages/**'
+      - 'config/brand.json'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/mobile.yml'
@@ -79,19 +81,30 @@ jobs:
           npx expo prebuild --platform ios --no-install
           cd ios
           pod install
+      - name: Üretilen iOS proje adı
+        working-directory: apps/mobile/ios
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          projects = list(Path('.').glob('*.xcodeproj'))
+          assert len(projects) == 1, 'Tek bir üretilmiş Xcode projesi gerekli'
+          with open(os.environ['GITHUB_ENV'], 'a') as f:
+              f.write('OGGAQ_IOS_PROJECT=' + projects[0].stem + '\n')
+          PY
       - name: iOS Simulator derlemesi
         working-directory: apps/mobile/ios
         run: |
-          xcodebuild -workspace oggaqnizleme.xcworkspace -scheme oggaqnizleme -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO DEVELOPMENT_TEAM= | tee build.log
+          xcodebuild -workspace "$OGGAQ_IOS_PROJECT.xcworkspace" -scheme "$OGGAQ_IOS_PROJECT" -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO DEVELOPMENT_TEAM= | tee build.log
         shell: bash -eo pipefail {0}
       - name: Xcode Simulator imzasını doğrula
         working-directory: apps/mobile/ios
         run: |
-          codesign --verify --deep --strict build/Build/Products/Release-iphonesimulator/oggaqnizleme.app
-          codesign -d --entitlements - build/Build/Products/Release-iphonesimulator/oggaqnizleme.app
+          codesign --verify --deep --strict "build/Build/Products/Release-iphonesimulator/$OGGAQ_IOS_PROJECT.app"
+          codesign -d --entitlements - "build/Build/Products/Release-iphonesimulator/$OGGAQ_IOS_PROJECT.app"
       - name: Simulator uygulamasını paketle
         working-directory: apps/mobile/ios
-        run: ditto -c -k --sequesterRsrc --keepParent build/Build/Products/Release-iphonesimulator/oggaqnizleme.app oggaq-ios-simulator.zip
+        run: ditto -c -k --sequesterRsrc --keepParent "build/Build/Products/Release-iphonesimulator/$OGGAQ_IOS_PROJECT.app" oggaq-ios-simulator.zip
       - uses: actions/upload-artifact@v4
         with:
           name: oggaq-ios-simulator

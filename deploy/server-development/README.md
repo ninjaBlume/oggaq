@@ -1,5 +1,7 @@
 # Sunucuda ayrı geliştirme ortamı
 
+25 Ekim marka kararı: **Ogg Sor - Soru Bankası**, yeni hedef **https://oggsor.com**. Aşağıdaki eski geliştirme adresi geçiş tamamlanana kadar çalışır; yeni DNS, posta, DNSSEC ve yayın durumu [BRAND](../../docs/BRAND.md) içinde izlenir. Alan adı geçişi henüz tamamlanmadı. Ortak IP'nin `smtp.codentum.net` PTR'si bu yeniden markalamada değiştirilmez.
+
 Hedef adres `https://oggsorubankasi.codentum.net`. Öğrenci uygulaması `/`, yönetim paneli `/yonetim/`, API `/api/v1/`, CSRF ucu `/sanctum/` altında sunulur. Mobil API kökü aynı HTTPS adresidir. Admin'in varsayılan yerel kökü `/` olarak korunur; alt yol derlemede `VITE_ADMIN_BASE_PATH=/yonetim/` ile seçilir.
 
 DNS ve HTTPS doğrulandıktan sonra mobil geliştirme istemcisini aynı API'ye bağlamak için proje kökünde `EXPO_PUBLIC_API_URL=https://oggsorubankasi.codentum.net npm run dev:mobile` kullanılır. Mevcut yerel API ayarları ve test adresleri değiştirilmez; yeni native/EAS paketleri için de bu değer derleme ortamında verilmelidir.
@@ -78,7 +80,7 @@ Uygulama, worker ve scheduler `MAIL_FROM_ADDRESS=no-reply@codentum.net`, `MAIL_U
 
 25 Ekim spam incelemesinde `1.1.1.1` ve `8.8.8.8`, `212.68.34.90` için PTR olarak `siberworld.xyz` döndürdü. Bu adın A kayıtları `13.248.169.48` / `76.223.54.146`; gönderici IP’ye dönmüyor. Bu, [Google’ın ileri/ters DNS şartını](https://support.google.com/mail/answer/81126?hl=en) sağlamaz. Düzeltme uygulandı: Cloudflare’de `smtp.codentum.net A 212.68.34.90` (yalnız DNS), Hosting Dünyam panelinde IP PTR’si `smtp.codentum.net` olarak kaydedildi. Panel yeniden yüklenince değer korundu; `rdns1.hostingdunyam.net` ve `rdns2.hostingdunyam.net` yetkili yanıtları yeni PTR’yi doğruladı. Her iki genel çözümleyici yeni A kaydını görüyor; PTR önbellekleri hâlâ eski adı döndürüyor (ölçülen kalan TTL yaklaşık 6–24 saat). Genel çözümleyicilerde de ileri/ters eşleşme sağlandıktan sonra yeni teslim testi ve Gmail klasör/özgün ileti kontrolü yapılmalı; bu son kontrol henüz yapılmadı. Exim’in mevcut `helo_data` ifadesi gönderici IP’nin PTR kaydını kullanır; ana sunucu adı veya başka alanların yapılandırması değiştirilmedi. PTR bu paylaşılan IP’nin posta kimliğidir; uygulama alan adlarının A/MX kayıtlarından ayrıdır. Spam sınıflandırmasının tek nedeninin PTR olduğu varsayılmaz.
 
-Yerel regresyonlar: `python3 -m unittest discover -s deploy/server-development/mail -p 'test_exim_relay.py' -v` (9 test); `bash deploy/server-development/mail/test-configure.sh` (eski MAIL_URL temizliği, gizli değer çıktısı, SMTP/web hatasında geri alma). CI'a eklendi. Göndericiyle ilgisiz SMTP günlükleri veya e-posta içerikleri depoya alınmaz.
+Yerel regresyonlar: `python3 -m unittest discover -s deploy/server-development/mail -p 'test_exim_relay.py' -v` (11 test; eski/yeni alanın ayrı imzası ve kısmi geçişi reddetme dahil); `bash deploy/server-development/mail/test-configure.sh` (eski MAIL_URL temizliği, gizli değer çıktısı, SMTP/web hatasında geri alma). CI'a eklendi. Göndericiyle ilgisiz SMTP günlükleri veya e-posta içerikleri depoya alınmaz.
 
 DKIM anahtarı uygulama `.env` dosyasının dışındadır; geri yüklemede `/etc/exim4/oggaq-dkim/` ve ilgili Exim yapılandırması da gerekir. Yedekleme betikleri bu işte değiştirilmedi (bu alan Claude’da); mevcut yedeklerin bu yeni anahtarı kapsadığı ayrıca doğrulanmalıdır.
 

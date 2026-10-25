@@ -6,6 +6,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { run as applyBrand } from './apply-brand.mjs';
 
 export const pages = ['gizlilik', 'kosullar', 'destek', 'hesap-silme'];
 export const labels = {
@@ -70,13 +71,13 @@ export function run(root, { check = false } = {}) {
     writeFileSync(path, applyToPage(readFileSync(path, 'utf8'), values, taslak));
   }
   const email = (values['destek-eposta'] ?? '').trim();
-  for (const path of ['apps/mobile/brand.json', 'apps/web/src/config.ts']) {
+  for (const path of ['config/brand.json']) {
     const full = join(root, path);
     if (existsSync(full)) writeFileSync(full, setSupportEmail(readFileSync(full, 'utf8'), email));
   }
   console.log(missing.length ? `Uygulandı. Hâlâ boş ${missing.length} alan: ${missing.join(', ')}` : 'Uygulandı. Tüm alanlar dolu.');
   console.log(taslak ? 'TASLAK bandı duruyor (docs/legal-values.json: "taslak": false yapınca kalkar).' : 'TASLAK bandı kaldırıldı.');
-  return 0;
+  return applyBrand(root);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

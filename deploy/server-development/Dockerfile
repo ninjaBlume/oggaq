@@ -8,9 +8,10 @@ COPY packages/ packages/
 RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY apps/admin/ apps/admin/
 COPY apps/web/ apps/web/
-ARG APP_URL=https://oggsorubankasi.codentum.net
-RUN VITE_API_URL="$APP_URL" npm run build:web \
-    && VITE_API_URL="$APP_URL" VITE_ADMIN_BASE_PATH=/yonetim/ npm run build:admin
+COPY config/brand.json config/brand.json
+# Keep requests on the opened host: cookies also work on www and the transition hostname.
+RUN VITE_API_URL=/ npm run build:web \
+    && VITE_API_URL=/ VITE_ADMIN_BASE_PATH=/yonetim/ npm run build:admin
 
 FROM php:8.4-fpm-bookworm AS php-base
 RUN apt-get update && apt-get install -y --no-install-recommends \

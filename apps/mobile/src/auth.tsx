@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Linking, Platform, Text, View } from "react-native";
 import { ShieldCheck, CheckCircle2, GraduationCap } from "./icons";
-import brand from "../brand.json";
+import brand from "../../../config/brand.json";
 import { shape, typography } from "./theme";
 import type { User } from "@oggaq/shared-types";
 import { api, frontendUrl } from "./api";
@@ -109,7 +109,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
             <ShieldCheck size={26} color={palette.onPrimaryContainer} strokeWidth={1.8} />
           </View>
           <View style={{ flex: 1, gap: 3 }}>
-            <Text style={{ color: palette.onNavy, fontSize: 21, lineHeight: 27, fontWeight: "800", letterSpacing: 1.2 }}>{brand.displayName}</Text>
+            <Text style={{ color: palette.onNavy, fontSize: 21, lineHeight: 27, fontWeight: "800", letterSpacing: 1.2 }}>{brand.name}</Text>
             <Text style={{ color: palette.onNavyMuted, fontSize: 12, lineHeight: 18 }}>{brand.subtitle}</Text>
           </View>
         </View>

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Deploy-user side (no root): configures the private relay or authenticated SMTP and sends one test mail.
-#   bash configure-app-mail.sh --to <deneme-adresi> [--host H] [--port 587] [--from no-reply@codentum.net] [--username U] [--prompt-password]
+#   bash configure-app-mail.sh --to <deneme-adresi> [--host H] [--port 587] [--from no-reply@oggsor.com] [--username U] [--prompt-password]
 # --relay: yalnız 172.30.88.1:25 özel Compose köprüsü; önce setup-exim-relay.sh uygulanmalıdır.
 # Hestia mailbox: defaults (host panel.harunaltay.net, username = the from address). SMTP provider (e.g. Brevo): pass
 # --host smtp-relay.brevo.com --username <SMTP girişi> --prompt-password (asks for the SMTP key without echo, stores it only in
@@ -10,7 +10,7 @@
 set -Eeuo pipefail
 umask 077
 base="${OGGAQ_BASE:-$HOME/oggaq-development}"
-host="panel.harunaltay.net"; port="587"; from="no-reply@codentum.net"; to=""; send_only=0; username=""; prompt_password=0; relay=0
+host="panel.harunaltay.net"; port="587"; from="no-reply@oggsor.com"; to=""; send_only=0; username=""; prompt_password=0; relay=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --to) to="${2:?}"; shift ;; --host) host="${2:?}"; shift ;; --port) port="${2:?}"; shift ;; --from) from="${2:?}"; shift ;;
@@ -28,7 +28,7 @@ env_file="$base/shared/.env"; password_file="$base/shared/mail-password"; manage
 
 if [ "$relay" = 1 ]; then
   [ "$prompt_password" = 0 ] || { echo "Relay kipinde parola kullanılmaz." >&2; exit 2; }
-  host="172.30.88.1"; port="25"; from="no-reply@codentum.net"
+  host="172.30.88.1"; port="25"
 fi
 username="${username:-$from}"
 if [ "$prompt_password" = 1 ]; then
@@ -41,7 +41,7 @@ if [ "$send_only" = 0 ]; then
   [ "$relay" = 1 ] || [ -r "$password_file" ] || { echo "Parola dosyası yok: $password_file (önce setup-hestia-mail.sh)." >&2; exit 1; }
   backup="$(mktemp "$base/shared/.env.bak.XXXXXX")"; cp -p "$env_file" "$backup"; chmod 600 "$backup"
   tmp="$(mktemp "$base/shared/.env.XXXXXX")"
-  grep -vE '^(MAIL_MAILER|MAIL_HOST|MAIL_PORT|MAIL_USERNAME|MAIL_PASSWORD|MAIL_FROM_ADDRESS|MAIL_SCHEME|MAIL_URL)=' "$env_file" >"$tmp"
+  grep -vE '^(MAIL_MAILER|MAIL_HOST|MAIL_PORT|MAIL_USERNAME|MAIL_PASSWORD|MAIL_FROM_ADDRESS|MAIL_FROM_NAME|MAIL_SCHEME|MAIL_URL)=' "$env_file" >"$tmp"
   {
     echo "MAIL_MAILER=smtp"; echo "MAIL_HOST=$host"; echo "MAIL_PORT=$port"
     if [ "$relay" = 1 ]; then
@@ -51,6 +51,7 @@ if [ "$send_only" = 0 ]; then
       echo "MAIL_USERNAME=$username"; printf 'MAIL_PASSWORD=%s\n' "$(head -n 1 "$password_file")"
     fi
     echo "MAIL_FROM_ADDRESS=$from"
+    echo 'MAIL_FROM_NAME="Ogg Sor - Soru Bankası"'
   } >>"$tmp"
   chmod 600 "$tmp"; mv "$tmp" "$env_file"
   rollback() {

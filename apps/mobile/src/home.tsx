@@ -29,7 +29,7 @@ import {
   TextLink,
 } from "./ui";
 import { useLayout, useTheme } from "./themeContext";
-import brand from "../brand.json";
+import brand from "../../../config/brand.json";
 export function Home({
   user,
   context,
