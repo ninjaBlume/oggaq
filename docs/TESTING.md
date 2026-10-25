@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, Metro'nun eski marka JSON'u
+
+- Kalıcı neden gerçek Expo Go runtime'ından yakalandı: **ERR_ARGUMENT_CAST**; native String beklenen ilk argümana `undefined` geliyordu. Servis edilen marka JSON'unda ad hâlâ **Ogg Sor**, `wordmarkFontFamily` yoktu; diskteki kaynakta **ÖGG SOR** ve **League Spartan** vardı. Önceki tek-font API değişikliği bu önbellek sorununu çözmemiştir.
+- SDK'nın varsayılan Metro izleme listesi workspace paketlerini kapsıyor, kökteki `config/` klasörünü kapsamıyordu. `apps/mobile/metro.config.cjs` bu klasörü açıkça izler. Yeni araç zinciri regresyon testi marka JSON'u, ana logo ve font kaynağının izleme kapsamını denetler. Eksik aile adı ayrıca native modüle geçmeden reddedilir.
+- **31 mobil test**, **20 araç zinciri testi** başarılı. Ayrı, bize ait 8082 Metro'sunda güncel ad/aile bilgisi gerçek development bundle'da doğrulandı. Geçici bir `config/` JSON'unu değiştirip aynı çalışan test bundle'ının güncellendiği gözlendi; test dosyaları ve 8082 süreci temizlendi.
+- Telefonun kullandığı 8081 süreci (PID 75800), kullanıcının önceki “Claude'un 8081 sunucusunu durdurma” talimatı nedeniyle yeniden başlatılmadı. Yeni Metro ayarının bu sürece uygulanması için kullanıcı onayı istendi; mevcut cihazdaki uyarı henüz çözülmüş sayılmaz.
+- Geçici, yalnız geliştirme font tanısı hesabı/tokenı/cihaz kimliğini toplamadan native hata ve genel font yapılandırmasını gösterdi; tanı kodu kaldırıldı. Backend, DB, sunucu yayını ve diğer geliştirme servisleri değiştirilmedi.
+
 ## Güncel doğrulama — 25 Ekim 2026, Expo Go font uyarısı
 
 - Kullanıcı Expo Go'nun üstte genel hata uyarısı gösterdiğini bildirdi. Sunucu readiness sağlıklı. Native hatanın ham nedeni bu oturumda yakalanamadı; iOS simülatörünün debugger bağlantısı runtime yanıtı vermeden kapandı. Önceki web/export doğrulaması gerçek cihaz doğrulaması değildi.

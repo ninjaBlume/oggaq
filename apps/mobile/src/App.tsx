@@ -490,7 +490,7 @@ function Root() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.shell}
       >
-        {fontTask.error ? <View style={{ padding: 12 }}><ErrorNotice error={fontTask.error} retry={loadFont} /></View> : null}
+        {fontTask.error ? <View style={{ padding: 12 }}><ErrorNotice title="Marka yazısı yüklenemedi" error={fontTask.error} retry={loadFont} /></View> : null}
         <Application />
       </KeyboardAvoidingView>
     </MotionProvider>

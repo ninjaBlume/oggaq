@@ -6,6 +6,16 @@ function fontApi() {
   return { isLoaded: vi.fn(() => false), unloadAsync: vi.fn(async () => {}), loadAsync: vi.fn(async (_family: string, _resource: unknown) => {}) };
 }
 
+it("rejects missing configuration before passing undefined to the native module", async () => {
+  for (const family of [undefined, "", " "]) {
+    const api = fontApi();
+    const loader = createBrandFontLoader(api, family as unknown as string, 42, false);
+    await expect(loader.load()).rejects.toThrow("configuration is missing");
+    expect(api.loadAsync).not.toHaveBeenCalled();
+    expect(loader.isReady()).toBe(false);
+  }
+});
+
 it("loads static Bold through the single-font native bridge without family APIs", async () => {
   const api = fontApi();
   const loader = createBrandFontLoader(api, "League Spartan", 42, false);

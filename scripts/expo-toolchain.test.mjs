@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createRequire } from 'node:module';
+import { dirname, relative, resolve, isAbsolute } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const mobileRequire = createRequire(new URL('../apps/mobile/package.json', import.meta.url));
 const expoRequire = createRequire(mobileRequire.resolve('expo/package.json'));
@@ -16,6 +18,18 @@ const plugin = {
     ] },
   ] },
 };
+
+test('Metro watches the canonical brand configuration outside workspace packages', () => {
+  const config = mobileRequire('./metro.config.cjs');
+  const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+  for (const file of ['config/brand.json', 'config/assets/oggsor-logo.png', 'config/fonts/LeagueSpartan-Bold.ttf']) {
+    const target = resolve(root, file);
+    assert.ok([config.projectRoot, ...config.watchFolders].some((folder) => {
+      const path = relative(folder, target);
+      return path !== '..' && !path.startsWith('../') && !isAbsolute(path);
+    }), `${file} must invalidate Metro's cached module after a change`);
+  }
+});
 
 test('the mobile workspace resolves the reviewed Expo CLI and fixed Zod version', () => {
   assert.equal(mobileRequire('expo/package.json').version, mobileRequire('./package.json').dependencies.expo);
