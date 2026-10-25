@@ -52,7 +52,20 @@ docker compose --env-file "$OGGAQ_ENV_FILE" \
 
 Tünel konteyneri token dosyasının sahibi olan dağıtım kullanıcısının UID/GID'siyle çalışır (bu sunucuda `1000:1000`; başka sunucu için `OGGAQ_UID`/`OGGAQ_GID` ayarlanır). Yalnızca proje ağına ve kendi token dosyasına erişir; host ağı veya Docker socket'i bağlanmaz. [Cloudflare token-file belgesi](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/run-parameters/).
 
-## E-posta: Hestia posta sunucusuyla gerçek gönderim (deneme)
+## E-posta: gerçek gönderim
+
+**25 Ekim 2026 sonucu: sunucudaki Hestia posta yığını çalışır durumda değil; Hestia yolu bırakıldı.** Root ile salt okunur bakıldı: `hestia` servisi `inactive`; `/usr/local/hestia/conf` ve `data` dizinleri yok, `v-*` komutları çalışmıyor; Exim, silinmiş `/usr/local/hestia/ssl/certificate.crt` sertifikasını arıyor ve bağlantılarda "TLS error (cert/key setup)" veriyor (yani 587/465 üzerinde TLS ile kimlik doğrulamalı gönderim kurulamaz); Dovecot `failed`; `/home/admin/mail` boş; ters DNS (PTR) başka bir projenin alan adını gösteriyor. Bunu onarmak, başka projelerin de kullandığı paylaşımlı posta yığınını root ile yeniden kurmak demektir; risk/fayda uygun değil. Yol: ücretsiz bir SMTP sağlayıcısı (Brevo: günde 300 e-posta, kredi kartı yok). `setup-hestia-mail.sh` yalnızca Hestia onarılırsa kullanılır.
+
+Brevo ile (sizin yaptığınız: hesap ve DNS; parola ekrana/sohbete yazılmaz):
+1. Brevo'da ücretsiz hesap açın, `codentum.net` alanını gönderen olarak doğrulayın (Brevo DKIM ve SPF/Brevo kodu kaydı verir); bir **SMTP anahtarı** oluşturun.
+2. Cloudflare DNS: Brevo'nun verdiği kayıtlar; SPF **tek** kayıt olmalı: `v=spf1 include:_spf.mx.cloudflare.net include:spf.brevo.com ~all` (Cloudflare E-posta Yönlendirme ile birlikte); DMARC: `_dmarc TXT "v=DMARC1; p=none; rua=mailto:hello@codentum.net"`.
+3. Sunucuda: `bash ~/oggaq-development/mail-setup/configure-app-mail.sh --to <gmail-adresi> --host smtp-relay.brevo.com --username <Brevo SMTP girişi> --prompt-password` (anahtarı yazarken göstermeden sorar, yalnızca `shared/mail-password` içine 0600 yazar).
+4. Gmail'de "Orijinali göster": `spf=pass`, `dkim=pass`, `dmarc=pass`; gelen kutusu/spam.
+5. `docs/legal-values.json` içinde `eposta-saglayicisi` ("Brevo (Sendinblue SAS, Fransa)") ve `yurt-disi-aktarim` alanlarını güncelleyin.
+
+### Hestia yolu (yalnızca Hestia onarılırsa; geçmiş kayıt)
+
+
 
 Şimdilik e-postalar yalnız Mailpit'e düşer; kullanıcılara ulaşmaz. İlk deneme, sunucudaki Hestia'nın Exim posta sunucusudur (ücretsiz, yurt içi). Gönderen `no-reply@codentum.net`. Başarı ölçütü: deneme e-postası Gmail **gelen kutusuna** düşer ve başlıklarda `spf=pass`, `dkim=pass`, `dmarc=pass` görünür; spam'e düşerse bir SMTP sağlayıcısına (ör. Brevo, günde 300 e-posta ücretsiz) geçilir.
 

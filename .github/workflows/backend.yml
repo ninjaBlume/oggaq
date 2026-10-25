@@ -74,6 +74,8 @@ jobs:
       - name: API sözleşmesi
         run: |
           npm ci --ignore-scripts
+          npm run security:prepare
+          npm run test:toolchain
           npm run lint:api
           npm run generate:api
           git diff --exit-code -- packages/shared-types/src/api.d.ts

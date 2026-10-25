@@ -19,24 +19,31 @@ export function patchedForgeSource(source, version) {
   if (hash(patched) !== afterHash) throw new Error('node-forge güvenlik yamasının bütünlük kontrolü başarısız.');
   return patched;
 }
-function installedForge() {
+function installedForges() {
   const rootRequire = createRequire(import.meta.url);
   const expoRequire = createRequire(rootRequire.resolve('expo/package.json'));
   const cliRequire = createRequire(expoRequire.resolve('@expo/cli/package.json'));
-  const metadata = cliRequire('node-forge/package.json');
-  return { version: metadata.version, filename: cliRequire.resolve('node-forge/lib/rsa.js') };
+  const signingRequire = createRequire(cliRequire.resolve('@expo/code-signing-certificates/package.json'));
+  const files = new Map();
+  for (const loader of [cliRequire, signingRequire]) {
+    const filename = loader.resolve('node-forge/lib/rsa.js');
+    files.set(filename, { version: loader('node-forge/package.json').version, filename });
+  }
+  return [...files.values()];
 }
 export function verifyForgeSecurityPatch() {
-  const { version, filename } = installedForge();
-  const source = readFileSync(filename, 'utf8');
-  patchedForgeSource(source, version);
-  if (hash(source) !== afterHash) throw new Error('node-forge güvenlik yaması eksik. Önce npm run security:prepare çalıştırın.');
+  for (const { version, filename } of installedForges()) {
+    const source = readFileSync(filename, 'utf8');
+    patchedForgeSource(source, version);
+    if (hash(source) !== afterHash) throw new Error('node-forge güvenlik yaması eksik. Önce npm run security:prepare çalıştırın.');
+  }
 }
 export function applyForgeSecurityPatch() {
-  const { version, filename } = installedForge();
-  const source = readFileSync(filename, 'utf8');
-  const patched = patchedForgeSource(source, version);
-  if (source !== patched) writeFileSync(filename, patched);
+  for (const { version, filename } of installedForges()) {
+    const source = readFileSync(filename, 'utf8');
+    const patched = patchedForgeSource(source, version);
+    if (source !== patched) writeFileSync(filename, patched);
+  }
   verifyForgeSecurityPatch();
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

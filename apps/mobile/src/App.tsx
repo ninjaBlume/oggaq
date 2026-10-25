@@ -368,11 +368,16 @@ function Application() {
     }
   }
   async function refresh() {
+    const token = session.token;
+    if (!token) return;
     try {
       setError(null);
       const result = await api.request("get", "/api/v1/me", {});
+      // A response from a signed-out account must never replace a newer session.
+      if (session.token !== token) return;
       setUser(result.data);
     } catch (e) {
+      if (session.token !== token) return;
       if (e instanceof ApiError && [401, 403].includes(e.status)) await clear();
       else setError(e);
     }

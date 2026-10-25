@@ -2,7 +2,23 @@
 
 Durum: cookie/CSRF, süreli ve cihaz bazlı Sanctum token, Argon2id, rate limit, aktif hesap/e-posta denetimi, rol/tenant policies, hassas bilgiyi açığa çıkarmayan API hatası, şifreli bildirim payload ve kurum/merkezi içerik audit kayıtları uygulanıp test edildi. QuestionBank merkezi yazmaları yalnız doğrulanmış aktif platform yöneticisine açar; öğrenciden taslak/cevap anahtarını saklar ve yayımlanmış sürüm/seçenekleri PostgreSQL trigger'larıyla korur. Diğer modüller ve KVKK yönetişim süreçleri aşağıda gereksinim olarak yer alır; hukuki uygunluk sağlandığı iddia edilmiyor. Kaynak inceleme tarihi 9 Ekim 2026; üretim öncesinde güncel metinler ve hizmetin fiilî kapsamı ayrıca incelenir.
 
+## JavaScript bağımlılık güvenliği — 25 Ekim 2026
+
+- **Zod:** [GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5) için düzeltilmiş `4.6.6`, yalnız kilitli `@expo/cli@58.1.14` altında override edildi. Uygulama/SDK sürümü değiştirilmedi. CLI'nin gerçek devtools ve MCP şemalarıyla uyumluluk; fazla büyük array/set/map girdisinin elemanları işlemeden reddi test ediliyor. Bu advisory audit istisnası değildir; yeniden bulunursa kontrol başarısız olur.
+- **node-forge:** [GHSA-86w9-cpqp-85rv](https://github.com/advisories/GHSA-86w9-cpqp-85rv) için bu tarihte yayımlanmış düzeltilmiş npm sürümü yoktur. `1.4.0` içindeki RSA `DigestAlgorithm` iç eleman sayısı kontrolüne dar bir yerel yama uygulanır. Kaynak [upstream sorun 1149](https://github.com/digitalbazaar/forge/issues/1149) ve henüz birleştirilmemiş [katkıcı PR 1152](https://github.com/digitalbazaar/forge/pull/1152)'dir; bu, upstream tarafından yayımlanmış bir düzeltme değildir. Sentetik anahtarla yeniden üretilen bozuk iç ASN.1 yapısı yamasız kabul edilirken yama sonrası reddedilir. Geçerli RSA, isteğe bağlı NULL ve RSA-PSS imzaları korunur.
+- `scripts/forge-security-patch.mjs`, CLI ve onun `@expo/code-signing-certificates` yardımcısının gerçekten çözdüğü bütün `rsa.js` kopyalarını denetler. Yalnız `1.4.0` ve incelenmiş SHA256 kabul edilir; değişmiş kaynak/sürümde kurulum durur. Yama tekrarlanabilir ve idempotenttir; yeni bir bağımlılık eklenmedi.
+
+Normal `npm ci` yaması `postinstall` ile uygular. `npm ci --ignore-scripts` kullanıldığında ardından **`npm run security:prepare`** zorunludur; CI işleri bunu açıkça çalıştırır. `npm run test:toolchain` Zod/Expo şemaları, gerçek imza davranışı, yama bütünlüğü ve audit kapısını doğrular (19 test). Kaynak/sürüm değiştiğinde bu korumaları devre dışı bırakmak yerine düzeltme yeniden incelenmelidir.
+
+**Ham `npm audit` temiz değildir:** registry, yerel kaynak yamasını bilmediğinden upstream `node-forge@1.4.0` ve ona bağlı Expo paketlerini listeler. `npm run audit` bunu açıkça raporlar; ancak yamanın her gerçek çözüm yolunda hash doğrulaması ve imza regresyonları geçerse yalnız bu tek advisory'yi yerel olarak düzeltilmiş sayar. Başka yol, yeni advisory, eksik/değişmiş yama veya Zod bulgusu hata verir. Bu sonuç bütün olası açıkların yokluğunu göstermez.
+
+Bakım: düzeltilmiş resmî forge/Expo sürümü yayımlandığında bağımlılığı yükseltip gerçek şema/imza/export ve E2E testlerini çalıştırın; ardından yerel yamayı, `postinstall`/`security:prepare` adımlarını ve audit'teki yalnız bu yamaya özgü tanımayı birlikte kaldırın. Yeni sürüm güvenliği doğrulanmadan sürüm/hash allowlist'ini genişletmeyin. Zod override'ı da CLI'nin düzeltilmiş sürüme kendisi geçtiği doğrulandığında kaldırılmalıdır.
+
+Çalışan eski Metro süreçleri bellekte önceki bağımlılığı tutabilir; süreç sahibinin kontrollü yeniden başlatması gerekir. Bu değişiklik sunucuya dağıtım veya mağaza yayını yapmaz. Sunucu/deploy işlemleri Claude'a aittir; salt web/admin çıktı üreten ve Node'u son imaja taşımayan Docker aşaması mobil CLI çalışma ortamıyla aynı değildir.
+
 ## Kimlik ve oturum
+
+25 Ekim 2026 mobil oturum düzeltmesi: arka plandan dönüşte başlatılan `/me` isteği, döndüğünde aynı token hâlâ geçerli değilse başarı/hata sonucunu ekrana uygulamaz. Böylece eski hesabın geciken kullanıcı verisi yeni profili değiştiremez; eski 401/403 yeni hesabı kapatamaz. `session-race.spec.ts` gerçek API ve iki sentetik hesapla üç gecikmiş yanıtı sınar. Web/admin oturum değişimi mevcut sorguları iptal eder; bu düzeltme mobil `refresh()` yolundadır.
 
 Web/admin, Sanctum cookie tabanlı oturum kullanır; API ve istemci aynı site alanının altında yerleştirilir. Allowlist CORS, credentials, HTTPS, `HttpOnly`/`Secure` oturum cookie'si, uygun SameSite ve mutasyonlarda CSRF gerekir. XSRF cookie'si frontend tarafından okunabilir; oturum cookie'si okunamaz. Login sonrasında session ID yenilenir; logout/session iptali sunucuda uygulanır. Yönetim ve öğrenci rolleri cookie varlığıyla değil Policy ile doğrulanır.
 

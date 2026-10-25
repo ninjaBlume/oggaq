@@ -1,6 +1,6 @@
 # Test ve doğrulama stratejisi
 
-## Güncel doğrulama — 25 Ekim 2026, performans ve hata düzeltmeleri
+## Önceki doğrulama — 25 Ekim 2026, performans ve hata düzeltmeleri
 
 - PHP 8.4 / PostgreSQL: **235 backend testi, 2.634 assertion** geçti (`composer test`; PATH'te Composer bulunmadığı için resmî SHA256'sı doğrulanmış geçici Composer PHAR ile aynı script çalıştırıldı). `composer lint`, `composer validate --strict` ve `composer audit` başarılı.
 - **137 Vitest** geçti: admin 16, web 6, mobil 27, `study-core` 25, `design-tokens` 63. Mağaza betiklerinin **14 Node testi** de geçti.

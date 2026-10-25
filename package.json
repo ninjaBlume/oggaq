@@ -27,7 +27,7 @@
     "test:core": "npm run test --workspace @oggaq/study-core",
     "postinstall": "node scripts/forge-security-patch.mjs",
     "security:prepare": "node scripts/forge-security-patch.mjs",
-    "test:toolchain": "node --test scripts/expo-toolchain.test.mjs scripts/forge-security.test.mjs scripts/forge-security-patch.test.mjs",
+    "test:toolchain": "node --test scripts/expo-toolchain.test.mjs scripts/forge-security.test.mjs scripts/forge-security-patch.test.mjs scripts/audit-node.test.mjs",
     "audit": "node scripts/audit-node.mjs",
     "export:mobile:preview": "EXPO_PUBLIC_LOCAL_PREVIEW=1 EXPO_PUBLIC_API_URL=http://127.0.0.1:8001 npm run export:mobile",
     "test:tokens": "npm run test --workspace @oggaq/design-tokens",

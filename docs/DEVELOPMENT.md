@@ -77,6 +77,8 @@ Depo kökünde Node 24 ile:
 
 ```sh
 npm ci --ignore-scripts
+npm run security:prepare
+npm run test:toolchain
 npm run lint:api
 ```
 
@@ -86,7 +88,7 @@ GitHub Actions aynı PHP/Node ana sürümleri ve PostgreSQL 18/Redis 8 servisler
 
 ## Yönetim paneli
 
-Backend API açıkken kökte Node 24 ile `npm ci --ignore-scripts` ve `npm run dev:admin` çalıştırın. Panel `http://127.0.0.1:5174` adresinde cookie/CSRF ile API'ye bağlanır. `.env.example` içindeki `ADMIN_URL` ve `SANCTUM_STATEFUL_DOMAINS` bu origin'i içerir. Yönetici hesabı için yukarıdaki `app:create-admin` komutu kullanılır; otomatik hesap yoktur. Akışlar ve sınırlar [panel README](../apps/admin/README.md) içindedir.
+Backend API açıkken kökte Node 24 ile `npm ci --ignore-scripts`, `npm run security:prepare` ve `npm run dev:admin` çalıştırın. Panel `http://127.0.0.1:5174` adresinde cookie/CSRF ile API'ye bağlanır. `.env.example` içindeki `ADMIN_URL` ve `SANCTUM_STATEFUL_DOMAINS` bu origin'i içerir. Yönetici hesabı için yukarıdaki `app:create-admin` komutu kullanılır; otomatik hesap yoktur. Akışlar ve sınırlar [panel README](../apps/admin/README.md) içindedir.
 
 `npm run typecheck`, `npm run test:admin`, `npm run build:admin` ile istemci kontrol edilir. `npx playwright install chromium` ardından `npm run test:e2e`, yalnız `oggaq_test` PostgreSQL üzerinde sentetik veriyle çalışır; test DB'sini önce/sonra yeniden oluşturur. PHPUnit ve E2E aynı anda çalıştırılmaz. E2E `8001`/`5183`/`5184` portlarını kendi açıp kapatır; normal `8000`/`5173`/`5174` sunucularını kullanmaz. Test session/cache'i izole PostgreSQL'de tutulur; gerçek geliştirme Redis verisi temizlenmez.
 
@@ -115,7 +117,7 @@ Veriler silinmez. `.env`, uygulama anahtarı ve veri dizini kaybolursa mevcut ş
 
 ## Deneme ve mobil
 
-Yeni tablolar için yalnız forward `php artisan migrate`; normal DB üzerinde `migrate:fresh` çalıştırmayın. Terk edilen süreli denemeler için `php artisan schedule:work` veya üretim cron scheduler gerekir. Mobil kurulum ve toolchain [MOBILE](MOBILE.md) içinde. E2E öncesi `npm run export:mobile:preview`; native/web QA ayrı. `npm run audit` yeni advisory’leri reddeder, belgelenmiş iki Expo build uyarısı açık kalır.
+Yeni tablolar için yalnız forward `php artisan migrate`; normal DB üzerinde `migrate:fresh` çalıştırmayın. Terk edilen süreli denemeler için `php artisan schedule:work` veya üretim cron scheduler gerekir. Mobil kurulum ve toolchain [MOBILE](MOBILE.md) içinde. E2E öncesi `npm run export:mobile:preview`; native/web QA ayrı. `npm run audit` yeni advisory’leri reddeder; Zod düzeltmesi ve hash doğrulamalı yerel forge yaması [SECURITY](SECURITY.md#javascript-bağımlılık-güvenliği--25-ekim-2026) içindedir. Ham npm audit yerel yamayı tanımadığından forge uyarısı sürer.
 
 ## Üretim hazırlığı
 
