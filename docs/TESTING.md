@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, 122. temelin canlı aktarımı
+
+- Yalnız veri aktarımı yapıldı; uygulama/API/CLI kodu değişmedi. Son kod doğrulaması aşağıdaki **247 backend / 2.712 assertion, 68 Vitest ve 6 ilgili E2E** koşumudur; bu veri işleminde yeniden çalıştırılmadı. Gerçek sunucuda PHPUnit/E2E fixture'ları kullanılmadı.
+- İki bağımsız A PDF'si bayt düzeyinde eşleşti; A/B karşılaştırması 125/125. 14 sayfanın görsel incelemesi, 125 işaretli cevap ile çıkarılmış anahtarın karşılaştırması ve 11 ders grubu kontrolü tamamlandı. EGM asıl dosyasına doğrudan erişim doğrulanmış sayılmadı.
+- Mevcut importer ile tek transaction: **51 yeni / 74 yeniden kullanılan soru sürümü**, 125/100 seçenek. 19 tablonun önceden var olan satır özetleri korundu, aynı batch tekrarı aynı kaldı. Ayrı READ ONLY sorgu tüm 125 metin/seçenek/cevap/ders bilgisini, paylaşılan ilk 100 sürümü ve temel dönem/kural bağlantılarını doğruladı. Önceki silahlı `unverified` / silahsız `pass_fail` karar türleri korundu; yenileme kuralı uygulanmadı. Sunucuda **288 temel** kayıt ve 98. yenilemenin iki kaydı vardır.
+- Canlı öğrenci webinde 390/1280 px'de 122. sınavın 125/100 soru olarak görünmesi ve Temel eğitim seçiminin korunması doğrulandı; görüntüler gözle incelendi. Sınav başlatılmadı veya cevap/geçmiş oluşturulmadı; yalnız kontrol oturumu normal giriş/çıkış kullandı. Credential/token/cookie kayda alınmadı. Kanıtlar `artifacts/basic122-live/`, ayrıntılar [EXAM_SOURCES](EXAM_SOURCES.md) içinde. Fiziksel Expo Go ayrıca denenmedi.
+- Yeni migration, imaj yayını, servis yeniden başlatma, yerel `oggaq` içerik yazması veya Git push yapılmadı. Claude'un servisleri, deploy/backup betikleri ve diğer siteler korundu.
+
 ## Güncel doğrulama — 26 Ekim 2026, 98. yenilemenin canlı aktarımı
 
 - `ReviewedBookletImport` ve `import:booklet` eklendi. JSON + iki farklı hosttan aynı SHA-256 değerli PDF, A/B karşılaştırması ve tamamlanmış görsel/ders incelemesi önizlemeye bağlanır. Dosya/kanıt/rapor değişikliği, yetki iptali, bozuk bölüm, mevcut sınav kimliği ve tekrarlar korunur; tüm içerik tek transaction içinde yazılır. Onay raporu JSONB anahtar sırasından bağımsız özetlenir; sonuç alanı onaylı snapshot'ın dışındadır.
