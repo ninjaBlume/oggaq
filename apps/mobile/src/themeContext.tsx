@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { Platform, View, useColorScheme, useWindowDimensions } from "react-native";
+import { Platform, useColorScheme, useWindowDimensions } from "react-native";
 import * as SystemUI from "expo-system-ui";
 import { StatusBar } from "expo-status-bar";
 import { resolveScheme, themePreferences } from "@oggaq/design-tokens";
@@ -38,7 +38,6 @@ const isPreference = (value: unknown): value is ThemePreference =>
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const system = useColorScheme();
   const [preference, setPreferenceState] = useState<ThemePreference>("system");
-  const [loaded, setLoaded] = useState(false);
   const changed = useRef(false);
   useEffect(() => {
     let mounted = true;
@@ -50,9 +49,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       () => {
         /* Unreadable storage: stay on the device setting. */
       },
-    ).finally(() => {
-      if (mounted) setLoaded(true);
-    });
+    );
     return () => {
       mounted = false;
     };
@@ -80,11 +77,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   return (
     <ThemeContext.Provider value={value}>
       <StatusBar style={scheme === "dark" ? "light" : "dark"} />
-      {loaded ? (
-        children
-      ) : (
-        <View style={{ flex: 1, backgroundColor: palette.paper }} />
-      )}
+      {children}
     </ThemeContext.Provider>
   );
 }

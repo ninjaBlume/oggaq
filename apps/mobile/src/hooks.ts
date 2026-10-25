@@ -1,8 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
+import { ScreenActive } from "./screenActivity";
 export function useOnReturn(callback: () => void) {
-  const focused = useIsFocused();
+  const screenFocused = useIsFocused();
+  const active = useContext(ScreenActive);
+  const focused = screenFocused && active;
   const blurred = useRef(false);
   const ref = useRef(callback);
   ref.current = callback;
@@ -97,11 +100,14 @@ export function useTask<T>() {
   return { pending, error, run, reset: () => setError(null) };
 }
 export function useResume(callback: () => void) {
+  const active = useContext(ScreenActive);
   const ref = useRef(callback);
   ref.current = callback;
+  const visible = useRef(active);
+  visible.current = active;
   useEffect(() => {
     const s = AppState.addEventListener("change", (state) => {
-      if (state === "active") ref.current();
+      if (state === "active" && visible.current) ref.current();
     });
     return () => s.remove();
   }, []);

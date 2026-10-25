@@ -55,6 +55,8 @@ import {
   type MainTab,
 } from "./navigation";
 import { ThemeProvider, useBody, useLayout, useTheme } from "./themeContext";
+import { ScreenActive } from "./screenActivity";
+import { restoreApplication, type Prepared } from "./startup";
 
 type Routes = {
   Main: undefined;
@@ -62,6 +64,8 @@ type Routes = {
   Account: undefined;
 };
 const Stack = createNativeStackNavigator<Routes>();
+const primaryTabs: readonly MainTab[] = ["home", "deneme", "ders", "history", "profile"];
+type PreparedContexts = Prepared<StudyContext[]>;
 function MainTabs({
   user,
   context,
@@ -84,8 +88,15 @@ function MainTabs({
   const { styles } = useTheme();
   const layout = useLayout();
   const [tab, setTab] = useState<MainTab>("home");
+  const [visited, setVisited] = useState<MainTab[]>(["home"]);
+  function activateTab(next: MainTab) {
+    if (primaryTabs.includes(next))
+      setVisited(previous => previous.includes(next) ? previous : [...previous, next]);
+    setTab(next);
+  }
   const [menuOpen, setMenuOpen] = useState(false);
   const [subject, setSubject] = useState<string>();
+  const [subjectRequest, setSubjectRequest] = useState(0);
   const content = useRef<ScrollViewInstance>(null);
   const focused = useIsFocused();
   const [keyboardOpen, setKeyboardOpen] = useState(false);
@@ -104,19 +115,20 @@ function MainTabs({
   useEffect(() => {
     if (!focused || tab === "home") return;
     const back = BackHandler.addEventListener("hardwareBackPress", () => {
-      setTab("home");
+      activateTab("home");
       return true;
     });
     return () => back.remove();
   }, [focused, tab]);
   function ders(subjectId?: string) {
     setSubject(subjectId);
-    setTab("ders");
+    setSubjectRequest(value => value + 1);
+    activateTab("ders");
   }
   function selectTab(id: MainTab) {
     if (id === "ders") setSubject(undefined);
     if (tab === id) content.current?.scrollTo({ y: 0, animated: true });
-    else setTab(id);
+    else activateTab(id);
   }
   // Lists and grids use the whole content area; forms (profile, review) stay a reading column.
   const body = useBody(["home", "deneme", "ders", "history", "stats"].includes(tab));
@@ -141,55 +153,64 @@ function MainTabs({
               menu={() => setMenuOpen(true)}
               profile={() => selectTab("profile")}
             />
-            <ScrollView
-              ref={content}
-              key={tab}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={body}
-            >
-              {tab === "home" ? (
-                <Home
-                  user={user}
-                  context={context}
-                  deneme={() => setTab("deneme")}
-                  ders={ders}
-                  history={() => setTab("history")}
-                  review={() => setTab("review")}
-                  stats={() => setTab("stats")}
-                  exam={exam}
-                />
-              ) : tab === "deneme" ? (
-                <ExamList context={context} kind="deneme" open={exam} />
-              ) : tab === "ders" ? (
-                <ExamList
-                  context={context}
-                  kind="ders"
-                  open={exam}
-                  initialSubject={subject}
-                />
-              ) : tab === "history" ? (
-                <Results context={context} openExam={exam} />
-              ) : tab === "review" ? (
-                <Review context={context} openExam={exam} />
-              ) : tab === "score" ? (
-                <ScoreCalculator />
-              ) : tab === "jobs" ? (
-                <Jobs user={user} />
-              ) : tab === "stats" ? (
-                <Stats context={context} />
-              ) : (
-                <Profile
-                  user={user}
-                  context={context}
-                  contexts={contexts}
-                  choose={choose}
-                  logout={logout}
-                  pending={pending}
-                  account={account}
-                />
-              )}
-            </ScrollView>
+            {(primaryTabs.includes(tab) ? visited : [...visited, tab]).map(page => (
+              <ScreenActive.Provider key={page} value={focused && page === tab}>
+                <View style={{ flex: 1, display: page === tab ? "flex" : "none" }}
+                  accessibilityElementsHidden={page !== tab}
+                  importantForAccessibility={page === tab ? "auto" : "no-hide-descendants"}
+                  aria-hidden={page !== tab}>
+                <ScrollView
+                  ref={page === tab ? content : undefined}
+                  keyboardShouldPersistTaps="handled"
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={body}
+                >
+                  {page === "home" ? (
+                    <Home
+                      user={user}
+                      context={context}
+                      deneme={() => activateTab("deneme")}
+                      ders={ders}
+                      history={() => activateTab("history")}
+                      review={() => activateTab("review")}
+                      stats={() => activateTab("stats")}
+                      exam={exam}
+                    />
+                  ) : page === "deneme" ? (
+                    <ExamList context={context} kind="deneme" open={exam} />
+                  ) : page === "ders" ? (
+                    <ExamList
+                      key={subjectRequest}
+                      context={context}
+                      kind="ders"
+                      open={exam}
+                      initialSubject={subject}
+                    />
+                  ) : page === "history" ? (
+                    <Results context={context} openExam={exam} />
+                  ) : page === "review" ? (
+                    <Review context={context} openExam={exam} />
+                  ) : page === "score" ? (
+                    <ScoreCalculator />
+                  ) : page === "jobs" ? (
+                    <Jobs user={user} />
+                  ) : page === "stats" ? (
+                    <Stats context={context} />
+                  ) : (
+                    <Profile
+                      user={user}
+                      context={context}
+                      contexts={contexts}
+                      choose={choose}
+                      logout={logout}
+                      pending={pending}
+                      account={account}
+                    />
+                  )}
+                </ScrollView>
+                </View>
+              </ScreenActive.Provider>
+            ))}
             {!layout.railed && !keyboardOpen && (
               <PrimaryNavigation tab={tab} select={selectTab} placement="bottom" />
             )}
@@ -218,12 +239,14 @@ function Workspace({
   pending,
   refresh,
   signedOut,
+  prepared,
 }: {
   user: User;
   logout: () => void;
   pending: boolean;
   refresh: () => void;
   signedOut: () => void;
+  prepared?: PreparedContexts;
 }) {
   const { palette, styles, scheme } = useTheme();
   const body = useBody();
@@ -241,9 +264,18 @@ function Workspace({
     }),
     [scheme, palette],
   );
+  const initialContexts = useRef(prepared);
   const query = useResource(
-    async (signal) =>
-      (await api.request("get", "/api/v1/me/contexts", { signal })).data,
+    async (signal) => {
+      if (initialContexts.current) {
+        const pending = initialContexts.current;
+        initialContexts.current = undefined;
+        const result = await pending;
+        if ("error" in result) throw result.error;
+        return result.data;
+      }
+      return (await api.request("get", "/api/v1/me/contexts", { signal })).data;
+    },
     [user.id],
   );
   const [contextId, setContextId] = useState<string | null>(null);
@@ -357,11 +389,13 @@ function Application() {
   const body = useBody();
   const [user, setUser] = useState<User | null>(null);
   const [restoring, setRestoring] = useState(true);
+  const [prepared, setPrepared] = useState<{ token: string; contexts: PreparedContexts }>();
   const [error, setError] = useState<unknown>(null);
   const task = useTask<unknown>();
   const insets = useSafeAreaInsets();
   async function clear() {
     setUser(null);
+    setPrepared(undefined);
     try {
       await session.clear();
     } catch (e) {
@@ -387,8 +421,15 @@ function Application() {
     setRestoring(true);
     setError(null);
     try {
-      await verifyPreviewStorage();
-      if (await session.restore()) await refresh();
+      await restoreApplication({
+        probe: verifyPreviewStorage,
+        restore: () => session.restore(),
+        contexts: async () => (await api.request("get", "/api/v1/me/contexts", {})).data,
+        prepared: contexts => {
+          if (session.token) setPrepared({ token: session.token, contexts });
+        },
+        identity: refresh,
+      });
     } catch (e) {
       setError(e);
     } finally {
@@ -410,7 +451,7 @@ function Application() {
         await api.request("post", "/api/v1/auth/logout", {});
         await session.clear();
       },
-      () => setUser(null),
+      () => { setUser(null); setPrepared(undefined); },
     );
   }
   return (
@@ -456,6 +497,7 @@ function Application() {
           pending={task.pending}
           refresh={() => void refresh()}
           signedOut={() => void clear()}
+          prepared={prepared?.token === session.token ? prepared.contexts : undefined}
         />
       ) : (
         <SafeAreaView style={styles.shell} edges={["top", "bottom"]}>

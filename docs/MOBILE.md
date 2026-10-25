@@ -4,6 +4,8 @@
 
 ## 25 Ekim 2026: sayfa geçiş logosu kaldırıldı
 
+Güncel açılış ve sekme performansı: tema/oturum işleri ve ardından kimlik/bağlam istekleri paraleldir. Ana beş sekme yalnız ilk ziyaretinde oluşturulur, kullanıcı/bağlam ömründe korunur; görünmeyen ekranlar erişilebilirlik ağacından çıkarılır. Liste yenilemeleri hazır veriyi silmez. Yenileme, sekmeye dönüş ve arka plan ayrıntıları [PERFORMANCE](PERFORMANCE.md) içinde; aşağıdaki logo kaldırma ve soru hızı davranışları korunur.
+
 Kullanıcının isteğiyle sekme, menü, sınav ve hesap ekranlarındaki logo örtüsü, animasyon ve yükleme sayacı kaldırıldı. Ekranların mevcut iskelet/yükleniyor, hata ve yeniden deneme durumları kullanılır. Marka logosu normal arayüzde ve uygulamanın açılışında kalır. Yalnız kaldırılan örtüyü sınayan geçici tarayıcı test betiği ve npm komutu da silindi.
 
 Önceki hız düzeltmeleri korunur: yeni sınav başlatma yanıtındaki sorular doğrudan ekrana aktarılır; aynı sorular ilk açılışta yeniden indirilmez. Normal Devam açılışı sunucudaki konumu alır. Cevap kaydı beklerken soru gezinmesi açıktır. Ortak sayaç `HH:MM:SS` biçimindedir (120 dk `02:00:00`, 150 dk `02:30:00`). Güncel doğrulama [TESTING](TESTING.md) içinde.

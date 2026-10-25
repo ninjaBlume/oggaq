@@ -62,3 +62,35 @@ for (const mobile of [false, true]) {
   expect(detailRequests).toHaveLength(0);
  });
 }
+
+test('mobil sekmeye dönüşte hazır form ve liste yavaş yenilemeyi beklemez; ana sayfa tekrar kurulmaz', async ({page}) => {
+ await page.setViewportSize({width:390,height:844});
+ let homeSubjectRequests = 0;
+ page.on('request', request => {
+  const url = new URL(request.url());
+  if (url.pathname === '/api/v1/subjects' && url.searchParams.get('per_page') === '4') homeSubjectRequests++;
+ });
+ await page.goto(mobilePreviewUrl);
+ await page.getByLabel('E-posta adresi',{exact:true}).fill('e2e-student@example.test');
+ await page.getByLabel('Parola',{exact:true}).fill('Synthetic-Browser-42!');
+ await page.getByRole('button',{name:'Giriş yap',exact:true}).click();
+ await expect(page.getByText('Merhaba, E2E.',{exact:true})).toBeVisible();
+ await page.getByRole('tab',{name:'Deneme',exact:true}).click();
+ await page.getByRole('button',{name:'Sınava gir',exact:true}).click();
+ await page.getByLabel('Süre (dakika)',{exact:true}).fill('120');
+ await page.getByRole('tab',{name:'Profil',exact:true}).click();
+ let release!: () => void;
+ const gate = new Promise<void>(resolve => {release = resolve;});
+ const refreshing = page.waitForRequest(request => new URL(request.url()).pathname.endsWith('/exam-attempts'));
+ await page.route('**/contexts/*/exam-attempts?*', async route => {await gate; await route.continue();});
+ try {
+  await page.getByRole('tab',{name:'Deneme',exact:true}).click();
+  await refreshing;
+  await expect(page.getByLabel('Süre (dakika)',{exact:true})).toHaveValue('120');
+  await expect(page.getByRole('button',{name:'Sınavı başlat',exact:true})).toBeVisible();
+  await expect(page.getByText('Sınavlar yükleniyor',{exact:true})).not.toBeVisible();
+ } finally { release(); }
+ await page.getByRole('tab',{name:'Ana sayfa',exact:true}).click();
+ await expect(page.getByText('Merhaba, E2E.',{exact:true})).toBeVisible();
+ expect(homeSubjectRequests).toBe(1);
+});

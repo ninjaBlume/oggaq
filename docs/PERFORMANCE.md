@@ -1,5 +1,13 @@
 # Sınav yükleme ve cevap kaydı performansı
 
+## 25 Ekim 2026: mobil açılış ve hazır sekmelere dönüş
+
+Açılışta tema tercihi okunana kadar bütün uygulama boş bekliyordu. Artık sistem temasıyla ekran ve oturum işlemleri hemen başlar; kaydedilmiş tercih geldiğinde mevcut ekran yerinde güncellenir. Oturum okuması ile QA depolama kontrolü paraleldir. Geçerli token bulunduğunda `/me` ve `/me/contexts` aynı anda başlatılır; çalışma alanı aynı hazırlık yanıtını kullanır ve ikinci bağlam isteği oluşturmaz. Kimlik doğrulanmadan içerik açılmaz. Bağlam hatası ayrı saklanır ve çalışma alanında yeniden denenir; çıkış/hesap değişiminde hazırlık eski tokenla yeni kullanıcıya uygulanmaz.
+
+Ana sayfa, Deneme, Ders, Sonuçlar ve Profil ilk ziyaretlerinde oluşturulur; aynı kullanıcı ve bağlamda en fazla bu beş ekran hazır tutulur. Filtre, açık süre formu ve kaydırma konumu korunur. Diğer sayfalar ihtiyaç anında oluşturulur; başlangıçta bütün ekranlar veya kataloglar önceden indirilmez. Ana sayfaya dönüşte ders kısayolları tekrar istenmez. Katalog ve geçmiş arka planda yenilenirken mevcut liste iskelete çevrilmez. Dönen sekme güncellenir; görünmeyen sekmeler odak/uygulamaya dönüş olayıyla yenileme başlatmaz. Hesap veya bağlam değişimi önceki ekran ağacını kaldırır; kişisel veriler diske yazılmaz. Backend yetkileri ve normal sınav Devam açılışındaki güncel konum isteği korunur.
+
+Bu değişiklik ağın ilk yanıt süresini sıfırlamaz. Kazanç; açılıştaki bağımsız işleri sırayla beklememek, sekmeleri yeniden kurmamak ve hazır içeriği yenileme bitene kadar saklamamaktan gelir. Fiziksel cihaz soğuk açılışı/native kare süresi bu oturumda ölçülmedi; tarayıcı ve birim doğrulamaları [TESTING](TESTING.md) içinde.
+
 ## 25 Ekim 2026: soru açılışı, gezinme ve geçiş beklemesi
 
 - Zorunlu 400 ms mobil sayfa geçişi kaldırıldı. Kullanıcının sonraki talebiyle yükleme sırasındaki logo katmanı da tamamen kaldırıldı; ekranların kendi iskelet/yükleme durumları kullanılır. Geçiş için zamanlayıcı veya örtü kalmadı.

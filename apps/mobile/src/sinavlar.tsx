@@ -179,12 +179,15 @@ export function ExamList({
   );
   useOnReturn(() => {
     void attempts.reload();
+    void exams.reload();
+    void subjects.reload();
   });
   const all = exams.data ?? [];
   const wholeExams = all.filter((exam) => !exam.subject && exam.weapon_status === weapon).sort(byNewest);
   const subjectExams = all.filter((exam) => exam.subject);
   const list = kind === "deneme" ? wholeExams : subjectExams.filter((exam) => exam.subject?.id === selected?.id).sort(byNewest);
-  const loading = exams.loading || attempts.loading || (kind === "ders" && subjects.loading);
+  const loading = (exams.loading && !exams.data) || (attempts.loading && !attempts.data)
+    || (kind === "ders" && subjects.loading && !subjects.data);
   const failure = exams.error ?? (kind === "ders" ? subjects.error : null);
   return (
     <>
@@ -352,7 +355,7 @@ export function Results({ context, openExam }: { context: StudyContext; openExam
   return (
     <>
       <ScreenTitle title={vocabulary.results.title} subtitle="Girdiğin deneme ve ders sınavları. Bir sınavı açıp tüm sorularını ve cevaplarını kaydırarak incele." />
-      {exams.loading ? (
+      {exams.loading && !exams.data ? (
         <Loading layout="list" label="Sonuçların yükleniyor" />
       ) : exams.error ? (
         <ErrorNotice title="Sonuçların yüklenemedi" error={exams.error} retry={() => void exams.reload()} />

@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, mobil açılış ve hazır sekmeler
+
+- Tema okuması artık uygulamanın kurulmasını engellemiyor. Depolama kontrolü/oturum okuması paralel; geçerli oturumla kimlik ve bağlam API istekleri paralel başlıyor. Hazırlanan bağlam yanıtı bir kez kullanılıyor; kimlik ve token/hesap sınırı korunuyor. Ana beş sekme ilk ziyaretinden sonra hazır tutuluyor; görünmeyen ekranlar erişilebilirlik ağacından çıkarılıyor ve dönüş yenilemelerini başlatmıyor. Liste yenilenirken hazır içerik korunuyor.
+- **35 mobil Vitest**, ortak strict TypeScript ve Android/iOS/web Metro export geçti. Yeni 4 başlangıç testi depolama eşzamanlılığı, bağlam yanıtı beklerken kimlik isteğinin başlayabilmesi, bağlam hatasının yeniden denenebilir kalması, oturumsuz ve depolama hatalı durumda kimlikli isteğin başlamamasını kapsıyor.
+- Gerçek Laravel/PostgreSQL ile son kodun ayrı export'unda **34 ilgili Chromium E2E tek koşumda geçti**: mobil gezinme/giriş/kayıt, bağlam ayrımı/çıkış, sınav ve kaldığı sorudan devam, hata/yeniden deneme, hareket azaltma, açık-koyu tema ve 320–1280 px yerleşimler. Yeni hız senaryosu dönüşte geçmiş isteğini kontrollü bekletirken açık sınav formunun **120 dakika değerini ve kullanılabilirliğini** koruduğunu; ana sayfaya dönüşte ders kısayolu isteğinin toplam **1** kaldığını doğruluyor. Bu süre, fiziksel cihaz hız ölçümü değildir.
+- İlk 34 koşumunda 32 geçti. Ekranların artık silinmemesi nedeniyle eski DOM-yokluk varsayımı ve gizli ana ekran kısayoluyla çakışan metin seçicisi başarısız oldu. Testler görünürlük/erişilebilir başlık ve görünür süre alanına bağlandı; ilgili 2 senaryo, ardından son kodla 34 senaryonun tamamı geçti. İlk başarısızlığı gizleyen otomatik retry kullanılmadı.
+- Ortak test DB/portları önceden kontrol edildi; yalnız `oggaq_test` ve mobil önizleme için **5186** kullanıldı. Backend/API/DB şeması değişmedi; PHPUnit ve bütün API E2E paketi yeniden çalıştırılmadı. Ortak geliştirme servisleri durdurulmadı. Fiziksel iOS/Android soğuk açılış, native bellek/kare süreleri ve release uygulama ölçülmedi; Expo export bir native cihaz testi değildir. Deploy, mağaza paketi ve push yapılmadı.
+
 ## Güncel doğrulama — 25 Ekim 2026, geçiş logosunun kaldırılması
 
 - Kullanıcının isteğiyle sayfa geçiş logosu, animasyon, gecikme zamanlayıcısı, yükleme sayacı/context'i ve ekran sarmalayıcıları kaldırıldı. Ekranların kendi yükleniyor/iskelet ve hata durumları korunur. Önceki soru yükleme/cevap gezinme hız düzeltmeleri ve `HH:MM:SS` sayaç değişmedi.
