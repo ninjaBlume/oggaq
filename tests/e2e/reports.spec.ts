@@ -1,3 +1,4 @@
+import { mobilePreviewUrl } from "../../playwright.config";
 import { test, expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
@@ -113,7 +114,7 @@ test("rapor formu nedensiz gönderilmez; hata gösterilir ve vazgeçilebilir", a
 });
 
 test.describe("mobil", () => {
-  test.use({ baseURL: "http://127.0.0.1:5185", viewport: { width: 390, height: 844 }, colorScheme: scheme });
+  test.use({ baseURL: mobilePreviewUrl, viewport: { width: 390, height: 844 }, colorScheme: scheme });
 
   test("öğrenci mobil sonuç ekranından soruyu bildirir", async ({ page }) => {
     const errors: string[] = [];

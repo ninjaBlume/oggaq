@@ -63,7 +63,7 @@ docs/                     Türkçe teknik belgeler
 | [Testler](docs/TESTING.md) | Kritik senaryolar ve doğrulama yöntemi |
 | [Yol haritası](docs/ROADMAP.md) | Aşamalar, bağımlılıklar ve tamamlanma kapıları |
 | [Geliştirme ortamı](docs/DEVELOPMENT.md) | Kurulum, servisler, API, test ve yönetici hesabı |
-| [OpenAPI 3.1.2](docs/openapi.json) | Uygulanmış 58 HTTP operasyonunun makineyle doğrulanabilir sözleşmesi |
+| [OpenAPI 3.1.2](docs/openapi.json) | Uygulanmış 102 HTTP operasyonunun makineyle doğrulanabilir sözleşmesi |
 
 ## Geliştirme ortamı
 

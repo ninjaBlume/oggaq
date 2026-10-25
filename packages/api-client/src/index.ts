@@ -29,6 +29,7 @@ type Fetcher = (url: string, init?: RequestInit) => Promise<Response>;
 type ClientOptions = ({ auth?: 'cookie'; csrfToken: () => string | null } | { auth: 'bearer'; accessToken: () => Promise<string | null> | string | null }) & {
   onSessionExpired?: () => void;
   fetch?: Fetcher;
+  timeoutMs?: number;
 }
 
 export class ApiClient {
@@ -72,27 +73,46 @@ export class ApiClient {
       const token = this.options.csrfToken();
       if (token) headers['X-XSRF-TOKEN'] = token;
     }
-    let response: Response;
-    try {
-      response = await this.fetcher(this.base + path, {
-        method, credentials: this.options.auth === 'bearer' ? 'omit' : 'include', cache: 'no-store', headers,
-        ...(body === undefined ? {} : { body: JSON.stringify(body) }), ...(signal ? { signal } : {}),
-      });
-    } catch (error) {
+    const controller = new AbortController();
+    const abort = () => controller.abort(signal?.reason);
+    if (signal?.aborted) abort();
+    else signal?.addEventListener('abort', abort, { once: true });
+    let timedOut = false;
+    const timeout = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, this.options.timeoutMs ?? 20_000);
+    const transportError = (error: unknown): never => {
       if (signal?.aborted) throw error;
+      if (timedOut) throw new ApiError(0, { code: 'request_timeout', detail: 'Sunucu yanıtı gecikti. Bağlantınızı kontrol edip yeniden deneyin. İşleminiz sunucuya ulaşmış olabilir.' });
       throw new ApiError(0, { code: 'network_error', detail: 'Sunucuya ulaşılamıyor. Bağlantınızı kontrol edip yeniden deneyin.' });
-    }
-    if (response.status === 204) return undefined;
-    let payload: unknown;
-    try { payload = await response.json(); }
-    catch { throw new ApiError(response.status, { code: 'invalid_response', detail: 'Sunucudan geçerli bir yanıt alınamadı.' }); }
-    if (!response.ok) {
-      if (response.status === 401 && path !== '/api/v1/me' && !path.startsWith('/api/v1/auth/')) {
-        if (this.options.auth !== 'bearer' || await this.options.accessToken() === sentToken) this.options.onSessionExpired?.();
+    };
+    try {
+      let response: Response;
+      try {
+        response = await this.fetcher(this.base + path, {
+          method, credentials: this.options.auth === 'bearer' ? 'omit' : 'include', cache: 'no-store', headers,
+          ...(body === undefined ? {} : { body: JSON.stringify(body) }), signal: controller.signal,
+        });
+      } catch (error) { return transportError(error); }
+      if (response.status === 204) return undefined;
+      let payload: unknown;
+      try { payload = await response.json(); }
+      catch (error) {
+        if (signal?.aborted || timedOut) return transportError(error);
+        throw new ApiError(response.status, { code: 'invalid_response', detail: 'Sunucudan geçerli bir yanıt alınamadı.' });
       }
-      throw new ApiError(response.status, isProblem(payload) ? payload : {});
+      if (!response.ok) {
+        if (response.status === 401 && path !== '/api/v1/me' && !path.startsWith('/api/v1/auth/')) {
+          if (this.options.auth !== 'bearer' || await this.options.accessToken() === sentToken) this.options.onSessionExpired?.();
+        }
+        throw new ApiError(response.status, isProblem(payload) ? payload : {});
+      }
+      return payload;
+    } finally {
+      clearTimeout(timeout);
+      signal?.removeEventListener('abort', abort);
     }
-    return payload;
   }
 }
 

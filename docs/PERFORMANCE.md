@@ -1,5 +1,21 @@
 # Sınav yükleme ve cevap kaydı performansı
 
+## 25 Ekim 2026: durum kontrolü, sonuç ekranı ve takılan istekler
+
+Hem web hem mobilde genel yavaşlık bildirimi üzerine üç somut nokta düzeltildi:
+
+- Aktif denemenin 15 saniyelik kontrolü, soru metinleri ve şıklarıyla tam ayrıntıyı yeniden indiriyordu. Yeni `GET /contexts/{context}/exam-attempts/{exam}/state` var olan kanonik küçük cevap yanıtını kullanır; ilk açılış tam ayrıntıyı getirir, tamamlanınca değerlendirme için tekrar tam ayrıntı alınır. Sunucu soru sürümü/şıklarını sorgulamaz. 25 soruluk sentetik PostgreSQL testinde durum JSON'u tam kaydın üçte birinden küçüktür; bu canlı 125 soruluk ölçüm veya uçtan uca hız yüzdesi değildir.
+- Sınav bitince yalnız durum kontrolü duruyor, saniyelik sayaç devam ediyordu. Sayaç state'i, webde bütün sonuç kartlarını ve mobilde sonuç listesini her saniye yeniden render ediyordu. Tamamlanmış sınav için saat kurulmaz; aktif sınavdan sonuca geçerken önceki timer temizlenir. Eklenen tarayıcı kontrolü eski kodda her iki istemcide de bir aktif saniyelik timer bulup başarısız oldu; düzeltme bu kontrolle doğrulanır.
+- Ortak HTTP istemcisinde bekleme sınırı yoktu. Başlık ve JSON gövdesini kapsayan 20 saniyelik timeout, kullanıcıya açık hata ve mevcut tekrar eylemi eklendi. Yazmalar kendiliğinden tekrarlanmaz; sunucuya ulaşmış cevabın aynı seçim/revision ile yeniden gönderilmesi güvenlidir. İstemci iptali ayrı korunur. Mobil yenileme sürerken gelen 15 saniyelik kontrol, isteği kesip sürekli baştan başlatmaz.
+
+İstemci, yeni durum yolu henüz dağıtılmamış API'den 404 alırsa o ekranın ömrü boyunca eski tam ayrıntı biçimiyle çalışır. Diğer API hataları gizlenmez. Yeni uç, değişmeyen sahiplik ve aktif üyelik kontrollerini kullanır; sınav süresini veya değerlendirme kuralını değiştirmez. Migration ve yeni bağımlılık yoktur.
+
+Bu çalışmada genel HTTPS sağlık ucu üç kez salt okunur ölçüldü: HTTP 200, ilk bayt yaklaşık 484/353/329 ms. Bunlar kimlikli ekran açılışı, düşük donanımlı cihaz veya tüm sunucu yükü ölçümü değildir. Genel yavaşlığın bütün nedenlerinin çözüldüğü iddia edilmez.
+
+Dağıtım: değişiklikler yerel `main` kodundadır. Sunucu operasyonu iş bölümüne uygun olarak dağıtım yapılmadı; API ve web derlemesinin Claude tarafından güncellenmesi gerekir. Fiziksel Android/iOS frame ve kaydırma ölçümü bu turda yapılmadı. Otomatik doğrulama sonuçları [TESTING](TESTING.md) içinde tutulur.
+
+## Önceki inceleme ve canlı ölçüm (24 Ekim 2026)
+
 24 Ekim 2026, kaynak sürümü `877560e`. Sorun CPU/RAM doygunluğu değildi: sunucuda yaklaşık 0,47 load ve 32 GB belleğin yaklaşık 4,8 GB kullanımı görüldü. Dış bağlantı süreleri dalgalanıyordu; bir soğuk sağlık isteği 4,39 saniye sürerken origin örnekleri yaklaşık 120–160 ms idi. Bu tek dış istek sürekli uygulama gecikmesi olarak kabul edilmedi.
 
 ## Bulunan darboğazlar ve değişiklik

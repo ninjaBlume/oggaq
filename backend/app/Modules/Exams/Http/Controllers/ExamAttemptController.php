@@ -38,6 +38,11 @@ class ExamAttemptController extends Controller
         return new ExamAttemptResource($action->execute($request->user(), $context, $exam));
     }
 
+    public function state(Request $request, string $context, string $exam, AccessExam $action): ExamAnswerStateResource
+    {
+        return new ExamAnswerStateResource($action->execute($request->user(), $context, $exam, compact: true));
+    }
+
     public function answer(SaveExamAnswerRequest $request, string $context, string $exam, string $answer, AccessExam $action): ExamAttemptResource|ExamAnswerStateResource
     {
         $attempt = $action->execute($request->user(), $context, $exam, $request->validated() + ['answer_id' => $answer], compact: $request->boolean('compact'));

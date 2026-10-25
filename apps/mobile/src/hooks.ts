@@ -62,7 +62,10 @@ export function useResource<T>(
     error,
     loading,
     reload,
-    cancel: () => controller.current?.abort(),
+    cancel: () => {
+      controller.current?.abort();
+      if (mounted.current) setLoading(false);
+    },
   };
 }
 export function useTask<T>() {

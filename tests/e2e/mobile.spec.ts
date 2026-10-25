@@ -1,9 +1,10 @@
+import { mobilePreviewUrl } from "../../playwright.config";
 import { test, expect, type Page } from "@playwright/test";
 import { execFileSync } from "node:child_process";
 import { mkdirSync } from "node:fs";
 import { browserTestEnv, phpBinary } from "../../playwright.config";
 test.use({
-  baseURL: "http://127.0.0.1:5185",
+  baseURL: mobilePreviewUrl,
   viewport: { width: 390, height: 844 },
 });
 function fixture(op: string) {
@@ -764,7 +765,7 @@ test('mobil devam son görüntülenen cevapsız soruya döner; yeniden girişte 
   await page.getByRole('button', { name: 'Denemene devam et', exact: true }).click();
   await expect(page.getByText('Soru 3 / 3', { exact: true })).toBeVisible();
   // A new browser context has no preview memory or local state: the API bookmark must be enough.
-  const otherContext = await browser.newContext({ baseURL: 'http://127.0.0.1:5185', viewport: { width: 390, height: 844 } });
+  const otherContext = await browser.newContext({ baseURL: mobilePreviewUrl, viewport: { width: 390, height: 844 } });
   try {
     const other = await otherContext.newPage();
     await login(other);

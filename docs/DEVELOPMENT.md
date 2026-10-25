@@ -92,6 +92,8 @@ Backend API açıkken kökte Node 24 ile `npm ci --ignore-scripts` ve `npm run d
 
 CI, OpenAPI tip üretimi/fark kontrolü, admin/öğrenci web strict tip/Vitest/build/npm audit ve gerçek API Chromium E2E kapılarını da içerir. İlk uzak çalışma, Git'te bulunmayan boş `tests/Unit` dizinine PHPUnit referansı nedeniyle başarısız oldu; bu referans kaldırıldı. Yeni uzak sonuç GitHub Actions'tan izlenir.
 
+Paylaşılan makinede mobil önizlemenin varsayılan `5185` portu kullanılıyorsa `E2E_MOBILE_PORT=5186 npm run test:e2e` ile ayrı port seçilir; bütün mobil testler aynı yapılandırmayı kullanır. `MOBILE_PREVIEW_DIR=/tam/yol` verilirse test sunucusu ortak `apps/mobile/dist` yerine o export dizinini okur. Ayrı çıktı üretmek için `EXPO_PUBLIC_LOCAL_PREVIEW=1 EXPO_PUBLIC_API_URL=http://127.0.0.1:8001 npm exec --workspace @oggaq/mobile -- expo export --platform all --output-dir /tam/yol` kullanılır. Başka ajanın servisleri durdurulmaz; PHPUnit/E2E veritabanı ve API/web test portları yine ortaktır, testler sırayla çalıştırılır.
+
 ## Öğrenci uygulaması
 
 Backend migration'ını `php artisan migrate` ile uygulayıp kökte `npm run dev:web` çalıştırın. Uygulama `http://127.0.0.1:5173` adresindedir. Kayıt/doğrulama/reset, ders/konu çalışması ve kalıcı çözüm geçmişi [web README](../apps/web/README.md) ve [STUDY](STUDY.md) içinde açıklanır. `npm run test:web`, `npm run build:web` ve ortak `npm run typecheck` webi de kontrol eder. Bildirim bağlantısı değiştiğinden açık Horizon worker'ını yeni kodla yeniden başlatın.

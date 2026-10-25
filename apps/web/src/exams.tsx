@@ -20,22 +20,38 @@ export function Exam() {
   const context = useStudyContext();
   const { exam: id = "" } = useParams();
   const cache = useQueryClient();
+  const opened = useRef<string | null>(null);
+  const supportsState = useRef(true);
+  const attemptKey = `${context.id}:${id}`;
   const query = useQuery({
     queryKey: ["exam", context.id, id],
     // Opening an attempt must read its bookmark from the server, including when another device moved it.
     // Do not initialize the question from an otherwise fresh TanStack cache entry.
     refetchOnMount: 'always',
     queryFn: async ({ signal }) => {
+      const current = () => cache.getQueryData<{ data: ExamAttempt }>(['exam', context.id, id]);
+      // First opening always reads the full authoritative bookmark; later polls reuse fixed questions.
+      if (supportsState.current && opened.current === attemptKey && current()?.data.status === 'active') {
+        try {
+          const state = await api.request('get', '/api/v1/contexts/{context}/exam-attempts/{exam}/state', {
+            params: { context: context.id, exam: id }, signal,
+          });
+          const latest = current();
+          if (state.data.status === 'active' && latest?.data.status === 'active')
+            return { data: mergeExamAnswerState(latest.data, state.data) };
+        } catch (error) {
+          // Older API deployments still serve the full detail; try this capability only once.
+          if (!(error instanceof ApiError) || error.status !== 404) throw error;
+          supportsState.current = false;
+        }
+      }
       const response = await api.request(
         "get",
         "/api/v1/contexts/{context}/exam-attempts/{exam}",
         { params: { context: context.id, exam: id }, signal },
       );
-      const cached = cache.getQueryData<{ data: ExamAttempt }>([
-        "exam",
-        context.id,
-        id,
-      ]);
+      if (!signal.aborted) opened.current = attemptKey;
+      const cached = current();
       return cached && cached.data.revision > response.data.revision
         ? cached
         : response;
@@ -94,6 +110,7 @@ function ExamContent({
   const expiredRequest = useRef(false);
   const done = exam.status === "completed";
   useEffect(() => {
+    if (done) return;
     const clock = anchorClock(
       exam.deadline_at,
       exam.server_time,

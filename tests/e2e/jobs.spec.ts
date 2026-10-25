@@ -1,7 +1,8 @@
+import { mobilePreviewUrl } from "../../playwright.config";
 import { test, expect, type Page } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { fixture, login } from './student';
-const web = 'http://127.0.0.1:5183'; const admin = 'http://127.0.0.1:5184'; const mobile = 'http://127.0.0.1:5185';
+const web = 'http://127.0.0.1:5183'; const admin = 'http://127.0.0.1:5184'; const mobile = mobilePreviewUrl;
 test.use({ baseURL: web });
 test.beforeEach(() => { fixture('setup-study'); });
 test.afterAll(() => fixture('cleanup'));

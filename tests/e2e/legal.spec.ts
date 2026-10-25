@@ -1,3 +1,4 @@
+import { mobilePreviewUrl } from "../../playwright.config";
 import { test, expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { execFileSync } from "node:child_process";
@@ -13,7 +14,7 @@ test.beforeEach(() => { fixture("setup-study"); fixture("official-exam"); fixtur
 test.afterAll(() => fixture("cleanup"));
 
 const web = "http://127.0.0.1:5183";
-const mobile = "http://127.0.0.1:5185";
+const mobile = mobilePreviewUrl;
 const password = "Synthetic-Browser-42!";
 const hex = (rgb: number[]) => `#${rgb.map((value) => value.toString(16).padStart(2, "0")).join("")}`;
 

@@ -1,3 +1,4 @@
+import { mobilePreviewUrl } from "../../playwright.config";
 import { test, expect, type Page } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { fixture, login } from './student';
@@ -6,7 +7,7 @@ test.use({ baseURL: 'http://127.0.0.1:5183' });
 test.beforeEach(() => { fixture('setup-study'); });
 test.afterAll(() => { fixture('cleanup'); });
 async function mobileLogin(page: Page) {
-  await page.goto('http://127.0.0.1:5185');
+  await page.goto(mobilePreviewUrl);
   await page.getByLabel('E-posta adresi', { exact: true }).fill('e2e-student@example.test');
   await page.getByLabel('Parola', { exact: true }).fill('Synthetic-Browser-42!');
   await page.getByRole('button', { name: 'Giriş yap', exact: true }).click();

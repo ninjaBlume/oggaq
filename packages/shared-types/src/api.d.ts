@@ -1667,6 +1667,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/contexts/{context}/exam-attempts/{exam}/state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Denemenin küçük kanonik cevap durumunu okuma
+         * @description Sabit soru metinlerini yeniden taşımadan sunucu zamanı, süre, revision, son soru konumu ve bütün cevap seçimlerini döndürür. Her çağrı sahiplik ve aktif üyeliği doğrular; süresi dolan deneme atomik tamamlanır. Tamamlanmış durum görüldüğünde soru açıklamaları ve cevap anahtarı için tam deneme ayrıntısı GET ile alınır.
+         */
+        get: operations["showExamState"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -6083,6 +6103,35 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ScoringPeriodResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    showExamState: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+                exam: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamAnswerStateResponse"];
                 };
             };
             401: components["responses"]["Problem"];

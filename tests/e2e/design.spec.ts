@@ -1,3 +1,4 @@
+import { mobilePreviewUrl } from "../../playwright.config";
 import { test, expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { execFileSync } from "node:child_process";
@@ -15,7 +16,7 @@ test.afterAll(() => fixture("cleanup"));
 
 const web = "http://127.0.0.1:5183";
 const admin = "http://127.0.0.1:5184";
-const mobile = "http://127.0.0.1:5185";
+const mobile = mobilePreviewUrl;
 const widths = [320, 390, 834, 1280];
 const schemes = ["light", "dark"] as const;
 const password = "Synthetic-Browser-42!";

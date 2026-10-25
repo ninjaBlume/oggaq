@@ -1,5 +1,16 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, performans ve hata düzeltmeleri
+
+- PHP 8.4 / PostgreSQL: **235 backend testi, 2.634 assertion** geçti (`composer test`; PATH'te Composer bulunmadığı için resmî SHA256'sı doğrulanmış geçici Composer PHAR ile aynı script çalıştırıldı). `composer lint`, `composer validate --strict` ve `composer audit` başarılı.
+- **137 Vitest** geçti: admin 16, web 6, mobil 27, `study-core` 25, `design-tokens` 63. Mağaza betiklerinin **14 Node testi** de geçti.
+- **99 Chromium E2E**, tek tam koşuda geçti (3,8 dakika). Bunların yeni 8 senaryosu: web/mobil küçük periyodik durum, diğer cihazdaki cevap, tamamlanınca tam değerlendirme ve saniyelik sayacın temizlenmesi, eski API ile uyumluluk, sunucuda kaydedildiği halde yanıtı takılan cevabın güvenli tekrarı; mobil uzun yenilemenin kesilmemesi ve cevap yazarken yenileme iptal edildikten sonra periyodik kontrolün devamı.
+- `npm run generate:api`, `npm run lint:api`, `npm run typecheck`, web/admin production build ve Android/iOS/web Metro export başarılı. Ayrı export dizini ve `E2E_MOBILE_PORT=5186` ile ortak `5185` servisine dokunulmadı; PHPUnit/E2E sırayla ve yalnız `oggaq_test` üzerinde çalıştırıldı.
+- **Başarısız kalan kontrol:** `npm run audit`, önceden belgelenmiş Expo CLI `zod@3.25.76` / [GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5) bulgusu nedeniyle 1 döndürdü. Yeni dependency/override veya audit istisnası eklenmedi; mevcut `node-forge` uyarısı da sürüyor. Ayrıntı [MOBILE](MOBILE.md) içindedir.
+- Fiziksel Android/iPhone/iPad, native frame ölçümü ve yeni native paket derlemesi yapılmadı. Sunucuya dağıtım yapılmadı. Ölçüm ve değişikliklerin sınırları [PERFORMANCE](PERFORMANCE.md) içinde.
+
+## Önceki doğrulama kayıtları
+
 Mevcut yerel sonuç: PHP 8.4 / gerçek PostgreSQL 18 / Redis ile **233 backend testi, 2.598 assertion**; admin 11, web 6, mobil 27, `study-core` 25 ve `design-tokens` 63 olmak üzere **132 Vitest**, ayrıca mağaza ön kontrol betiği için **9 Node testi** (`npm run test:store`). **91 Chromium E2E** (tek seferde, 24 Ekim 2026 son çalıştırma; iş ilanları, puan hesaplama, sınav sonuçları ve bağlı sınav seçenekleri dahil) admin, öğrenci, deneme, tasarım, bildirim, hesap ve Expo ekran/Bearer akışlarını kapsar. Strict TypeScript, iki web production build, üç platform Metro export, native prebuild ve Expo Doctor (21/21) doğrulandı. Native derleme sonuçları [MOBILE](MOBILE.md) içinde ayrı tutulur; Chromium kontrolü cihaz testi yerine geçmez. İki upstream Expo build advisory'si açıktır; ham npm audit temiz değildir.
 
 24 Ekim 2026 başlık gösterimi kontrolü: parantezli sınav tarihini gizleyen ortak gösterim web, mobil ve yönetim başlıklarına uygulandı. Strict TypeScript, mevcut 124 Vitest, web/admin build ve ayrı çıktı klasöründe mobil web export geçti. Mevcut Vite servisinden yüklenen ortak fonksiyonla tarihli/tarihsiz başlık ve tarih dışı parantezli açıklama elle doğrulandı; API istekleri sentetik yanıtla kesildi, hesap/veritabanı kullanılmadı. Düşük etkili sunum değişikliği için yeni test eklenmedi; test sayıları aynı kaldı. Backend ve E2E yeniden çalıştırılmadı; ortak `5185` önizleme servisi durdurulmadı. Native cihaz doğrulaması yapılmadı.

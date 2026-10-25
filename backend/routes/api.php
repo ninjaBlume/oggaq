@@ -107,6 +107,7 @@ Route::prefix('v1')->group(function () {
             Route::get('contexts/{context}/exam-attempts', [ExamAttemptController::class, 'index'])->whereUuid('context');
             Route::post('contexts/{context}/exam-attempts', [ExamAttemptController::class, 'store'])->whereUuid('context');
             Route::get('contexts/{context}/exam-attempts/{exam}', [ExamAttemptController::class, 'show'])->whereUuid(['context', 'exam']);
+            Route::get('contexts/{context}/exam-attempts/{exam}/state', [ExamAttemptController::class, 'state'])->whereUuid(['context', 'exam']);
             Route::put('contexts/{context}/exam-attempts/{exam}/answers/{answer}', [ExamAttemptController::class, 'answer'])->whereUuid(['context', 'exam', 'answer']);
             Route::post('contexts/{context}/exam-attempts/{exam}/answers/{answer}/report', [ExamAttemptController::class, 'report'])->whereUuid(['context', 'exam', 'answer'])->middleware('throttle:reports');
             Route::put('contexts/{context}/exam-attempts/{exam}/position', [ExamAttemptController::class, 'position'])->whereUuid(['context', 'exam']);

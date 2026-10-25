@@ -19,6 +19,48 @@ class ExamTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_state_poll_keeps_canonical_answers_and_bookmark_without_loading_fixed_questions(): void
+    {
+        $this->pool(25);
+        $this->asToken($this->createUser());
+        $exam = $this->start(input: ['question_count' => 25]);
+        $exam = $this->answer($exam, 1, 0);
+        $this->putJson($this->url($exam, '/position'), ['position' => 3])->assertOk();
+        DB::enableQueryLog();
+        try {
+            $state = $this->getJson($this->url($exam, '/state'))->assertOk()
+                ->assertJsonPath('data.revision', $exam['revision'])
+                ->assertJsonPath('data.resume_position', 3)
+                ->assertJsonPath('data.deadline_at', $exam['deadline_at'])
+                ->assertJsonCount(25, 'data.answers')
+                ->assertJsonPath('data.answers.1.selected_option_id', $exam['questions'][1]['selected_option_id'])
+                ->assertJsonMissingPath('data.questions')
+                ->assertJsonMissingPath('data.answers.0.question')
+                ->assertJsonMissingPath('data.answers.0.feedback');
+            $this->assertStringNotContainsString('from "question_versions"', implode(' ', array_column(DB::getQueryLog(), 'query')));
+        } finally {
+            DB::disableQueryLog();
+            DB::flushQueryLog();
+        }
+        $this->assertLessThan(strlen(json_encode($exam)) / 3, strlen($state->getContent()));
+        $this->getJson($this->url($exam))->assertOk()->assertJsonPath('data.questions', $exam['questions']);
+    }
+
+    public function test_state_poll_finalizes_expiry_once_and_full_detail_keeps_feedback(): void
+    {
+        $this->pool();
+        $this->asToken($this->createUser());
+        $exam = $this->answer($this->start(), 0, 0);
+        $this->travel(61)->seconds();
+        $state = $this->getJson($this->url($exam, '/state'))->assertOk()
+            ->assertJsonPath('data.status', 'completed')->assertJsonPath('data.result.correct', 1)
+            ->assertJsonPath('data.result.blank', 2)->assertJsonMissingPath('data.questions')->json('data');
+        $this->getJson($this->url($exam, '/state'))->assertOk()->assertJsonPath('data.result', $state['result'])
+            ->assertJsonPath('data.revision', $state['revision']);
+        $this->getJson($this->url($exam))->assertOk()->assertJsonPath('data.questions.0.feedback.outcome', 'correct');
+        $this->assertDatabaseCount('exam_attempts', 1);
+    }
+
     public function test_compact_answer_preserves_canonical_selections_conflicts_and_expiry_without_question_payload(): void
     {
         $this->pool(25);
@@ -295,18 +337,23 @@ class ExamTest extends TestCase
         $context = $student->studyContexts()->where('tenant_id', $tenant->id)->firstOrFail();
         $company = $this->start($context->id);
         $this->getJson('/api/v1/contexts/'.$personal['context_id'].'/exam-attempts/'.$company['id'])->assertNotFound();
+        $this->getJson('/api/v1/contexts/'.$personal['context_id'].'/exam-attempts/'.$company['id'].'/state')->assertNotFound();
         $this->putJson('/api/v1/contexts/'.$personal['context_id'].'/exam-attempts/'.$company['id'].'/position', ['position' => 2])->assertNotFound();
         $admin = $this->createUser(['platform_role' => 'platform_admin']);
         $this->asToken($admin);
         $this->getJson($this->url($personal))->assertNotFound();
         $this->getJson($this->url($company))->assertNotFound();
+        $this->getJson($this->url($personal, '/state'))->assertNotFound();
+        $this->getJson($this->url($company, '/state'))->assertNotFound();
         $this->putJson($this->url($company, '/position'), ['position' => 2])->assertNotFound();
         $this->asToken($student);
         app(RevokeMembership::class)->execute($admin, $tenant, $membership->id);
         $this->getJson($this->url($company))->assertForbidden();
+        $this->getJson($this->url($company, '/state'))->assertForbidden();
         $this->putJson($this->url($company, '/position'), ['position' => 2])->assertForbidden();
         $this->postJson($this->url($company, '/finish'), ['base_version' => 1])->assertForbidden();
         $this->getJson($this->url($personal))->assertOk();
+        $this->getJson($this->url($personal, '/state'))->assertOk();
     }
 
     public function test_unverified_or_suspended_user_cannot_start(): void

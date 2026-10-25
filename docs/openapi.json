@@ -6457,6 +6457,74 @@
           }
         ]
       }
+    },
+    "/api/v1/contexts/{context}/exam-attempts/{exam}/state": {
+      "get": {
+        "operationId": "showExamState",
+        "summary": "Denemenin küçük kanonik cevap durumunu okuma",
+        "description": "Sabit soru metinlerini yeniden taşımadan sunucu zamanı, süre, revision, son soru konumu ve bütün cevap seçimlerini döndürür. Her çağrı sahiplik ve aktif üyeliği doğrular; süresi dolan deneme atomik tamamlanır. Tamamlanmış durum görüldüğünde soru açıklamaları ve cevap anahtarı için tam deneme ayrıntısı GET ile alınır.",
+        "tags": [
+          "Exams"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamAnswerStateResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "exam",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
     }
   },
   "components": {

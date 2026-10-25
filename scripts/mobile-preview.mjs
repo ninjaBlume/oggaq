@@ -2,7 +2,10 @@
 import http from "node:http";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-const root = path.resolve("apps/mobile/dist");
+const root = path.resolve(process.env.MOBILE_PREVIEW_DIR ?? "apps/mobile/dist");
+const port = Number(process.env.MOBILE_PREVIEW_PORT ?? 5185);
+if (!Number.isInteger(port) || port < 1024 || port > 65535)
+  throw new Error("MOBILE_PREVIEW_PORT geçerli bir yerel port olmalı.");
 const mime = {
   ".html": "text/html",
   ".js": "application/javascript",
@@ -11,7 +14,7 @@ const mime = {
 };
 const server = http.createServer(async (req, res) => {
   try {
-    const url = new URL(req.url, "http://127.0.0.1:5185");
+    const url = new URL(req.url, `http://127.0.0.1:${port}`);
     const filename = path.resolve(
       root,
       "." +
@@ -32,6 +35,6 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(404).end("Export the mobile preview first.");
   }
 });
-server.listen(5185, "127.0.0.1");
+server.listen(port, "127.0.0.1");
 for (const signal of ["SIGTERM", "SIGINT"])
   process.on(signal, () => server.close(() => process.exit()));

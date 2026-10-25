@@ -116,11 +116,28 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
   // Expanded windows keep the question map and the clock in a side panel next to the question.
   const wide = layout.cls === "expanded";
   const latest = useRef<ExamAttempt | null>(null);
+  const supportsState = useRef(true);
   const scroll = useRef<ScrollViewInstance>(null);
   const insets = useSafeAreaInsets();
   const [overview, setOverview] = useState(false);
   const query = useResource(
     async (signal) => {
+      if (supportsState.current && latest.current?.status === 'active') {
+        try {
+          const state = await api.request('get', '/api/v1/contexts/{context}/exam-attempts/{exam}/state', {
+            params: { context: context.id, exam: id }, signal,
+          });
+          if (state.data.status === 'active') {
+            const data = mergeExamAnswerState(latest.current, state.data);
+            if (!signal.aborted) latest.current = data;
+            return { data };
+          }
+        } catch (error) {
+          // Keep an already installed client usable while the API is being upgraded.
+          if (!(error instanceof ApiError) || error.status !== 404) throw error;
+          supportsState.current = false;
+        }
+      }
       const response = await api.request(
         "get",
         "/api/v1/contexts/{context}/exam-attempts/{exam}",
@@ -128,7 +145,7 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
       );
       if (latest.current && latest.current.revision > response.data.revision)
         return { data: latest.current };
-      latest.current = response.data;
+      if (!signal.aborted) latest.current = response.data;
       return response;
     },
     [context.id, id],
@@ -155,6 +172,8 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
   if (initialIndex.current === null && exam) initialIndex.current = resumeQuestionIndex(exam);
   const index = selectedIndex ?? initialIndex.current ?? 0;
   const done = exam?.status === "completed";
+  const refreshing = useRef(query.loading);
+  refreshing.current = query.loading;
   useEffect(() => {
     if (done) {
       scroll.current?.scrollTo({ y: 0, animated: false });
@@ -169,12 +188,13 @@ export function Exam({ context, id }: { context: StudyContext; id: string }) {
   useEffect(() => {
     if (!exam || done) return;
     const timer = setInterval(() => {
-      void query.reload();
+      // A slow request must reach its timeout instead of being aborted/restarted every poll.
+      if (!refreshing.current) void query.reload();
     }, 15000);
     return () => clearInterval(timer);
   }, [done, exam?.id]);
   useEffect(() => {
-    if (!exam) return;
+    if (!exam || done) return;
     const clock = anchorClock(
       exam.deadline_at,
       exam.server_time,

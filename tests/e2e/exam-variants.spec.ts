@@ -1,3 +1,4 @@
+import { mobilePreviewUrl } from "../../playwright.config";
 import { test, expect, type Page } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { fixture, login } from './student';
@@ -38,7 +39,7 @@ test('admin tek girişten iki seçenek yayımlar; webde 100/125 soru ve ortak d�
 test('mobil aynı sınavı silahsız 100 ve silahlı 125 soru ile başlatır', async ({ browser, page }) => {
   test.setTimeout(60_000); const id = fixture('paired-exam-draft'); const managerContext = await browser.newContext(); const manager = await managerContext.newPage();
   try { await adminLogin(manager); await publishPair(manager, id); } finally { await managerContext.close(); }
-  await page.setViewportSize({ width: 390, height: 844 }); await page.goto('http://127.0.0.1:5185'); await page.getByLabel('E-posta adresi', { exact: true }).fill('e2e-student@example.test'); await page.getByLabel('Parola', { exact: true }).fill('Synthetic-Browser-42!'); await page.getByRole('button', { name: 'Giriş yap', exact: true }).click(); await page.getByRole('tab', { name: 'Deneme', exact: true }).click();
+  await page.setViewportSize({ width: 390, height: 844 }); await page.goto(mobilePreviewUrl); await page.getByLabel('E-posta adresi', { exact: true }).fill('e2e-student@example.test'); await page.getByLabel('Parola', { exact: true }).fill('Synthetic-Browser-42!'); await page.getByRole('button', { name: 'Giriş yap', exact: true }).click(); await page.getByRole('tab', { name: 'Deneme', exact: true }).click();
   for (const [label, count] of [['Silahsız sınavlar', 100], ['Silahlı sınavlar', 125]] as const) {
     await page.getByRole('button', { name: label, exact: true }).click(); await expect(page.getByText(new RegExp(`${count} soru ·`))).toBeVisible(); await page.getByRole('button', { name: 'Sınava gir', exact: true }).click();
     const response = page.waitForResponse((r) => r.url().endsWith('/exam-attempts') && r.request().method() === 'POST'); await page.getByRole('button', { name: 'Sınavı başlat', exact: true }).click(); const exam = (await (await response).json()).data; expect(exam.questions).toHaveLength(count); expect(exam.questions.at(-1).question.stem).toBe(`Uzun sonuç sentetik soru ${count}`); await expect(page.getByText(`Soru 1 / ${count}`, { exact: true })).toBeVisible(); await page.getByRole('button', { name: 'Geri dön', exact: true }).click();

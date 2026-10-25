@@ -8,7 +8,7 @@ Exams modülü, web `Deneme` ekranı ve Expo mobil uygulaması gerçek PostgreSQ
 
 ## İşlemler
 
-`/api/v1/contexts/{context}/exam-attempts` GET/POST; `/{exam}` GET; `/{exam}/answers/{answer}` PUT; `/{exam}/finish` POST.  Biten denemedeki bir soru `/{exam}/answers/{answer}/report` POST ile bildirilir ([QUESTION_BANK](QUESTION_BANK.md#soru-bildirimleri)); cevap kaynağı `questions[].reported` açık bildirimi gösterir. Tipler [OpenAPI](openapi.json) içinde üretilir.
+`/api/v1/contexts/{context}/exam-attempts` GET/POST; `/{exam}` GET; `/{exam}/state` GET; `/{exam}/answers/{answer}` PUT; `/{exam}/finish` POST.  Biten denemedeki bir soru `/{exam}/answers/{answer}/report` POST ile bildirilir ([QUESTION_BANK](QUESTION_BANK.md#soru-bildirimleri)); cevap kaynağı `questions[].reported` açık bildirimi gösterir. Tipler [OpenAPI](openapi.json) içinde üretilir.
 
 Başlatma gövdesi `id` UUID, `question_count`, `duration_seconds` ve isteğe bağlı `subject_id`/`topic_id` içerir. Aynı id/ayarlar aynı kaydı döndürür; farklı ayarlar veya bağlam 409. Açılan soru sırası ve sürümleri değişmez; yeni yayın mevcut denemeyi etkilemez.
 
@@ -71,3 +71,11 @@ Doğrulanmış puanlama dönemine açıkça bağlanmış tam denemelerde başlan
 ## Cevap kaydında küçük durum yanıtı (24 Ekim 2026)
 
 Web ve mobil cevap yazarken `?compact=true` kullanır. Yanıt kanonik sınav özeti ve bütün `id/selected_option_id` seçimlerini içerir; değişmez soru metni/şıkları tekrar gönderilmez. Backend yine aktif bağlamı, rolü, sürümü, seçenek aidiyetini ve son tarihi aynı transaction içinde doğrular. İstemci yalnız aynı bağlam/sınav ve eksiksiz cevap kimlikleri eşleşirse sunucu seçimlerini mevcut sabit sorularla birleştirir; eski revision daha yeni durumu ezmez. Bir başka cihazın başka soruda yaptığı değişiklik de kanonik seçimlerde gelir. Sınav tamamlandıysa ayrıntı yeniden GET ile alınır, değerlendirme istemcide yapılmaz. `compact` göndermeyen mevcut istemciler tam yanıtı almaya devam eder.
+
+## Periyodik durum ve ağ bekleme sınırı (25 Ekim 2026)
+
+İlk açılış tam GET ile sabit soruları ve sunucudaki son soru konumunu yükler. Aktif ekrandaki sonraki yenilemeler `GET /api/v1/contexts/{context}/exam-attempts/{exam}/state` kullanır; `ExamAnswerStateResponse` yalnız özet ve cevap seçimlerini taşır. Backend soru sürümü/şıkları yüklemez. Başka cihazdaki cevap değişiklikleri aynı kimlik/revision kontrolleriyle birleştirilir; ekrandaki soru kendiliğinden değişmez. Tamamlanmış durum görüldüğünde tek tam GET ile kaynak açıklamaları, değerlendirme ve puan ayrıntısı alınır. API henüz bu yolu sunmuyorsa istemci bir 404 sonrasında ekranın ömrü boyunca eski tam GET biçimine döner; başka hatalar gizlenmez.
+
+Ortak HTTP istemcisi başlıklar ve JSON gövdesi için toplam 20 saniye bekler. Süre aşımında `request_timeout` hatası görünür; yazma sunucuya ulaşmış olabileceği için aynı cevap/seçim/revision ile mevcut tekrar akışı kullanılır. Otomatik yazma tekrarı yoktur. Ekran kapanması/filtre değişimi iptali timeout veya JSON hatasına dönüştürülmez. Mobil periyodik kontrol, devam eden yenilemeyi 15 saniyede kesip yeniden başlatmaz.
+
+Tamamlanan denemede saniyelik sayaç da durdurulur; sonuç ekranındaki soru kartları kalan sınav süresi boyunca her saniye yeniden render edilmez. Süre sonu kararını ve puanlamayı yine sunucu verir.
