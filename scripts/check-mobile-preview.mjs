@@ -13,7 +13,7 @@ assert(!origin.username && !origin.password && !origin.search && !origin.hash, '
 assert.equal(origin.pathname, '/', 'Tünelin kök adresini kullanın.');
 const mobile = JSON.parse(await readFile(new URL('../apps/mobile/package.json', import.meta.url), 'utf8'));
 const expectedSdk = `${mobile.dependencies.expo.split('.')[0]}.0.0`;
-const apiUrl = process.env.OGGAQ_MOBILE_API_URL ?? 'https://oggsorubankasi.codentum.net';
+const apiUrl = process.env.OGGAQ_MOBILE_API_URL ?? 'https://oggsor.com';
 
 for (const platform of ['ios', 'android']) {
   const response = await fetch(origin, {

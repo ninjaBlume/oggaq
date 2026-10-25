@@ -1,14 +1,14 @@
 # Sunucuda ayrı geliştirme ortamı
 
-25 Ekim marka kararı: **Ogg Sor - Soru Bankası**, yeni hedef **https://oggsor.com**. Aşağıdaki eski geliştirme adresi geçiş tamamlanana kadar çalışır; yeni DNS, posta, DNSSEC ve yayın durumu [BRAND](../../docs/BRAND.md) içinde izlenir. Alan adı geçişi henüz tamamlanmadı. Ortak IP'nin `smtp.codentum.net` PTR'si bu yeniden markalamada değiştirilmez.
+25 Ekim marka kararı: **Ogg Sor - Soru Bankası**, güncel adres **https://oggsor.com**. Eski geliştirme adresi geçişte uyumluluk için çalışır; yeni DNS, posta, DNSSEC ve yayın kanıtları [BRAND](../../docs/BRAND.md) içinde izlenir. Yeni TLS/API ve öğrenci oturumu doğrulandı; DNS önbellekleri bazı ağlarda eski adresi gösterebilir. Ortak IP'nin `smtp.codentum.net` PTR'si bu yeniden markalamada değiştirilmez.
 
-Hedef adres `https://oggsorubankasi.codentum.net`. Öğrenci uygulaması `/`, yönetim paneli `/yonetim/`, API `/api/v1/`, CSRF ucu `/sanctum/` altında sunulur. Mobil API kökü aynı HTTPS adresidir. Admin'in varsayılan yerel kökü `/` olarak korunur; alt yol derlemede `VITE_ADMIN_BASE_PATH=/yonetim/` ile seçilir.
+Güncel adres `https://oggsor.com` (eski alias: `https://oggsorubankasi.codentum.net`). Öğrenci uygulaması `/`, yönetim paneli `/yonetim/`, API `/api/v1/`, CSRF ucu `/sanctum/` altında sunulur. Mobil API kökü aynı HTTPS adresidir. Admin'in varsayılan yerel kökü `/` olarak korunur; alt yol derlemede `VITE_ADMIN_BASE_PATH=/yonetim/` ile seçilir.
 
-DNS ve HTTPS doğrulandıktan sonra mobil geliştirme istemcisini aynı API'ye bağlamak için proje kökünde `EXPO_PUBLIC_API_URL=https://oggsorubankasi.codentum.net npm run dev:mobile` kullanılır. Mevcut yerel API ayarları ve test adresleri değiştirilmez; yeni native/EAS paketleri için de bu değer derleme ortamında verilmelidir.
+DNS ve HTTPS doğrulandıktan sonra mobil geliştirme istemcisini aynı API'ye bağlamak için proje kökünde `EXPO_PUBLIC_API_URL=https://oggsor.com EXPO_PUBLIC_WEB_URL=https://oggsor.com npm run dev:mobile` kullanılır. Mevcut yerel API ayarları ve test adresleri değiştirilmez; yeni native/EAS paketleri için de bu değer derleme ortamında verilmelidir.
 
 Bu kurulum mevcut Hestia, nginx, PHP 8.3, PostgreSQL 14 ve diğer projelerin servislerini değiştirmeden Docker Compose içinde PHP 8.4, PostgreSQL 18, Redis 8 ve nginx kullanır. Node 24 yalnızca imajın web derleme aşamasındadır. Güncelleme yeni imaj derleyip ilgili konteynerleri yeniden oluşturmayı gerektirir; canlı dosya izleme/HMR yoktur.
 
-Geliştirme sunucusu internete açılacağı için Laravel `APP_ENV=production`, `APP_DEBUG=false` ve güvenli oturum çerezi kullanır. Oturum çerezi yalnızca bu host içindir; diğer `codentum.net` uygulamalarına gönderilmez. Kullanıcının tercihi, Cloudflare Access yerine uygulamanın kendi girişini kullanmaktır. Adresi bilen herkes giriş/kayıt sayfasını görebilir; içerik erişimi backend yetkilendirmesine bağlıdır.
+Geliştirme sunucusu internete açılacağı için Laravel `APP_ENV=production`, `APP_DEBUG=false` ve güvenli oturum çerezi kullanır. Oturum çerezi yalnızca bu host içindir; diğer alan adlarına gönderilmez. Kullanıcının tercihi, Cloudflare Access yerine uygulamanın kendi girişini kullanmaktır. Adresi bilen herkes giriş/kayıt sayfasını görebilir; içerik erişimi backend yetkilendirmesine bağlıdır.
 
 ## Yapılandırma
 
@@ -43,7 +43,7 @@ docker compose --env-file "$OGGAQ_ENV_FILE" -f deploy/server-development/compose
 - Uygulama e-postaları 25 Ekim itibarıyla aşağıdaki özel Exim relay üzerinden dışarı gönderilir. Mailpit geliştirme aracıdır ve `127.0.0.1:18025` üzerinde kalır; artık uygulamanın aktif gönderim hedefi değildir.
 - Cloudflare Access eklenmez; uygulama girişi test ekibinin erişim yöntemidir.
 
-Cloudflare'de ayrı `oggaq-development` tüneli ve yalnızca `oggsorubankasi.codentum.net` için `http://web:8080` yönlendirmesi kullanılır. Tünel token'ı kaynak kod dışında 0600 izinli `.tunnel-token` dosyasına yazılır; komut satırına veya depoya eklenmez. Token dosyası hazır olduktan sonra:
+Cloudflare'de ayrı `oggaq-development` tüneli ve `oggsor.com`, `www.oggsor.com` ve eski `oggsorubankasi.codentum.net` için `http://web:8080` yönlendirmeleri kullanılır. Tünel token'ı kaynak kod dışında 0600 izinli `.tunnel-token` dosyasına yazılır; komut satırına veya depoya eklenmez. Token dosyası hazır olduktan sonra:
 
 ```sh
 export OGGAQ_TUNNEL_TOKEN_FILE=/home/harun/oggaq-development/shared/.tunnel-token
@@ -56,7 +56,19 @@ Tünel konteyneri token dosyasının sahibi olan dağıtım kullanıcısının U
 
 ## E-posta: gerçek gönderim
 
-### 25 Ekim 2026: uygulamaya özel Exim gönderimi
+### Ogg Sor alanına geçiş
+
+Gerçek gönderen `no-reply@oggsor.com`, görünen ad `Ogg Sor - Soru Bankası`; destek alıcısı `destek@oggsor.com` Cloudflare ile doğrulanmış Gmail hedefine yönlenir. Yeni alanın anahtarı `/etc/exim4/oggaq-dkim/oggsor.com.pem`; önceki Codentum anahtarı geçişte korunur. Güncel idempotent kontrol:
+
+```sh
+python3 exim_relay.py --check --domain oggsor.com --previous-domain codentum.net --existing-spf 'v=spf1 include:_spf.mx.cloudflare.net ip4:212.68.34.90 -all'
+```
+
+Üç MX ve Cloudflare yönlendirme DKIM’i eklenirken IP yetkisi ve sıkı DMARC korundu. Destek yönlendirmesi gerçek Gmail gelen kutusu testini geçti. Doğrudan uygulama testi Gmail’de SPF/DKIM/DMARC PASS ile **Spam** klasöründedir; doğrudan gelen kutusu yerleşimi açık kalır. `HORIZON_PREFIX` teknik eski değerine sabitlendi; ad değişikliği Redis/oturum veya kuyruk izleme adlarını değiştirmez. Yalnız uygulama servisleri yeniden oluşturulur, ardından nginx reload ve readiness kontrolü yapılır.
+
+Aşağıdaki bölüm **Codentum alanındaki ilk kurulumun tarihsel kaydıdır**; güncel komut ve durum yukarıdadır.
+
+### 25 Ekim 2026: ilk uygulamaya özel Exim gönderimi
 
 Kullanıcı e-posta işini Codex'e devretti. Hestia/Dovecot onarılmadan, mevcut Exim'e yalnız `172.30.88.0/24` Compose ağı ve `codentum.net` zarf/Header From alanı için kontrollü gönderim eklendi. Diğer projelerin kimlik doğrulaması/anahtarları ve alanları korunur. DKIM anahtarı **`/etc/exim4/oggaq-dkim/codentum.net.pem`** içindedir; `/etc/exim4/domains/` altına konmaz, aksi halde alan adı yerel alıcı alanı sayılıp Cloudflare MX teslimi bozulur. Dizin `root:Debian-exim 0750`, anahtar `0640`; özel anahtar sunucudan çıkarılmadı. Codentum postası imzalanamazsa gönderilmez, kuyrukta bekler.
 

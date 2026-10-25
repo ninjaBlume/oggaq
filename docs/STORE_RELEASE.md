@@ -12,13 +12,13 @@ Durum (25 Ekim 2026): **yayına hazır değil.** Kod tarafında hesap silme, sor
 | Hesap silme için herkese açık web sayfası (Google) | Taslak hazır: `/legal/hesap-silme.html` | Hukukçu + e-posta adresi |
 | Gizlilik politikası / KVKK aydınlatma metni | **Taslak**: `/legal/gizlilik.html` | Hukukçu |
 | Kullanım koşulları | **Taslak**: `/legal/kosullar.html` | Hukukçu |
-| Destek sayfası ve iletişim | `destek@oggsor.com` yapılandırıldı; yeni alan adı için posta yönlendirme/teslim ve sayfa onayı bekleniyor | Kullanıcı |
+| Destek sayfası ve iletişim | `destek@oggsor.com` yönlendirmesi gerçek testte Gmail gelen kutusunda doğrulandı; yasal sayfa onayı bekleniyor | Kullanıcı |
 | Uygulama içinde yasal bağlantılar | Hazır: web altbilgisi, giriş/kayıt, mobil Profil → Yasal ve destek, giriş ekranı | — |
 | "Resmî kurum değildir" uyarısı | Hazır: web altbilgisi, giriş, mobil Profil; kullanım koşullarında | — |
 | "Hesaplama resmî sonuç değildir" notu | Hazır: puan hesaplama ekranları (web, mobil) | — |
 | Uygulama ikonu, uyumlu (adaptive) ikon, açılış simgesi, favicon | **Geçici** marka: `apps/mobile/assets/` | Kullanıcı (nihai logo) |
 | Yerel açılış ekranı (native splash) | SDK 58 uyumlu eklentiyle mevcut simge, mavi zemin ve koyu tema hazır; iki native proje üretimi doğrulandı | Yeni release paketinde görsel kontrol |
-| Derleme yapılandırması | `eas.json` üretim adresi `https://oggsor.com`; yeni alan adının canlı API/yasal sayfa kontrolü bekleniyor | Alan adı bağlantısı + paket doğrulama |
+| Derleme yapılandırması | `eas.json` üç profilde `https://oggsor.com`; canlı HTTPS/API ve oturum doğrulandı, yasal taslak onayı bekleniyor | Alan adı bağlantısı + paket doğrulama |
 | Paket kimliği | **Geçici**: `net.harunaltay.oggaq` | Kullanıcı (yayıncı kararı) |
 | Takip, reklam, analitik SDK'sı | Yok (gizlilik beyanı basit) | — |
 | Üçüncü taraf girişi (Apple ile Giriş zorunluluğu) | Yok | — |
@@ -28,7 +28,7 @@ Durum (25 Ekim 2026): **yayına hazır değil.** Kod tarafında hesap silme, sor
 | Soru içeriğinin hak teyidi | **Engel** | Kullanıcı + hukukçu |
 | Puanlama kurallarının uzman onayı | **Engel** | Kullanıcı + uzman |
 | Veri sorumlusu, VERBİS, yurt dışı aktarım | **Engel** | Kullanıcı + hukukçu |
-| Gerçek e-posta gönderimi | Proje ağına özel Exim/DKIM aktif; SMTP teslimi ve SPF/DKIM/DMARC PASS; ilk testler Gmail spam klasöründe; A/PTR düzeltildi, DNS yayılımı ve yeni klasör testi bekleniyor | Codex |
+| Gerçek e-posta gönderimi | `no-reply@oggsor.com` aktif; gerçek kuyruk testi Gmail’de SPF/DKIM/DMARC PASS fakat Spam. Destek yönlendirmesi gelen kutusunda doğrulandı; doğrudan gönderimin gelen kutusu yerleşimi açık | Codex |
 | Yedekleme | Betikler hazır, sunucuda çalıştırılmadı | Kullanıcı |
 | Apple DSA (AB tüccar) doğrulaması | Sürüyor (Codentum hesabı) | Kullanıcı / Apple |
 

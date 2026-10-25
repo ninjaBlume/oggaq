@@ -9,8 +9,8 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://oggsorubankasi.codentum.net",
-        "EXPO_PUBLIC_WEB_URL": "https://oggsorubankasi.codentum.net"
+        "EXPO_PUBLIC_API_URL": "https://oggsor.com",
+        "EXPO_PUBLIC_WEB_URL": "https://oggsor.com"
       }
     },
     "preview": {
@@ -19,8 +19,8 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://oggsorubankasi.codentum.net",
-        "EXPO_PUBLIC_WEB_URL": "https://oggsorubankasi.codentum.net"
+        "EXPO_PUBLIC_API_URL": "https://oggsor.com",
+        "EXPO_PUBLIC_WEB_URL": "https://oggsor.com"
       }
     },
     "production": {
