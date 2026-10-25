@@ -19,3 +19,6 @@ infrastructure/data
 artifacts
 apps/mobile/android
 apps/mobile/ios
+
+# Yerel şirket belgeleri (kimlik, vergi numarası); imaja ya da sunucuya hiçbir zaman gitmemeli
+docs/Codentum/
