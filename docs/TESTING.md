@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, Expo Go font uyarısı
+
+- Kullanıcı Expo Go'nun üstte genel hata uyarısı gösterdiğini bildirdi. Sunucu readiness sağlıklı. Native hatanın ham nedeni bu oturumda yakalanamadı; iOS simülatörünün debugger bağlantısı runtime yanıtı vermeden kapandı. Önceki web/export doğrulaması gerçek cihaz doğrulaması değildi.
+- Sabit bir Bold dosyası için çoklu font ailesi yükleme API'sine ihtiyaç kaldırıldı. Yükleyici, yerleşik tek-font `loadAsync(family, resource)` yolunu kullanır; web kaynağı açıkça 700 ağırlığını korur. Devam eden yüklemeler paylaşılır; başarısız yükleme başarı diye saklanmaz ve tekrar denenebilir. Mevcut hata görünümü korunur.
+- **30 mobil test** geçti (önceki 27 + yeni 3): aile API'si bulunmayan native köprüde yükleme, aynı anda yüklemelerin paylaşılması/başarısızlık sonrası yeniden deneme, webde eski CSS kaydının temizlenmesi ve gerçek 700 kaynağı. Ortak strict TypeScript ve Android/iOS/web Metro export başarılı.
+- Gerçek tarayıcıda altı görünüm + statik yasal sayfada `LeagueSpartan-Bold`, 700 ağırlık ve yedi özel-font glifi doğrulandı; kesilen font isteği sonrası form erişilebilirliği ve yeniden deneme de geçti. Rapor/ekranlar `artifacts/font-fix-review/` içinde. Bunlar fiziksel Expo Go testi yerine geçmez; kullanıcıdan yenileme sonrası cihaz sonucu istendi.
+- Metro 8081 ve ortak servisler durdurulmadı. Backend/DB/API değişmedi; PHPUnit ve tam API E2E yeniden çalıştırılmadı. Sunucu yayını ve yeni imzalı paket gerektiren bir değişiklik yapılmadı; düzeltme mobil JS yükleyicisindedir. Push yapılmadı.
+
 ## Güncel doğrulama — 25 Ekim 2026, ÖGG SOR marka yazısı
 
 - Marka adı **ÖGG SOR** / **ÖGG SOR - Soru Bankası**; marka yazı tipi **League Spartan Bold (700)** olarak merkezi kaynağa işlendi. Sabit TTF'nin OS/2 ağırlığı 700 doğrulandı; tam OFL metninin Android/iOS Hermes paketlerinde bulunduğu da kontrol edildi; TTF/WOFF2 dosyaları ve lisans upstream `27341b9bf93a2c7faa140538a64ce342486c5fb5` sürümünden alındı. Başka fontların/soru metninin stilleri değişmedi.
