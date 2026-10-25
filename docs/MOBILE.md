@@ -2,6 +2,10 @@
 
 `apps/mobile`, React Native 0.88.0 / Expo SDK 58.0.19 ile iOS/Android native bileşenleri kullanır. Kayıt/giriş, doğrulama e-postasını yeniden gönderme ve kontrol etme, parola yenileme e-postası, kişisel/aktif kurum seçimi, ders/konu ve yayımlanmış soru çalışması, geçmiş, süreli deneme/sonuç uygulanmıştır. HTML/web ekranı native içine gömülmez. Ortak API sözleşmesi ve saf sayaç kodu web ile paylaşılır. Uygulamaların React sürümü SDK'nın renderer sürümü 19.3.0'a eşitlendi; güncel geçiş kontrolleri aşağıdadır. Tarihsel doğrulamalar ilgili eski sürümlerini anlatır.
 
+## 25 Ekim 2026: markadan ana sayfaya dönüş
+
+Ana başlıktaki logo ve ÖGG SOR yazısı aynı ana sayfa düğmesidir. Yan menüdeki marka da menüyü kapatarak Ana sayfa sekmesini açar. Profil altındaki marka yazısı aynı hedefe gider. Mevcut kullanıcı/kurum bağlamı korunur; açık sınav bitirilmez veya yeniden başlatılmaz. Klavye ve ekran okuyucu için düğme adı vardır, dokunma alanı en az 44 px'tir.
+
 ## 25 Ekim 2026: üç kademeli yazı boyutu
 
 Profil → Yazı boyutu bölümünde **Küçük / Standart / Büyük** seçilir. Varsayılan Standart; çarpanlar 0,9 / 1 / 1,2. Başlık, gövde, soru/seçenek, menü ve giriş alanlarının özgün font/satır yüksekliği ortak metin bileşeninde ölçeklenir; native gezinme başlıkları da tercihi izler. Sistem font büyütmesi açık kalır, ikonlar/dokunma alanları küçültülmez. Tercih hemen uygulanır; native SecureStore, Expo web önizlemede localStorage içinde `oggaq.textSize` anahtarında tutulur. Sunucuya veya başka cihaza aktarılmaz.

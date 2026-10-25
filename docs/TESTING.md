@@ -1,5 +1,12 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, markadan ana sayfaya dönüş
+
+- Mobil üst başlık ve yan menüdeki logo/marka yazısı ile Profil altındaki marka, mevcut bağlamdaki Ana sayfa sekmesini açar. Yan menü önce kapanır. Erişilebilir düğme adı ve en az 44 px hedef kullanılır; başlık düğmesi klavyeyle de çalışır.
+- Ortak strict TypeScript, mevcut **42 mobil Vitest**, Android/iOS/web Metro export başarılı. **10 ilgili Chromium E2E** içinden ilk koşumda 9 geçti. Tablet logo testi menü açılma animasyonu sırasında görüntü/düğme koordinatlarını farklı karelerden ölçtüğü için yanlış noktayı tıkladı; test mevcut panelin yerleşmesini bekleyecek şekilde düzeltildi. Telefon/tablet için yeni **2 senaryo tekrar 2/2 geçti**; 10 farklı ilgili senaryo doğrulandı, tek temiz 10 koşumu iddiası değildir.
+- Yeni senaryolar 390/1024 px'de başlık logo görseline ve yazısına ayrı dokunmayı, yan menü görseli/yazısından menüyü kapatarak dönüşü, Profil alt marka bağlantısını ve Enter tuşuyla dönüşü sınar. Mevcut dört yan menü ve dört yazı boyutu senaryosu da geçti.
+- Yalnız `oggaq_test` ve ayrı mobil **5186** kullanıldı; ortak DB/portlarda başka test süreci kontrol edildi. Backend/API değişmedi; PHPUnit ve tam E2E tekrar çalıştırılmadı. Fiziksel iOS/Android bu küçük gezinme değişikliği için denenmedi. Ortak geliştirme servisleri durdurulmadı; deploy/mağaza paketi/push yapılmadı.
+
 ## Güncel doğrulama — 25 Ekim 2026, üç kademeli yazı boyutu
 
 - Mobil Profil'e Küçük/Standart/Büyük, örnek metin, cihazda saklama ve kayıt hatasında yeniden deneme eklendi. Uygulamaya ait Text/TextInput ortak bileşenden geçer; özel inline fontlar ve satır yükseklikleri de ölçeklenir. İç içe metin iki kez büyütülmez; native gezinme başlıkları ayrı ölçeklenir. Sistem font büyütmesi kapatılmadı; ekran ve sınav durumu korunur.

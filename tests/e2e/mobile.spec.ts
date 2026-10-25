@@ -24,6 +24,45 @@ async function login(page: Page) {
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
   await expect(page.getByText("Merhaba, E2E.", { exact: true })).toBeVisible();
 }
+
+for (const width of [390, 1024]) {
+  test(`logo ve marka yazısı ana sayfaya döner (${width}px)`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await login(page);
+    const home = page.getByRole("tab", { name: "Ana sayfa", exact: true });
+    async function clickLogo(id: string) {
+      if (id === "menu-brand-home") {
+        await expect.poll(async () => (await page.getByLabel("Uygulama menüsü", { exact: true }).boundingBox())?.x).toBe(0);
+      }
+      const button = page.getByTestId(id);
+      const image = await button.locator("img").boundingBox();
+      const box = await button.boundingBox();
+      expect(image).toBeTruthy(); expect(box).toBeTruthy();
+      await button.click({position:{x:image!.x + image!.width / 2 - box!.x, y:image!.y + image!.height / 2 - box!.y}});
+    }
+    await page.getByRole("tab", { name: "Ders", exact: true }).click();
+    await clickLogo("header-brand-home");
+    await expect(home).toHaveAttribute("aria-selected", "true");
+    await page.getByRole("tab", { name: "Deneme", exact: true }).click();
+    await page.getByTestId("header-brand-home").getByText("ÖGG SOR", { exact: true }).click();
+    await expect(home).toHaveAttribute("aria-selected", "true");
+    for (const image of [true, false]) {
+      await page.getByRole("tab", { name: "Profil", exact: true }).click();
+      await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
+      if (image) await clickLogo("menu-brand-home");
+      else await page.getByTestId("menu-brand-home").getByText("ÖGG SOR", { exact: true }).click();
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+      await expect(home).toHaveAttribute("aria-selected", "true");
+    }
+    await page.getByRole("tab", { name: "Profil", exact: true }).click();
+    await page.getByTestId("profile-brand-home").click();
+    await expect(home).toHaveAttribute("aria-selected", "true");
+    await page.getByRole("tab", { name: "Deneme", exact: true }).click();
+    await page.getByTestId("header-brand-home").focus();
+    await page.keyboard.press("Enter");
+    await expect(home).toHaveAttribute("aria-selected", "true");
+  });
+}
 async function screenshot(page: Page, name: string) {
   mkdirSync("artifacts/mobile-preview/redesign", { recursive: true });
   const panel = page.getByLabel("Uygulama menüsü", { exact: true });

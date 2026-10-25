@@ -146,6 +146,7 @@ function MainTabs({
               expanded={menuOpen}
               menu={() => setMenuOpen(true)}
               profile={() => selectTab("profile")}
+              home={() => selectTab("home")}
             />
             {(primaryTabs.includes(tab) ? visited : [...visited, tab]).map(page => (
               <ScreenActive.Provider key={page} value={focused && page === tab}>
@@ -199,6 +200,7 @@ function MainTabs({
                       logout={logout}
                       pending={pending}
                       account={account}
+                      home={() => selectTab("home")}
                     />
                   )}
                 </ScrollView>

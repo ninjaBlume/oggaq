@@ -34,6 +34,7 @@ export function Profile({
   logout,
   pending,
   account,
+  home,
 }: {
   user: User;
   context: StudyContext;
@@ -42,6 +43,7 @@ export function Profile({
   logout: () => void;
   pending: boolean;
   account: () => void;
+  home: () => void;
 }) {
   const { palette, styles, preference, setPreference, textSize, setTextSize, textSizeError } = useTheme();
   return (
@@ -203,12 +205,18 @@ export function Profile({
           {pending ? "Oturum kapatılıyor…" : "Çıkış yap"}
         </Button>
       </View>
-      <View style={[styles.row, { justifyContent: "center", paddingTop: 12 }]}>
+      <Pressable
+        testID="profile-brand-home"
+        accessibilityRole="button"
+        accessibilityLabel={`${brand.name} ana sayfaya dön`}
+        onPress={home}
+        style={[styles.row, { justifyContent: "center", paddingTop: 12, minHeight: 44 }]}
+      >
         <ShieldCheck size={15} color={palette.muted} />
         <Text style={[styles.muted, { fontSize: 11 }]}>
           <BrandWordmark />{` - ${brand.subtitle}`}
         </Text>
-      </View>
+      </Pressable>
     </>
   );
 }

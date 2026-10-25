@@ -56,12 +56,14 @@ export function MainHeader({
   context,
   menu,
   profile,
+  home,
   expanded,
 }: {
   user: User;
   context: StudyContext;
   menu: () => void;
   profile: () => void;
+  home: () => void;
   expanded: boolean;
 }) {
   const { palette } = useTheme();
@@ -91,7 +93,13 @@ export function MainHeader({
       >
         <Menu size={23} color={palette.ink} strokeWidth={1.8} />
       </Pressable>
-      <View style={navStyles.brand}>
+      <Pressable
+        testID="header-brand-home"
+        accessibilityRole="button"
+        accessibilityLabel={`${brand.name} ana sayfa`}
+        onPress={() => { Keyboard.dismiss(); home(); }}
+        style={({ pressed }) => [navStyles.brand, { minHeight: 44 }, pressed && navStyles.pressed]}
+      >
         <BrandLogo size={40} />
         <View style={{ flex: 1, gap: 2 }}>
           <BrandWordmark style={navStyles.wordmark} />
@@ -99,7 +107,7 @@ export function MainHeader({
             {context.kind === "personal" ? brand.subtitle : context.name}
           </Text>
         </View>
-      </View>
+      </Pressable>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Profilimi aç"
@@ -291,10 +299,16 @@ export function SideMenu({
           <StatusBar style="light" />
           <View style={[navStyles.account, { paddingTop: insets.top + 16 }]}>
             <View style={navStyles.between}>
-              <View style={navStyles.brand}>
+              <Pressable
+                testID="menu-brand-home"
+                accessibilityRole="button"
+                accessibilityLabel={`${brand.name} ana sayfa`}
+                onPress={() => dismiss(() => select("home"))}
+                style={({ pressed }) => [navStyles.brand, { minHeight: 44 }, pressed && navStyles.pressed]}
+              >
                 <BrandLogo size={54} />
                 <BrandWordmark style={[navStyles.wordmark, { color: palette.onNavy }]} />
-              </View>
+              </Pressable>
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Menüyü kapat"
