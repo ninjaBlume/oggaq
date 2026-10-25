@@ -1,4 +1,5 @@
-import { Linking, Pressable, Text, View } from "react-native";
+import { Text } from "./text";
+import { Linking, Pressable, View } from "react-native";
 import { legalPages, legalUrl, notOfficialNotice } from "@oggaq/study-core";
 import type { LegalPageId } from "@oggaq/study-core";
 import brand from "../../../config/brand.json";

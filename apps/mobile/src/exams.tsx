@@ -1,6 +1,7 @@
+import { Text } from "./text";
 import { useEffect, useRef, useState } from "react";
 import type { ScrollViewInstance } from "react-native";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   ArrowLeft,

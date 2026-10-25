@@ -1,5 +1,6 @@
+import { Text } from "./text";
 import * as Font from "expo-font";
-import { Platform, Text } from "react-native";
+import { Platform } from "react-native";
 import type { StyleProp, TextStyle } from "react-native";
 import brand from "../../../config/brand.json";
 import { createBrandFontLoader } from "./fontLoading";

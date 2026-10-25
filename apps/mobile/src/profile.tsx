@@ -1,5 +1,6 @@
+import { Text } from "./text";
 import { BrandWordmark } from "./wordmark";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import {
   Building2,
   Check,
@@ -15,6 +16,7 @@ import {
   Badge,
   Button,
   Card,
+  ErrorNotice,
   ScreenTitle,
   SectionTitle,
 } from "./ui";
@@ -23,6 +25,7 @@ import { ChoiceGroup } from "./expressive";
 import { LegalSection } from "./legal";
 import { vocabulary } from "@oggaq/study-core";
 import { themePreferenceLabels, themePreferences } from "@oggaq/design-tokens";
+import { textSizes, textSizeLabels } from "./textSize";
 export function Profile({
   user,
   context,
@@ -40,7 +43,7 @@ export function Profile({
   pending: boolean;
   account: () => void;
 }) {
-  const { palette, styles, preference, setPreference } = useTheme();
+  const { palette, styles, preference, setPreference, textSize, setTextSize, textSizeError } = useTheme();
   return (
     <>
       <ScreenTitle
@@ -132,6 +135,17 @@ export function Profile({
         value={preference}
         onChange={setPreference}
       />
+      <SectionTitle>Yazı boyutu</SectionTitle>
+      <Text style={styles.muted}>Okumayı kolaylaştırmak için yazı boyutunu seç. Tercihin bu cihazda saklanır.</Text>
+      <ChoiceGroup
+        choices={textSizes.map(value => ({ value, label: textSizeLabels[value], accessibilityLabel: `Yazı boyutu: ${textSizeLabels[value]}` }))}
+        value={textSize}
+        onChange={setTextSize}
+      />
+      <Card>
+        <Text style={styles.text}>Örnek metin: Soruları ve seçenekleri rahatça oku.</Text>
+      </Card>
+      <ErrorNotice title="Yazı boyutu tercihi saklanamadı" error={textSizeError} retry={() => setTextSize(textSize)} />
       {contexts.length > 1 && (
         <>
           <SectionTitle>Çalışma alanın</SectionTitle>

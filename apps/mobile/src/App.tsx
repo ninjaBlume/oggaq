@@ -1,16 +1,9 @@
+import { Text } from "./text";
 import { BrandWordmark, loadBrandFont } from "./wordmark";
 import { BrandLogo } from "./brandLogo";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ScrollViewInstance } from "react-native";
-import {
-  KeyboardAvoidingView,
-  BackHandler,
-  Keyboard,
-  Platform,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, BackHandler, Keyboard, Platform, ScrollView, View } from "react-native";
 import {
   SafeAreaProvider,
   SafeAreaView,
@@ -57,6 +50,7 @@ import {
 import { ThemeProvider, useBody, useLayout, useTheme } from "./themeContext";
 import { ScreenActive } from "./screenActivity";
 import { restoreApplication, type Prepared } from "./startup";
+import { textSizeFactors } from "./textSize";
 
 type Routes = {
   Main: undefined;
@@ -248,7 +242,7 @@ function Workspace({
   signedOut: () => void;
   prepared?: PreparedContexts;
 }) {
-  const { palette, styles, scheme } = useTheme();
+  const { palette, styles, scheme, textSize } = useTheme();
   const body = useBody();
   const navigationTheme = useMemo(
     () => ({
@@ -345,7 +339,7 @@ function Workspace({
           contentStyle: { backgroundColor: palette.paper },
           headerStyle: { backgroundColor: palette.paper },
           headerShadowVisible: false,
-          headerTitleStyle: { fontSize: 16, fontWeight: "700" },
+          headerTitleStyle: { fontSize: 16 * textSizeFactors[textSize], fontWeight: "700" },
           headerTintColor: palette.ink,
           headerTitleAlign: "center",
           headerLeft: () => (

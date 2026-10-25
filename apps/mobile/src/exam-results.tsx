@@ -1,5 +1,6 @@
+import { Text } from "./text";
 import { ExamScorePanel } from "./scoring";
-import { FlatList, Text, View } from 'react-native';
+import { FlatList, View } from "react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { ExamAttempt, StudyContext } from '@oggaq/shared-types';
 import { api } from './api';

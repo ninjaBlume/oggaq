@@ -1,4 +1,5 @@
-import { Text, View } from 'react-native';
+import { Text } from "./text";
+import { View } from "react-native";
 import type { ScoreRangeProps } from './ScoreRange';
 import { useTheme } from './themeContext';
 export function ScoreRange({ label, value, maximum, change, disabled }: ScoreRangeProps) {

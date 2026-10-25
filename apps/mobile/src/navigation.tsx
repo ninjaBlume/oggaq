@@ -1,19 +1,8 @@
+import { Text } from "./text";
 import { BrandWordmark } from "./wordmark";
 import { BrandLogo } from "./brandLogo";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import {
-  Animated,
-  Keyboard,
-  Modal,
-  PanResponder,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  useWindowDimensions,
-} from "react-native";
+import { Animated, Keyboard, Modal, PanResponder, Platform, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import type { StudyContext, User } from "@oggaq/shared-types";

@@ -1,5 +1,6 @@
+import { Text } from "./text";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import type { ExamAttempt } from "@oggaq/shared-types";
 import { reportNoteLimit, reportReasons } from "@oggaq/study-core";
 import type { ReportReason } from "@oggaq/study-core";

@@ -1,5 +1,6 @@
+import { Text } from "./text";
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from "react-native";
 import type { components, User } from '@oggaq/shared-types';
 import { ApiError, cursorFromLink } from '@oggaq/api-client';
 import { jobApplicationStatusLabels, jobWeaponLabels, jobApplicationNotice } from '@oggaq/study-core';

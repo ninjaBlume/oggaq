@@ -17,7 +17,9 @@ import { layoutFor } from "./layout";
 import type { Layout } from "./layout";
 import { stylesFor } from "./styles";
 import type { Styles } from "./styles";
-import { themeStore } from "./storage";
+import { themeStore, textSizeStore } from "./storage";
+import { isTextSize, preferenceWriter, type TextSize } from "./textSize";
+import { TextSizeContext } from "./text";
 import { palettes } from "./theme";
 import type { AppPalette } from "./theme";
 
@@ -27,6 +29,9 @@ type Theme = {
   scheme: ColorScheme;
   preference: ThemePreference;
   setPreference: (next: ThemePreference) => void;
+  textSize: TextSize;
+  setTextSize: (next: TextSize) => void;
+  textSizeError: unknown;
 };
 const ThemeContext = createContext<Theme | null>(null);
 
@@ -39,6 +44,29 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const system = useColorScheme();
   const [preference, setPreferenceState] = useState<ThemePreference>("system");
   const changed = useRef(false);
+  const [textSize, setTextSizeState] = useState<TextSize>("standard");
+  const [textSizeError, setTextSizeError] = useState<unknown>(null);
+  const sizeRevision = useRef(0);
+  const sizeMounted = useRef(true);
+  const writeSize = useMemo(() => preferenceWriter(textSizeStore.write), []);
+  useEffect(() => {
+    sizeMounted.current = true;
+    let mounted = true;
+    void textSizeStore.read().then(saved => {
+      if (mounted && sizeRevision.current === 0 && isTextSize(saved)) setTextSizeState(saved);
+    }, error => {
+      if (mounted && sizeRevision.current === 0) setTextSizeError(error);
+    });
+    return () => { mounted = false; sizeMounted.current = false; };
+  }, []);
+  const setTextSize = useCallback((next: TextSize) => {
+    const revision = ++sizeRevision.current;
+    setTextSizeState(next);
+    setTextSizeError(null);
+    void writeSize(next).catch(error => {
+      if (sizeMounted.current && sizeRevision.current === revision) setTextSizeError(error);
+    });
+  }, [writeSize]);
   useEffect(() => {
     let mounted = true;
     themeStore.read().then(
@@ -71,13 +99,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       void SystemUI.setBackgroundColorAsync(palette.paper).catch(() => {});
   }, [palette.paper]);
   const value = useMemo<Theme>(
-    () => ({ palette, styles: stylesFor(scheme), scheme, preference, setPreference }),
-    [palette, scheme, preference, setPreference],
+    () => ({ palette, styles: stylesFor(scheme), scheme, preference, setPreference, textSize, setTextSize, textSizeError }),
+    [palette, scheme, preference, setPreference, textSize, setTextSize, textSizeError],
   );
   return (
     <ThemeContext.Provider value={value}>
       <StatusBar style={scheme === "dark" ? "light" : "dark"} />
-      {children}
+      <TextSizeContext.Provider value={textSize}>{children}</TextSizeContext.Provider>
     </ThemeContext.Provider>
   );
 }

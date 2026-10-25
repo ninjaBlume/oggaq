@@ -2,6 +2,12 @@
 
 `apps/mobile`, React Native 0.88.0 / Expo SDK 58.0.19 ile iOS/Android native bileşenleri kullanır. Kayıt/giriş, doğrulama e-postasını yeniden gönderme ve kontrol etme, parola yenileme e-postası, kişisel/aktif kurum seçimi, ders/konu ve yayımlanmış soru çalışması, geçmiş, süreli deneme/sonuç uygulanmıştır. HTML/web ekranı native içine gömülmez. Ortak API sözleşmesi ve saf sayaç kodu web ile paylaşılır. Uygulamaların React sürümü SDK'nın renderer sürümü 19.3.0'a eşitlendi; güncel geçiş kontrolleri aşağıdadır. Tarihsel doğrulamalar ilgili eski sürümlerini anlatır.
 
+## 25 Ekim 2026: üç kademeli yazı boyutu
+
+Profil → Yazı boyutu bölümünde **Küçük / Standart / Büyük** seçilir. Varsayılan Standart; çarpanlar 0,9 / 1 / 1,2. Başlık, gövde, soru/seçenek, menü ve giriş alanlarının özgün font/satır yüksekliği ortak metin bileşeninde ölçeklenir; native gezinme başlıkları da tercihi izler. Sistem font büyütmesi açık kalır, ikonlar/dokunma alanları küçültülmez. Tercih hemen uygulanır; native SecureStore, Expo web önizlemede localStorage içinde `oggaq.textSize` anahtarında tutulur. Sunucuya veya başka cihaza aktarılmaz.
+
+Başlangıçta tercih okuması diğer açılış işlerini bekletmez. Geç/bozuk kayıt kullanıcının yeni seçimini ezmez; hızlı seçimlerin yazmaları sırayla tamamlanır. Kayıt hatasında seçili boyut oturumda kalır ve Profil'de hata/yeniden deneme gösterilir. Boyut değişimi açık ekranı/sınavı yeniden kurmaz. İnceleme için 320/390/834/1280 px açık/koyu görüntüler `artifacts/text-size/` içinde; bunlar native cihaz testi değildir. Doğrulama [TESTING](TESTING.md) içinde. Ayrı `apps/web` sitesine bu ayar bu teslimde eklenmedi.
+
 ## 25 Ekim 2026: sayfa geçiş logosu kaldırıldı
 
 Güncel açılış ve sekme performansı: tema/oturum işleri ve ardından kimlik/bağlam istekleri paraleldir. Ana beş sekme yalnız ilk ziyaretinde oluşturulur, kullanıcı/bağlam ömründe korunur; görünmeyen ekranlar erişilebilirlik ağacından çıkarılır. Liste yenilemeleri hazır veriyi silmez. Yenileme, sekmeye dönüş ve arka plan ayrıntıları [PERFORMANCE](PERFORMANCE.md) içinde; aşağıdaki logo kaldırma ve soru hızı davranışları korunur.

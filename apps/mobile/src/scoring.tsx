@@ -1,5 +1,6 @@
+import { Text } from "./text";
 import { useEffect, useRef, useState } from 'react';
-import { Linking, Text, View } from 'react-native';
+import { Linking, View } from "react-native";
 import type { ExamAttempt, components } from '@oggaq/shared-types';
 import { ApiError } from '@oggaq/api-client';
 import { scoreEstimateNotice } from '@oggaq/study-core';

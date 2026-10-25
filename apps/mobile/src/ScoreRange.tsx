@@ -1,5 +1,6 @@
+import { Text } from "./text";
 import Slider from '@react-native-community/slider';
-import { Text, View } from 'react-native';
+import { View } from "react-native";
 import { useTheme } from './themeContext';
 export interface ScoreRangeProps { label: string; value: number; maximum: number; change: (value: number) => void; disabled?: boolean }
 export function ScoreRange({ label, value, maximum, change, disabled }: ScoreRangeProps) {

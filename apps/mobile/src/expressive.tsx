@@ -1,13 +1,6 @@
+import { Text } from "./text";
 import { useState, type ReactNode } from "react";
-import {
-  Animated,
-  Pressable,
-  Text,
-  View,
-  type PressableProps,
-  type StyleProp,
-  type ViewStyle,
-} from "react-native";
+import { Animated, Pressable, View, type PressableProps, type StyleProp, type ViewStyle } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { Check } from "./icons";
 import { useReducedMotion, useSpringValue } from "./motion";

@@ -1,6 +1,7 @@
+import { Text } from "./text";
 import { CatalogCache } from "./catalog-cache";
 import { useEffect, useRef, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { newId } from "./ids";
 import { ApiError, cursorFromLink } from "@oggaq/api-client";
 import type { ExamAttempt, Page, StudyContext, components } from "@oggaq/shared-types";

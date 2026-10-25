@@ -1,4 +1,5 @@
-import { Pressable, Text, View } from "react-native";
+import { Text } from "./text";
+import { Pressable, View } from "react-native";
 import {
   ArrowRight,
   BookOpen,

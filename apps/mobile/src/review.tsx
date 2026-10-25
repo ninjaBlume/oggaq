@@ -1,5 +1,6 @@
+import { Text } from "./text";
 import { useEffect, useRef, useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { vocabulary } from "@oggaq/study-core";
 import { typography } from "./theme";
 import { newId } from "./ids";

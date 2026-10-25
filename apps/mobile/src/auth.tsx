@@ -1,7 +1,8 @@
+import { Text } from "./text";
 import { BrandWordmark } from "./wordmark";
 import { BrandLogo } from "./brandLogo";
 import { useState } from "react";
-import { Linking, Platform, Text, View } from "react-native";
+import { Linking, Platform, View } from "react-native";
 import { CheckCircle2, GraduationCap } from "./icons";
 import brand from "../../../config/brand.json";
 import { shape, typography } from "./theme";

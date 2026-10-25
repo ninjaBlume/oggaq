@@ -1,6 +1,7 @@
+import { Text } from "./text";
 import brand from "../../../config/brand.json";
 import { useState } from "react";
-import { Platform, ScrollView, Share, Text, View } from "react-native";
+import { Platform, ScrollView, Share, View } from "react-native";
 import type { User } from "@oggaq/shared-types";
 import { deleteAccountConfirmation, vocabulary } from "@oggaq/study-core";
 import { api } from "./api";

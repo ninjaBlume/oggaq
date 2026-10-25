@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, üç kademeli yazı boyutu
+
+- Mobil Profil'e Küçük/Standart/Büyük, örnek metin, cihazda saklama ve kayıt hatasında yeniden deneme eklendi. Uygulamaya ait Text/TextInput ortak bileşenden geçer; özel inline fontlar ve satır yükseklikleri de ölçeklenir. İç içe metin iki kez büyütülmez; native gezinme başlıkları ayrı ölçeklenir. Sistem font büyütmesi kapatılmadı; ekran ve sınav durumu korunur.
+- **42 mobil Vitest** ve ortak strict TypeScript başarılı. Yeni 7 test üç ölçek, geçerli/geçersiz kayıt, iç içe metin/varsayılan metrik, hızlı yazmaların sırası ve hata sonrası tekrar kaydını doğrular. Android/iOS/web Metro export başarılı.
+- İlk **38 ilgili Chromium E2E** koşumunda **37 geçti**: önceki 34 mobil/tasarım/hız senaryosu ve yeni üç senaryo başarılıydı. Yeni sınav testi sorunun 21 px olan temel yazısını 17 px varsaydığı için 20,4 beklerken doğru 25,2 px değerini gördü. Beklenti düzeltildi; son export ile **4 yeni senaryonun tamamı geçti**. Bunlar 38 farklı ilgili senaryonun doğrulanmasıdır; tek temiz 38 koşumu iddiası değildir.
+- Yeni testler üç seçimin gerçek CSS font değerini, açık/koyu temada 320/390/834/1280 px taşmama durumunu, yeniden yüklemede kalıcılığı ve giriş alanı büyüklüğünü; açık sınav süresi formunu, native gezinme başlığı büyüklüğünü, kayıtlı cevabı ve son soru konumunu; saklama hatasında seçimin korunmasını ve yeniden denemeyi kapsar. 320 px açık ve 834 px koyu görüntüler ayrıca gözle incelendi; ekranlar `artifacts/text-size/` içinde.
+- Testler yalnız `oggaq_test` ve ayrı mobil **5186** portunu kullandı; başka PHPUnit/E2E süreci/portlar kontrol edildi. Backend/API/DB şeması değişmedi; PHPUnit ve tam API E2E paketi yeniden çalıştırılmadı. Fiziksel iOS/Android ve işletim sisteminde büyük Dynamic Type birleşimi denenmedi; Expo web kontrolü native cihaz teyidi değildir. Ortak geliştirme servisleri durdurulmadı; sunucu deploy'u, mağaza paketi ve push yapılmadı.
+
 ## Güncel doğrulama — 25 Ekim 2026, mobil açılış ve hazır sekmeler
 
 - Tema okuması artık uygulamanın kurulmasını engellemiyor. Depolama kontrolü/oturum okuması paralel; geçerli oturumla kimlik ve bağlam API istekleri paralel başlıyor. Hazırlanan bağlam yanıtı bir kez kullanılıyor; kimlik ve token/hesap sınırı korunuyor. Ana beş sekme ilk ziyaretinden sonra hazır tutuluyor; görünmeyen ekranlar erişilebilirlik ağacından çıkarılıyor ve dönüş yenilemelerini başlatmıyor. Liste yenilenirken hazır içerik korunuyor.

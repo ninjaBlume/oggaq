@@ -72,3 +72,16 @@ export const themeStore = {
     await SecureStore.setItemAsync(themeKey, value);
   },
 };
+
+// Non-sensitive device preference; failures reach the settings notice.
+const textSizeKey = "oggaq.textSize";
+export const textSizeStore = {
+  async read(): Promise<string | null> {
+    return Platform.OS === "web" ? globalThis.localStorage.getItem(textSizeKey)
+      : SecureStore.getItemAsync(textSizeKey);
+  },
+  async write(value: string): Promise<void> {
+    if (Platform.OS === "web") globalThis.localStorage.setItem(textSizeKey, value);
+    else await SecureStore.setItemAsync(textSizeKey, value);
+  },
+};
