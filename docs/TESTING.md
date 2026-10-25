@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, ücretsiz ana sayfa tasarım örneği
+
+- Kullanıcının üç görselinden bölümleme/odak hiyerarşisi alınarak mobil ana sayfa düzenlendi: lacivert/mavi başlat-devam alanı, gerçek kişisel özet, gruplandırılmış araç/ders/geçmiş satırları. Bütün özellikler ücretsiz; PRO/abonelik/ödeme ile açılan özellik yoktur. Bu kalıcı ürün kararı `prompt.md` ve DESIGN içinde açıklaştırıldı. Referans görseller uygulamaya dahil edilmedi.
+- Aynı üç veri isteği ve mevcut yetkili eylemler kullanılır. Yeni bağımlılık, API/DB değişikliği, varsayımsal hedef/seri/grafik/takvim veya giriş gecikmesi yoktur. Aktif deneme önceliği, soru konumu, geri dönüşte hazır ekran, metin boyutu ve azaltılmış hareket davranışları korunur. Geniş tablette başlat/özet ve araç grupları yan yanadır.
+- **42 mobil Vitest**, ortak strict TypeScript ve Android/iOS/web Metro export başarılı. İlk üç yeni gerçek API senaryosu **3/3 geçti**: gerçek API sayaçları, bütün araçların açık olması, ücretli arayüz bulunmaması, 320/390/834/1280 açık-koyu görünüm ve yavaş/hatalı özet durumunda ana eylemin kullanılabilirliği/yeniden deneme. Fotoğraflardaki sayılar veya hedefler örnek veri olarak kullanılmadı.
+- Son export ile genişletilen **43 ilgili Chromium E2E** koşumunda **38 geçti**. İki admin tasarım testi eski sayfanın başlığını ölçen SPA geçiş yarışına; iki mobil test arka planda tutulan yeni ana sayfa metniyle çakışan seçiciye takıldı. Hedef sayfa başlığı ve görünür öğe seçimiyle testler düzeltildi. Bir yeni yavaş-ağ testi giriş tamamlanmadan genel 45 saniye süresine takıldı; ürün kaynaklı neden doğrulanmadı. Bu **5 senaryo hedefli tekrar koşumunda 5/5 geçti**. Toplam 43 farklı senaryo doğrulandı; tek temiz 43 koşumu veya tam API E2E başarısı iddiası değildir.
+- Açık/koyu telefon/tablet ve 320 px büyük yazı görüntüleri `artifacts/home-reference/` içinde gözle incelendi. Bunlar sentetik test hesabı/soru içerir. Fiziksel iOS/Android görünümü ve native kare/bellek ölçümü bu teslimde denenmedi. Testler yalnız `oggaq_test` ve mobil **5186** kullandı; PHPUnit ile eşzamanlı çalıştırılmadı. Ortak geliştirme servisleri, deploy ve sunucu yedekleri değiştirilmedi; yeni mağaza paketi/push yok.
+
 ## Güncel doğrulama — 25 Ekim 2026, Ö harfinin üst boşluğu
 
 - Marka JSON'u ve çalışan iOS Expo Go ortamı **ÖGG SOR** döndürüyor; ilk karakter **U+00D6 (214)**, League Spartan yerel kaydı yüklü. Font dosyasında Ö'nün üst sınırı 1694, typographic ascender 1400 (em 2000). Görsel kırpılma riskini önlemek için marka bileşenine font boyutuyla orantılı satır yüksekliği/üst boşluk ve Android font padding eklendi. Font dosyası/ağırlık/aile ve marka metni değiştirilmedi.

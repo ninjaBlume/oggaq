@@ -2,6 +2,12 @@
 
 `apps/mobile`, React Native 0.88.0 / Expo SDK 58.0.19 ile iOS/Android native bileşenleri kullanır. Kayıt/giriş, doğrulama e-postasını yeniden gönderme ve kontrol etme, parola yenileme e-postası, kişisel/aktif kurum seçimi, ders/konu ve yayımlanmış soru çalışması, geçmiş, süreli deneme/sonuç uygulanmıştır. HTML/web ekranı native içine gömülmez. Ortak API sözleşmesi ve saf sayaç kodu web ile paylaşılır. Uygulamaların React sürümü SDK'nın renderer sürümü 19.3.0'a eşitlendi; güncel geçiş kontrolleri aşağıdadır. Tarihsel doğrulamalar ilgili eski sürümlerini anlatır.
 
+## 25 Ekim 2026: referanslara göre ana sayfa örneği
+
+Ana sayfa; belirgin mavi/lacivert başlangıç alanı, kişisel özet, Hızlı başla/Çalışmaların satır grupları, dersler ve son sınavlar olarak düzenlendi. Bütün araçlar ücretsizdir; ödeme/PRO/özellik kilidi yoktur. Soru/doğruluk/biten sınav değerleri mevcut gerçek Stats API'sinden gelir; yükleme ve hatada sayı uydurulmaz. Aynı üç veri isteği kullanılır, yeni bağımlılık veya bekleme animasyonu eklenmez. Aktif sınav öne alınır; mevcut başlatma/devam/tekrar/sonuç yolları korunur. Geniş tablette başlangıç/özet ve araç grupları yan yana, telefonda alt altadır.
+
+Kullanıcının görselleri yalnız tasarım referansıdır; uygulamaya kopyalanmaz. Günlük hedef, seri, ücretli analiz, sınav takvimi gibi referanstaki ek özellikler oluşturulmadı. Bu örnek yalnız `apps/mobile` ana sayfasını değiştirir. Açık/koyu ve büyük yazı ekranları `artifacts/home-reference/` içinde; gerçek cihaz teyidi ayrıca gerekir.
+
 ## 25 Ekim 2026: markadan ana sayfaya dönüş
 
 Ana başlıktaki logo ve ÖGG SOR yazısı aynı ana sayfa düğmesidir. Yan menüdeki marka da menüyü kapatarak Ana sayfa sekmesini açar. Profil altındaki marka yazısı aynı hedefe gider. Mevcut kullanıcı/kurum bağlamı korunur; açık sınav bitirilmez veya yeniden başlatılmaz. Klavye ve ekran okuyucu için düğme adı vardır, dokunma alanı en az 44 px'tir.

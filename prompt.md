@@ -50,7 +50,7 @@ Elimizde MySQL/MariaDB formatında mevcut soru bankaları var. Kaynak şema hen�
 
 ## 6. Reklam ve iş modeli
 
-- Öğrenci kullanımı ücretsiz olacak.
+- Tüm uygulama özellikleri ücretsiz olacak. PRO/premium katmanı, ücretli abonelik, yükseltme satışı veya ödeme ile açılan özellik bulunmayacak.
 - Gelecekte web/mobil reklam ağları kullanılabilir.
 - Firmalara doğrudan tanıtım ve reklam kampanyaları satılabilir.
 - Reklam gösterimi, kampanya süresi, yerleşim ve raporlama için genişletilebilir mimari düşünülmeli.

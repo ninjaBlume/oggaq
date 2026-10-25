@@ -183,8 +183,8 @@ test("mobil sekmeler gerçek Bearer API ile deneme sınavı, sonuçlar ve çık�
   await page.getByRole("button", { name: "Geri dön" }).click();
   await expect(page.getByText(/1 kez · en iyi %33.33/)).toBeVisible();
   await page.getByRole("tab", { name: "Sonuçlar", exact: true }).click();
-  await expect(page.getByText("Sonuçlarım", { exact: true })).toBeVisible();
-  await expect(page.getByText("%33,3", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Sonuçlarım", exact: true })).toBeVisible();
+  await expect(page.getByText("%33,3", { exact: true }).filter({ visible: true })).toBeVisible();
   await expect(page.getByText("1 doğru", { exact: true })).toBeVisible();
   await screenshot(page, "results");
   await page.getByRole("tab", { name: "Profil", exact: true }).click();
@@ -200,7 +200,7 @@ test("ders sınavı dersine göre bulunur ve çözülür; çalışma alanı değ
   await page
     .getByRole("button", { name: "Sentetik çalışma dersi dersini aç" })
     .click();
-  await expect(page.getByText("Ders sınavları", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Ders sınavları", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Ders seçimi" })).toContainText(
     "Sentetik çalışma dersi",
   );

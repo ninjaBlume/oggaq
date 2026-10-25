@@ -101,10 +101,11 @@ for (const scheme of schemes) {
     await expect(page.getByRole("heading", { name: "Deneme sınavları", exact: true })).toBeVisible();
     for (const width of widths) {
       await page.setViewportSize({ width, height: 900 });
-      for (const path of ["/deneme-sinavlari", "/ders-sinavlari", "/official-exams/new", "/catalogs"]) {
+      for (const [path, title] of [["/deneme-sinavlari", "Deneme sınavları"], ["/ders-sinavlari", "Ders sınavları"], ["/official-exams/new", "Yeni deneme sınavı"], ["/catalogs", "Kataloglar"]]) {
         // Client-side navigation: reloading the page 16 times would trip the API rate limit on the session check.
         await page.evaluate((to) => { history.pushState({}, "", to); dispatchEvent(new PopStateEvent("popstate")); }, path);
-        await expect(page.getByRole("heading").first()).toBeVisible();
+        // Wait for the destination, not the old page's heading during the route transition.
+        await expect(page.getByRole("heading", { name: title, exact: true })).toBeVisible();
         await expectFits(page);
         await expectHeadingContrast(page);
       }

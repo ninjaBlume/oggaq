@@ -1,5 +1,7 @@
 import { Text } from "./text";
 import { Pressable, View } from "react-native";
+import type { ReactNode } from "react";
+import type { LucideIcon } from "lucide-react-native";
 import {
   ArrowRight,
   BookOpen,
@@ -10,27 +12,23 @@ import {
   History,
   ListChecks,
   Play,
+  ShieldCheck,
 } from "./icons";
 import type { StudyContext, User } from "@oggaq/shared-types";
-import { Enter, ExpressivePressable } from "./expressive";
+import { ExpressivePressable } from "./expressive";
 import { examDisplayTitle, vocabulary } from "@oggaq/study-core";
 import { scoreTone, shape } from "./theme";
 import { api } from "./api";
 import { useResource, useOnReturn } from "./hooks";
 import {
   Badge,
-  Button,
-  Columns,
   EmptyState,
   ErrorNotice,
-  ListRow,
   Loading,
-  ScreenTitle,
   SectionTitle,
   TextLink,
 } from "./ui";
 import { useLayout, useTheme } from "./themeContext";
-import brand from "../../../config/brand.json";
 export function Home({
   user,
   context,
@@ -60,7 +58,7 @@ export function Home({
       }),
     [],
   );
-  // Quiet shortcut data: a failed request only hides the accuracy hint.
+  // Reuse the real summary; missing data is never displayed as invented zeros.
   const summary = useResource(
     (signal) =>
       api.request("get", "/api/v1/contexts/{context}/stats", {
@@ -86,186 +84,175 @@ export function Home({
     void recentExams.reload();
   });
   const activeExam = recentExams.data?.data.find((e) => e.status === "active" && Date.parse(e.deadline_at) > Date.parse(e.server_time));
-  const quick = [
-    {
-      title: vocabulary.review.title,
-      text: "Hatalarından sınav yap",
-      icon: ListChecks,
-      press: review,
-      bg: palette.secondaryContainer,
-      color: palette.onSecondaryContainer,
-    },
-    {
-      title: vocabulary.stats.title,
-      text:
-        typeof accuracy === "number"
-          ? `Doğruluk %${accuracy.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}`
-          : "İlerlemeni gör",
-      icon: ChartColumn,
-      press: stats,
-      bg: palette.primaryContainer,
-      color: palette.onPrimaryContainer,
-    },
+  const totals = summary.data?.data;
+  const metrics = [
+    { label: "Soru", accessible: "Değerlendirilen soru", value: totals?.answers.total.toLocaleString("tr-TR"), icon: BookOpen },
+    { label: "Doğruluk", accessible: "Doğruluk", value: typeof accuracy === "number" ? `%${accuracy.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}` : undefined, icon: ChartColumn },
+    { label: "Biten sınav", accessible: "Tamamlanan sınav", value: totals?.exams.completed.toLocaleString("tr-TR"), icon: ListChecks },
   ];
   return (
     <>
-      <ScreenTitle
-        title={`Merhaba, ${user.name.trim().split(/\s+/)[0]}.`}
-        subtitle="Bir sınav seç, kaldığın yerden devam et."
-      />
-      {recentExams.loading && !recentExams.data ? (
-        <Loading layout="list" count={1} label="Devam eden sınavların yükleniyor" />
-      ) : activeExam ? (
-        <Enter style={{ backgroundColor: palette.surface, borderRadius: shape.large, padding: layout.cardPadding, gap: 12, borderWidth: 1, borderColor: palette.primary }}>
-          <Badge>Devam ediyor</Badge>
-          <Text accessibilityRole="header" style={styles.heading}>Kaldığın yerden devam et</Text>
-          <Text style={styles.text}>{activeExam.official_exam ? examDisplayTitle(activeExam.official_exam.title) : `${activeExam.question_count} soruluk deneme`}</Text>
-          <Text style={styles.muted}>{activeExam.question_count} soru · Süren işlemeye devam ediyor</Text>
-          <Button icon={Play} onPress={() => exam(activeExam.id)}>Denemene devam et</Button>
-          <TextLink onPress={deneme}>Diğer sınavları gör</TextLink>
-        </Enter>
-      ) : (
-        <Enter style={{ backgroundColor: palette.navy, padding: layout.cardPadding, borderRadius: shape.large, gap: 12 }}>
-          <Text accessibilityRole="header" style={[styles.heading, { color: palette.onNavy }]}>{brand.tagline}.</Text>
-          <Text style={[styles.muted, { color: palette.onNavyMuted }]}>Deneme veya ders sınavı seç, sonuçlarını incele.</Text>
-          <View style={{ alignSelf: "flex-start" }}>
-            <Button secondary icon={ArrowRight} onPress={deneme}>Sınava gir</Button>
-          </View>
-        </Enter>
-      )}
-      <View style={{ flexDirection: "row", gap: 12 }}>
-          {quick.map(({ title, text, icon: Icon, press, bg, color }) => (
-            <ExpressivePressable
-              key={title}
-              radius={shape.large}
-              accessibilityRole="button"
-              accessibilityLabel={title + " ekranını aç"}
-              onPress={press}
-              style={{
-                flex: 1,
-                backgroundColor: bg,
-                borderRadius: shape.large,
-                padding: layout.cardPadding,
-                gap: 8,
-              }}
-            >
-              <View
-                style={{
-                  width: 36,
-                  height: 36,
-                  backgroundColor: palette.surface,
-                  borderRadius: shape.medium,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 0,
-                }}
-              >
-                <Icon size={21} color={color} strokeWidth={1.8} />
-              </View>
-              <Text style={{ color, fontSize: 17, fontWeight: "700" }}>
-                {title}
-              </Text>
-              <Text style={{ fontSize: 14, color, lineHeight: 21 }}>{text}</Text>
-            </ExpressivePressable>
-          ))}
+      <View style={{ gap: 4 }}>
+        <Text accessibilityRole="header" style={[styles.heading, { fontSize: 22, lineHeight: 28 }]}>
+          {`Merhaba, ${user.name.trim().split(/\s+/)[0]}.`}
+        </Text>
+        <Text style={styles.muted}>Bir sınav seç, kaldığın yerden devam et.</Text>
       </View>
-      <SectionTitle action="Tüm dersler" onPress={() => ders()}>
-        Derslerini keşfet
-      </SectionTitle>
-      {subjects.loading ? (
-        <Loading layout="tiles" label="Dersler yükleniyor" />
-      ) : subjects.error ? (
-        <ErrorNotice
-          title="Dersler yüklenemedi"
-          error={subjects.error}
-          retry={() => {
-            void subjects.reload();
-          }}
-        />
-      ) : subjects.data?.data.length === 0 ? (
-        <EmptyState
-          icon={GraduationCap}
-          title="Dersler hazırlanıyor"
-          message="Dersler yayımlandığında buradan kolayca ulaşabilirsin."
-        />
-      ) : (
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
-          {subjects.data?.data.map((s) => (
-            <Pressable
-              key={s.id}
-              accessibilityRole="button"
-              accessibilityLabel={`${s.name} dersini aç`}
-              onPress={() => ders(s.id)}
-              style={({ pressed }) => [
-                {
-                  width: layout.columns === 2 ? "23.7%" : "47.8%",
-                  flexGrow: 1,
-                  backgroundColor: palette.surface,
-                  borderRadius: shape.large,
-                  padding: 14,
-                  gap: 14,
-                  borderWidth: 1,
-                  borderColor: palette.line,
-                },
-                pressed && { backgroundColor: palette.softPrimary },
-              ]}
-            >
-              <View style={styles.between}>
-                <BookOpen size={22} color={palette.primary} />
-                <ChevronRight size={15} color={palette.muted} />
-              </View>
-              <Text
-                numberOfLines={3}
-                style={{
-                  fontSize: 14,
-                  lineHeight: 21,
-                  fontWeight: "700",
-                  color: palette.ink,
-                }}
-              >
-                {s.name}
-              </Text>
-            </Pressable>
+
+      <View style={{ flexDirection: layout.columns === 2 ? "row" : "column", gap: 20 }}>
+      <View testID="home-focus" style={{ flex: layout.columns === 2 ? 2 : undefined, backgroundColor: palette.navy, borderRadius: shape.large, padding: layout.cardPadding + 4, gap: 14, overflow: "hidden" }}>
+        <View pointerEvents="none" accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"
+          style={{ position: "absolute", width: 210, height: 280, right: -120, top: -70, borderRadius: shape.extraLarge, backgroundColor: palette.primary, opacity: 0.18, transform: [{ rotate: "-18deg" }] }} />
+        <View pointerEvents="none" accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"
+          style={{ position: "absolute", width: 170, height: 170, right: -38, bottom: -115, borderRadius: 85, borderWidth: 1, borderColor: palette.decorativeLine }} />
+        <View style={[styles.between, { flexWrap: "wrap" }]}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 7 }}>
+            <ShieldCheck size={17} color={palette.onNavyMuted} />
+            <Text style={{ color: palette.onNavyMuted, fontSize: 12, lineHeight: 18, fontWeight: "700" }}>SINAVA HAZIRLIK</Text>
+          </View>
+          <View style={{ borderWidth: 1, borderColor: palette.decorativeLine, paddingHorizontal: 9, paddingVertical: 4, borderRadius: shape.small }}>
+            <Text style={{ color: palette.onNavy, fontSize: 12, fontWeight: "600" }}>{activeExam ? "Devam ediyor" : "Tamamen ücretsiz"}</Text>
+          </View>
+        </View>
+        <View style={{ gap: 7 }}>
+          <Text accessibilityRole="header" style={{ color: palette.onNavy, fontSize: 24, lineHeight: 31, fontWeight: "700" }}>
+            {activeExam ? "Kaldığın yerden devam et" : "Deneme sınavına başla"}
+          </Text>
+          <Text style={{ color: palette.onNavyMuted, fontSize: 14, lineHeight: 22 }}>
+            {activeExam
+              ? activeExam.official_exam ? examDisplayTitle(activeExam.official_exam.title) : `${activeExam.question_count} soruluk deneme`
+              : "Silahlı veya silahsız sınavını seç, soruları çöz ve sonucunu incele."}
+          </Text>
+          {activeExam && <Text style={{ color: palette.onNavyMuted, fontSize: 12, lineHeight: 18 }}>{activeExam.question_count} soru · Süren işlemeye devam ediyor</Text>}
+        </View>
+        <ExpressivePressable radius={shape.control} pressedRadius={shape.controlPressed}
+          accessibilityRole="button" accessibilityLabel={activeExam ? "Denemene devam et" : "Sınava gir"}
+          onPress={activeExam ? () => exam(activeExam.id) : deneme}
+          style={{ minHeight: 54, borderRadius: shape.control, paddingVertical: 14, paddingHorizontal: 16, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9, backgroundColor: palette.onNavy }}>
+          {activeExam ? <Play size={18} color={palette.navy} /> : <ArrowRight size={18} color={palette.navy} />}
+          <Text style={{ color: palette.navy, fontSize: 15, lineHeight: 22, fontWeight: "700" }}>{activeExam ? "Denemene devam et" : "Sınava gir"}</Text>
+        </ExpressivePressable>
+        {activeExam ? (
+          <Pressable accessibilityRole="button" accessibilityLabel="Diğer sınavları gör" onPress={deneme} style={{ minHeight: 44, alignItems: "center", justifyContent: "center" }}>
+            <Text style={{ color: palette.onNavyMuted, fontSize: 13, fontWeight: "600" }}>Diğer sınavları gör</Text>
+          </Pressable>
+        ) : recentExams.loading && !recentExams.data ? (
+          <Text accessibilityLiveRegion="polite" style={{ color: palette.onNavyMuted, fontSize: 12, lineHeight: 18 }}>Devam eden sınavların kontrol ediliyor…</Text>
+        ) : null}
+      </View>
+
+      <View testID="home-summary" style={{ flex: layout.columns === 2 ? 1 : undefined, justifyContent: "space-between", backgroundColor: palette.surface, borderRadius: shape.control, borderWidth: 1, borderColor: palette.line, padding: 14, gap: 12 }}>
+        <View style={styles.between}>
+          <Text style={{ color: palette.ink, fontSize: 14, fontWeight: "600" }}>Genel durumun</Text>
+          <TextLink onPress={stats}>Detayları gör</TextLink>
+        </View>
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          {metrics.map(({ label, accessible, value, icon: Icon }, index) => (
+            <View key={label} accessible accessibilityLabel={`${accessible}: ${value ?? (summary.loading ? "yükleniyor" : "henüz yok")}`}
+              style={{ flex: 1, minWidth: 0, gap: 5, paddingLeft: index === 0 ? 0 : 10, borderLeftWidth: index === 0 ? 0 : 1, borderColor: palette.line }}>
+              <Icon size={17} color={palette.primary} strokeWidth={1.8} />
+              <Text style={{ color: palette.ink, fontSize: 22, lineHeight: 29, fontWeight: "700", fontVariant: ["tabular-nums"] }}>{value ?? "—"}</Text>
+              <Text style={{ color: palette.muted, fontSize: 12, lineHeight: 18 }}>{label}</Text>
+            </View>
           ))}
         </View>
+        <ErrorNotice title="Özet bilgilerin yüklenemedi" error={summary.error} retry={() => void summary.reload()} />
+      </View>
+      </View>
+
+      <View style={{ flexDirection: layout.columns === 2 ? "row" : "column", gap: 20 }}>
+      <View style={{ flex: layout.columns === 2 ? 1 : undefined, gap: 12 }}>
+      <SectionTitle>Hızlı başla</SectionTitle>
+      <HomeGroup>
+        <HomeRow icon={BookOpen} title={vocabulary.ders.title} description="Dersini seç, ilgili sınavlara ulaş" onPress={() => ders()} divider />
+        <HomeRow icon={ListChecks} title={vocabulary.review.title} description="Yanlış, boş ve favori sorularından sınav yap"
+          accessibilityLabel={`${vocabulary.review.title} ekranını aç`} onPress={review} />
+      </HomeGroup>
+      </View>
+      <View style={{ flex: layout.columns === 2 ? 1 : undefined, gap: 12 }}>
+      <SectionTitle>Çalışmaların</SectionTitle>
+      <HomeGroup>
+        <HomeRow icon={History} title={vocabulary.results.title} description="Girdiğin sınavları ve cevaplarını incele" onPress={history} divider />
+        <HomeRow icon={ChartColumn} title={vocabulary.stats.title}
+          description={typeof accuracy === "number" ? `Doğruluk %${accuracy.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}` : "İlerlemeni ve derslere göre durumunu gör"}
+          accessibilityLabel={`${vocabulary.stats.title} ekranını aç`} onPress={stats} />
+      </HomeGroup>
+      </View>
+      </View>
+
+      <SectionTitle action="Tüm dersler" onPress={() => ders()}>Derslerini keşfet</SectionTitle>
+      {subjects.loading && !subjects.data ? (
+        <Loading layout="list" label="Dersler yükleniyor" />
+      ) : subjects.error ? (
+        <ErrorNotice title="Dersler yüklenemedi" error={subjects.error} retry={() => void subjects.reload()} />
+      ) : subjects.data?.data.length === 0 ? (
+        <EmptyState icon={GraduationCap} title="Dersler hazırlanıyor" message="Dersler yayımlandığında buradan kolayca ulaşabilirsin." />
+      ) : (
+        <HomeGroup>
+          {subjects.data?.data.map((subject, index, all) => (
+            <HomeRow key={subject.id} icon={BookOpen} title={subject.name} accessibilityLabel={`${subject.name} dersini aç`}
+              onPress={() => ders(subject.id)} divider={index < all.length - 1} />
+          ))}
+        </HomeGroup>
       )}
-      <SectionTitle action="Tümünü gör" onPress={history}>
-        Son sınavların
-      </SectionTitle>
-      {recentExams.loading ? (
+
+      <SectionTitle action="Tümünü gör" onPress={history}>Son sınavların</SectionTitle>
+      {recentExams.loading && !recentExams.data ? (
         <Loading layout="list" label="Son sınavların yükleniyor" />
       ) : recentExams.error ? (
         <ErrorNotice title="Son sınavların yüklenemedi" error={recentExams.error} retry={() => void recentExams.reload()} />
       ) : recentExams.data?.data.length === 0 ? (
-        <EmptyState
-          icon={History}
-          title="İlk sınavın burada"
-          message="Girdiğin deneme ve ders sınavları burada birikir. Bir deneme sınavıyla başlayabilirsin."
-          action="Deneme sınavlarına git"
-          onPress={deneme}
-        />
+        <HomeGroup>
+          <View style={{ padding: 16, gap: 8 }}>
+            <Text style={[styles.text, { fontWeight: "600" }]}>İlk sınavın burada</Text>
+            <Text style={styles.muted}>Girdiğin deneme ve ders sınavlarını burada görebilirsin.</Text>
+            <TextLink onPress={deneme}>Deneme sınavlarına git</TextLink>
+          </View>
+        </HomeGroup>
       ) : (
-        <Columns>
-          {recentExams.data?.data.map((e) => (
-          <ListRow
-            key={e.id}
-            icon={Clock3}
-            title={e.official_exam ? examDisplayTitle(e.official_exam.title) : `${e.question_count} soruluk deneme`}
-            subtitle={new Date(e.started_at).toLocaleDateString("tr-TR")}
-            onPress={() => exam(e.id)}
-            badge={
-              <Badge tone={e.status === "completed" && e.result ? scoreTone(e.result.score_percent, palette).badge : "primary"}>
-                {e.status === "active"
-                  ? Date.parse(e.deadline_at) > Date.parse(e.server_time) ? "Devam ediyor" : "Süresi doldu"
-                  : e.result
-                    ? `%${e.result.score_percent} doğru`
-                    : "Sonuç bekleniyor"}
-              </Badge>
-            }
-          />
-        ))}
-        </Columns>
+        <HomeGroup>
+          {recentExams.data?.data.map((attempt, index, all) => {
+            const title = attempt.official_exam ? examDisplayTitle(attempt.official_exam.title) : `${attempt.question_count} soruluk deneme`;
+            const status = attempt.status === "active"
+              ? Date.parse(attempt.deadline_at) > Date.parse(attempt.server_time) ? "Devam ediyor" : "Süresi doldu"
+              : attempt.result ? `%${attempt.result.score_percent} doğru` : "Sonuç bekleniyor";
+            return <HomeRow key={attempt.id} icon={Clock3} title={title}
+              description={new Date(attempt.started_at).toLocaleDateString("tr-TR")}
+              accessibilityLabel={`${title}, ${status}`} onPress={() => exam(attempt.id)} divider={index < all.length - 1}
+              badge={<Badge tone={attempt.status === "completed" && attempt.result ? scoreTone(attempt.result.score_percent, palette).badge : "primary"}>{status}</Badge>} />;
+          })}
+        </HomeGroup>
       )}
     </>
   );
+}
+
+function HomeGroup({ children }: { children: ReactNode }) {
+  const { palette } = useTheme();
+  return <View style={{ backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.line, borderRadius: shape.control, overflow: "hidden" }}>{children}</View>;
+}
+
+function HomeRow({ icon: Icon, title, description, accessibilityLabel, onPress, divider = false, badge }: {
+  icon: LucideIcon;
+  title: string;
+  description?: string;
+  accessibilityLabel?: string;
+  onPress: () => void;
+  divider?: boolean;
+  badge?: ReactNode;
+}) {
+  const { palette } = useTheme();
+  return <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? `${title} ekranını aç`} onPress={onPress}
+    style={({ pressed }) => [{ minHeight: 72, padding: 14, flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: pressed ? palette.softPrimary : palette.surface },
+      divider && { borderBottomWidth: 1, borderBottomColor: palette.line }]}>
+    <View style={{ width: 40, height: 40, borderRadius: shape.controlPressed, alignItems: "center", justifyContent: "center", backgroundColor: palette.softPrimary }}>
+      <Icon size={21} color={palette.primary} strokeWidth={1.8} />
+    </View>
+    <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
+      <Text style={{ color: palette.ink, fontSize: 15, lineHeight: 22, fontWeight: "600" }}>{title}</Text>
+      {description && <Text style={{ color: palette.muted, fontSize: 13, lineHeight: 20 }}>{description}</Text>}
+      {badge}
+    </View>
+    <ChevronRight size={17} color={palette.muted} />
+  </Pressable>;
 }

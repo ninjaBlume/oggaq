@@ -1,6 +1,6 @@
 # Tasarım ilkeleri
 
-Durum: Bu belge web, yönetim paneli ve mobil uygulamanın ortak görsel ve etkileşim kuralını tanımlar. Marka Ogg Sor - Soru Bankası’dır; mevcut mavi palet korunur. Yapı (rol, kontrast, koyu mod, pencere sınıfları) markadan bağımsızdır. Kod değerleri [packages/design-tokens](../packages/design-tokens/src/index.ts) içindedir; bu belge değerleri değil, kuralları ve nedenlerini anlatır.
+Durum: Bu belge web, yönetim paneli ve mobil uygulamanın ortak görsel ve etkileşim kuralını tanımlar. Marka ÖGG SOR - Soru Bankası’dır; mevcut mavi palet korunur. Yapı (rol, kontrast, koyu mod, pencere sınıfları) markadan bağımsızdır. Kod değerleri [packages/design-tokens](../packages/design-tokens/src/index.ts) içindedir; bu belge değerleri değil, kuralları ve nedenlerini anlatır.
 
 ## 1. Ürün ilkeleri
 
@@ -11,6 +11,7 @@ Durum: Bu belge web, yönetim paneli ve mobil uygulamanın ortak görsel ve etki
 5. **Süreli sınav kesintisiz akar:** sınav sırasında reklam, tanıtım veya bildirim penceresi çıkmaz.
 6. **Dürüst sunum:** uygulama resmî kurum izlenimi vermez; sonuç ekranı “geçti/kaldı” demez. Örnek içerik resmî içerik gibi sunulmaz.
 7. **Her ekran dört durumu bilir:** yükleniyor, boş, hata, yeniden dene. Süresi dolmuş deneme “devam ediyor” görünmez; hiç cevaplanmamış deneme sonuç sayılmaz.
+8. **Bütün özellikler ücretsizdir:** PRO/premium katmanı, ücretli abonelik, yükseltme satışı ve ödeme ile açılan özellik arayüzü bulunmaz. Kullanıcının gönderdiği referanslardaki ücretli bölümler ürün kapsamı değildir.
 
 ## 2. Sözlük
 
@@ -33,7 +34,7 @@ Sınav başlıklarının parantez içindeki tarihleri gösterilmez: `ÖGG 104. D
 ## 2a. Metin tonu
 
 - **Slogan somut bilgi verir:** “Özel güvenlik sınavlarına hazırlan.” Genel motivasyon cümleleri (“bir adım daha”, “kendi hızında”) kullanılmaz; her metin kullanıcıya ne yapabileceğini veya ne olduğunu söyler.
-- **Marka metni tek yerde:** ad (Ogg Sor), tam uygulama adı (Ogg Sor - Soru Bankası), alt başlık (Soru Bankası), slogan ve iletişim değerleri `config/brand.json` içindedir. Web, yönetim paneli ve mobil bu dosyayı okur. `npm run brand:apply` statik başlıkları, yasal sayfa marka alanlarını, mağaza taslağını ve backend marka yapılandırmasını günceller; `npm run check:brand` sapmayı denetler. Ekranlar bu değerleri okur; metni ekrana yazmak yerine yapılandırmadan alın.
+- **Marka metni tek yerde:** ad (ÖGG SOR), tam uygulama adı (ÖGG SOR - Soru Bankası), alt başlık (Soru Bankası), slogan ve iletişim değerleri `config/brand.json` içindedir. Web, yönetim paneli ve mobil bu dosyayı okur. `npm run brand:apply` statik başlıkları, yasal sayfa marka alanlarını, mağaza taslağını ve backend marka yapılandırmasını günceller; `npm run check:brand` sapmayı denetler. Ekranlar bu değerleri okur; metni ekrana yazmak yerine yapılandırmadan alın.
 - **Başlık altı etiketi:** bireysel kullanımda logonun altında platform alt başlığı görünür; kurumda kurumun adı görünür. Tek erişim alanı olan mobil ve web öğrencisine “kişisel çalışma alanı” etiketi veya seçici gösterilmez. Alan seçimi yalnız birden fazla seçenek olduğunda sunulur.
 
 ## 3. Renk
@@ -70,6 +71,8 @@ Kurallar: okuma sütunu (soru, form) 720 pikseli geçmez; satır uzunluğu yakla
 Web ve yönetim paneli aynı sınıfları kullanır: telefonda üst gezinme kaydırılır, tablette içerik ortalanır ve iki sütuna geçer, masaüstünde yönetim paneli yan menülüdür.
 
 ## 6. Kalıplar
+
+25 Ekim 2026 ana sayfa örneği: kullanıcı referanslarından bölümleme, belirgin başlangıç alanı, küçük kişisel özet ve ikonlu liste satırları alındı. ÖGG SOR mavi/lacivert paletiyle özgün bir düzen kullanılır. Üstte gerçek aktif denemeye devam veya sınav seçimine geçiş; altında aynı Stats API'den değerlendirilen soru, doğruluk ve biten sınav sayıları; Hızlı başla/Çalışmaların grupları, mevcut dersler ve son denemeler vardır. 840 px'den geniş pencerede başlangıç/özet ve araç grupları yan yana gelir. Satır grupları 16 px, ana başlangıç alanı 24 px köşelidir; her satıra ayrı renkli kart yapılmaz. İlk veri istekleri ekranı bütünüyle kapatmaz, yenilemede hazır içerik korunur. Varsayımsal günlük hedef, seri, haftalık grafik, sınav takvimi veya abonelik verisi üretilmez. Bu teslim yalnız mobil ana sayfadır; diğer ekranların görsel yenilemesi ayrı değerlendirilecektir.
 
 - **Liste satırı:** sol blok (skor ya da ikon) · tür etiketi + başlık + meta · ok. Başlık sola hizalıdır, uzun başlık kesilmez sarar (en çok 3 satır). Sayı ve yüzde sabit genişlikli sütundadır; uzun ad onu itmez.
 - **Skor kutusu:** skor büyük ve ilk okunan şeydir; altında doğru/yanlış/boş oranı çubuğu ve nokta + sayı + ad açıklaması.
