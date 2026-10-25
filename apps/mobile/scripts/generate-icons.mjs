@@ -1,35 +1,23 @@
-// Generates the PLACEHOLDER app icon set from design tokens: a white shield with an open book on the brand navy.
-// The brand is not final (docs/STORE_RELEASE.md); replace the files in assets/ when the final logo exists and keep the
-// sizes. Deterministic: the same tokens give the same PNGs. Run from the repo root: node apps/mobile/scripts/generate-icons.mjs
-// Needs Chromium from the Playwright install the e2e suite already uses; no extra package.
-import { mkdirSync, writeFileSync } from 'node:fs';
+// Derive platform sizes from the approved Ogg Sor logo; never redraw the artwork.
+// Run from the repo root: node apps/mobile/scripts/generate-icons.mjs && npm run brand:apply
+// Uses the existing Playwright Chromium install; no extra dependency or node_modules copy.
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { inflateSync, deflateSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
 import { lightPalette } from '../../../packages/design-tokens/src/index.ts';
 
+const root = new URL('../../../', import.meta.url);
+const brand = JSON.parse(readFileSync(new URL('config/brand.json', root), 'utf8'));
+const image = `data:image/png;base64,${readFileSync(new URL(brand.logoAsset, root)).toString('base64')}`;
 const out = fileURLToPath(new URL('../assets/', import.meta.url));
 mkdirSync(out, { recursive: true });
-const { navy, accent } = lightPalette;
-
-// The mark in a 1024 box: shield (white, gold inner line) and an open book (navy pages, gold spine).
-const mark = `
-  <path d="M512 150 L840 270 V520 C840 720 700 860 512 930 C324 860 184 720 184 520 V270 Z" fill="#FFFFFF"/>
-  <path d="M512 196 L796 300 V520 C796 694 676 818 512 880 C348 818 228 694 228 520 V300 Z" fill="none" stroke="${accent}" stroke-width="14" stroke-linejoin="round"/>
-  <path d="M512 432 C440 396 360 392 296 412 V652 C360 632 440 636 512 674 Z" fill="${navy}"/>
-  <path d="M512 432 C584 396 664 392 728 412 V652 C664 632 584 636 512 674 Z" fill="${navy}"/>
-  <path d="M512 432 V674" stroke="${accent}" stroke-width="16" stroke-linecap="round"/>`;
-const svg = (content, background) => `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">${background ? `<rect width="1024" height="1024" fill="${background}"/>` : ''}${content}</svg>`;
-// The shield spans y 150-930, so it is lifted by 28 to sit on the vertical centre of the canvas.
-const centered = `<g transform="translate(0 -28)">${mark}</g>`;
-// Android adaptive icons crop to a circle/squircle of about two thirds of the canvas: scale the mark into that safe zone.
-const safe = (scale) => `<g transform="translate(512 512) scale(${scale}) translate(-512 -540)">${mark}</g>`;
-
 const assets = [
-  { name: 'icon.png', size: 1024, svg: svg(centered, navy), opaque: true }, // Apple: no alpha channel, no rounded corners
-  { name: 'adaptive-icon.png', size: 1024, svg: svg(safe(0.62)), opaque: false }, // foreground only; backgroundColor comes from app.config
-  { name: 'splash-icon.png', size: 1024, svg: svg(safe(0.8)), opaque: false },
-  { name: 'favicon.png', size: 196, svg: svg(centered, navy), opaque: true },
+  { name: 'icon.png', size: 1024, scale: 1, opaque: true }, // Apple: square RGB canvas, no alpha channel.
+  { name: 'adaptive-icon.png', size: 1024, scale: 0.62, opaque: false }, // Complete mark inside Android's safe zone.
+  { name: 'splash-icon.png', size: 1024, scale: 0.8, opaque: false },
+  { name: 'favicon.png', size: 196, scale: 1, opaque: false },
+  { name: 'brand-logo.png', size: 256, scale: 1, opaque: false },
 ];
 
 // Chromium may write RGBA PNGs even for opaque pages. Apple rejects an App Store icon with an alpha channel, so opaque
@@ -71,7 +59,9 @@ const browser = await chromium.launch();
 try {
   for (const asset of assets) {
     const page = await browser.newPage({ viewport: { width: asset.size, height: asset.size }, deviceScaleFactor: 1 });
-    await page.setContent(`<style>html,body{margin:0;background:transparent}svg{display:block;width:${asset.size}px;height:${asset.size}px}</style>${asset.svg}`);
+    const side = asset.size * asset.scale;
+    await page.setContent(`<style>html,body{margin:0;width:100%;height:100%;background:${asset.opaque ? lightPalette.navy : 'transparent'}}body{display:grid;place-items:center}img{display:block;width:${side}px;height:${side}px;object-fit:contain;clip-path:inset(2.6% round 21%)}</style><img src="${image}" alt="">`);
+    await page.locator('img').evaluate(async (img) => { await img.decode(); });
     const shot = await page.screenshot({ type: 'png', omitBackground: !asset.opaque, clip: { x: 0, y: 0, width: asset.size, height: asset.size } });
     writeFileSync(out + asset.name, asset.opaque ? toRgb(shot) : shot);
     await page.close();

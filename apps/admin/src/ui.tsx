@@ -71,3 +71,8 @@ export function Status({ published, pending }: { published: boolean; pending?: b
 export function dateLabel(value: string | null | undefined): string {
   return value ? new Intl.DateTimeFormat('tr-TR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : 'Henüz yayımlanmadı';
 }
+
+// The adjacent wordmark provides the accessible brand name.
+export function BrandLogo() {
+  return <img className="brand-logo" src={`${import.meta.env.BASE_URL}brand-logo.png`} width={48} height={48} alt="" decoding="async" />;
+}

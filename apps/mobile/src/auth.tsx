@@ -1,6 +1,7 @@
+import { BrandLogo } from "./brandLogo";
 import { useState } from "react";
 import { Linking, Platform, Text, View } from "react-native";
-import { ShieldCheck, CheckCircle2, GraduationCap } from "./icons";
+import { CheckCircle2, GraduationCap } from "./icons";
 import brand from "../../../config/brand.json";
 import { shape, typography } from "./theme";
 import type { User } from "@oggaq/shared-types";
@@ -105,9 +106,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
           <View style={{ position: "absolute", inset: 18, borderRadius: shape.large, borderWidth: 1, borderColor: palette.decorativeLine }} />
         </View>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-          <View style={{ width: 46, height: 46, borderRadius: shape.medium, backgroundColor: palette.primaryContainer, alignItems: "center", justifyContent: "center" }}>
-            <ShieldCheck size={26} color={palette.onPrimaryContainer} strokeWidth={1.8} />
-          </View>
+          <BrandLogo size={84} />
           <View style={{ flex: 1, gap: 3 }}>
             <Text style={{ color: palette.onNavy, fontSize: 21, lineHeight: 27, fontWeight: "800", letterSpacing: 1.2 }}>{brand.name}</Text>
             <Text style={{ color: palette.onNavyMuted, fontSize: 12, lineHeight: 18 }}>{brand.subtitle}</Text>

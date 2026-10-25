@@ -8,5 +8,6 @@
   "supportEmail": "destek@oggsor.com",
   "mailFromAddress": "no-reply@oggsor.com",
   "exportPrefix": "oggsor-verilerim",
-  "bundleIdentifier": "net.codentum.oggsor"
+  "bundleIdentifier": "net.codentum.oggsor",
+  "logoAsset": "config/assets/oggsor-logo.png"
 }

@@ -9,7 +9,7 @@ import { notOfficialNotice } from '@oggaq/study-core';
 import { api } from './api';
 import { brand } from './config';
 import { verificationInput } from './verification';
-import { ErrorNotice, Field, Loading, PasswordField } from './ui';
+import { BrandLogo, ErrorNotice, Field, Loading, PasswordField } from './ui';
 import { Icon } from './icons';
 import { ThemeSwitch } from './theme';
 import { LegalLinks, RegisterNotice } from './legal';
@@ -45,7 +45,7 @@ export function SessionEvents({ children }: { children: ReactNode }) {
 export function AuthFrame({ children }: { children: ReactNode }) {
   return <main className="auth-layout">
     <section className="auth-story" aria-label={brand.subtitle}>
-      <Link to="/" className="brand"><span className="brand-mark"><Icon name="shield" size={27} /></span><span>{brand.name}<small>{brand.subtitle}</small></span></Link>
+      <Link to="/" className="brand"><BrandLogo /><span>{brand.name}<small>{brand.subtitle}</small></span></Link>
       <div className="auth-story-copy"><h1>{brand.tagline}</h1><p>Deneme ve ders sınavlarını süreyle çöz; sonuçlarını ve tekrar listelerini hesabından takip et.</p></div>
       <div className="auth-features"><span><Icon name="book" />Deneme ve ders sınavları</span><span><Icon name="chart" />Sonuçlar ve gelişim</span></div>
     </section>

@@ -23,3 +23,8 @@ export function dateLabel(value: string) { return new Intl.DateTimeFormat('tr-TR
 export const outcomeLabel = { pending: 'Devam ediyor', correct: 'Doğru', incorrect: 'Yanlış', skipped: 'Boş bırakıldı' } as const;
 
 export const percent = (value: number | null) => (value === null ? '—' : `%${value.toLocaleString('tr-TR', { maximumFractionDigits: 1 })}`);
+
+// The adjacent wordmark provides the accessible brand name.
+export function BrandLogo() {
+  return <img className="brand-logo" src={`${import.meta.env.BASE_URL}brand-logo.png`} width={48} height={48} alt="" decoding="async" />;
+}

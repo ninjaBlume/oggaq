@@ -23,19 +23,21 @@ export function brandFiles(root) {
     if (!source.includes('rel="icon"')) source = source.replace('</head>', '<link rel="icon" type="image/png" href="/favicon.png" /></head>');
     files.set(path, source);
     files.set(`apps/${app}/public/favicon.png`, readFileSync(join(root, 'apps/mobile/assets/favicon.png')));
+    files.set(`apps/${app}/public/brand-logo.png`, readFileSync(join(root, 'apps/mobile/assets/brand-logo.png')));
   }
   const titles = { gizlilik: 'Gizlilik Politikası ve KVKK Aydınlatma Metni', kosullar: 'Kullanım Koşulları', destek: 'Destek', 'hesap-silme': 'Hesap silme' };
   for (const [page, title] of Object.entries(titles)) {
     const path = `apps/web/public/legal/${page}.html`;
     const deletionSubject = `${brand.name} hesap silme talebi`;
     let source = read(path).replace(/<title>[\s\S]*?<\/title>/, `<title>${title} · ${html(brand.name)}</title>`)
-      .replace(/<a class="brand" href="\/">[\s\S]*?<\/a>/, `<a class="brand" href="/">${html(brand.name)}<small>${html(brand.subtitle)}</small></a>`)
+      .replace(/<a class="brand" href="\/">[\s\S]*?<\/a>/, `<a class="brand" href="/"><img src="/brand-logo.png" width="48" height="48" alt=""><span>${html(brand.name)}<small>${html(brand.subtitle)}</small></span></a>`)
       .replaceAll('OGGAQ — ÖGG Soru Cevap Platformu', html(brand.displayName))
       .replaceAll('ÖGG Soru Cevap Platformu’nu', `${html(brand.displayName)} uygulamasını`)
       .replaceAll('OGGAQ hesap silme talebi', `${html(brand.name)} hesap silme talebi`)
       .replace(/(<span data-brand="displayName">)[\s\S]*?(<\/span>)/g, `$1${html(brand.displayName)}$2`)
       .replace(/(<span data-brand="deletionSubject">)[\s\S]*?(<\/span>)/g, `$1${html(deletionSubject)}$2`)
       .replace(/(data-(?:placeholder|filled)="destek-eposta-baglantisi" href="mailto:[^"?]*\?subject=)[^"]*/g, `$1${encodeURIComponent(deletionSubject)}`);
+    if (!source.includes('rel="icon"')) source = source.replace('</head>', '<link rel="icon" type="image/png" href="/favicon.png" /></head>');
     files.set(path, source);
   }
   const metadata = JSON.parse(read('docs/store-metadata.tr.json'));

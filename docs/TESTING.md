@@ -1,5 +1,12 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 25 Ekim 2026, seçilen logo
+
+- Kullanıcının verdiği güvenlik görevlisi/kitap görseli marka kaynağına alındı. Gömülü dama zemini şeffaflığa dönüştürüldü; platform boyutları, Android güvenli alanı ve opak RGB iOS simgesi üretildi. Uygulama içi logo yalnız 256 px / yaklaşık 101 KB; büyük ana görsel JS paketine alınmaz.
+- Web 6, admin 16, mobil 27 olmak üzere **49 ilgili Vitest**, **17 mağaza betiği testi**, ortak strict TypeScript, `check:brand`, web/admin build ve Android/iOS/web Metro export başarılı. `check:store` önceki **8 hukuki engel / 1 sürüm uyarısını** koruyor; yeni simge boyutu/alpha engeli yok.
+- Sentetik 401 yanıtlarıyla, gerçek hesap/DB kullanmadan altı Chromium düzeni kontrol edildi: web 1440 açık / 390 koyu, admin 1440 koyu / 390 açık, Expo web 390 açık / 1024 koyu. Tüm logolar yüklendi, yatay taşma ve JavaScript hatası yok; altı ekran görüntüsü gözle incelendi. Geçici HTTP sunucuları OS tarafından ayrılan boş portları kullandı ve kapatıldı; Claude servisleri ve ortak DB kullanılmadı.
+- Yeni imzalı APK/IPA, native splash/launcher cihaz açılışı ve mağaza yüklemesi yapılmadı. Bu sunum değişikliğinde PHPUnit ve tam API E2E paketi yeniden çalıştırılmadı; önceki sonuçlar aşağıdadır. Push yapılmadı.
+
 ## Güncel doğrulama — 25 Ekim 2026, mobil paket kimliği
 
 - Android/iOS ortak kimliği `config/brand.json` → `bundleIdentifier: net.codentum.oggsor` oldu. Expo yapılandırması ortak değeri okur; native açılış CI'ı kimliği APK/Info.plist içinden alır.

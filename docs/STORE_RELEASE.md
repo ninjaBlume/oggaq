@@ -16,7 +16,7 @@ Durum (25 Ekim 2026): **yayına hazır değil.** Kod tarafında hesap silme, sor
 | Uygulama içinde yasal bağlantılar | Hazır: web altbilgisi, giriş/kayıt, mobil Profil → Yasal ve destek, giriş ekranı | — |
 | "Resmî kurum değildir" uyarısı | Hazır: web altbilgisi, giriş, mobil Profil; kullanım koşullarında | — |
 | "Hesaplama resmî sonuç değildir" notu | Hazır: puan hesaplama ekranları (web, mobil) | — |
-| Uygulama ikonu, uyumlu (adaptive) ikon, açılış simgesi, favicon | **Geçici** marka: `apps/mobile/assets/` | Kullanıcı (nihai logo) |
+| Uygulama ikonu, uyumlu (adaptive) ikon, açılış simgesi, favicon | Kullanıcının seçtiği Ogg Sor görselinden türetildi; opak iOS simgesi ve Android güvenli alanı hazır | Yeni native pakette cihaz kontrolü |
 | Yerel açılış ekranı (native splash) | SDK 58 uyumlu eklentiyle mevcut simge, mavi zemin ve koyu tema hazır; iki native proje üretimi doğrulandı | Yeni release paketinde görsel kontrol |
 | Derleme yapılandırması | `eas.json` üç profilde `https://oggsor.com`; canlı HTTPS/API ve oturum doğrulandı, yasal taslak onayı bekleniyor | Alan adı bağlantısı + paket doğrulama |
 | Paket kimliği | **`net.codentum.oggsor`** (Android/iOS ortak marka kimliği); mağaza kaydı ve imzalama yeni kimlikle doğrulanacak | Paket gönderimi öncesi |
@@ -200,7 +200,7 @@ Mağaza kuralları sık değişir; bu belgedeki bilgi 24 Ekim 2026 tarihli okuma
 - [ ] Soru veritabanının ve EGM yayınlarının kullanım hakkı yazılı teyit edildi
 - [ ] Puanlama kuralları uzman tarafından resmî metinlerle karşılaştırıldı
 - [ ] Veri sorumlusu, VERBİS durumu ve yurt dışı aktarım kararı yazıldı
-- [ ] Geçici ikon nihai logoyla değiştirildi ve yapılandırılmış yerel açılış ekranı release paketinde kontrol edildi
+- [ ] Seçilen logo, Android maskelemesi ve yerel açılış ekranı release paketinde cihazda kontrol edildi
 - [ ] Gerçek e-posta sağlayıcısı kuruldu; doğrulama ve parola yenileme e-postaları gerçek adrese ulaşıyor
 - [ ] İnceleme demo hesabı sunucuda oluşturuldu, e-postası doğrulandı; sunucu inceleme boyunca açık
 - [ ] Apple gizlilik etiketleri ve Google Data safety formu bu belgedeki taslakla karşılaştırılıp dolduruldu

@@ -12,7 +12,7 @@ const config: ExpoConfig = {
   scheme: ["oggsor", "oggaq"],
   orientation: "default",
   userInterfaceStyle: "automatic",
-  // Existing blue shield/book assets contain no old brand lettering.
+  // Platform sizes are derived from the approved Ogg Sor artwork.
   icon: "./assets/icon.png",
   ios: {
     supportsTablet: true,

@@ -1,3 +1,4 @@
+import { BrandLogo } from "./brandLogo";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ScrollViewInstance } from "react-native";
 import {
@@ -21,7 +22,7 @@ import {
   useIsFocused,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { ArrowLeft, ShieldCheck } from "./icons";
+import { ArrowLeft } from "./icons";
 import type { StudyContext, User } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
 import brand from "../../../config/brand.json";
@@ -352,7 +353,7 @@ function ExamDetail({ context, id }: { context: StudyContext; id: string }) {
   return <Exam key={id} context={context} id={id} />;
 }
 function Application() {
-  const { palette, styles } = useTheme();
+  const { styles } = useTheme();
   const body = useBody();
   const [user, setUser] = useState<User | null>(null);
   const [restoring, setRestoring] = useState(true);
@@ -443,7 +444,7 @@ function Application() {
             gap: 16,
           }}
         >
-          <ShieldCheck size={42} color={palette.primary} />
+          <BrandLogo size={88} />
           <Text style={styles.heading}>{brand.name}</Text>
           <Loading />
         </View>

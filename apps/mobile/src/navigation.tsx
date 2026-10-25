@@ -1,3 +1,4 @@
+import { BrandLogo } from "./brandLogo";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   Animated,
@@ -28,7 +29,6 @@ import {
   ListChecks,
   LogOut,
   Menu,
-  ShieldCheck,
   SlidersHorizontal,
   UserRound,
   X,
@@ -102,7 +102,7 @@ export function MainHeader({
         <Menu size={23} color={palette.ink} strokeWidth={1.8} />
       </Pressable>
       <View style={navStyles.brand}>
-        <ShieldCheck size={23} color={palette.primary} strokeWidth={1.8} />
+        <BrandLogo size={40} />
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={navStyles.wordmark}>{brand.name}</Text>
           <Text numberOfLines={1} style={navStyles.contextLabel}>
@@ -302,7 +302,7 @@ export function SideMenu({
           <View style={[navStyles.account, { paddingTop: insets.top + 16 }]}>
             <View style={navStyles.between}>
               <View style={navStyles.brand}>
-                <ShieldCheck size={24} color={palette.accent} />
+                <BrandLogo size={54} />
                 <Text style={[navStyles.wordmark, { color: palette.onNavy }]}>
                   {brand.name}
                 </Text>

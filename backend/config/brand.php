@@ -12,4 +12,5 @@ return [
     'mailFromAddress' => 'no-reply@oggsor.com',
     'exportPrefix' => 'oggsor-verilerim',
     'bundleIdentifier' => 'net.codentum.oggsor',
+    'logoAsset' => 'config/assets/oggsor-logo.png',
 ];
