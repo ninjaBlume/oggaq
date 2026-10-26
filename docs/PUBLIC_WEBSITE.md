@@ -30,3 +30,5 @@ Son komut yalnız 5187/5188 portlarında statik önizlemeler açar; API/PostgreS
 Sunucu Dockerfile'ı her iki ön yüzü oluşturur. Yalnız web yayını yeterlidir; backend, veritabanı veya DNS değişikliği gerekmez. Yayın öncesinde aday Nginx yapılandırması, site/hesap dosyaları ve API/yönetim yolları kontrol edilir; önceki web imajı geri dönüş için korunur.
 
 26 Ekim 2026 yayını: `public-site-cf356dc`, yalnız web imajı güncellendi. Origin statik dosyaları/hesap yolları ve genel HTTPS üzerinde tanıtım, www, hesap girişi/çıkışı, parola bağlantısı, API/yönetim erişimi doğrulandı. Mobil kaynak ve veritabanı değiştirilmedi. Mağaza bağlantıları hâlâ `null` / Yakında durumundadır. Ayrıntılı doğrulama [TESTING](TESTING.md) içindedir.
+
+Gerçek mobil ekranı kullanan son tanıtım tasarımı: `site-screen-51b0fd1`. Yeni başlık/mağaza düzeni ve düz özellik listesiyle birlikte yalnız site dosyaları yayımlandı. Mobil arayüz ve API değişmedi; JPEG ve CSS genel HTTPS üzerinden hash ve ekran boyutuyla doğrulandı.
