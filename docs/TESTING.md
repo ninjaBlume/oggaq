@@ -4,6 +4,7 @@
 
 - Telefon çizimi ve sayfa düzeni korundu; ana başlık 66 yerine en çok 52 px, telefonda 48 yerine 38 px (320 px ekranda 34 px), satır aralığı 1,17 oldu. Ana başlığın aşırı sıkışık harfleri ve küçük metinlerin geniş harf aralıkları düzeltildi. Bölümler/kartlar arasındaki boşluklar azaltıldı; üst etiketler normal cümle düzeninde. Marka League Spartan Bold 700 olarak kalır.
 - **4 mevcut site Node testi** ve **4 mevcut Chromium E2E** geçti (2,7 saniye). Site build başarılı; 320/390/834/1280 px açık/koyu düzen, mağaza bekleme durumu, sıfır ana sayfa API isteği ve hesap/reset yolları kontrol edildi. Telefon ve masaüstü görüntüleri gözle incelendi. Düşük etkili biçim değişikliği için yeni test eklenmedi; backend/mobil/tam DB testleri yeniden çalıştırılmadı.
+- Yalnız site dosyaları **`oggaq-development-web:site-type-32f4f79`** ile yayımlandı; aday Nginx/origin 19 dosya hash’i, hesap/yönetim/API yolları ve beş readiness kontrolü başarılıdır. Diğer yedi servis/DB korundu. Genel HTTPS üzerinde yeni CSS hash’i, telefon çizimi, 390/1280 px başlık ölçüleri/taşma ve sıfır API isteği doğrulandı. Kanıtlar `artifacts/site-typography/` içindedir; Git push yapılmadı.
 
 ## Güncel doğrulama — 26 Ekim 2026, tanıtım ve indirme sitesi
 
