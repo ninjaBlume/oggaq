@@ -8,6 +8,7 @@ const bundleId = process.env.OGGAQ_BUNDLE_ID ?? brand.bundleIdentifier;
 const config: ExpoConfig = {
   name: localPreview ? `${brand.displayName} Önizleme` : brand.displayName,
   slug: "oggaq",
+  owner: "ninjablume",
   version: "0.1.0",
   scheme: ["oggsor", "oggaq"],
   orientation: "default",
@@ -46,6 +47,7 @@ const config: ExpoConfig = {
     "./plugins/local-preview.cjs",
   ],
   extra: {
+    eas: { projectId: "edf67d8f-aa02-429b-99f7-68f1e1bf6e9d" },
     localPreview,
     apiUrl: process.env.EXPO_PUBLIC_API_URL ?? "http://127.0.0.1:8000",
     frontendUrl: process.env.EXPO_PUBLIC_WEB_URL ?? "http://127.0.0.1:5173",

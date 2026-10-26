@@ -29,9 +29,23 @@
         "EXPO_PUBLIC_API_URL": "https://oggsor.com",
         "EXPO_PUBLIC_WEB_URL": "https://oggsor.com"
       }
+    },
+    "testflight": {
+      "extends": "production",
+      "distribution": "store",
+      "ios": {
+        "simulator": false
+      },
+      "node": "24.22.0"
     }
   },
   "submit": {
-    "production": {}
+    "production": {},
+    "testflight": {
+      "ios": {
+        "ascAppId": "6827324899",
+        "appleTeamId": "CHS5258JRU"
+      }
+    }
   }
 }

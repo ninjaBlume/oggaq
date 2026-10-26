@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 27 Ekim 2026, kişisel iOS beta hazırlığı
+
+- Ayrı `testflight` EAS profili; production kalıtımı, gerçek cihaz/store dağıtımı, otomatik build numarası, Node 24.22.0 ve mevcut HTTPS API ile hazırlandı. Expo projesi bağlandı, Apple bundle ID ve App Store Connect kaydı oluşturuldu; yalnız hesap sahibinin bulunduğu iç test grubu doğrulandı. [Durum ve kaynaklar](IOS_BETA.md).
+- **42 mobil + 19 mağaza/değer testi**, strict TypeScript ve iOS Hermes export geçti. Çözümlenmiş gerçek Expo config'te bundle ID, tablet desteği, API URL'si ve yerel önizlemenin kapalı olduğu doğrulandı. Arşiv incelemesinde 148 dosya / 4.229.452 bayt; şirket belgeleri, backend/deploy, Git geçmişi, anahtar ve node_modules kopyası yoktur. Geçici arşiv kopyaları temizlendi. Şema/API/soru ekranı değişmedi; backend/DB E2E testleri yeniden çalıştırılmadı.
+- Kullanıcı onayıyla oluşturulan Apple sertifikası/profilinin anahtar, takım ve uygulama eşleşmesi doğrulandı. İlk bulut build'i PKCS#12 Keychain uyumsuzluğunda başarısızdır; uyumlu biçimle yerel gerçek Keychain import kontrolü geçti ve EAS imzalama dosyaları yenilendi. Bu sonuç başarılı IPA veya cihaz kurulumu sayılmaz; TestFlight yüklemesi/kurulumu henüz yapılmadı. Kanıtlar `artifacts/ios-beta/` içindedir.
+
 ## Güncel doğrulama — 26 Ekim 2026, bilgi sayfalarının siteyle eşitlenmesi
 
 - Gizlilik/koşullar/destek/hesap silme; ana sayfanın ortak header/footer şablonunu, logo/wordmark'ını ve CSS kaynağını kullanır. `brand:apply` üretilen `legal/site.css` ve ortak sayfa çerçevesini denetler. Dört sayfa cihaz temasını JavaScript olmadan izler. Tablo kendi içinde klavyeyle kaydırılır; hesap ve e-posta ile silme yolları korunur.

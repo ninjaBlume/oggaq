@@ -37,3 +37,9 @@ __pycache__/
 
 # Kaynak veri dökümleri kişisel veri içerebilir; depoya girmez
 docs/*.sql
+
+# Native signing credentials stay outside source control.
+**/credentials.json
+*.p8
+*.p12
+*.mobileprovision
