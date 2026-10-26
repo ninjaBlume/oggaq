@@ -1,5 +1,12 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, soru yanıtlama ve devam denetimi
+
+- Uygulama kodu değiştirilmeden PHP 8.4/PostgreSQL üzerinde `ExamTest.php` **21 test / 239 assertion**, ardından `ExamConcurrencyTest.php` **1 test / 7 assertion** geçti. Cevap seçme/değiştirme/temizleme, aynı yazının tekrarı, cevap bazlı çakışma, son soru konumu, sabit süre/soru sürümü, geç cevap reddi, bitirme yarışı, değişmez sonuç ve yetki/kurum sınırları doğrulandı.
+- Güncel ayrı Expo web export ile **19 E2E** geçti: `exams.spec.ts` (6), `exam-sync.spec.ts` (8), `exam-results.spec.ts` (4), `mobile.spec.ts:794` (1). Web/mobil önizlemede kaybolan yanıt ve timeout sonrası güvenli tekrar, başka cihaz cevabının gelmesi, cevapsız son soruya dönüş, yeniden giriş/yeni cihazda konumun korunması, süre sonu ve 200 soruluk kaydırılan sonuç kontrol edildi. Yeni özellik veya test eklenmedi.
+- Test süreçleri/portları önceden kontrol edildi; PHPUnit ve E2E sırayla, yalnız `oggaq_test` üzerinde çalıştı. Mobil önizleme 5186 kullandı; ortak geliştirme servisleri ve canlı kullanıcı denemeleri değiştirilmedi. Tam backend/Vitest/build matrisi bu incelemede tekrar çalıştırılmadı; son tam koşum aşağıda kayıtlıdır. Fiziksel iOS/Android bu denetimde ayrıca denenmedi.
+- İnternet olmadan kalıcı cevap outbox'ı bulunmaz. Cevap ve soru konumu ayrı sunucu yazılarıdır; kayıt beklenirken uygulama kapanırsa son gönderimin ulaştığı varsayılmaz. Kayıt hatası/yeniden deneme görünür. Sınavdan çıkış deadline'ı durdurmaz. Kanıtlar `artifacts/core-flow-audit/` içinde; yayın ve Git push yapılmadı.
+
 ## Güncel doğrulama — 26 Ekim 2026, çıkmış soru açıklamaları
 
 - Web/mobil Deneme ve Ders başlık açıklamaları ortak `vocabulary` üzerinden soruların geçmiş ÖGG sınavlarında çıkmış olduğunu belirtir. Mobil ana sayfa rozeti `Çıkmış sorular`; ücretsiz bilgisi yalnız giriş modunda tek kez görünür. Kayıt/parola yenileme/doğrulama ve oturum açık ekranlarda tekrarlanmaz.
