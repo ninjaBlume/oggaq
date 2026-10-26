@@ -1,6 +1,6 @@
 # iPhone ve iPad için kapalı beta
 
-27 Ekim 2026: Uygulamayı App Store'da herkese yayımlamadan telefona kurmak için TestFlight yolu hazırlanıyor. Bu belge kurulmuş/indirilebilir bir beta anlamına gelmez; ilk imzalı paket henüz oluşturulmadı veya yüklenmedi.
+27 Ekim 2026: Uygulamayı App Store'da herkese yayımlamadan telefona kurmak için TestFlight yolu hazırlanıyor. İlk imzalı IPA oluşturuldu; Apple'a yükleme ve TestFlight işlemesi henüz tamamlanmadı. Bu belge indirilebilir beta anlamına gelmez.
 
 ## Hazır yapılandırma
 
@@ -14,15 +14,17 @@ Kullanıcı CSR/sertifika/profil oluşturma ve EAS'te anahtarı kullanma için a
 
 Kişisel grupta yalnız hesap sahibi vardır (**1 iç tester, 0 dış tester**). İlk EAS build `7d6da679-c05b-4a40-b2c6-af287a6fbc52`, OpenSSL 4 varsayılan PKCS#12 çıktısının macOS Keychain ile uyumsuzluğu nedeniyle `PREPARE_CREDENTIALS` aşamasında durdu. Aynı anahtar/sertifika Apple uyumlu parola korumalı PKCS#12 biçimine aktarıldı; geçici macOS keychain'ine gerçek import başarılıdır, mevcut keychain listesi korundu ve geçici keychain silindi. Uyumlu dosya EAS'te yeniden atandı. Uygulama anahtarı, HTTPS veya uygulamanın veri şifrelemesi değişmedi. İkinci build `2469310e-06c6-4ceb-aecf-a634c710f7af` imzalamayı geçti, fakat CLI 26'nın gömülü config-plugins 55 sürümü Türkçe adı `GGSORSoruBankas`, SDK 58 prebuild ise `OGGSORSoruBankasi` yaptığı için Xcode hedefi bulunamadı. `scripts/eas-sdk58.cjs`, yalnız EAS'in iOS proje meta verisi çözücülerinde SDK 58'in ad dönüşümünü kullanır. Uygulama adı/bundle ID veya native proje kaynakları değiştirilmez; CLI önbellek dosyaları da değiştirilmez. Köprü CLI 26.0.0 / SDK 58 dışındaki sürümleri reddeder; geçici uyumluluk çözümüdür ve EAS güncellendiğinde yeniden değerlendirilmelidir. Üç yönlendirme testi ve gerçek EAS scheme/bundle resolver'ı ile `OGGSORSoruBankasi` / `net.codentum.oggsor` eşleşmesi doğrulandı.
 
-Henüz başarılı IPA veya TestFlight paketi yok; `npm run build:ios:beta` ile düzeltilmiş build devam eder. EAS Free planı kullanılır; ücretli plan veya ödeme başlatılmaz.
+Üçüncü build **`efb17778-7c6e-41ea-b667-a86797ee6264` başarıyla tamamlandı**: sürüm **0.1.0 (3)**, 13.961.187 bayt store IPA. İndirilen gerçek pakette `codesign --verify --deep --strict` geçti; görünen ad, bundle ID, takım, `get-task-allow: false`, `beta-reports-active: true`, iPhone/iPad cihaz aileleri ve iOS 16.4 minimumu doğrulandı. SHA256: `491fb740080fe6ff5250bcbcf193f54746ffac25550a903f73ef4992c6be9ceb`. Paket depo dışında korumalı imzalama klasöründe; kanıt `artifacts/ios-beta/ipa-check.json`. EAS Free planı kullanılır; ücretli plan veya ödeme başlatılmaz.
+
+**Kalan:** Apple'ın ücretsiz Transporter kurulumu App Store hesap onayında bekliyor; kullanıcıdan bu adımı ve Transporter lisansı/girişini kendi ekranında tamamlaması istendi. Paket App Store Connect'e henüz yüklenmedi; iç test grubunda son kontrolde 1 tester / 0 build vardı. Cihaz kurulumu ve native uçtan uca deneme yapılmadı.
 
 ## Kurulum sırası
 
 1. Apple Developer üyeliği, doğru takım ve `net.codentum.oggsor` uygulama kaydını doğrula. Sözleşme veya yeni yetki gerekiyorsa kullanıcının ilgili işlemi tamamlaması gerekir.
 2. EAS CLI'ı resmî npm kaynağından hazırlayıp mevcut Expo hesabıyla projenin kimliğini doğrula/bağla. Kaynak yüklemeden önce gizli dosya ve ilgisiz belgelerin arşive alınmadığını kontrol et. Yeni ücretli plan/ödeme başlatma.
 3. iOS dağıtım sertifikası ve provisioning profilini doğrula. Apple parolası, 2FA kodu veya imzalama anahtarı sohbete/Git'e girmez.
-4. Mobil dizininde `npm run build:ios:beta` (depo kökünde) ile imzalı IPA oluştur. Build/expo/native kontrollerini değerlendir; mevcut API'ye bağlanan paketi hedefle.
-5. `eas submit --platform ios --profile testflight` ile paketi App Store Connect'e yükle. Bu işlem herkese açık App Store yayını değildir. Genel yayına gönderme/otomatik yayın açılmaz; web sitesinin mağaza alanları Yakında kalır.
+4. Depo kökünde `npm run build:ios:beta` ile imzalı IPA oluştur. Build/expo/native kontrollerini değerlendir; mevcut API'ye bağlanan paketi hedefle.
+5. Başarılı IPA'yı Apple'ın resmî Transporter uygulamasıyla App Store Connect'e yükle. Bu oturumda ek API anahtarı veya uygulamaya özel Apple parolası oluşturulmaz; Transporter lisansı/girişi kullanıcı tarafından tamamlanır. `submit.testflight` hedef yapılandırması alternatif EAS Submit yolu için hazırdır, ancak otomatik gönderim yapılmaz. Bu işlem herkese açık App Store yayını değildir. Genel yayına gönderme/otomatik yayın açılmaz; web sitesinin mağaza alanları Yakında kalır.
 6. Kullanıcının seçimine göre iç test veya davetli dış test grubunu hazırla. İç test, uygun App Store Connect kullanıcılarına yöneliktir. Dış tester'lara yönetim yetkisi verme; dış testin ilk build'i Apple Beta App Review sürecinden geçer. Kullanıcı istemeden kimseye e-posta daveti gönderme.
 7. iPhone/iPad'de TestFlight ile kurulum, giriş, soru yanıtlama/devam, uygulamayı kapatıp açma ve API bağlantısını doğrula. Masaüstü Metro kapalıyken de çalıştığını kontrol et. Yeni sürümler TestFlight'tan dağıtılır; build'ler 90 gün kullanılabilir.
 
