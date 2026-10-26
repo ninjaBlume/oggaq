@@ -21,11 +21,11 @@ def split_colored_line(spans):
 
 
 def exam_date(header):
-    months = {name: i + 1 for i, name in enumerate(['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'])}
+    months = {name.upper().replace('İ', 'I'): i + 1 for i, name in enumerate(['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'])}
     dates = set()
     for day, month, year in re.findall(r'\b(\d{2})[./](\d{2})[./](\d{4})\b', header):
         dates.add(date(int(year), int(month), int(day)).isoformat())
-    for day, month, year in re.findall(r'\b(\d{1,2})\s+(' + '|'.join(months) + r')\s+(\d{4})\b', header):
+    for day, month, year in re.findall(r'\b(\d{1,2})\s+(' + '|'.join(months) + r')\s+(\d{4})\b', header.upper().replace('İ', 'I')):
         dates.add(date(int(year), months[month], int(day)).isoformat())
     if len(dates) != 1:
         raise ValueError('Missing or ambiguous exam date')
@@ -36,6 +36,7 @@ def parse_lines(lines):
     questions = []
     current = None
     option = None
+    notice_started = False
     for text, red, page in lines:
         text = " ".join(text.split())
         if not text or "ÖZEL GÜVENLİK" in text or "Diğer sayfaya" in text:
@@ -43,7 +44,10 @@ def parse_lines(lines):
         notice = text.upper().replace('İ', 'I').replace(' ', '')
         letters = [char for char in text if char.isalpha()]
         notice_style = letters and sum(char.isupper() for char in letters) / len(letters) >= .8
-        if current is not None and current["position"] == 100 and len(current["options"]) == 5 and notice_style and any(token in notice for token in ["ADAYLAR", "CEVAPLARINIZI", "KONTROLEDINIZ", "SORULARINI", "CEVAPLAYINIZ", "SILAHBILGISISORULARI"]):
+        if notice_started and notice in {'KONTROL', 'EDINIZ', 'EDINIZ.'}:
+            continue
+        if current is not None and current["position"] in [100, 125] and len(current["options"]) == 5 and notice_style and any(token in notice for token in ["ADAYLAR", "CEVAPLARINIZI", "KONTROLEDINIZ", "SORULARINI", "CEVAPLAYINIZ", "SILAHBILGISISORULARI"]):
+            notice_started = True
             continue
         match = re.match(r"^(\d{1,3})\.(?:\s+|$)(.*)$", text)
         if match and (current is None or len(current["options"]) == 5):
@@ -55,6 +59,7 @@ def parse_lines(lines):
                        "stem": match[2], "options": [], "source_pages": [page], "visual_review_required": True}
             questions.append(current)
             option = None
+            notice_started = False
         elif current is not None:
             if page not in current["source_pages"]:
                 current["source_pages"].append(page)
@@ -95,15 +100,22 @@ def compare_booklets(first, second):
     index = {}
     for question in second["questions"]:
         key = signature(question)
-        if key in index:
-            raise ValueError("Ambiguous duplicate questions in the comparison booklet")
-        index[key] = question
+        index.setdefault(key, []).append(question)
     matches, missing, conflicts = [], [], []
     for question in first["questions"]:
-        other = index.get(signature(question))
-        if other is None:
+        candidates = index.get(signature(question), [])
+        if not candidates:
             missing.append(question["position"])
             continue
+        if len(candidates) > 1:
+            ordered = tuple(normalize(o['text']) for o in question['options'])
+            exact = [q for q in candidates if tuple(normalize(o['text']) for o in q['options']) == ordered]
+            if len(exact) != 1:
+                raise ValueError("Ambiguous duplicate questions in the comparison booklet")
+            other = exact[0]
+        else:
+            other = candidates[0]
+        candidates.remove(other)
         matches.append({"first": question["position"], "second": other["position"]})
         if answer(question) != answer(other):
             conflicts.append(question["position"])
@@ -142,7 +154,9 @@ def extract(path, education, number, group):
                     if (re.fullmatch(r"\d+", text) and y0 > page.rect.height - 150 and page.rect.width * .4 < x0 < page.rect.width * .6) or "Diğer sayfaya" in text:
                         continue
                     for index, (part, red) in enumerate(split_colored_line(line["spans"])):
-                        found.append((round(y0, 1), x0 + index / 1000, part, red, page_index + 1))
+                        # Different fonts on the same printed row have different bounding-box tops.
+                        baseline = line['spans'][0]['origin'][1]
+                        found.append((round(baseline, 1), x0 + index / 1000, part, red, page_index + 1))
             for _, _, text, red, page_number in sorted(found):
                 lines.append((text, red, page_number))
     return {"education_type": education, "exam_number": number, "booklet_group": group,

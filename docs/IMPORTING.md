@@ -8,6 +8,8 @@ Kaynak dosyalar değiştirilmez. Gerçek kaynak veri aktarımı kullanıcı onay
 
 ## Güvenli iş akışı
 
+PDF hazırlığında `scripts/extract-exam-booklet.py` tarih başlıklarında Türkçe ayların büyük harfini de okur; iki sütunda farklı font parçalarını bbox üstüne göre değil metin baseline'ına göre sıralar. Soru 100/125 sonundaki bölünmüş test talimatı seçeneklere eklenmez. A/B karşılaştırmasında aynı kök ve seçenek kümesi tekrar ediyorsa yalnız tek anlamlı sıralı seçenek eşleşmesi seçilir, B sorusu bir kez tüketilir; belirsiz eşleşme reddedilir. Bu kontroller görsel/ders incelemesinin yerine geçmez. 76–82 gerçek arşiv doğrulaması [EXAM_SOURCES](EXAM_SOURCES.md) içindedir.
+
 ### İncelenmiş kitapçık JSON'u — 26 Ekim 2026
 
 `import:booklet <json> <pdf> <ikinci-pdf> --by=<platform-admin>` yalnız önizleme kaydı oluşturur. Aynı komuta `--commit=<batch> --approve=<12-haneli-kod>` eklenince onaylı snapshot tek transaction içinde aktarılır. Varsayılan kanıt iki farklı hosttan aynı PDF'nin SHA-256 eşleşmesidir. Arşivde ikinci belgenin PDF/Word biçimi veya dosya baytları farklıysa `evidence_sha256`, `evidence_format`, `evidence_reviewed` ve 125 soruluk içerik/cevap karşılaştırması ayrıca bağlanır; Word dosyasında OLE imzası kontrol edilir. A/B tam eşleşmeyen her soru için ayrı konum ve inceleme gerekçesi gerekir (`comparison_exceptions`); tam eşleşenler ve açıklanmış farkların toplamı 125 olmalıdır. Kaynak metni/anahtarı otomatik düzeltilmez. Görsel/ders incelemesi ve uygun yayımlanmış dönem kuralları zorunludur. Bu yöntem doğrudan EGM dosyasına erişilmiş olduğu iddiasını üretmez; kullanılan aynalar ve doğrulama yöntemi rapora/kaynağa yazılır.

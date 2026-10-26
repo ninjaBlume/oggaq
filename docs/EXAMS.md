@@ -1,5 +1,7 @@
 # Süreli deneme
 
+26 Ekim 2026 güncel arşiv: **76–98. yenileme**, 30 Ekim 2022’den itibaren **23 dönem / 46 tam seçenek / 253 ders sınavı** olarak canlıda. Son genişletmede 76–82 için 14 tam seçenek ve 77 ders eklendi; önceki içerik/sonuçlar korundu. Dersler aynı sabit soru sürümlerini paylaşır ve ortak Ders ekranında bulunur. Kanıtlar [EXAM_SOURCES](EXAM_SOURCES.md) içinde.
+
 ## 26 Ekim 2026: denemede eğitim türü
 
 Web ve mobil **Deneme sınavları** ekranında Temel eğitim / Yenileme eğitimi seçilir; silahlı/silahsız seçimi bunun altında bağımsızdır. Web adresindeki `egitim=basic|renewal` ile mobil katalog önbelleği bu ayrımı korur. Ders sınavlarında eğitim seçimi veya ayrı liste eklenmez. Eğitim değişimi soru/sonuç kopyalamaz; seçilen yayımlanmış sınav kimliğini mevcut deneme akışına gönderir. Boş/hata/yükleniyor durumları korunur.

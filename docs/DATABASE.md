@@ -1,5 +1,7 @@
 # Veritabanı tasarımı
 
+26 Ekim 2026 arşiv genişletmesi: 76–82. yenileme için mevcut modelde **14 tam seçenek + 77 ders şablonu** eklendi; güncel yenileme toplamı **46 tam + 253 ders** (76–98). 875 soru kaydında **368 yeni soru / 507 tekrar kullanılan sürüm** vardır. Dersler tam sınavla aynı sürümleri kullanır; kısmi derslere puanlama bağlantısı eklenmez. Yeni şema/migration yok; her dönem işleminde 19 tablonun eski satırları korundu. Gerçek aktarım yalnız canlı sunucudadır, yerel ortak içerik veritabanına yazılmadı. Ayrıntılar [EXAM_SOURCES](EXAM_SOURCES.md) içinde.
+
 ## Uygulanan eğitim ayrımı — 26 Ekim 2026
 
 `official_exams.education_type`: NOT NULL, `basic|renewal` CHECK, varsayılan `basic`. Migration öncesi arşivin tamamı kullanıcı tarafından temel eğitim olarak doğrulandı; yeni alan varsayılanla eklenir, yayımlanmış soru/sınav içeriği veya geçmiş cevaplar değiştirilmez. Sınav tekilliği `(exam_type_id, education_type, year, term, exam_number, weapon_status, subject_id) NULLS NOT DISTINCT` olur. Tam sınavlar için eğitim/silah/yıl indeksi vardır. Ders ekranı eğitim türüne göre ayrılmaz.

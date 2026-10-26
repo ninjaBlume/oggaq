@@ -1,4 +1,5 @@
 import importlib.util
+import copy
 from pathlib import Path
 import unittest
 
@@ -18,9 +19,12 @@ def sample():
 
 class BookletTest(unittest.TestCase):
     def test_archive_dates_are_parsed_without_guessing_or_accepting_conflicts(self):
-        for text in ['24/02/2024', '24.02.2024', '24 Şubat 2024']:
+        for text in ['24/02/2024', '24.02.2024', '24 Şubat 2024', '24 ŞUBAT 2024']:
             self.assertEqual(booklet.exam_date(text), '2024-02-24')
-        for text in ['24.02.2024 25 Şubat 2024', '31.02.2024', 'no date']:
+        self.assertEqual(booklet.exam_date('30 EKİM 2022'), '2022-10-30')
+        self.assertEqual(booklet.exam_date('30 EKIM 2022'), '2022-10-30')
+        self.assertEqual(booklet.exam_date('06 MAYIS 2023'), '2023-05-06')
+        for text in ['24.02.2024 25 Şubat 2024', '30 EKİM 2022 31 Ekim 2022', '31.02.2024', 'no date']:
             with self.assertRaises(ValueError):
                 booklet.exam_date(text)
 
@@ -40,9 +44,12 @@ class BookletTest(unittest.TestCase):
         lines = sample()
         lines.insert(600, ('SiLAHLI ADAYLAR,', False, 10))
         lines.insert(600, ('Adaylar için normal seçenek devamı', False, 10))
+        lines += [('EDİNİZ.', False, 14), ('CEVAPLARINIZI KONTROL', False, 14), ('EDİNİZ.', False, 14)]
         questions = booklet.parse_lines(lines)
         self.assertIn('normal seçenek devamı', questions[99]['options'][4]['text'])
         self.assertNotIn('SiLAHLI', questions[99]['options'][4]['text'])
+        self.assertNotIn('CEVAPLARINIZI', questions[124]['options'][4]['text'])
+        self.assertEqual(questions[124]['options'][4]['text'].count('EDİNİZ.'), 1)
 
     def test_sections_and_printed_number_restart_preserve_original_order(self):
         questions = booklet.parse_lines(sample())
@@ -100,6 +107,21 @@ class BookletTest(unittest.TestCase):
         result = booklet.compare_booklets(first, second)
         self.assertEqual(result["answer_conflicts"], [125])
         self.assertFalse(result["complete"])
+
+    def test_repeated_stem_is_matched_once_per_distinct_ordered_variant(self):
+        first = {"education_type": "renewal", "exam_number": 78, "exam_date": "2023-04-30", "booklet_group": "A", "questions": booklet.parse_lines(sample())}
+        first['questions'][1]['stem'] = first['questions'][0]['stem']
+        options = first['questions'][1]['options']
+        first['questions'][1]['options'] = options[2:] + options[:2]
+        second = copy.deepcopy(first)
+        second['booklet_group'] = 'B'
+        second['questions'].reverse()
+        result = booklet.compare_booklets(first, second)
+        self.assertTrue(result['complete'])
+        self.assertEqual(len({m['second'] for m in result['matches']}), 125)
+        second['questions'][-2]['options'] = copy.deepcopy(second['questions'][-1]['options'])
+        with self.assertRaisesRegex(ValueError, 'Ambiguous duplicate'):
+            booklet.compare_booklets(first, second)
 
     def test_comparison_preserves_numeric_punctuation_and_checks_exam_identity(self):
         first = {"education_type": "basic", "exam_number": 1, "exam_date": "2026-01-01", "booklet_group": "A", "questions": booklet.parse_lines(sample())}
