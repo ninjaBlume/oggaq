@@ -43,3 +43,40 @@ test('hesap modu: giriş ekranı yalnız hesap işlemlerini sunar', async ({ pag
   await expect(page.getByRole('button', { name: 'Hesap oluştur', exact: true })).toHaveCount(0);
   await expect(page.getByRole('link', { name: /Deneme sınavları/ })).toHaveCount(0);
 });
+
+for (const colorScheme of ['light', 'dark'] as const) test(`bilgi sayfaları: ortak tasarım, temiz metin ve ${colorScheme} düzen`, async ({ browser }) => {
+  const context = await browser.newContext({ colorScheme });const page = await context.newPage();const apiRequests: string[] = [];
+  page.on('request', request => { if (new URL(request.url()).pathname.startsWith('/api/')) apiRequests.push(request.url()); });
+  try {
+    await page.goto('http://127.0.0.1:5187/');
+    const appearance = await page.evaluate(() => ({ background: getComputedStyle(document.body).backgroundColor, font: getComputedStyle(document.querySelector('.site-header .brand-wordmark')!).fontFamily }));
+    for (const [id, title] of [['gizlilik', 'Gizlilik Politikası'], ['kosullar', 'Kullanım Koşulları'], ['destek', 'Destek'], ['hesap-silme', 'Hesap silme']]) {
+      const response = await page.goto(`http://127.0.0.1:5187/legal/${id}.html`);
+      expect(response?.ok()).toBe(true);
+      await expect(page.getByRole('navigation', { name: 'Bilgi ve destek', exact: true }).getByRole('link', { name: title, exact: true })).toHaveAttribute('aria-current', 'page');
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+      expect(await page.locator('body').innerText()).not.toMatch(/taslak|hukukçu|\[YÜRÜRLÜK|\[VERBİS|YETKİLİ MAHKEME/i);
+      await expect(page.locator('[data-placeholder], script')).toHaveCount(0);
+      await expect(page.getByRole('banner').getByRole('link', { name: 'Mağazalar' })).toHaveAttribute('href', '/#indir');
+      await expect.poll(() => page.getByRole('contentinfo').locator('.brand img').evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+      expect(await page.evaluate(() => ({ background: getComputedStyle(document.body).backgroundColor, font: getComputedStyle(document.querySelector('.site-header .brand-wordmark')!).fontFamily }))).toEqual(appearance);
+      for (const width of [320, 390, 834, 1280]) {
+        await page.setViewportSize({ width, height: 1000 });
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        if (width === 390 || width === 1280) await page.screenshot({ path: `artifacts/public-site/screens/legal-${id}-${colorScheme}-${width}.png`, fullPage: true });
+      }
+      if (id === 'gizlilik') {
+        await expect(page.getByRole('region', { name: 'İşlenen kişisel veriler' })).toBeVisible();
+        await expect(page.locator('main')).toContainText('Codentum L.L.C.');
+        await expect(page.locator('main')).toContainText('Haklarını nasıl kullanırsın?');
+      }
+      if (id === 'hesap-silme') {
+        await expect(page.getByRole('link', { name: 'Silme talebi gönder', exact: true })).toHaveAttribute('href', /^mailto:destek@oggsor\.com\?subject=/);
+        await expect(page.getByRole('link', { name: 'Hesabım sayfasından giriş yap', exact: true })).toHaveAttribute('href', '/account');
+      }
+    }
+    expect(apiRequests).toEqual([]);
+    await page.getByRole('banner').getByRole('link', { name: 'ÖGG SOR ana sayfa', exact: true }).click();
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Çıkmış sorularla');
+  } finally { await context.close(); }
+});

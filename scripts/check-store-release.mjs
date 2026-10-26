@@ -4,6 +4,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { missingValues } from './apply-legal-values.mjs';
 
 const legalFiles = ['gizlilik', 'kosullar', 'destek', 'hesap-silme'];
 const placeholderHost = /(^|\.)(invalid|example|test|localhost)$|^(127\.|10\.|192\.168\.)/;
@@ -21,7 +22,13 @@ export function checkRelease(root) {
   const blockers = []; const warnings = []; const manual = [];
   const web = join(root, 'apps/web'); const mobile = join(root, 'apps/mobile');
 
-  // 1. Public legal pages must be final: no draft banner, no marked placeholder.
+  // 1. Review status is independent of presentation: removing a public banner is not approval.
+  try {
+    const legal = JSON.parse(read(join(root, 'docs/legal-values.json')) ?? 'null');
+    if (!legal || legal.taslak !== false) blockers.push('docs/legal-values.json: metin incelemesi tamamlanmamış (taslak).');
+    const missing = missingValues(legal?.degerler ?? {});
+    if (missing.length) blockers.push(`docs/legal-values.json: eksik ${missing.length} alan var (${missing.join(', ')}).`);
+  } catch { blockers.push('docs/legal-values.json okunamadı.'); }
   for (const page of legalFiles) {
     const html = read(join(web, 'public/legal', `${page}.html`));
     if (html === null) { blockers.push(`Yasal sayfa yok: apps/web/public/legal/${page}.html`); continue; }

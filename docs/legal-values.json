@@ -1,6 +1,6 @@
 {
   "_nasil": "Bu dosya dört yasal sayfanın ve uygulamaların boş alanlarını tek yerden doldurur. Boş bırakılan alan sayfada işaretli yer tutucu olarak kalır. Doldurduktan sonra `npm run legal:apply` çalıştırın; kalan eksikleri `npm run legal:apply -- --check` ve `npm run check:store` gösterir.",
-  "_dikkat": "'Öneri' ile başlayan notlar benim önerimdir, hukuki görüş değildir. Dolu gelen alanlar uygulamanın bugünkü gerçek davranışına göre yazıldı; davranış değişirse güncelleyin. Metinleri siz onaylıyorsanız en altta \"taslak\": false yapın, TASLAK bandı kalkar.",
+  "_dikkat": "Dolu alanlar uygulamanın belgelenen davranışını anlatır. taslak alanı mağaza ön kontrolündeki iç inceleme durumudur; herkese açık sayfalarda inceleme notu gösterilmez. Tasarım/metin temizliği hukuki uygunluk onayı yerine geçmez.",
   "taslak": true,
   "degerler": {
     "veri-sorumlusu-unvan": "Codentum L.L.C. (Wyoming, ABD)",

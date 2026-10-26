@@ -18,7 +18,6 @@ export const labels = {
   'barindirma-konumu': '[BARINDIRMA KONUMU]',
 };
 const mailKey = 'destek-eposta-baglantisi';
-export const draftBanner = '<div id="taslak-bandi" class="draft-banner" role="note"><strong>TASLAK — hukukçu onayı olmadan yayımlamayın.</strong> Bu sayfa teknik gerçeklerden üretilmiş bir taslaktır; işaretli alanlar doldurulmadan ve hukukçu onaylamadan mağazaya bildirilemez.</div>';
 const escapeHtml = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const emailPattern = /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/;
 
@@ -30,7 +29,7 @@ export function validate(values) {
   return problems;
 }
 
-export function applyToPage(html, values, taslak) {
+export function applyToPage(html, values) {
   const email = (values['destek-eposta'] ?? '').trim();
   let out = html;
   for (const [key, label] of Object.entries(labels)) {
@@ -41,7 +40,8 @@ export function applyToPage(html, values, taslak) {
   // The e-mail request button: the placeholder is an attribute, not an element.
   out = out.replace(/<a class="button" data-(?:placeholder|filled)="destek-eposta-baglantisi" href="mailto:[^"]*\?subject=([^"]*)">/g, (_all, subject) =>
     email === '' ? `<a class="button" data-placeholder="${mailKey}" href="mailto:?subject=${subject}">` : `<a class="button" data-filled="${mailKey}" href="mailto:${escapeHtml(email)}?subject=${subject}">`);
-  out = out.replace(/<!--taslak:start-->[\s\S]*?<!--taslak:end-->/, `<!--taslak:start-->${taslak ? draftBanner : ''}<!--taslak:end-->`);
+  // Review status belongs to the private release checklist, never to public page copy.
+  out = out.replace(/<!--taslak:start-->[\s\S]*?<!--taslak:end-->/g, '');
   return out;
 }
 
@@ -63,12 +63,12 @@ export function run(root, { check = false } = {}) {
   const taslak = config.taslak !== false;
   if (check) {
     console.log(missing.length ? `Boş alanlar (${missing.length}): ${missing.join(', ')}` : 'Tüm alanlar dolu.');
-    console.log(taslak ? '"taslak": true — sayfalarda TASLAK bandı duracak.' : '"taslak": false — TASLAK bandı kaldırılacak.');
+    console.log(taslak ? '"taslak": true — mağaza için metin incelemesi bekleniyor.' : '"taslak": false — metin incelemesi tamamlandı olarak işaretlenmiş.');
     return missing.length ? 1 : 0;
   }
   for (const page of pages) {
     const path = join(root, 'apps/web/public/legal', `${page}.html`);
-    writeFileSync(path, applyToPage(readFileSync(path, 'utf8'), values, taslak));
+    writeFileSync(path, applyToPage(readFileSync(path, 'utf8'), values));
   }
   const email = (values['destek-eposta'] ?? '').trim();
   for (const path of ['config/brand.json']) {
@@ -76,7 +76,7 @@ export function run(root, { check = false } = {}) {
     if (existsSync(full)) writeFileSync(full, setSupportEmail(readFileSync(full, 'utf8'), email));
   }
   console.log(missing.length ? `Uygulandı. Hâlâ boş ${missing.length} alan: ${missing.join(', ')}` : 'Uygulandı. Tüm alanlar dolu.');
-  console.log(taslak ? 'TASLAK bandı duruyor (docs/legal-values.json: "taslak": false yapınca kalkar).' : 'TASLAK bandı kaldırıldı.');
+  console.log(taslak ? 'Metin incelemesi bekleniyor; mağaza ön kontrolünde engel olarak kalır.' : 'Metin incelemesi tamamlandı olarak işaretlenmiş.');
   return applyBrand(root);
 }
 

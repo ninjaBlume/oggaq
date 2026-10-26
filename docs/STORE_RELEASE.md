@@ -34,7 +34,7 @@ Durum (25 Ekim 2026): **yayına hazır değil.** Kod tarafında hesap silme, sor
 
 ### Yer tutucu alanlar (yasal sayfalarda)
 
-`apps/web/public/legal/*.html` içinde `data-placeholder` ile işaretli alanlar doldurulmadan ve `id="taslak-bandi"` banner'ı kaldırılmadan `npm run check:store` engel verir. Alanlar:
+`npm run check:store`, `docs/legal-values.json` içindeki inceleme durumunu (`taslak`) ve aşağıdaki eksik kararları doğrudan denetler. Herkese açık sayfalarda iç inceleme notları veya boş karar etiketleri gösterilmez; bu metin temizliği mağaza onayı sayılmaz. Sayfada yanlışlıkla kalan `data-placeholder` veya eski taslak bandı da ayrıca engeldir. Alanlar:
 
 | Anahtar | Ne yazılacak |
 | --- | --- |
@@ -48,6 +48,8 @@ Durum (25 Ekim 2026): **yayına hazır değil.** Kod tarafında hesap silme, sor
 | `uygulanacak-hukuk` | Uygulanacak hukuk ve yetkili mahkeme |
 | `yanit-suresi` | Talebe yanıt süresi |
 | `yururluk-tarihi` | Yayın tarihi |
+
+Sayfaların header/footer ve temel stilleri ana sayfadan `npm run brand:apply` ile üretilir; `legal/site.css` elle düzenlenmez. İçerik bilgileri, haklar ve hesap silme yolları korunur. Açıklamaların kapsamı için [KVKK aydınlatma rehberi](https://www.kvkk.gov.tr/Icerik/2033/Aydinlatma-Yukumlulugu-) kontrol edildi (26 Ekim 2026); tasarım değişikliği tek başına hukuki uygunluk sonucu değildir.
 
 Sayfalar JavaScript olmadan çalışan statik HTML'dir; web uygulamasıyla aynı adreste sunulur (`/legal/...`). Geliştirme sunucusu nginx ayarı `X-Robots-Tag: noindex` ekler; yayın alan adında bu başlık olmamalı. Üretim şablonunda (`deploy/nginx/oggaq-app.conf`) `/legal/` ayrı konumdur: SPA'ya düşmez, bilinmeyen yol 404 verir.
 
@@ -63,7 +65,7 @@ Dört yasal sayfadaki ve uygulamalardaki boş alanlar `docs/legal-values.json` d
 
 1. `docs/legal-values.json` içindeki `degerler` alanlarını doldurun. Dolu gelenler uygulamanın bugünkü davranışına göre yazılmış önerilerdir (hukuki sebep, saklama süreleri, başvuru süreci); doğruysa bırakın, değilse değiştirin. `_oneriler` bölümü boş alanlar için ne yazılabileceğini gösterir.
 2. `npm run legal:apply` sayfaları ve `supportEmail` değerini (`config/brand.json`; üç uygulama bu değeri okur) günceller. Tekrar çalıştırmak güvenlidir; bir alanı boşaltmak işaretli yer tutucuyu geri getirir. `npm run legal:apply -- --check` yazmadan boş alanları listeler.
-3. Metinleri onayladığınızda dosyanın başındaki `"taslak": true` değerini `false` yapıp tekrar çalıştırın; TASLAK bandı kalkar.
+3. Metin incelemesi tamamlandığında dosyanın başındaki `"taslak": true` değeri `false` olarak işaretlenir. Bu iç durum yalnız mağaza ön kontrolünü etkiler; herkese açık sayfalara inceleme bandı eklenmez. Eksik kararlar doldurulmadan ön kontrol yine engel verir.
 4. `npm run check:store` kalan engelleri gösterir. Mağazadaki yayıncı adı, iletişim e-postası, veri sorumlusu ve yürürlük tarihi gerçek değerlerle dolmalıdır.
 
 Not: dolu gelen öneriler hukuki görüş değildir; sorumluluk metni onaylayanındır.
@@ -195,7 +197,7 @@ Mağaza kuralları sık değişir; bu belgedeki bilgi 24 Ekim 2026 tarihli okuma
 
 ## Elle kontrol
 
-- [ ] Hukukçu dört yasal sayfayı onayladı, işaretli alanlar dolduruldu ve TASLAK bandı kaldırıldı
+- [ ] Dört metnin incelemesi tamamlandı; gerçek kararlar legal-values.json içinde dolduruldu ve inceleme durumu kaydedildi
 - [ ] Yayıncı adı ve paket kimliği kararı verildi (mağaza hesabıyla uyumlu)
 - [ ] Soru veritabanının ve EGM yayınlarının kullanım hakkı yazılı teyit edildi
 - [ ] Puanlama kuralları uzman tarafından resmî metinlerle karşılaştırıldı

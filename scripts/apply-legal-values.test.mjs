@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { applyToPage, draftBanner, labels, missingValues, setSupportEmail, validate } from './apply-legal-values.mjs';
+import { applyToPage, labels, missingValues, setSupportEmail, validate } from './apply-legal-values.mjs';
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
-const page = `<body><!--taslak:start-->${draftBanner}<!--taslak:end--><p><mark data-placeholder="destek-eposta">${labels['destek-eposta']}</mark> ve <mark data-placeholder="verbis">${labels.verbis}</mark></p><a class="button" data-placeholder="destek-eposta-baglantisi" href="mailto:?subject=Silme%20talebi">Gönder</a></body>`;
+const page = `<body><!--taslak:start--><div id="taslak-bandi">TASLAK — hukukçu incelemesi</div><!--taslak:end--><p><mark data-placeholder="destek-eposta">${labels['destek-eposta']}</mark> ve <mark data-placeholder="verbis">${labels.verbis}</mark></p><a class="button" data-placeholder="destek-eposta-baglantisi" href="mailto:?subject=Silme%20talebi">Gönder</a></body>`;
 
 test('fills values, escapes HTML and builds the mailto link', () => {
   const out = applyToPage(page, { 'destek-eposta': 'destek@ornek.com', verbis: 'a <b> & "c"' }, true);
@@ -27,10 +27,10 @@ test('is idempotent and an emptied value restores the marked placeholder', () =>
   assert.match(emptied, /data-placeholder="destek-eposta-baglantisi" href="mailto:\?subject=/);
 });
 
-test('draft banner follows the taslak flag in both directions', () => {
-  const without = applyToPage(page, {}, false);
-  assert.doesNotMatch(without, /taslak-bandi/);
-  assert.match(applyToPage(without, {}, true), /id="taslak-bandi"/);
+test('legacy internal draft instructions are removed and cannot return on repeated application', () => {
+  const without = applyToPage(page, {});
+  assert.doesNotMatch(without, /taslak|hukukçu/i);
+  assert.equal(applyToPage(without, {}), without);
 });
 
 test('validation and missing list', () => {

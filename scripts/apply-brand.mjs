@@ -3,6 +3,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { legalShell } from '../apps/site/shell.mjs';
 
 const html = (value) => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('"', '&quot;');
 const php = (value) => `'${value.replaceAll('\\', '\\\\').replaceAll("'", "\\'")}'`;
@@ -42,11 +43,16 @@ export function brandFiles(root) {
     files.set(`apps/${app}/public/brand-logo.png`, readFileSync(join(root, 'apps/mobile/assets/brand-logo.png')));
   }
   const fontCssVersion = createHash('sha256').update(fontCss).digest('hex').slice(0, 12);
-  const legalCss = read('apps/web/public/legal/legal.css').replace(/@import url\("\/fonts\/wordmark\.css(?:\?[^"]*)?"\);/, `@import url("/fonts/wordmark.css?v=${fontCssVersion}");`);
+  const siteCss = read('apps/site/styles.css');
+  files.set('apps/web/public/legal/site.css', siteCss);
+  const siteCssVersion = createHash('sha256').update(siteCss).digest('hex').slice(0, 12);
+  const legalCss = read('apps/web/public/legal/legal.css').replace(/@import url\("\/fonts\/wordmark\.css(?:\?[^"]*)?"\);/, `@import url("/fonts/wordmark.css?v=${fontCssVersion}");`)
+    .replace(/@import url\("site\.css(?:\?[^"]*)?"\);/, `@import url("site.css?v=${siteCssVersion}");`);
   files.set('apps/web/public/legal/legal.css', legalCss);
   const legalCssHref = `/legal/legal.css?v=${createHash('sha256').update(legalCss).digest('hex').slice(0, 12)}`;
   const titles = { gizlilik: 'Gizlilik Politikası ve KVKK Aydınlatma Metni', kosullar: 'Kullanım Koşulları', destek: 'Destek', 'hesap-silme': 'Hesap silme' };
   for (const [page, title] of Object.entries(titles)) {
+    const shell = legalShell(read('apps/site/index.html'), brand, page);
     const path = `apps/web/public/legal/${page}.html`;
     const deletionSubject = `${brand.name} hesap silme talebi`;
     let source = read(path).replace(/<title>[\s\S]*?<\/title>/, `<title>${title} · ${html(brand.name)}</title>`)
@@ -60,6 +66,8 @@ export function brandFiles(root) {
       .replace(/(data-(?:placeholder|filled)="destek-eposta-baglantisi" href="mailto:[^"?]*\?subject=)[^"]*/g, `$1${encodeURIComponent(deletionSubject)}`);
     if (!source.includes('rel="icon"')) source = source.replace('</head>', '<link rel="icon" type="image/png" href="/favicon.png" /></head>');
     source = source.replace(/href="\/favicon\.png(?:\?[^"]*)?"/g, `href="${faviconHref}"`);
+    source = source.replace(/<header\b[\s\S]*?<\/header>(?:\s*<nav class="legal-nav wrap"[\s\S]*?<\/nav>)?/, `${shell.header}\n${shell.navigation}`)
+      .replace(/<footer\b[\s\S]*?<\/footer>/, shell.footer);
     files.set(path, source);
   }
   const metadata = JSON.parse(read('docs/store-metadata.tr.json'));

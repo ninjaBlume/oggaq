@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { deflateSync } from 'node:zlib';
 import { checkRelease } from './check-store-release.mjs';
+import { labels } from './apply-legal-values.mjs';
 
 // A minimal valid PNG header + IDAT is not needed: the check reads only IHDR (width, height, colour type).
 function pngHeader(width, height, colorType) {
@@ -28,6 +29,7 @@ function repo(mutate = () => {}) {
   writeFileSync(join(root, 'apps/mobile/app.config.ts'), 'const bundleId = process.env.OGGAQ_BUNDLE_ID ?? brand.bundleIdentifier;\nconst c = { version: "1.0.0" };');
   writeFileSync(join(root, 'apps/mobile/package.json'), '{"dependencies":{"expo-splash-screen":"1.0.0"}}');
   writeFileSync(join(root, 'docs/STORE_RELEASE.md'), '# x\n\n## Elle kontrol\n\n- [x] Yapıldı\n\n## Sonraki\n');
+  writeFileSync(join(root, 'docs/legal-values.json'), JSON.stringify({ taslak: false, degerler: Object.fromEntries(Object.keys(labels).map(key => [key, 'Configured test value'])) }));
   mutate(root);
   return root;
 }
@@ -36,6 +38,16 @@ const run = (mutate) => { const root = repo(mutate); try { return checkRelease(r
 test('a finished repository has no blockers and nothing to warn about', () => {
   const result = run();
   assert.deepEqual(result, { blockers: [], warnings: [], manual: [] });
+});
+test('clean public pages do not bypass a pending private review', () => {
+  const result = run(root => writeFileSync(join(root, 'docs/legal-values.json'), JSON.stringify({ taslak: true, degerler: Object.fromEntries(Object.keys(labels).map(key => [key, 'Configured test value'])) })));
+  assert.equal(result.blockers.length, 1);
+  assert.match(result.blockers[0], /metin incelemesi tamamlanmamış/);
+});
+test('private missing decisions still block even without public placeholders', () => {
+  const result = run(root => writeFileSync(join(root, 'docs/legal-values.json'), JSON.stringify({ taslak: false, degerler: {} })));
+  assert.equal(result.blockers.length, 1);
+  assert.match(result.blockers[0], /eksik .*verbis.*uygulanacak-hukuk/);
 });
 test('draft banner and marked placeholders in a legal page block the release', () => {
   const { blockers } = run((root) => writeFileSync(join(root, 'apps/web/public/legal/gizlilik.html'), '<div id="taslak-bandi"></div><mark data-placeholder="veri-sorumlusu-unvan">[x]</mark><mark data-placeholder="verbis">[y]</mark>'));
