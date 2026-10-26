@@ -232,7 +232,7 @@ function ExamContent({
         <p>
           {done
             ? "Cevapların, başladığın soru sürümlerinden değerlendirildi."
-            : "Cevapların seçtikçe kaydedilir. Süre bitmeden değiştirebilirsin."}
+            : "Cevapların seçtikçe kaydedilir. Doğru yanıt hemen gösterilir; seçimin değiştirilemez."}
         </p>
       </PageIntro>
       <div className="practice-layout">
