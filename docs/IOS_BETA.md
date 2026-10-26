@@ -1,6 +1,6 @@
 # iPhone ve iPad için kapalı beta
 
-27 Ekim 2026: Uygulamayı App Store'da herkese yayımlamadan telefona kurmak için kişisel TestFlight betası hazır. **0.1.0 (3)** Apple'a yüklendi ve yalnız hesap sahibinin bulunduğu iç grupta **Testing** durumunda doğrulandı. iPhone/iPad'de gerçek kurulum ve kullanım teyidi kullanıcıdan beklenir.
+27 Ekim 2026: Uygulamayı App Store'da herkese yayımlamadan telefona kurmak için kişisel TestFlight betası hazır. **0.1.0 (3)** Apple'a yüklendi ve yalnız hesap sahibinin bulunduğu iç grupta **Testing** durumunda doğrulandı. Kullanıcı indirdiğini ve teste başladığını bildirdi. Hangi cihazda kurduğu veya tüm akışların geçtiği ayrıca belirtilmedi; iPhone ve iPad'in ikisinde de tam doğrulama yapıldığı anlamına gelmez.
 
 ## Hazır yapılandırma
 
@@ -19,6 +19,16 @@ Kişisel grupta yalnız hesap sahibi vardır (**1 iç tester, 0 dış tester**).
 **Aktarım ve dağıtım:** Kullanıcı Transporter lisansı ve Apple girişini tamamladı. İmzalı `0.1.0 (3)` paketi **27 Ekim 2026 02:13 (İstanbul)** itibarıyla Apple'a başarıyla teslim edildi; Transporter yeşil teslim işaretiyle Gönderildi bölümünde gösterdi. Apple build kimliği `2a70943b-e2db-443c-a940-10132eab2f27`. Apple işlemesi tamamlandı; build kişisel gruba otomatik eklendi. Grubun **1 Tester / 1 Build**, hesap sahibinin **Invited**, build'in **Testing / Expires in 90 days** durumları gerçek App Store Connect arayüzünde doğrulandı. Türkçe test notları kaydedildi. Başka kullanıcı/dış tester daveti veya genel App Store incelemesine gönderim yapılmadı. Cihaz kurulumu ve native uçtan uca deneme yapılmadı. Mevcut HTTPS API readiness kontrolü `ok` döndü; veritabanı/Redis/migration/queue/scheduler kontrolleri başarılıydı.
 
 Kullanıcı iPhone ve iPad'e Apple TestFlight uygulamasını kurup hesap sahibine gelen test davetini cihazdan açar; ÖGG SOR için Kabul Et / Yükle yoluyla **0.1.0 (3)** kurulur. Bu paket Expo Go/Metro gerektirmez. İlk cihaz kontrolünde giriş, ders/deneme, cevap kaydı, devam, süre tercihi, sonuç/puan, iPad düzeni ve yeniden açılış denenmelidir. Gerçek cihazda çalıştığı kullanıcı teyidi olmadan tamamlanmış kabul edilmez.
+
+## Sürüm ve güncelleme düzeni
+
+Görünen uygulama sürümü `apps/mobile/app.config.ts` içindeki `version` değeridir; mevcut sürüm **0.1.0**. Parantez içindeki **3** iOS build numarasıdır. `appVersionSource: remote` ve kalıtılan `autoIncrement: true` ile EAS her yeni pakette build numarasını artırır; başarısız derlemeler nedeniyle numaralar atlayabilir. Aynı sürüm için birden fazla build çıkarılabilir. Hata düzeltme sürümleri için `0.1.1`, yeni özellik grubu için `0.2.0`, ilk genel yayın için hazır olduğunda `1.0.0` düzeni kullanılır; bu numaralar henüz yayımlanmış değildir.
+
+Şu an mobil projede `expo-updates`, güncelleme kanalı veya `runtimeVersion` yapılandırması **yoktur**. Dolayısıyla mobil kod/tasarım değişikliği mevcut kurulu pakete kendiliğinden ulaşmaz: ilgili testler, yeni imzalı build, Apple'a yükleme, işleme, kişisel grupta Testing kontrolü ve değişiklik notları gerekir. Her Git commit'i ayrı beta yayını değildir; doğrulanmış değişiklikler paketlenir. Kullanıcı TestFlight'tan Güncelle seçer veya uygulama için otomatik güncellemeleri açar. Her build 90 gün test edilebilir.
+
+API/soru içeriği güncellemeleri sunucudan sonraki veri alma/yenileme ile gelir; yerel cache süresi ve uygulama uyumluluğu dikkate alınır. Geriye uyumlu API korunmalı, yayımlanmış soru sürümleri ve geçmiş sınavlar değiştirilmemelidir. Sunucu değişikliği ile mobil paket değişikliği ayrı kaydedilir.
+
+İleride EAS Update istenirse uyumlu JavaScript/görsel düzeltmeleri için kanal ve runtime uyumluluğu hazırlanıp bunları içeren yeni bir native paket dağıtılmalıdır; mevcut build 3'e geriye dönük eklenemez. Native bağımlılık/SDK/izin değişiklikleri yeni paket gerektirir. Bu özellik bu görüşmede kurulmadı. [Expo kurulumu](https://docs.expo.dev/eas-update/getting-started/), [runtime uyumluluğu](https://docs.expo.dev/versions/latest/sdk/updates/), [TestFlight güncellemeleri](https://testflight.apple.com/).
 
 ## Kurulum sırası
 
