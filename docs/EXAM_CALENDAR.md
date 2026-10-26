@@ -2,6 +2,8 @@
 
 Takvim, Deneme/Ders soru bankasından ve puanlama dönemlerinden ayrı bir merkezi veridir. Web ve mobil öğrenci menüsündeki **Sınav takvimi** ekranı Temel/Yenileme numaralarını, sınav gününü, eğitim bitişini ve kaynak/son doğrulama bilgisini birlikte gösterir. Eğitim bitişi başvuru son günü olarak sunulmaz; sınav saati veya açıklanmamış tarih üretilmez.
 
+26 Ekim 2026: `b63538f` web/API ve mevcut scheduler üzerinde yayındadır. İlk canlı kontrol 2026 için altı doğrulanmış dönem kaydetti; 2027 henüz yayımlanmış değildir. Mobil geliştirme kaynağı aynı canlı API'yi kullanır.
+
 ## Kaynak ve kontrol
 
 Birincil kaynak [EGM Özel Güvenlik 2026 sınav takvimi](https://www.egm.gov.tr/ozelguvenlik/2026-sinav-takvimi). 26 Ekim 2026 incelemesinde resmî HTML tablo doğrudan indirildi ve altı Temel/Yenileme çifti ayrıştırıldı. Son satır 124. Temel / 100. Yenileme, 27 Aralık 2026; eğitim bitişi 13 Kasım 2026'dır. Aynı gün uygulama sunucusundan bot kimliğiyle bu sayfa 200, 2027 adresi `/Hata/Page404` yoluna 302 döndürdü (normal istemcinin takip ettiği son sayfa 404). Bot bu sabit hata yönlendirmesini takip etmeden yayımlanmamış yıl olarak tanır. Üçüncü taraf kurs takvimleri doğrulanmış veri kaynağı değildir.
