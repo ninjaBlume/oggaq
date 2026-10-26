@@ -35,8 +35,21 @@ if (config('database.default') !== 'pgsql' || config('database.connections.pgsql
     throw new RuntimeException('Browser fixtures require the isolated oggaq_test PostgreSQL database.');
 }
 $operation = $argv[1] ?? '';
-if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'renewal-exams', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'long-result', 'paired-exam-draft', 'scoring', 'scored-exam-draft', 'calendar', 'calendar-stale', 'cleanup'], true)) {
+if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'renewal-exams', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'long-result', 'paired-exam-draft', 'scoring', 'scored-exam-draft', 'calendar', 'calendar-stale', 'upcoming-calendar', 'upcoming-empty', 'cleanup'], true)) {
     throw new InvalidArgumentException('Expected setup or cleanup.');
+}
+if ($operation === 'upcoming-empty') {
+    DB::table('exam_calendar_sources')->update(['active_snapshot_id' => null, 'verified_at' => null, 'status' => 'unavailable']);
+    exit;
+}
+if ($operation === 'upcoming-calendar') {
+    $exam = Carbon::now('Europe/Istanbul')->startOfDay()->addDays(10);
+    $deadline = $exam->copy()->subDays(5);
+    $year = $exam->year;
+    $html = '<table><tr><td colspan="4">'.$year.' YILI SINAV TAKVİMİ</td></tr><tr><td>SN</td><td>SINAVIN ADI</td><td>SINAV TARİHİ</td><td>EĞİTİM BİTİŞ TARİHİ</td></tr><tr><td>1</td><td>ÖZEL GÜVENLİK 990. TEMEL EĞİTİM VE 790. YENİLEME EĞİTİMİ SINAVI</td><td>'.$exam->locale('tr')->isoFormat('D MMMM YYYY dddd').'</td><td>'.$deadline->locale('tr')->isoFormat('D MMMM YYYY dddd').'</td></tr></table>';
+    Illuminate\Support\Facades\Http::fake([App\Modules\Calendar\SyncCalendarYear::url($year) => Illuminate\Support\Facades\Http::response($html)]);
+    app(App\Modules\Calendar\SyncCalendarYear::class)->execute($year);
+    exit;
 }
 if ($operation === 'calendar-stale') {
     DB::table('exam_calendar_sources')->update(['status' => 'fetch_failed', 'checked_at' => now()]);

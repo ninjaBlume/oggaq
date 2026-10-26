@@ -7,10 +7,10 @@ import { Badge, Button, Card, Columns, EmptyState, ErrorNotice, Loading, ScreenT
 import { Text } from './text';
 import { useTheme } from './themeContext';
 
-export function ExamCalendarScreen() {
+export function ExamCalendarScreen({ initialYear }: { initialYear?: number }) {
   const { styles } = useTheme();
   const current = Number(calendarToday().slice(0, 4));
-  const [year, setYear] = useState(current);const [picking, setPicking] = useState(false);
+  const [year, setYear] = useState(initialYear ?? current);const [picking, setPicking] = useState(false);
   const calendar = useResource(signal => api.request('get', '/api/v1/exam-calendar', { signal, query: { year } }), [year]);
   useOnReturn(() => { void calendar.reload(); });
   const link = useTask<void>();const data = calendar.data?.data;

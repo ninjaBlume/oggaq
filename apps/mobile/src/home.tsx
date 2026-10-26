@@ -1,3 +1,4 @@
+import { UpcomingExamCard } from "./upcomingExam";
 import { Text } from "./text";
 import { Pressable, View } from "react-native";
 import type { ReactNode } from "react";
@@ -37,6 +38,7 @@ export function Home({
   review,
   stats,
   exam,
+  calendar,
 }: {
   user: User;
   context: StudyContext;
@@ -46,6 +48,7 @@ export function Home({
   review: () => void;
   stats: () => void;
   exam: (id: string) => void;
+  calendar: (year?: number) => void;
 }) {
   const { palette, styles } = useTheme();
   const layout = useLayout();
@@ -89,6 +92,8 @@ export function Home({
         </Text>
         <Text style={styles.muted}>Bir sınav seç, kaldığın yerden devam et.</Text>
       </View>
+
+      <UpcomingExamCard open={calendar} />
 
       <View style={{ flexDirection: layout.columns === 2 ? "row" : "column", gap: 20 }}>
       <View testID="home-focus" style={{ flex: layout.columns === 2 ? 2 : undefined, backgroundColor: palette.navy, borderRadius: shape.large, padding: layout.cardPadding + 2, gap: 12, overflow: "hidden" }}>

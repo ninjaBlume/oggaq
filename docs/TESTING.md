@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, ana sayfada sıradaki sınav
+
+- Mobil ana sayfaya ve webin ana giriş Deneme ekranına tarih, Temel/Yenileme numaraları ve kalan gün kartı eklendi. Gün sayısı sunucunun Türkiye takvim gününden gelir; bugün sıfır gün yerine `Bugün` gösterilir. Geçmiş sınavlar atlanır, yıl sonunda gelecek yıl taranır. Eksik/eski takvim ve yükleme/hata durumları görünür; diğer ana sayfa eylemleri isteği beklemez. Kart doğru yılın takvimini açar. DB migration veya takvim/soru yazısı yoktur.
+- PHP 8.4/PostgreSQL tam **276 test / 2.918 assertion** geçti. Yeni beş test (23 assertion) kalan gün/ilk tarih, UTC/Türkiye gün sınırı, Bugün ve sonraki yıla geçiş, eski veri ve eksik cari yıl uyarısı, boş veri/yetki/migration bekleyen korumalı yerel DB'yi doğrular. Composer strict validate/audit geçti; ilk strict Pint koşumunda yeni testte kalan argüman boşluğu düzeltildi ve lint tekrarlandı.
+- Strict TypeScript, API tip üretimi/OpenAPI lint, **108 Vitest** (40 study-core + 16 admin + 10 web + 42 mobil), admin/web build ve iOS/Android/web Expo export geçti. İlk web typecheck'teki React Query döngüsel çıkarımı açık `UpcomingExam` tipiyle düzeltildi. Expo export başarılı (exit 0); Metro CLI yalnız kendi export sürecini bitirirken force-exit uyarısı verdi, dış geliştirme Metro'suna işlem yapılmadı.
+- **8 ilgili E2E tek koşumda geçti** (4 yeni ana sayfa + 4 takvim): açık/koyu web/mobil, yavaş takvim isteğinde ana sayfanın kullanılabilirliği, doğru gün/numara, karta dokunup takvime geçme, eski/boş durum ve 320/390/834/1280 px taşma. Görüntüler gözle incelendi. Geçici QA konfigürasyonu 90 saniye test/30 saniye beklenti kullanır; normal timeout değişmedi, koşum 17,1 saniyedir. Tam eski E2E paketi ve fiziksel iOS/Android bu teslimde denenmedi.
+- PHPUnit/E2E sırayla yalnız `oggaq_test` üzerinde çalıştı; başka test süreçleri/portlar kontrol edildi, mobil 5186 kullanıldı. Yerel ortak içerik DB'si/hesaplar ve Claude'un servisleri korunur. Yenileme yalnız görünür/aktif ön plandaki ana sayfada beş dakikada veya Türkiye gece yarısında yapılır; yeni EGM indirmesi yoktur. Kanıtlar `artifacts/upcoming-exam/` içindedir. Git push yapılmadı.
+
 ## Güncel doğrulama — 26 Ekim 2026, otomatik resmî sınav takvimi
 
 - Calendar modülü, ayrı kaynak/değişmez snapshot tabloları, `calendar:sync`, günlük 03.20 Europe/Istanbul görevi, salt okunur yetkili API, web ve mobil Sınav takvimi menüsü eklendi. Temel/Yenileme numaraları ayrı okunur; soru ve puanlama kayıtları değiştirilmez. [İşletim ve sınırlar](EXAM_CALENDAR.md).

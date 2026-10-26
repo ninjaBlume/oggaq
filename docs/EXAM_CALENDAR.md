@@ -25,3 +25,11 @@ Birincil kaynak [EGM Özel Güvenlik 2026 sınav takvimi](https://www.egm.gov.tr
 Migration `2026_10_26_000004_create_exam_calendar` yalnız takvim tablolarını ekler. Kullanıcının koruduğu yerel `oggaq` DB'sine otomatik uygulanmaz: eksik şemada API boş/hazır değil döner, CLI dış kaynağı sorgulamadan durur. Normal yerel API'ye bu migration'ın uygulanması ayrıca kullanıcı yetkisi gerektirir; `oggaq_test` doğrulaması bu sınıra dahil değildir.
 
 Gerçek takvim aktarımı kullanıcının otomatik takvim çekme talebi kapsamındadır; gerçek soru aktarımı yapılmaz. Yayın ve doğrulama kanıtı [TESTING](TESTING.md) içinde izlenir.
+
+## Ana sayfada sıradaki sınav
+
+Mobil ana sayfanın üstünde ve webin girişte açılan Deneme ekranında kompakt bir tarih/gün kartı vardır. `GET /api/v1/exam-calendar/next` bugün dahil, bu yıl ve gelecek yılın doğrulanmış snapshot'larından en yakın tarihi seçer. Kalan gün sunucunun Europe/Istanbul takvim günlerinden hesaplanır; saat farkı ve cihazın saati sonuca karışmaz. Sınav gününün tamamında `Bugün`, sonraki gün yeni sınav görünür; açıklanmamış sınav saati tahmin edilmez.
+
+Kartta tarih, Temel/Yenileme numaraları ve kalan gün vardır. Tıklama doğru yılın takvimini açar. Geçmiş tarihler seçilmez; gelecek tarih yoksa `Yaklaşan sınav tarihi henüz doğrulanmadı.` görünür. Eski veri korunur ve belirtilir; bu yılın takvimi eksikken sonraki yıldan bilinen tarih de uyarıyla sunulur.
+
+Ana sayfa takvim isteğini bağımsız yürütür; diğer eylemler bu isteği beklemez. Web görünürken ve mobilde yalnız aktif/ön plandaki ana sayfada en geç beş dakikada, Türkiye gece yarısı daha yakınsa o gün sınırında yenilenir. Yeniden odak/ön plana gelişte kontrol edilir. Arka planda gereksiz sorgu çalıştırılmaz; hata sonrası tekrar beş dakika ile sınırlıdır. API yalnız DB'de iki yıla ait en fazla iki snapshot okur; EGM'ye istek veya veri yazısı yapmaz. Yeni migration yoktur.

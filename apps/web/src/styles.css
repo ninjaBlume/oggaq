@@ -1429,3 +1429,18 @@ input::placeholder { color:var(--c-muted); opacity:1 }
 .calendar-entry p,.calendar-source p { margin:0 }
 .calendar-labels { display:flex; flex-wrap:wrap; gap:8px }
 @media(min-width:840px) { .calendar-grid { grid-template-columns:repeat(2,minmax(0,1fr)) } }
+
+.upcoming-container,.upcoming-placeholder { margin-bottom:20px }
+.upcoming-exam { display:flex; flex-wrap:wrap; align-items:center; gap:12px 24px; text-decoration:none; color:var(--c-ink) }
+.upcoming-exam:hover { border-color:var(--c-primary) }
+.upcoming-details { flex:1 1 150px; min-width:0; display:grid; gap:4px }
+.upcoming-details .eyebrow { margin:0; letter-spacing:1px; text-transform:none; font-size:13px }
+.upcoming-details h2,.upcoming-placeholder h2 { font-size:19px; line-height:1.4; margin:0 }
+.upcoming-details p { margin:0; color:var(--c-muted); font-size:14px }
+.upcoming-details small { color:var(--c-muted) }
+.upcoming-link { color:var(--c-primary); font-size:13px; font-weight:600 }
+.upcoming-count { min-width:82px; padding:8px 12px; border:1px solid var(--c-card-sand-line); background:var(--c-card-sand-surface); color:var(--c-card-sand-accent); border-radius:16px; display:grid; justify-items:center; flex-shrink:0 }
+.upcoming-count strong { font-size:32px; line-height:1.2; font-variant-numeric:tabular-nums }
+.upcoming-count span { font-size:13px }
+.upcoming-placeholder { display:grid; gap:8px }
+.upcoming-placeholder p { margin:0 }

@@ -6699,6 +6699,55 @@
           }
         }
       }
+    },
+    "/api/v1/exam-calendar/next": {
+      "get": {
+        "operationId": "getUpcomingExam",
+        "summary": "Bugün veya sonraki ilk doğrulanmış sınavı ve kalan günü oku",
+        "tags": [
+          "Calendar"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Saklanan doğrulanmış takvim; öğrenci isteğinde dış kaynak indirilmez.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/UpcomingExam"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -12259,6 +12308,68 @@
             "items": {
               "$ref": "#/components/schemas/ExamCalendarEntry"
             }
+          }
+        }
+      },
+      "UpcomingExam": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "server_time",
+          "today",
+          "status",
+          "entry",
+          "days_remaining",
+          "source_url",
+          "verified_at"
+        ],
+        "properties": {
+          "server_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "today": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "stale",
+              "unavailable"
+            ]
+          },
+          "entry": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ExamCalendarEntry"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "days_remaining": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "source_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri"
+          },
+          "verified_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
           }
         }
       }

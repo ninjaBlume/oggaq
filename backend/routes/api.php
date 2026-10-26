@@ -48,6 +48,7 @@ Route::prefix('v1')->group(function () {
 
         Route::middleware('email.verified')->group(function () {
             Route::get('exam-calendar', ExamCalendarController::class);
+            Route::get('exam-calendar/next', [ExamCalendarController::class, 'next']);
             Route::get('job-postings', [JobController::class, 'index']);
             Route::get('job-postings/{job}', [JobController::class, 'show'])->whereUuid('job');
             Route::post('job-postings/{job}/applications', [JobController::class, 'apply'])->whereUuid('job')->middleware('throttle:job-applications');

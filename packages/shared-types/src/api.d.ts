@@ -1724,6 +1724,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/exam-calendar/next": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Bugün veya sonraki ilk doğrulanmış sınavı ve kalan günü oku */
+        get: operations["getUpcomingExam"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3159,6 +3176,20 @@ export interface components {
             /** Format: uri */
             source_url: string;
             entries: components["schemas"]["ExamCalendarEntry"][];
+        };
+        UpcomingExam: {
+            /** Format: date-time */
+            server_time: string;
+            /** Format: date */
+            today: string;
+            /** @enum {string} */
+            status: "ready" | "stale" | "unavailable";
+            entry: components["schemas"]["ExamCalendarEntry"] | null;
+            days_remaining: number | null;
+            /** Format: uri */
+            source_url: string | null;
+            /** Format: date-time */
+            verified_at: string | null;
         };
     };
     responses: {
@@ -6312,6 +6343,32 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["ExamCalendar"];
+                    };
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    getUpcomingExam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Saklanan doğrulanmış takvim; öğrenci isteğinde dış kaynak indirilmez. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["UpcomingExam"];
                     };
                 };
             };

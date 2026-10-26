@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { calendarDate, calendarNotice, calendarPhase, calendarStaleNotice, calendarToday, calendarYears, vocabulary } from '@oggaq/study-core';
 import { api } from './api';
@@ -7,7 +7,10 @@ import { ErrorNotice, Field, Loading } from './ui';
 
 export function ExamCalendarPage() {
   const current = Number(calendarToday().slice(0, 4));
-  const [year, setYear] = useState(current);
+  const [params, setParams] = useSearchParams();
+  const requested = Number(params.get('year'));
+  const year = Number.isInteger(requested) && requested >= 2020 && requested <= 2100 ? requested : current;
+  const setYear = (value: number) => setParams({year: String(value)});
   const calendar = useQuery({ queryKey: ['exam-calendar', year], staleTime: 300000, queryFn: ({ signal }) => api.request('get', '/api/v1/exam-calendar', { signal, query: { year } }) });
   const data = calendar.data?.data;
   return <>

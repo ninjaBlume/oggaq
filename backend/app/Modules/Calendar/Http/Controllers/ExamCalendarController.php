@@ -15,4 +15,9 @@ class ExamCalendarController extends Controller
 
         return response()->json(['data' => $calendar->execute((int) ($input['year'] ?? now('Europe/Istanbul')->year))]);
     }
+
+    public function next(ReadCalendar $calendar): JsonResponse
+    {
+        return response()->json(['data' => $calendar->next()]);
+    }
 }

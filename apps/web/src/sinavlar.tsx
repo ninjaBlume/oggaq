@@ -1,3 +1,4 @@
+import { UpcomingExamCard } from './upcoming-exam';
 import { useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -106,6 +107,7 @@ export function DenemeSinavlari() {
   const list = (exams.data ?? []).filter((exam) => !exam.subject && exam.weapon_status === weapon && (exam.education_type ?? 'basic') === education).sort(byNewest);
   return <>
     <PageIntro eyebrow="SINAVA GİR" title={vocabulary.deneme.title}><p>{vocabulary.deneme.description}</p></PageIntro>
+    <UpcomingExamCard />
     <nav className="tab-bar" aria-label="Eğitim türü">{([['basic', 'Temel eğitim'], ['renewal', 'Yenileme eğitimi']] as const).map(([value, label]) => <button key={value} type="button" className={`tab-button${education === value ? ' active' : ''}`} aria-pressed={education === value} onClick={() => setParams({ egitim: value, silah: weapon })}>{label}</button>)}</nav>
     <nav className="tab-bar" aria-label="Silah durumu">{([['armed', 'Silahlı sınav'], ['unarmed', 'Silahsız sınav']] as const).map(([value, label]) => <button key={value} type="button" className={`tab-button${weapon === value ? ' active' : ''}`} aria-pressed={weapon === value} onClick={() => setParams({ egitim: education, silah: value })}>{label}</button>)}</nav>
     {exams.isPending ? <Loading /> : exams.isError ? <ErrorNotice error={exams.error} retry={() => { void exams.refetch(); }} /> : list.length === 0 ? <section className="card empty"><h2>Henüz deneme sınavı yok</h2><p>Seçtiğin {education === 'basic' ? 'temel' : 'yenileme'} eğitimi için yayımlanmış sınav olduğunda burada görünür.</p></section>

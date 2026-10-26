@@ -91,6 +91,7 @@ function MainTabs({
   }
   const [menuOpen, setMenuOpen] = useState(false);
   const [subject, setSubject] = useState<string>();
+  const [calendarYear, setCalendarYear] = useState<number>();
   const [subjectRequest, setSubjectRequest] = useState(0);
   const content = useRef<ScrollViewInstance>(null);
   const focused = useIsFocused();
@@ -170,6 +171,7 @@ function MainTabs({
                       history={() => activateTab("history")}
                       review={() => activateTab("review")}
                       stats={() => activateTab("stats")}
+                      calendar={(year) => { setCalendarYear(year); activateTab("calendar"); }}
                       exam={exam}
                     />
                   ) : page === "deneme" ? (
@@ -189,7 +191,7 @@ function MainTabs({
                   ) : page === "score" ? (
                     <ScoreCalculator />
                   ) : page === "calendar" ? (
-                    <ExamCalendarScreen />
+                    <ExamCalendarScreen initialYear={calendarYear} />
                   ) : page === "jobs" ? (
                     <Jobs user={user} />
                   ) : page === "stats" ? (
