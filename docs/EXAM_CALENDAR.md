@@ -26,6 +26,8 @@ Migration `2026_10_26_000004_create_exam_calendar` yalnız takvim tablolarını 
 
 Gerçek takvim aktarımı kullanıcının otomatik takvim çekme talebi kapsamındadır; gerçek soru aktarımı yapılmaz. Yayın ve doğrulama kanıtı [TESTING](TESTING.md) içinde izlenir.
 
+26 Ekim 2026: ana sayfa kartı `37976b4` ile web/API üzerinde yayındadır; gerçek takvimden 27 Aralık 2026 için 62 kalan gün doğrulandı.
+
 ## Ana sayfada sıradaki sınav
 
 Mobil ana sayfanın üstünde ve webin girişte açılan Deneme ekranında kompakt bir tarih/gün kartı vardır. `GET /api/v1/exam-calendar/next` bugün dahil, bu yıl ve gelecek yılın doğrulanmış snapshot'larından en yakın tarihi seçer. Kalan gün sunucunun Europe/Istanbul takvim günlerinden hesaplanır; saat farkı ve cihazın saati sonuca karışmaz. Sınav gününün tamamında `Bugün`, sonraki gün yeni sınav görünür; açıklanmamış sınav saati tahmin edilmez.
