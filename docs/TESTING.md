@@ -1,5 +1,10 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, yayıncı adının tanıtımdan kaldırılması
+
+- Tanıtım altbilgisindeki şirket adı kaldırıldı; normal web/mobil/yönetim ekranlarında başka bir Codentum gösterimi bulunmadı. Yasal metinler ve şirket/mağaza kimlik değerleri değiştirilmedi. **4 mevcut Node + 4 mevcut Chromium testi** geçti (tarayıcı 2,6 saniye); site build başarılıdır. Düşük etkili metin/biçim değişikliği için yeni test eklenmedi; backend/mobil test matrisi yeniden çalıştırılmadı.
+- Yalnız site dosyaları **`oggaq-development-web:site-brand-bba761e`** ile yayımlandı. Aday Nginx, origin 20 dosya hash’i, hesap/yönetim/API ve beş readiness kontrolü başarılıdır; diğer yedi servis/DB korundu. Genel HTTPS üzerinde ana sayfada şirket adının görünmediği, gizlilik sayfasında kimliğin korunduğu, CSS/görsel hash’i, 390/1280 px düzen ve sıfır API isteği doğrulandı. Kanıtlar `artifacts/site-brand/` içindedir; Git push yapılmadı.
+
 ## Güncel doğrulama — 26 Ekim 2026, gerçek mobil ekranla tanıtım tasarımı
 
 - Tanıtım sayfasındaki HTML taklidi telefon ekranı, mevcut Expo bileşenlerinden alınmış 390×844 px / 2× ana ekran JPEG'iyle değiştirildi. Kişisel ad/geçmiş yayımlanmadı: tarayıcıda anonim tanıtım hesabı ve boş özet, çekim anındaki sunucu takvimi gösterildi. Ekran yakalama yalnız 5189 statik mobil önizlemesini kullandı; geliştirme/test DB'sine yazılmadı. Takvim okuma oturumu kapatıldı. Görsel native cihaz testi sayılmaz; kaynak ve statik tarih sınırı [SCREENSHOTS](../apps/site/SCREENSHOTS.md) içindedir.
