@@ -95,7 +95,7 @@ Kişinin tam adı tek `name` alanında tutulur. İkinci ad ve birleşik soyadı 
 
 Web ve mobil aynı `personInitials` hesabını kullanır: **Ayşe Yılmaz → AY**, **Ayşe Deniz Yılmaz → ADY**. Rozet en fazla üç kelimenin harfini alır; daha uzun adlarda ilk iki ve son kelime kullanılır. Profil tam adı eksiksiz gösterir. Türkçe `i/ı`, birleşik Unicode karakterler, tek kelimeli/boş adlar ve tire/apostrof desteklenir. Küçük header rozeti üç harfte daha küçük yazı kullanır; mobil merkezdeki marka ve 44 px dokunma alanı korunur. Webde tam ad masaüstünde, dar ekranda avatarla birlikte erişilebilir açıklamada ve Hesabım sayfasında bulunur.
 
-Hesabım içindeki **Ad soyad** alanı ikinci ad dahil en fazla 100 karakterle mevcut `PATCH /api/v1/me` ucuna kaydeder. Başarılı kayıtta yalnız oturumdaki kişi bilgisi güncellenir; webde başka hesaba geçilmişse eski yanıt o hesabın oturumunu değiştirmez. Hata sırasında yazılan değer korunur. Kayıt formu ve mobil klavye tam ad otomatik doldurmasını destekler. E-posta/parola ve diğer hassas hesap işlemlerinin kuralları korunur.
+Hesabım içindeki **Ad soyad** alanı ikinci ad dahil en fazla 100 karakterle mevcut `PATCH /api/v1/me` ucuna kaydeder. Başarılı kayıtta hesabın sunucu kaydı ve oturum önbelleğindeki kişi bilgisi güncellenir; webde başka hesaba geçilmişse eski yanıt o hesabın oturumunu değiştirmez. Hata sırasında yazılan değer korunur. Kayıt formu ve mobil klavye tam ad otomatik doldurmasını destekler. E-posta/parola ve diğer hassas hesap işlemlerinin kuralları korunur.
 
 ## 7. Reklam yuvası (ileride)
 
