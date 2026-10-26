@@ -30,13 +30,12 @@ function storeCard(store, url) {
 
 export async function buildSite({ output = path.join(root, 'apps/site/dist'), links: suppliedLinks } = {}) {
   const brand = JSON.parse(await readFile(path.join(root, 'config/brand.json'), 'utf8'));
-  const legal = JSON.parse(await readFile(path.join(root, 'docs/legal-values.json'), 'utf8'));
   const links = storeLinks(suppliedLinks ?? JSON.parse(await readFile(path.join(root, 'config/store-links.json'), 'utf8')), brand.bundleIdentifier);
   const css = cssTokens()+'\n'+await readFile(path.join(root, 'apps/site/styles.css'), 'utf8');
   const cssName = `site-${createHash('sha256').update(css).digest('hex').slice(0, 12)}.css`;
   const values = {
     name: brand.name, subtitle: brand.subtitle, title: brand.displayName, themeColor: lightPalette.navy,
-    website: brand.websiteUrl, support: brand.supportEmail, publisher: legal.degerler['yayinci-adi'],
+    website: brand.websiteUrl, support: brand.supportEmail,
     css: `/site-assets/${cssName}`, notice: notOfficialNotice,
     homeScreen: `/screens/mobile-home.jpg?v=${createHash('sha256').update(await readFile(path.join(root, 'apps/site/public/screens/mobile-home.jpg'))).digest('hex').slice(0, 12)}`,
     stores: storeCard('appStore', links.appStore)+storeCard('googlePlay', links.googlePlay),
