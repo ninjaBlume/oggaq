@@ -101,7 +101,7 @@ export function Home({
             <Text style={{ color: palette.onNavyMuted, fontSize: 12, lineHeight: 18, fontWeight: "700" }}>SINAVA HAZIRLIK</Text>
           </View>
           <View style={{ borderWidth: 1, borderColor: palette.decorativeLine, paddingHorizontal: 9, paddingVertical: 4, borderRadius: shape.small }}>
-            <Text style={{ color: palette.onNavy, fontSize: 12, fontWeight: "600" }}>{activeExam ? "Devam ediyor" : "Tamamen ücretsiz"}</Text>
+            <Text style={{ color: palette.onNavy, fontSize: 12, fontWeight: "600" }}>{activeExam ? "Devam ediyor" : "Çıkmış sorular"}</Text>
           </View>
         </View>
         <View style={{ gap: 7 }}>

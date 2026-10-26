@@ -198,8 +198,8 @@ export function ExamList({
         title={kind === "deneme" ? vocabulary.deneme.title : vocabulary.ders.title}
         subtitle={
           kind === "deneme"
-            ? "Geçmiş sınavları özgün soru sırasıyla çöz."
-            : "Dersini seç, geçmiş sınavlarla çalış."
+            ? vocabulary.deneme.description
+            : vocabulary.ders.description
         }
       />
       {kind === "deneme" && (

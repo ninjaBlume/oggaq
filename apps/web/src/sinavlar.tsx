@@ -103,7 +103,7 @@ export function DenemeSinavlari() {
   const exams = useOfficialExams({ scope: 'whole', education_type: education, weapon_status: weapon });
   const list = (exams.data ?? []).filter((exam) => !exam.subject && exam.weapon_status === weapon && (exam.education_type ?? 'basic') === education).sort(byNewest);
   return <>
-    <PageIntro eyebrow="SINAVA GİR" title={vocabulary.deneme.title}><p>Geçmiş sınavın tamamını gerçek sınav düzeninde ve süreyle çöz. Silahlı sınav 125, silahsız sınav 100 sorudur; sonuçların kaydedilir.</p></PageIntro>
+    <PageIntro eyebrow="SINAVA GİR" title={vocabulary.deneme.title}><p>{vocabulary.deneme.description}</p></PageIntro>
     <nav className="tab-bar" aria-label="Eğitim türü">{([['basic', 'Temel eğitim'], ['renewal', 'Yenileme eğitimi']] as const).map(([value, label]) => <button key={value} type="button" className={`tab-button${education === value ? ' active' : ''}`} aria-pressed={education === value} onClick={() => setParams({ egitim: value, silah: weapon })}>{label}</button>)}</nav>
     <nav className="tab-bar" aria-label="Silah durumu">{([['armed', 'Silahlı sınav'], ['unarmed', 'Silahsız sınav']] as const).map(([value, label]) => <button key={value} type="button" className={`tab-button${weapon === value ? ' active' : ''}`} aria-pressed={weapon === value} onClick={() => setParams({ egitim: education, silah: value })}>{label}</button>)}</nav>
     {exams.isPending ? <Loading /> : exams.isError ? <ErrorNotice error={exams.error} retry={() => { void exams.refetch(); }} /> : list.length === 0 ? <section className="card empty"><h2>Henüz deneme sınavı yok</h2><p>Seçtiğin {education === 'basic' ? 'temel' : 'yenileme'} eğitimi için yayımlanmış sınav olduğunda burada görünür.</p></section>
@@ -120,7 +120,7 @@ export function DersSinavlari() {
   const exams = useOfficialExams({ scope: 'subject', subject_id: selected?.id }, !!selected);
   const list = [...(exams.data ?? [])].sort(byNewest);
   return <>
-    <PageIntro eyebrow="DERS DERS ÇALIŞ" title={vocabulary.ders.title}><p>Bir ders seç ve o dersin geçmiş sınavlardaki sorularını sınav olarak çöz. Her sınav numarasının her dersi ayrı bir sınavdır.</p></PageIntro>
+    <PageIntro eyebrow="DERS DERS ÇALIŞ" title={vocabulary.ders.title}><p>{vocabulary.ders.description}</p></PageIntro>
     {(!!selected && exams.isPending) || subjects.isPending ? <Loading /> : exams.isError || subjects.isError ? <ErrorNotice error={exams.error ?? subjects.error} retry={() => { if (selected) void exams.refetch(); void subjects.refetch(); }} /> : withExams.length === 0 ? <section className="card empty"><h2>Henüz ders sınavı yok</h2><p>Yayımlanmış bir ders sınavı olduğunda burada görünür.</p></section>
       : <>
         <nav className="tab-bar" aria-label="Ders">{withExams.map((subject) => <button key={subject.id} type="button" className={`tab-button${selected?.id === subject.id ? ' active' : ''}`} aria-pressed={selected?.id === subject.id} onClick={() => setParams({ ders: subject.id })}>{subject.name}<small> {subject.published_exam_count}</small></button>)}</nav>

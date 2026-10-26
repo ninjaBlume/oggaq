@@ -42,14 +42,14 @@ export function SessionEvents({ children }: { children: ReactNode }) {
   }, [cache]);
   return children;
 }
-export function AuthFrame({ children }: { children: ReactNode }) {
+export function AuthFrame({ children, showFreeNotice = false }: { children: ReactNode; showFreeNotice?: boolean }) {
   return <main className="auth-layout">
     <section className="auth-story" aria-label={brand.subtitle}>
       <Link to="/" className="brand"><BrandLogo /><span><BrandWordmark /><small>{brand.subtitle}</small></span></Link>
       <div className="auth-story-copy"><h1>{brand.tagline}</h1><p>Deneme ve ders sınavlarını süreyle çöz; sonuçlarını ve tekrar listelerini hesabından takip et.</p></div>
       <div className="auth-features"><span><Icon name="book" />Deneme ve ders sınavları</span><span><Icon name="chart" />Sonuçlar ve gelişim</span></div>
     </section>
-    <section className="auth-content"><div className="auth-card">{children}</div><p className="auth-free"><Icon name="cap" size={18} />Öğrenciler için ücretsiz.</p><LegalLinks /><p className="legal-official">{notOfficialNotice}</p></section>
+    <section className="auth-content"><div className="auth-card">{children}</div>{showFreeNotice && <p className="auth-free"><Icon name="cap" size={18} />Öğrenciler için ücretsiz.</p>}<LegalLinks /><p className="legal-official">{notOfficialNotice}</p></section>
     <div className="auth-appearance"><ThemeSwitch /></div>
   </main>;
 }
@@ -75,7 +75,7 @@ export function Login() {
   const fieldError = (field: string) => mutation.error instanceof ApiError ? mutation.error.field(field) : undefined;
   function changeMode(next: typeof mode) { setMode(next); setMessage(''); setPassword(''); setConfirmation(''); mutation.reset(); }
   function submit(event: FormEvent) { event.preventDefault(); mutation.mutate(); }
-  return <AuthFrame><div className="auth-heading"><h2>{mode === 'register' ? 'Hesap oluştur' : mode === 'forgot' ? 'Parolanı yenile' : 'Hoş geldin'}</h2><p className="muted">{mode === 'login' ? 'Denemelerine ve sonuçlarına ulaş.' : mode === 'register' ? 'Ücretsiz hesabınla sınavlarını ve sonuçlarını takip et.' : 'E-posta adresine parola yenileme bağlantısı gönderelim.'}</p></div>{message && <p role="status" className="notice success">{message}</p>}{mutation.isError && <ErrorNotice error={mutation.error} />}<form onSubmit={submit}><fieldset disabled={mutation.isPending}>
+  return <AuthFrame showFreeNotice={mode === 'login'}><div className="auth-heading"><h2>{mode === 'register' ? 'Hesap oluştur' : mode === 'forgot' ? 'Parolanı yenile' : 'Hoş geldin'}</h2><p className="muted">{mode === 'login' ? 'Denemelerine ve sonuçlarına ulaş.' : mode === 'register' ? 'Hesabınla sınavlarını ve sonuçlarını takip et.' : 'E-posta adresine parola yenileme bağlantısı gönderelim.'}</p></div>{message && <p role="status" className="notice success">{message}</p>}{mutation.isError && <ErrorNotice error={mutation.error} />}<form onSubmit={submit}><fieldset disabled={mutation.isPending}>
     {mode === 'register' && <Field label="Ad soyad" error={fieldError('name')}>{(props) => <input {...props} required maxLength={100} autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} />}</Field>}
     <Field label="E-posta adresi" error={fieldError('email')}>{(props) => <div className="input-shell"><Icon name="mail" /><input {...props} required type="email" autoComplete="username" placeholder="ornek@eposta.com" value={email} onChange={(event) => setEmail(event.target.value)} /></div>}</Field>
     {mode !== 'forgot' && <PasswordField key={`${mode}-password`} value={password} onChange={setPassword} newPassword={mode === 'register'} error={fieldError('password')} hint={mode === 'register' ? 'En az 12 karakter; büyük/küçük harf, rakam ve sembol.' : undefined} labelAction={mode === 'login' ? <button className="text-button" type="button" onClick={() => changeMode('forgot')}>Parolamı unuttum</button> : undefined} />}

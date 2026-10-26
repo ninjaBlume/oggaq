@@ -89,8 +89,8 @@ export const deleteAccountConfirmation = 'HESABIMI SİL';
 // tight places. Nothing else names these places.
 export const vocabulary = {
   home: { title: 'Ana sayfa', short: 'Ana sayfa' },
-  deneme: { title: 'Deneme sınavları', short: 'Deneme' },
-  ders: { title: 'Ders sınavları', short: 'Ders' },
+  deneme: { title: 'Deneme sınavları', short: 'Deneme', description: 'Geçmiş ÖGG sınavlarında çıkmış soruları özgün sırasıyla çöz. Silahlı sınav 125, silahsız sınav 100 sorudur.' },
+  ders: { title: 'Ders sınavları', short: 'Ders', description: 'Çıkmış ÖGG sorularını derslerine göre çöz. Bir ders seçerek ilgili sınavlara ulaş.' },
   results: { title: 'Sonuçlarım', short: 'Sonuçlar' },
   review: { title: 'Tekrar sınavı', short: 'Tekrar' },
   stats: { title: 'Başarı durumum', short: 'Başarım' },

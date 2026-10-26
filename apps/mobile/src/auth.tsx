@@ -99,7 +99,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
   const description = mode === "login"
     ? "Denemelerine ve sonuçlarına ulaş."
     : mode === "register"
-      ? "Ücretsiz hesabınla sınavlarını ve sonuçlarını takip et."
+      ? "Hesabınla sınavlarını ve sonuçlarını takip et."
       : "E-posta adresine parola yenileme bağlantısı gönderelim.";
   return (
     <View style={{ width: "100%", maxWidth: 480, alignSelf: "center", gap: 20, paddingTop: 12 }}>
@@ -173,10 +173,10 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
             </TextLink>
           </View>
         )}
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7 }}>
+        {mode === "login" && <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7 }}>
           <GraduationCap size={17} color={palette.muted} />
           <Text style={styles.muted}>Öğrenciler için ücretsiz.</Text>
-        </View>
+        </View>}
         <AuthLegal register={mode === "register"} />
       </View>
     </View>

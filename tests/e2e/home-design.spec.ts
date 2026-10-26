@@ -14,7 +14,7 @@ async function login(page: Page) {
  await expect(page.getByText("Merhaba, E2E.",{exact:true})).toBeVisible();
 }
 for (const colorScheme of ["light","dark"] as const) {
- test(`ana sayfa: gerçek özet, ücretsiz araçlar ve ${colorScheme} telefon/tablet düzeni`,async({page}) => {
+ test(`ana sayfa: gerçek özet, çıkmış sorular ve ${colorScheme} telefon/tablet düzeni`,async({page}) => {
   await page.emulateMedia({colorScheme});
   const response = page.waitForResponse(r => new URL(r.url()).pathname.endsWith("/stats"));
   await login(page);
@@ -22,7 +22,7 @@ for (const colorScheme of ["light","dark"] as const) {
   const summary = page.getByTestId("home-summary");
   await expect(summary.getByLabel(`Değerlendirilen soru: ${data.answers.total.toLocaleString("tr-TR")}`,{exact:true})).toBeVisible();
   await expect(summary.getByLabel(`Tamamlanan sınav: ${data.exams.completed.toLocaleString("tr-TR")}`,{exact:true})).toBeVisible();
-  await expect(page.getByText("Tamamen ücretsiz",{exact:true})).toBeVisible();
+  await expect(page.getByText("Çıkmış sorular",{exact:true})).toBeVisible();
   await expect(page.getByText(/\bPRO\b|premium|abonelik|yükselt|₺/i)).toHaveCount(0);
   for (const name of ["Ders sınavları ekranını aç","Deneme sınavları ekranını aç","Tekrar sınavı ekranını aç","Sonuçlarım ekranını aç","Başarı durumum ekranını aç"]) {
    await expect(page.getByRole("button",{name,exact:true})).toBeEnabled();
