@@ -4,6 +4,8 @@
 
 ## Öğrencinin süre tercihi — 26 Ekim 2026
 
+Web/API ve süre sonlandırma servisleri `351697e` ile canlıya alındı; Expo kaynakları aynı depodadır. Yerel ortak DB henüz migration içermeyebilir; aşağıdaki uyumluluk sınırı bu ortam içindir. Yayın/doğrulama kanıtı [TESTING](TESTING.md) içinde.
+
 Deneme ve Ders sınavı başlatılırken öğrenci `Çıkınca süre devam etsin` (`continuous`) veya `Çıkınca süre dursun` (`pause_on_exit`) seçer. Tercih denemeye sabitlenir; aynı işlem kimliğiyle başka tercih 409 döndürür. Eski kayıtlar/istemciler `continuous` kalır. Kayıtlı cevap kilidi, soru konumu ve puanlama değişmez.
 
 `POST .../exam-attempts/{exam}/timer` `{action: resume|pause|heartbeat, session_id: UUID}` alır; süre ve ara uzunluğunu istemci belirleyemez. Her işlem aktif hesap/bağlam sahipliğiyle doğrulanır ve aynı deneme satırı kilitlenir. İlk duraklatılabilir kayıt ekran açılana kadar duraktır. `resume`, bir ekran oturumunu yetkili yapar; eski ekranın pause/heartbeat/cevap/bitirme isteği başka ekranın süresini değiştiremez. Cevap ve bitirme yazıları o ekranın `timer_session_id` alanını taşır. Normal ayrılma/arka plan/sekme kapanışında pause, dönüşte resume gönderilir. Kontrol yazıları sırayla yürütülür; her resume yeni ekran oturumu kullanır, gecikmiş eski pause reddedilir.
