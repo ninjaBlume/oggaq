@@ -73,6 +73,7 @@ export function MainHeader({
   const layout = useLayout();
   return (
     <View
+      testID="main-header"
       style={[
         navStyles.header,
         { maxWidth: layout.maxWidth, paddingHorizontal: layout.gutter },
@@ -100,14 +101,16 @@ export function MainHeader({
         accessibilityRole="button"
         accessibilityLabel={`${brand.name} ana sayfa`}
         onPress={() => { Keyboard.dismiss(); home(); }}
-        style={({ pressed }) => [navStyles.brand, { minHeight: 44 }, pressed && navStyles.pressed]}
+        style={({ pressed }) => [navStyles.brand, { minHeight: 44, minWidth: 0, justifyContent: "center" }, pressed && navStyles.pressed]}
       >
-        <BrandLogo size={40} />
-        <View style={{ flex: 1, gap: 2 }}>
-          <BrandWordmark style={navStyles.wordmark} />
-          <Text numberOfLines={1} style={navStyles.contextLabel}>
-            {context.kind === "personal" ? brand.subtitle : context.name}
-          </Text>
+        <View testID="header-brand-content" style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, flexShrink: 1, maxWidth: "100%" }}>
+          <BrandLogo size={40} />
+          <View style={{ flexShrink: 1, minWidth: 0, gap: 0, alignItems: "center" }}>
+            <BrandWordmark style={[navStyles.wordmark, { textAlign: "center" }]} />
+            <Text numberOfLines={1} style={[navStyles.contextLabel, { textAlign: "center" }]}>
+              {context.kind === "personal" ? brand.subtitle : context.name}
+            </Text>
+          </View>
         </View>
       </Pressable>
       <Pressable

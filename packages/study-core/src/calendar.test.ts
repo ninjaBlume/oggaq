@@ -4,6 +4,7 @@ describe('exam calendar presentation', () => {
   it('uses the Turkish day across UTC midnight and never invents a time', () => {
     expect(calendarToday(new Date('2026-12-26T21:30:00Z'))).toBe('2026-12-27');
     expect(calendarDate('2026-12-27')).toBe('27 Aralık 2026 Pazar');
+    expect(calendarDate('2026-12-27', false)).toBe('27 Aralık 2026');
     expect(calendarPhase('2026-12-27', '2026-12-26')).toBe('Yaklaşan sınav');
     expect(calendarPhase('2026-12-27', '2026-12-27')).toBe('Bugün');
     expect(calendarPhase('2026-12-27', '2026-12-28')).toBe('Sınav tarihi geçti');

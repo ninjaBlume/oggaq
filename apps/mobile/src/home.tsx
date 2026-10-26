@@ -93,10 +93,9 @@ export function Home({
         <Text style={styles.muted}>Bir sınav seç, kaldığın yerden devam et.</Text>
       </View>
 
-      <UpcomingExamCard open={calendar} />
-
       <View style={{ flexDirection: layout.columns === 2 ? "row" : "column", gap: 20 }}>
-      <View testID="home-focus" style={{ flex: layout.columns === 2 ? 2 : undefined, backgroundColor: palette.navy, borderRadius: shape.large, padding: layout.cardPadding + 2, gap: 12, overflow: "hidden" }}>
+      <View style={{ flex: layout.columns === 2 ? 2 : undefined, gap: 12 }}>
+      <View testID="home-focus" style={{ backgroundColor: palette.navy, borderRadius: shape.large, padding: layout.cardPadding + 2, gap: 12, overflow: "hidden" }}>
         <View pointerEvents="none" accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"
           style={{ position: "absolute", width: 210, height: 280, right: -120, top: -70, borderRadius: shape.extraLarge, backgroundColor: palette.primary, opacity: 0.24, transform: [{ rotate: "-18deg" }] }} />
         <View pointerEvents="none" accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"
@@ -136,8 +135,10 @@ export function Home({
           <Text accessibilityLiveRegion="polite" style={{ color: palette.onNavyMuted, fontSize: 12, lineHeight: 18 }}>Devam eden sınavların kontrol ediliyor…</Text>
         ) : null}
       </View>
+      <UpcomingExamCard open={calendar} />
+      </View>
 
-      <View testID="home-summary" style={{ flex: layout.columns === 2 ? 1 : undefined, justifyContent: "space-between", gap: 12 }}>
+      <View testID="home-summary" style={{ flex: layout.columns === 2 ? 1 : undefined, justifyContent: "flex-start", gap: 12 }}>
         <View style={styles.between}>
           <Text style={{ color: palette.ink, fontSize: 14, fontWeight: "600" }}>Genel durumun</Text>
           <TextLink onPress={stats}>Detayları gör</TextLink>

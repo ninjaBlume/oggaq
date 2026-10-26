@@ -285,4 +285,4 @@ Cevap yazmaları küçük kanonik seçim yanıtını kullanır; aynı sabit soru
 
 Yan menüde Sınav takvimi vardır; beş ana sekmenin sırası korunur, İş İlanları en altta kalır. Yıl seçimi, Temel/Yenileme çiftleri, eğitim bitişi, resmî kaynak bağlantısı ve güncel/eski/hazır değil durumları gerçek Calendar API'sine bağlıdır. API veriyi saklanan snapshot'tan okur; mobil cihazda kazıma veya zamanlayıcı yoktur. [Takvim işletimi](EXAM_CALENDAR.md).
 
-Ana sayfada karşılama metninin hemen altında Sıradaki sınav kartı vardır. Kalan gün sunucudan gelir; tarih/Temel/Yenileme numaraları ve günlük sayaç tek kartta, geniş yazı boyutunda akışla büyür. Kart takvimin ilgili yılını açar. Ziyaret edilmiş ana sayfa arka planda tutulsa bile bu takvim kartı yalnız aktif/ön planda yenilenir.
+Ana sayfada Sınava hazırlık kartının hemen altında Sıradaki sınav kartı vardır. Kalan gün sunucudan gelir; tarih/Temel/Yenileme numaraları ve günlük sayaç tek kartta, geniş yazı boyutunda akışla büyür. Kart takvimin ilgili yılını açar. Ziyaret edilmiş ana sayfa arka planda tutulsa bile bu takvim kartı yalnız aktif/ön planda yenilenir.

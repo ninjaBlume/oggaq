@@ -71,6 +71,8 @@ Kurallar: okuma sütunu (soru, form) 720 pikseli geçmez; satır uzunluğu yakla
 
 Web ve yönetim paneli aynı sınıfları kullanır: telefonda üst gezinme kaydırılır, tablette içerik ortalanır ve iki sütuna geçer, masaüstünde yönetim paneli yan menülüdür.
 
+Üst başlıkta logo ve ÖGG SOR/alt başlık grubu eşit 44 px yan düğmelerin arasında ortalanır. Grup tek dokunma alanıyla ana sayfaya döner; uzun kurum adı ve büyük yazı boyutunda yan düğmelerin üzerine taşmaz. Mobil ana sayfada Sınava hazırlık ve altında kompakt Sıradaki sınav kartı birlikte bir sütundur; tablette kişisel özet bu sütunun yanındadır.
+
 ## 6. Kalıplar
 
 25 Ekim 2026 ana sayfa örneği: kullanıcı referanslarından bölümleme, belirgin başlangıç alanı, küçük kişisel özet ve ikonlu liste satırları alındı. ÖGG SOR mavi/lacivert paletiyle özgün bir düzen kullanılır. Üstte gerçek aktif denemeye devam veya sınav seçimine geçiş; altında aynı Stats API'den değerlendirilen soru, doğruluk ve biten sınav sayıları; Hızlı başla/Çalışmaların grupları ve son denemeler vardır. Ders seçimi ayrı Ders sınavları ekranındadır. 840 px'den geniş pencerede başlangıç/özet ve araç grupları yan yana gelir. Ana başlangıç alanı 24 px köşelidir. Kullanıcının küçük bir yakınlaştırma isteğiyle özet göstergeleri üç ayrı kompakt kutuda, araç/geçmiş satırları başlıkları altında 10 px aralıklı, ince çerçeveli 16 px kutularda gösterilir. İkon zeminleri ana sayfa satırında 38 px, sınav listesinde 34 px boyutundadır; mavi vurgu ölçülü tutulur. İlk veri istekleri ekranı bütünüyle kapatmaz, yenilemede hazır içerik korunur. Varsayımsal günlük hedef, seri, haftalık grafik, sınav takvimi veya abonelik verisi üretilmez. Bu teslim yalnız mobil ana sayfadır; diğer ekranların görsel yenilemesi ayrı değerlendirilecektir.

@@ -4,7 +4,7 @@ import { mobilePreviewUrl } from "../../playwright.config";
 import { fixture } from "./student";
 
 test.use({baseURL:mobilePreviewUrl, viewport:{width:390,height:844}});
-test.beforeEach(() => {fixture("setup-study"); fixture("official-exam"); fixture("subject-exam");});
+test.beforeEach(() => {fixture("setup-study"); fixture("official-exam"); fixture("subject-exam");fixture("upcoming-calendar");});
 test.afterAll(() => fixture("cleanup"));
 async function login(page: Page) {
  await page.goto("/");
@@ -63,6 +63,9 @@ test("özet isteği yavaş veya hatalıyken ana eylem açık kalır; büyük yaz
   await login(page);
   await expect(page.getByTestId("home-focus").getByRole("button",{name:"Sınava gir",exact:true})).toBeEnabled();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  const header=await page.getByTestId("main-header").boundingBox();const brand=await page.getByTestId("header-brand-content").boundingBox();
+  expect(Math.abs((brand!.x+brand!.width/2)-(header!.x+header!.width/2))).toBeLessThanOrEqual(1);
+  await expect(page.getByTestId("upcoming-exam")).toContainText("gün kaldı");
  } finally {release();}
  await expect(page.getByRole("alert")).toContainText("Özet bilgilerin yüklenemedi");
  await expect(page.getByTestId("home-summary").getByText("—",{exact:true})).toHaveCount(3);
