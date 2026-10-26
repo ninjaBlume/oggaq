@@ -34,6 +34,10 @@
   --c-on-navy-muted: #C8D9F1;
   --c-accent: #D6A64F;
   --c-scrim: rgba(20, 45, 80, 0.48);
+  --card-padding-y: 11px;
+  --card-padding-y-wide: 17px;
+  --card-gap: 10px;
+  --card-icon-size: 34px;
   --radius-s: 8px;
   --radius-m: 16px;
   --radius-l: 24px;

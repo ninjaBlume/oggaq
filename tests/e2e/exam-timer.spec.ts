@@ -15,7 +15,7 @@ for (const platform of ['web','mobile'] as const) {
       else await page.getByRole('tab',{name:kind === 'deneme' ? 'Deneme':'Ders',exact:true}).click();
       await page.getByRole('button',{name:'Sınava gir',exact:true}).click();
       if (platform === 'web') await page.getByLabel('Uygulamadan ayrılınca',{exact:true}).selectOption(pause ? 'pause_on_exit':'continuous');
-      else await page.getByRole('button',{name:pause ? 'Çıkınca süre dursun':'Çıkınca süre devam etsin',exact:true}).click();
+      else await page.getByRole('button',{name:pause ? 'Çıkınca süre dursun':'Süre devam etsin',exact:true}).click();
       const started=page.waitForResponse(r=>r.request().method()==='POST'&&/\/exam-attempts$/.test(new URL(r.url()).pathname));
       await page.getByRole('button',{name:'Sınavı başlat',exact:true}).click();
       const response=await started;const exam=(await response.json()).data;

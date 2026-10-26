@@ -1,5 +1,12 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, kısa süre etiketi ve kompakt kartlar
+
+- Ortak süre tercihi etiketi `Süre devam etsin` oldu; Deneme ve Ders web/mobil başlangıçları aynı kaynağı kullanır. `continuous` API değeri ve sayaç davranışı değişmedi. Mevcut mobil E2E seçicisi yeni görünen etikete güncellendi.
+- Dikey iç boşluk, kart aralıkları ve ikon ölçüleri ortak `cardDensity` değerlerinden yönetilir. Renkli kartlar telefonda 11 px/tablette 17 px dikey boşluk; sınav listesi ikonları 34 px kullanır. Ana sayfa satırları ve sonuç kartları da daraltıldı. Yazı boyutları, 44 px asgari dokunma hedefleri ve otomatik büyüyen metin düzeni korunur; sabit kart yüksekliği eklenmedi. Soru okuma yüzeylerine genel yoğunluk kuralı uygulanmadı.
+- **97 token/kontrast + 36 study-core + 10 web + 42 mobil test**, strict TypeScript, üretim web build ve iOS/Android/web Expo export geçti. **10 mevcut E2E tek koşumda geçti**: açık/koyu web/mobil 320–1280 px yerleşim (4), iki platformda Deneme/Ders süre duraklama/devam ve sürekli süre (6). Telefon ekran görüntülerinde sınav ve ana sayfa kartları gözle incelendi. Geçici QA konfigürasyonu 90 saniye test/30 saniye beklenti kullandı; normal timeout değerleri değişmedi. Koşum 41,2 saniyede tamamlandı.
+- Başka test süreçleri ve portlar önceden kontrol edildi. Yalnız `oggaq_test`, mobil 5186 kullanıldı; ortak geliştirme servisleri ve yerel içerik DB'si/hesaplara dokunulmadı. Backend/SQL değişmediğinden PHPUnit/API matrisi yeniden çalıştırılmadı; fiziksel iOS/Android bu teslimde denenmedi. Kanıtlar `artifacts/compact-cards/` içindedir. Git push yapılmadı.
+
 ## Güncel doğrulama — 26 Ekim 2026, diğer öğrenci sayfalarının kartları
 
 - Merkezi mavi/indigo/kum aileleri sonuç listesi/özeti, ders başarı kartları, tekrar, puan hesaplama/geçmiş, profil/hesap, yasal bağlantı ve iş ilanı/başvuru kartlarına taşındı. Mobil `Card` isteğe bağlı `tone` alır; varsayılan okuma/soru yüzeyi korunur. Boş durum kartları da mavi aileyi kullanır. Hesap silme ve doğru/yanlış geri bildiriminin anlam renkleri değişmedi; yeni API, veri yazısı, animasyon veya bağımlılık eklenmedi.

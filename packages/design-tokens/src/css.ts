@@ -1,4 +1,4 @@
-import { colorRoles, darkPalette, lightPalette, shape } from './index.ts';
+import { colorRoles, darkPalette, lightPalette, shape, cardDensity } from './index.ts';
 import type { Palette } from './index.ts';
 
 const name = (role: string) => `--c-${role.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`;
@@ -9,6 +9,10 @@ export function cssTokens() {
 :root {
   color-scheme: light;
 ${declarations(lightPalette, '  ')}
+  --card-padding-y: ${cardDensity.paddingY}px;
+  --card-padding-y-wide: ${cardDensity.paddingYWide}px;
+  --card-gap: ${cardDensity.gap}px;
+  --card-icon-size: ${cardDensity.iconSize}px;
   --radius-s: ${shape.small}px;
   --radius-m: ${shape.medium}px;
   --radius-l: ${shape.large}px;

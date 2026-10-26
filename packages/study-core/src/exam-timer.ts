@@ -1,6 +1,6 @@
 import type { ExamAttempt, ExamSummary } from '@oggaq/shared-types';
 export const examTimerChoices = [
-  { value: 'continuous', label: 'Çıkınca süre devam etsin' },
+  { value: 'continuous', label: 'Süre devam etsin' },
   { value: 'pause_on_exit', label: 'Çıkınca süre dursun' },
 ] as const;
 export type ExamTimerPolicy = typeof examTimerChoices[number]['value'];

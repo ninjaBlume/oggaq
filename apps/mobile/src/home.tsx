@@ -16,7 +16,7 @@ import {
 import type { StudyContext, User } from "@oggaq/shared-types";
 import { ExpressivePressable } from "./expressive";
 import { examDisplayTitle, vocabulary } from "@oggaq/study-core";
-import { cardTone, type CardTone } from "@oggaq/design-tokens";
+import { cardDensity, cardTone, type CardTone } from "@oggaq/design-tokens";
 import { scoreTone, shape } from "./theme";
 import { api } from "./api";
 import { useResource, useOnReturn } from "./hooks";
@@ -91,7 +91,7 @@ export function Home({
       </View>
 
       <View style={{ flexDirection: layout.columns === 2 ? "row" : "column", gap: 20 }}>
-      <View testID="home-focus" style={{ flex: layout.columns === 2 ? 2 : undefined, backgroundColor: palette.navy, borderRadius: shape.large, padding: layout.cardPadding + 4, gap: 14, overflow: "hidden" }}>
+      <View testID="home-focus" style={{ flex: layout.columns === 2 ? 2 : undefined, backgroundColor: palette.navy, borderRadius: shape.large, padding: layout.cardPadding + 2, gap: 12, overflow: "hidden" }}>
         <View pointerEvents="none" accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"
           style={{ position: "absolute", width: 210, height: 280, right: -120, top: -70, borderRadius: shape.extraLarge, backgroundColor: palette.primary, opacity: 0.24, transform: [{ rotate: "-18deg" }] }} />
         <View pointerEvents="none" accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"
@@ -223,12 +223,12 @@ function HomeRow({ icon: Icon, title, description, accessibilityLabel, onPress, 
   const { palette } = useTheme();
   const tint = tone ? cardTone(palette, tone) : null;
   return <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? `${title} ekranını aç`} onPress={onPress}
-    style={({ pressed }) => ({ minHeight: 76, padding: 14, flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: pressed ? (tint?.iconSurface ?? palette.softPrimary) : (tint?.surface ?? palette.surface),
+    style={({ pressed }) => ({ minHeight: 66, paddingHorizontal: 14, paddingVertical: cardDensity.paddingY, flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: pressed ? (tint?.iconSurface ?? palette.softPrimary) : (tint?.surface ?? palette.surface),
       borderWidth: 1, borderColor: tint?.line ?? palette.line, borderRadius: shape.control })}>
-    <View style={{ width: 44, height: 44, borderRadius: shape.control, alignItems: "center", justifyContent: "center", backgroundColor: tint?.iconSurface ?? palette.softPrimary }}>
+    <View style={{ width: 38, height: 38, borderRadius: shape.control, alignItems: "center", justifyContent: "center", backgroundColor: tint?.iconSurface ?? palette.softPrimary }}>
       <Icon size={21} color={tint?.accent ?? palette.primary} strokeWidth={1.8} />
     </View>
-    <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
+    <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
       <Text style={{ color: palette.ink, fontSize: 15, lineHeight: 22, fontWeight: "600" }}>{title}</Text>
       {description && <Text style={{ color: palette.muted, fontSize: 13, lineHeight: 20 }}>{description}</Text>}
       {badge}

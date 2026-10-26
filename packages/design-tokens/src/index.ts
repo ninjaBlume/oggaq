@@ -54,6 +54,9 @@ export const shape = { small: 8, medium: 16, large: 24, extraLarge: 32, full: 99
 // Spacing in px. Phones keep content close to the screen edges; larger windows get more air and a reading width.
 export const space = { gutterCompact: 14, gutterMedium: 24, gutterExpanded: 32, cardPadding: 14, cardPaddingWide: 20, gap: 12 } as const;
 
+// Card spacing is independent of text size and minimum touch targets.
+export const cardDensity = { paddingY: 11, paddingYWide: 17, gap: 10, rowGap: 8, iconSize: 34 } as const;
+
 // Window size classes (Material window size classes, in px): compact is a phone, medium a small tablet / foldable,
 // expanded a large tablet or desktop.
 export const breakpoints = { medium: 600, expanded: 840 } as const;

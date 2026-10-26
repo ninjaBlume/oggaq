@@ -166,7 +166,7 @@ small {
 .card-tone-blue { --card-surface:var(--c-soft-primary); --card-line:var(--c-primary-container); --card-accent:var(--c-primary) }
 .card-tone-indigo { --card-surface:var(--c-card-indigo-surface); --card-line:var(--c-card-indigo-line); --card-accent:var(--c-card-indigo-accent) }
 .card-tone-sand { --card-surface:var(--c-card-sand-surface); --card-line:var(--c-card-sand-line); --card-accent:var(--c-card-sand-accent) }
-.card[class*="card-tone-"] { background:var(--card-surface); border-color:var(--card-line) }
+.card[class*="card-tone-"] { background:var(--card-surface); border-color:var(--card-line); padding-block:var(--card-padding-y) }
 .card[class*="card-tone-"] .exam-mark { background:var(--card-line); color:var(--card-accent) }
 .card[class*="card-tone-"] .eyebrow { color:var(--card-accent) }
 .notice {
@@ -1065,9 +1065,9 @@ input::placeholder { color:var(--c-muted); opacity:1 }
 .sinav-row {
   display:grid;
   grid-template-columns:minmax(0,1fr);
-  gap:8px 18px;
+  gap:6px 18px;
   align-items:center;
-  padding:14px 16px
+  padding:11px 14px
 }
 .sinav-main h2 {
   margin:0 0 4px;
@@ -1206,7 +1206,7 @@ input::placeholder { color:var(--c-muted); opacity:1 }
   }
   .sinav-row {
     grid-template-columns:minmax(0,1fr) auto;
-    padding:18px 22px
+    padding:17px 20px
   }
   .sinav-action .button {
     width:auto
@@ -1312,9 +1312,9 @@ input::placeholder { color:var(--c-muted); opacity:1 }
 .page-intro .eyebrow { letter-spacing:1.6px; margin-bottom:10px; font-size:11px }
 .page-intro p { margin-top:12px; line-height:1.6 }
 .history-row { border-radius:24px }
-.sinav-title { display:flex; align-items:center; gap:12px; margin-bottom:12px }
+.sinav-title { display:flex; align-items:center; gap:10px; margin-bottom:6px }
 .sinav-title h2 { margin:0; font-weight:700; overflow-wrap:anywhere }
-.exam-mark { width:42px; height:42px; display:grid; place-items:center; flex-shrink:0; border-radius:14px; background:var(--c-soft-primary); color:var(--c-primary) }
+.exam-mark { width:var(--card-icon-size); height:var(--card-icon-size); display:grid; place-items:center; flex-shrink:0; border-radius:14px; background:var(--c-soft-primary); color:var(--c-primary) }
 .tab-bar { gap:4px }
 .tab-button { min-height:44px; border-radius:8px; border-color:transparent; background:var(--c-secondary-container); color:var(--c-on-secondary-container); font-size:14px }
 .tab-button:first-child { border-top-left-radius:24px; border-bottom-left-radius:24px }
@@ -1335,14 +1335,14 @@ input::placeholder { color:var(--c-muted); opacity:1 }
   .site-header .brand { font-size:20px }
   .user-menu { gap:10px; width:100%; justify-content:space-between }
   .page-intro h1 { font-size:26px; line-height:33px }
-  .sinav-row { padding:16px }
-  .sinav-action { margin-top:6px }
+  .sinav-row { padding:11px 14px }
+  .sinav-action { margin-top:0 }
 }
 @media(prefers-reduced-motion:reduce) { .button { transition:none } }
 
 /* Jobs share the student card and form system; listing text remains plain and readable. */
 .job-grid { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; margin:20px 0 }
-.job-card { display:flex; flex-direction:column; align-items:flex-start; gap:12px; min-width:0; overflow-wrap:anywhere }
+.job-card { display:flex; flex-direction:column; align-items:flex-start; gap:var(--card-gap); min-width:0; overflow-wrap:anywhere }
 .job-card h2 { font-size:21px; line-height:28px }
 .job-card .button { margin-top:auto; width:100% }
 .job-detail { max-width:720px; display:grid; gap:18px; margin-top:18px; overflow-wrap:anywhere }
@@ -1369,7 +1369,7 @@ input::placeholder { color:var(--c-muted); opacity:1 }
 .result-actions .report-state,.result-actions .report-form { width:100% }
 
 /* Backend-driven scoring. Sliders are native HTML range controls with keyboard support. */
-.score-settings,.score-inputs,.score-breakdown { display:grid;gap:20px;min-width:0; }
+.score-settings,.score-inputs,.score-breakdown { display:grid;gap:16px;min-width:0; }
 .score-settings { margin-bottom:24px; }
 .score-selectors { display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr)); }
 .score-selectors label,.score-controls>label { display:grid;gap:8px;font-weight:650;min-width:0; }
@@ -1419,3 +1419,5 @@ input::placeholder { color:var(--c-muted); opacity:1 }
 
 /* Keep the hover affordance visible on tinted result links. */
 .card.history-row:hover { border-color:var(--c-primary) }
+
+@media(min-width:600px) { .card[class*="card-tone-"] { padding-block:var(--card-padding-y-wide) } }

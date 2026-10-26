@@ -1,5 +1,5 @@
 import { Text } from "./text";
-import { cardTone } from "@oggaq/design-tokens";
+import { cardDensity, cardTone } from "@oggaq/design-tokens";
 import { CatalogCache } from "./catalog-cache";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, View } from "react-native";
@@ -108,9 +108,9 @@ function ExamEntry({
   const locked = task.pending || (submission.current !== null && !(task.error instanceof ApiError && ([409, 422].includes(task.error.status) || task.error.problem.code === 'timer_unavailable')));
   const valid = Number(minutes) >= 1 && Number(minutes) <= 180;
   return (
-    <View style={{ padding: 14, gap: 10, borderRadius: shape.large, backgroundColor: tint.surface, borderWidth: 1, borderColor: progress.open && !expired ? palette.primary : tint.line }}>
+    <View style={{ paddingHorizontal: 14, paddingVertical: cardDensity.paddingY, gap: cardDensity.rowGap, borderRadius: shape.large, backgroundColor: tint.surface, borderWidth: 1, borderColor: progress.open && !expired ? palette.primary : tint.line }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-        <View style={{ width: 40, height: 40, borderRadius: shape.control, alignItems: "center", justifyContent: "center", backgroundColor: tint.iconSurface }}>
+        <View style={{ width: cardDensity.iconSize, height: cardDensity.iconSize, borderRadius: shape.control, alignItems: "center", justifyContent: "center", backgroundColor: tint.iconSurface }}>
           <BookOpen size={21} color={tint.accent} />
         </View>
         <Text accessibilityRole="header" style={[styles.heading, { flex: 1, fontSize: 17, lineHeight: 24 }]}>{title}</Text>
@@ -329,12 +329,12 @@ function ResultCard({ attempt: e, open }: { attempt: Summary; open: () => void }
       accessibilityLabel={live ? "Sınava dön" : `${title} sonucunu incele`}
       onPress={open}
       style={({ pressed }) => [
-        { backgroundColor: tint.surface, borderWidth: 1, borderColor: tint.line, borderRadius: 24, padding: layout.cardPadding, gap: 14 },
+        { backgroundColor: tint.surface, borderWidth: 1, borderColor: tint.line, borderRadius: 24, paddingHorizontal: layout.cardPadding, paddingVertical: layout.cls === "compact" ? cardDensity.paddingY : cardDensity.paddingYWide, gap: cardDensity.gap },
         pressed && { borderColor: palette.primary },
       ]}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
-        <View style={{ minWidth: 76, height: 68, paddingHorizontal: 6, borderRadius: 20, alignItems: "center", justifyContent: "center", backgroundColor: tone.backgroundColor }}>
+        <View style={{ minWidth: 76, height: 60, paddingHorizontal: 6, borderRadius: 20, alignItems: "center", justifyContent: "center", backgroundColor: tone.backgroundColor }}>
           {result ? (
             <Text numberOfLines={1} style={{ fontSize: 20, lineHeight: 26, fontWeight: "800", color: tone.color }}>{percent(result.score_percent)}</Text>
           ) : (
