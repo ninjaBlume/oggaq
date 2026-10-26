@@ -17,6 +17,7 @@ for (const mobile of [false, true]) {
    await page.getByRole('button', {name:'Giriş yap',exact:true}).click();
    if (mobile) await page.getByRole('tab',{name:'Deneme',exact:true}).click();
    await expect(page.getByRole('heading',{name:'Deneme sınavları',exact:true})).toBeVisible();
+   await expect(page.getByRole('button',{name:/^(Silahlı|Silahsız)$/})).toHaveText(['Silahlı','Silahsız']);
    const basic = page.getByRole('button',{name:mobile ? 'Temel eğitim sınavları' : 'Temel eğitim',exact:true});
    const renewal = page.getByRole('button',{name:mobile ? 'Yenileme eğitimi sınavları' : 'Yenileme eğitimi',exact:true});
    await expect(basic).toHaveAttribute(mobile ? 'aria-selected' : 'aria-pressed','true');
@@ -39,7 +40,7 @@ for (const mobile of [false, true]) {
     const u=new URL(r.url());
     return u.pathname === '/api/v1/official-exams' && u.searchParams.get('education_type') === 'renewal' && u.searchParams.get('weapon_status') === 'unarmed';
    });
-   await page.getByRole('button',{name:mobile ? 'Silahsız sınavlar' : 'Silahsız sınav',exact:true}).click();
+   await page.getByRole('button',{name:'Silahsız',exact:true}).click();
    const unarmed = (await (await unarmedResponse).json()).data;
    expect(unarmed).toHaveLength(1);
    expect(unarmed[0].education_type).toBe('renewal');

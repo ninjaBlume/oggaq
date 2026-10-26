@@ -78,7 +78,7 @@ Web ve mobil **Deneme sınavları** listesinde tam çıkmış sınavlar eğitim 
 - Temel: **122. Temel Eğitim Sınav Soruları**.
 - Yenileme: **98. Yenileme Sınav Soruları**; numara kaydın kendi `exam_number` alanıdır.
 
-Ortak `examQuestionTitle` yordamı `education_type` ve `exam_number` alanlarını kullanır. Temel numarasından yenileme numarası hesaplanmaz. Numarası olmayan kayıtta hayalî yıl/numara eklenmez. Silahlı/silahsız filtreleri aynı eğitim başlığını kullanır; ay/yıl, soru sayısı ve süre bilgisi alt satırda kalır. Ders listesi kendi ders başlıklarını kullanmayı sürdürür. Bu yalnızca liste sunumudur; veritabanındaki yayımlanmış başlıklar/sürümler ve geçmiş deneme kayıtları değiştirilmez.
+Ortak `examQuestionTitle` yordamı `education_type` ve `exam_number` alanlarını kullanır. Temel numarasından yenileme numarası hesaplanmaz. Numarası olmayan kayıtta hayalî yıl/numara eklenmez. **Silahlı** ilk, **Silahsız** ikinci seçenek olarak gösterilir; iki seçenek aynı eğitim başlığını kullanır; ay/yıl, soru sayısı ve süre bilgisi alt satırda kalır. Ders listesi kendi ders başlıklarını kullanmayı sürdürür. Bu yalnızca liste sunumudur; veritabanındaki yayımlanmış başlıklar/sürümler ve geçmiş deneme kayıtları değiştirilmez.
 
 ## Soru bildirimleri
 

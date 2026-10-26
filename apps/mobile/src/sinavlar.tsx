@@ -225,8 +225,8 @@ export function ExamList({
       {kind === "deneme" && (
         <ChoiceGroup
           choices={[
-            { value: "armed", label: "Silahlı sınav", accessibilityLabel: "Silahlı sınavlar" },
-            { value: "unarmed", label: "Silahsız sınav", accessibilityLabel: "Silahsız sınavlar" },
+            { value: "armed", label: "Silahlı", accessibilityLabel: "Silahlı" },
+            { value: "unarmed", label: "Silahsız", accessibilityLabel: "Silahsız" },
           ]}
           value={weapon}
           onChange={setWeapon}

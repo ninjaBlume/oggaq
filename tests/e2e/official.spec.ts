@@ -99,9 +99,9 @@ test("yönetici çıkmış sınavı sıralayıp yayımlar; öğrenci orijinal s�
 
   await student.reload();
   // The exam appears among the armed Deneme sınavları, not among the unarmed ones.
-  await student.getByRole("button", { name: "Silahsız sınav" }).click();
+  await student.getByRole("button", { name: "Silahsız" }).click();
   await expect(student.getByRole("heading", { name: "Henüz deneme sınavı yok" })).toBeVisible();
-  await student.getByRole("button", { name: "Silahlı sınav" }).click();
+  await student.getByRole("button", { name: "Silahlı" }).click();
   const row = student.locator(".sinav-row").filter({ hasText: "1. Temel Eğitim Sınav Soruları" });
   await row.getByRole("button", { name: "Sınava gir", exact: true }).click();
   await row.getByLabel("Süre (dakika)", { exact: true }).fill("5");

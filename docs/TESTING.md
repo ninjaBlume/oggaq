@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, kısa silah seçimi etiketleri
+
+- Kullanıcının son talimatıyla yalnız iki filtre etiketi kısaltıldı: **Silahlı**, ardından **Silahsız**. Mobil erişilebilir adlar aynı metinleri kullanır. Eğitim türü ve 125/100 soruluk sınav akışları korunur.
+- Strict TypeScript, üretim web build ve iOS/Android/web Expo QA export geçti. **9 mevcut E2E 23,1 saniyede başarılı:** web/mobil 320/390/834 px eğitim ayrımı, iki etiketin sırası, silahlı/silahsız 125/100 soru başlatma ve yönetici yayını. İlgili test seçicileri güncellendi; düşük etkili metin değişikliği için yeni birim testi eklenmedi. Backend/API/DB değişmedi; PHPUnit ve tam test matrisi yeniden çalıştırılmadı. Fiziksel cihaz kontrolü yapılmadı.
+- Yalnız ortak `oggaq_test` ve 8001/5183/5184/5186 test portları kullanıldı; kendi test servisleri kapandı. Yerel içerik veritabanı/hesaplar ve diğer geliştirme servisleri korunur. Kanıtlar `artifacts/weapon-labels/` içindedir. Git push yapılmadı.
+
 ## Güncel doğrulama — 26 Ekim 2026, sınav başlıkları ve sunucu yayını
 
 - Kullanıcı sunucu yayın/operasyon sorumluluğunu Codex’e devretti. Önce test edilmiş takvim/kural sayfası `calendar-rules-597f46b` web imajıyla yayımlandı. Yalnız web konteyneri yenilendi; app/worker/scheduler/database/redis/mailpit/tunnel kimlikleri korundu. Origin üzerinde 17 dosya hash’i ve readiness başarılı; `oggsor.com` üzerinden gerçek öğrenciyle 124. Temel takvimi/kurallar ve 390/1280 px düzen doğrulandı. Cloudflare HTML'i değiştirdiği için ilk dış HTML hash kontrolü farklı çıktı; yeni JS/CSS referansları ve dosya hash’leri ayrıca birebir doğrulandı. Sınav/cevap oluşturulmadı, kontrol oturumu kapatıldı.

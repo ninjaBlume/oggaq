@@ -67,9 +67,9 @@ test('öğrenci deneme sınavına girer; cevaplar, sonuç ve geçmiş kalır', a
   mkdirSync('artifacts/web-preview', { recursive: true });
   await page.screenshot({ path: 'artifacts/web-preview/deneme.png', fullPage: true });
   // The fixture exam is an armed exam; the unarmed list is empty.
-  await page.getByRole('button', { name: 'Silahsız sınav' }).click();
+  await page.getByRole('button', { name: 'Silahsız' }).click();
   await expect(page.getByRole('heading', { name: 'Henüz deneme sınavı yok' })).toBeVisible();
-  await page.getByRole('button', { name: 'Silahlı sınav' }).click();
+  await page.getByRole('button', { name: 'Silahlı' }).click();
   await row.getByRole('button', { name: 'Sınava gir', exact: true }).click();
   await expect(row.getByLabel('Süre (dakika)', { exact: true })).toHaveValue('150');
   await row.getByLabel('Süre (dakika)', { exact: true }).fill('5');

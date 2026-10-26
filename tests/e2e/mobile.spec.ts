@@ -525,20 +525,20 @@ test("Expressive düğme ve seçim grupları eylemleri korur ve küçük ekrana 
     page.getByRole("heading", { name: "Deneme sınavları", exact: true }),
   ).toBeVisible();
   await page
-    .getByRole("button", { name: "Silahsız sınavlar", exact: true })
+    .getByRole("button", { name: "Silahsız", exact: true })
     .click();
   await expect(
-    page.getByRole("button", { name: "Silahsız sınavlar", exact: true }),
+    page.getByRole("button", { name: "Silahsız", exact: true }),
   ).toHaveAttribute("aria-selected", "true");
   await expect(
-    page.getByRole("button", { name: "Silahlı sınavlar", exact: true }),
+    page.getByRole("button", { name: "Silahlı", exact: true }),
   ).toHaveAttribute("aria-selected", "false");
   await expect(
     page.getByText("Henüz deneme sınavı yok", { exact: true }),
   ).toBeVisible();
   await page.setViewportSize({ width: 320, height: 844 });
   await expect(
-    page.getByRole("button", { name: "Silahsız sınavlar", exact: true }),
+    page.getByRole("button", { name: "Silahsız", exact: true }),
   ).toBeInViewport();
   expect(
     await page.evaluate(
