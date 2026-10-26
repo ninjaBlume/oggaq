@@ -1,6 +1,6 @@
 # Resmî sınav kaynağı hazırlığı — 26 Ekim 2026
 
-Durum: **76–98. yenileme arşivi ve 122. temel, deneme ve ders sınavlarıyla oggsor.com üzerinde yayında.** 122. temel, kullanıcının açık aktarım talimatıyla ayrıca tamamlandı. Yerel eğitim migration'ı önce ayrı onayla tamamlandı. 98. yenileme aktarımında telefonun API'si olan sunucudaki gerekli migration/kod güncellemesi de kullanıcıya bildirilerek dar kapsamda yapıldı. Normal sunucu operasyonu/backup sorumluluğu Claude'da kalır; deploy ve backup betikleri değiştirilmedi.
+Durum: **76–98. yenileme arşivi ve 122. temel, deneme ve ders sınavlarıyla oggsor.com üzerinde yayında.** 122. temel, kullanıcının açık aktarım talimatıyla ayrıca tamamlandı. Yerel eğitim migration'ı önce ayrı onayla tamamlandı. 98. yenileme aktarımında telefonun API'si olan sunucudaki gerekli migration/kod güncellemesi de kullanıcıya bildirilerek dar kapsamda yapıldı. Sunucu operasyonu/backup sorumluluğu 26 Ekim'de kullanıcının son talimatıyla Codex'e devredildi; önceki aktarımda deploy ve backup betikleri değiştirilmedi.
 
 ## Eski temel arşivindeki eksik içerikler — 26 Ekim 2026
 
