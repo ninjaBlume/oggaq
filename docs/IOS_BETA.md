@@ -1,6 +1,6 @@
 # iPhone ve iPad için kapalı beta
 
-27 Ekim 2026: Uygulamayı App Store'da herkese yayımlamadan telefona kurmak için TestFlight yolu hazırlanıyor. İlk imzalı IPA oluşturuldu; Apple'a yükleme ve TestFlight işlemesi henüz tamamlanmadı. Bu belge indirilebilir beta anlamına gelmez.
+27 Ekim 2026: Uygulamayı App Store'da herkese yayımlamadan telefona kurmak için kişisel TestFlight betası hazır. **0.1.0 (3)** Apple'a yüklendi ve yalnız hesap sahibinin bulunduğu iç grupta **Testing** durumunda doğrulandı. iPhone/iPad'de gerçek kurulum ve kullanım teyidi kullanıcıdan beklenir.
 
 ## Hazır yapılandırma
 
@@ -16,7 +16,9 @@ Kişisel grupta yalnız hesap sahibi vardır (**1 iç tester, 0 dış tester**).
 
 Üçüncü build **`efb17778-7c6e-41ea-b667-a86797ee6264` başarıyla tamamlandı**: sürüm **0.1.0 (3)**, 13.961.187 bayt store IPA. İndirilen gerçek pakette `codesign --verify --deep --strict` geçti; görünen ad, bundle ID, takım, `get-task-allow: false`, `beta-reports-active: true`, iPhone/iPad cihaz aileleri ve iOS 16.4 minimumu doğrulandı. SHA256: `491fb740080fe6ff5250bcbcf193f54746ffac25550a903f73ef4992c6be9ceb`. Paket depo dışında korumalı imzalama klasöründe; kanıt `artifacts/ios-beta/ipa-check.json`. EAS Free planı kullanılır; ücretli plan veya ödeme başlatılmaz.
 
-**Kalan:** Apple'ın ücretsiz Transporter kurulumu App Store hesap onayında bekliyor; kullanıcıdan bu adımı ve Transporter lisansı/girişini kendi ekranında tamamlaması istendi. Paket App Store Connect'e henüz yüklenmedi; iç test grubunda son kontrolde 1 tester / 0 build vardı. Cihaz kurulumu ve native uçtan uca deneme yapılmadı.
+**Aktarım ve dağıtım:** Kullanıcı Transporter lisansı ve Apple girişini tamamladı. İmzalı `0.1.0 (3)` paketi **27 Ekim 2026 02:13 (İstanbul)** itibarıyla Apple'a başarıyla teslim edildi; Transporter yeşil teslim işaretiyle Gönderildi bölümünde gösterdi. Apple build kimliği `2a70943b-e2db-443c-a940-10132eab2f27`. Apple işlemesi tamamlandı; build kişisel gruba otomatik eklendi. Grubun **1 Tester / 1 Build**, hesap sahibinin **Invited**, build'in **Testing / Expires in 90 days** durumları gerçek App Store Connect arayüzünde doğrulandı. Türkçe test notları kaydedildi. Başka kullanıcı/dış tester daveti veya genel App Store incelemesine gönderim yapılmadı. Cihaz kurulumu ve native uçtan uca deneme yapılmadı. Mevcut HTTPS API readiness kontrolü `ok` döndü; veritabanı/Redis/migration/queue/scheduler kontrolleri başarılıydı.
+
+Kullanıcı iPhone ve iPad'e Apple TestFlight uygulamasını kurup hesap sahibine gelen test davetini cihazdan açar; ÖGG SOR için Kabul Et / Yükle yoluyla **0.1.0 (3)** kurulur. Bu paket Expo Go/Metro gerektirmez. İlk cihaz kontrolünde giriş, ders/deneme, cevap kaydı, devam, süre tercihi, sonuç/puan, iPad düzeni ve yeniden açılış denenmelidir. Gerçek cihazda çalıştığı kullanıcı teyidi olmadan tamamlanmış kabul edilmez.
 
 ## Kurulum sırası
 
