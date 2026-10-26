@@ -37,6 +37,7 @@ import { ExamList, Results } from "./sinavlar";
 import { Home } from "./home";
 import { MotionProvider } from "./motion";
 import { ScoreCalculator } from "./scoring";
+import { ExamCalendarScreen } from "./calendar";
 import { Jobs } from "./jobs";
 import { vocabulary } from "@oggaq/study-core";
 import { AccountScreen } from "./account";
@@ -187,6 +188,8 @@ function MainTabs({
                     <Review context={context} openExam={exam} />
                   ) : page === "score" ? (
                     <ScoreCalculator />
+                  ) : page === "calendar" ? (
+                    <ExamCalendarScreen />
                   ) : page === "jobs" ? (
                     <Jobs user={user} />
                   ) : page === "stats" ? (

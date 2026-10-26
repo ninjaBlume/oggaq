@@ -1421,3 +1421,11 @@ input::placeholder { color:var(--c-muted); opacity:1 }
 .card.history-row:hover { border-color:var(--c-primary) }
 
 @media(min-width:600px) { .card[class*="card-tone-"] { padding-block:var(--card-padding-y-wide) } }
+
+.calendar-year { max-width:220px; margin-bottom:16px }
+.calendar-grid { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; margin-bottom:20px }
+.calendar-entry,.calendar-source { display:grid; gap:10px; min-width:0; overflow-wrap:anywhere }
+.calendar-entry h2 { font-size:19px; line-height:1.45; margin:0 }
+.calendar-entry p,.calendar-source p { margin:0 }
+.calendar-labels { display:flex; flex-wrap:wrap; gap:8px }
+@media(min-width:840px) { .calendar-grid { grid-template-columns:repeat(2,minmax(0,1fr)) } }

@@ -35,8 +35,24 @@ if (config('database.default') !== 'pgsql' || config('database.connections.pgsql
     throw new RuntimeException('Browser fixtures require the isolated oggaq_test PostgreSQL database.');
 }
 $operation = $argv[1] ?? '';
-if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'renewal-exams', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'long-result', 'paired-exam-draft', 'scoring', 'scored-exam-draft', 'cleanup'], true)) {
+if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'renewal-exams', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'long-result', 'paired-exam-draft', 'scoring', 'scored-exam-draft', 'calendar', 'calendar-stale', 'cleanup'], true)) {
     throw new InvalidArgumentException('Expected setup or cleanup.');
+}
+if ($operation === 'calendar-stale') {
+    DB::table('exam_calendar_sources')->update(['status' => 'fetch_failed', 'checked_at' => now()]);
+    exit;
+}
+if ($operation === 'calendar') {
+    $year = now('Europe/Istanbul')->year;
+    $date = fn ($day) => Carbon::parse($year.'-'.$day, 'Europe/Istanbul')->locale('tr')->isoFormat('D MMMM YYYY dddd');
+    $html = '<table><tr><td colspan="4">'.$year.' YILI SINAV TAKVİMİ</td></tr><tr><td>SN</td><td>SINAVIN ADI</td><td>SINAV TARİHİ</td><td>EĞİTİM BİTİŞ TARİHİ</td></tr>';
+    foreach ([[901,701,'02-22','01-16'],[902,702,'12-27','11-13']] as [$basic,$renewal,$exam,$deadline]) {
+        $html .= '<tr><td>1</td><td>ÖZEL GÜVENLİK '.$basic.'. TEMEL EĞİTİM VE '.$renewal.'. YENİLEME EĞİTİMİ SINAVI</td><td>'.$date($exam).'</td><td>'.$date($deadline).'</td></tr>';
+    }
+    $html .= '</table>';
+    Illuminate\Support\Facades\Http::fake([App\Modules\Calendar\SyncCalendarYear::url($year) => Illuminate\Support\Facades\Http::response($html)]);
+    app(App\Modules\Calendar\SyncCalendarYear::class)->execute($year);
+    exit;
 }
 if (in_array($operation, ['verification-link', 'reset-link'], true)) {
     $email = $argv[2] ?? '';

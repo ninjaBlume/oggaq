@@ -97,6 +97,7 @@ export const vocabulary = {
   profile: { title: 'Profil', short: 'Profil' },
   reports: { title: 'Bildirimler', short: 'Bildirimler' },
   account: { title: 'Hesabım', short: 'Hesabım' },
+  calendar: { title: 'Sınav takvimi', short: 'Takvim' },
   jobs: { title: 'İş İlanları', short: 'İş İlanları' },
 } as const;
 
@@ -133,3 +134,5 @@ export { jobStatusLabels, jobWeaponLabels, jobApplicationStatusLabels, jobApplic
 export * from './legal';
 export { examTimerChoices, ExamTimerSession, mergeExamTimer } from './exam-timer';
 export type { ExamTimerPolicy } from './exam-timer';
+export { calendarDate, calendarYears, calendarToday, calendarPhase, calendarNotice, calendarStaleNotice } from './calendar';
+export type { ExamCalendar, CalendarEntry } from './calendar';

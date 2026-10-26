@@ -11,6 +11,7 @@
     "license": "proprietary",
     "require": {
         "php": "~8.4.0",
+        "ext-dom": "*",
         "ext-pdo": "*",
         "ext-pdo_pgsql": "*",
         "laravel/framework": "^13.17",

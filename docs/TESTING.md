@@ -1,5 +1,14 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, otomatik resmî sınav takvimi
+
+- Calendar modülü, ayrı kaynak/değişmez snapshot tabloları, `calendar:sync`, günlük 03.20 Europe/Istanbul görevi, salt okunur yetkili API, web ve mobil Sınav takvimi menüsü eklendi. Temel/Yenileme numaraları ayrı okunur; soru ve puanlama kayıtları değiştirilmez. [İşletim ve sınırlar](EXAM_CALENDAR.md).
+- PHP 8.4/PostgreSQL tam **270 test / 2.892 assertion** geçti. Son komut kaydı `bootstrap/app.php` üzerinden yapıldıktan sonra **10 Calendar testi / 55 assertion** tekrar geçti. İlk indirme/tekrar, tarih değişikliği ve eski sürüm, hata/404/bozuk belge, kaldırılan çiftin karantinaya alınması, yanlış yıl/gün/çoğaltma, öğrenci okuma/yazma reddi, eşzamanlı kilit, değişmez DB snapshot/bileşik FK, gerçek günlük görev ve migration bekleyen korumalı yerel DB doğrulandı. İlk hedefli koşudaki sahte HTTP stream yeniden okuması ve sırasız sentetik yenileme numarası düzeltildi; son koşumlar başarılıdır.
+- Pint, Composer strict validate/audit geçti. Yerelde Composer çalıştırıcısı bulunmadığından resmî installer SHA-384 imzası doğrulanıp geçici CLI aracı kullanıldı. Yalnız mevcut DOM uzantısı platform gereksinimine eklendi; paket sürümü/referansı değişmedi. Sunucuda DOM/mbstring zaten vardır. API tip üretimi/OpenAPI lint, strict TypeScript, **106 Vitest** (38 study-core + 16 admin + 10 web + 42 mobil), admin/web build ve iOS/Android/web Expo export geçti.
+- Yeni **4 E2E** tek koşumda geçti: web/mobil × açık/koyu; menü, Temel/Yenileme sayıları, eğitim bitişi, eski veri uyarısı ve korunmuş tarihler, boş gelecek yıl, 320/834/1280 px taşma kontrolü. Görüntüler gözle incelendi. Geçici QA konfigürasyonu 90 saniye test/30 saniye beklenti kullanır; normal timeout değişmedi, koşum 10,6 saniyedir. Tam eski E2E paketi yeniden çalıştırılmadı; fiziksel iOS/Android bu teslimde denenmedi.
+- İlk gerçek kaynak önizlemesi resmî EGM HTML'inden **6 dönem** ayrıştırdı; SHA-256/plan `artifacts/exam-calendar/` altında. Sunucudan bot User-Agent ile 2026 kaynağı 200 ve 2027 kaynağı 404 doğrulandı. Web arama aracının erişim hatası normal HTTPS istemcisiyle aşılmıştır; üçüncü taraf takvim kopyası kullanılmadı. Bu kontroller içerik aktarımı yapılmış sayılmaz.
+- PHPUnit ve E2E sırayla yalnız `oggaq_test` üzerinde çalıştı; başka test süreçleri/portlar önceden kontrol edildi, mobil 5186 kullanıldı. Ortak yerel `oggaq` DB'si/hesaplar, Claude'un servisleri ve deploy/backup kaynakları değiştirilmedi. Git push yapılmadı.
+
 ## Güncel doğrulama — 26 Ekim 2026, kısa süre etiketi ve kompakt kartlar
 
 - Ortak süre tercihi etiketi `Süre devam etsin` oldu; Deneme ve Ders web/mobil başlangıçları aynı kaynağı kullanır. `continuous` API değeri ve sayaç davranışı değişmedi. Mevcut mobil E2E seçicisi yeni görünen etikete güncellendi.

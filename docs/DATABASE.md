@@ -148,3 +148,7 @@ Identity/Tenancy/QuestionBank FK/CHECK/unique, transaction ve yayımlanmış iç
 ## Dönem bazlı ÖGG puanlama (24 Ekim 2026)
 
 `scoring_rules` sürümlü merkezi kural/JSONB yapılandırması ve resmî kaynakları; `scoring_periods` eğitim+seçenek+numara tekilliğiyle tarih/kural eşleştirmesini; `official_exam_scoring` tam sınav metaveri bağlantısını taşır. `exam_score_results` kullanıcı ve isteğe bağlı deneme FK'larıyla kişisel, değişmez hesaplama sürümlerini saklar. Deneme+sürüm ve işlem kimlikleri tekildir; başlatmada seçilen kural geçmiş hesaplarda değişmez. Yayımlanmış kural ve hesap değişmezliği, çakışan kural aralıkları, kural/dönem tutarlılığı ve gerçek deneme cevabı sayıları PostgreSQL trigger'larıyla denetlenir. Hesap silme/export kapsamına alındı. Eski `correct_ratio_v1`, `score_percent`, sorular ve cevaplar değiştirilmez. Ayrıntılı alanlar/ilişkiler [EXAM_SCORING](EXAM_SCORING.md).
+
+## Resmî sınav takvimi
+
+`2026_10_26_000004_create_exam_calendar`, `exam_calendar_sources` (year PK, sabit EGM source_url, status, checked_at, verified_at, active_snapshot_id) ve `exam_calendar_snapshots` (UUID PK, year FK, unique year/content_hash, jsonb entries, created_at) tablolarını ekler. Kaynak, snapshot'ı aynı yıl üzerinden bileşik FK ile seçer. Snapshot UPDATE/DELETE PostgreSQL trigger'ı ile engellenir. Soru ve puanlama tablolarına bağlanmaz, mevcut kayıtları güncellemez. Ayrıntılar [EXAM_CALENDAR](EXAM_CALENDAR.md).

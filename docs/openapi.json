@@ -43,6 +43,10 @@
     {
       "name": "Scoring",
       "description": "Dönem bazlı, sürümlü ÖGG puan hesaplama."
+    },
+    {
+      "name": "Calendar",
+      "description": "Resmî Temel/Yenileme sınav takvimi"
     }
   ],
   "security": [
@@ -6634,6 +6638,67 @@
           }
         }
       }
+    },
+    "/api/v1/exam-calendar": {
+      "get": {
+        "operationId": "getExamCalendar",
+        "summary": "Resmî Temel/Yenileme takvimini oku",
+        "tags": [
+          "Calendar"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 2020,
+              "maximum": 2100
+            },
+            "description": "Varsayılan Türkiye saatine göre bu yıl."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Saklanan doğrulanmış takvim; öğrenci isteğinde dış kaynak indirilmez.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ExamCalendar"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -12110,6 +12175,92 @@
           "session_id"
         ],
         "additionalProperties": false
+      },
+      "ExamCalendarEntry": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "basic_number",
+          "renewal_number",
+          "exam_date",
+          "training_deadline"
+        ],
+        "properties": {
+          "basic_number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "renewal_number": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "exam_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "training_deadline": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "ExamCalendar": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "year",
+          "years",
+          "status",
+          "checked_at",
+          "verified_at",
+          "source_url",
+          "entries"
+        ],
+        "properties": {
+          "year": {
+            "type": "integer",
+            "minimum": 2020,
+            "maximum": 2100
+          },
+          "years": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "stale",
+              "unavailable"
+            ]
+          },
+          "checked_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "verified_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "source_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExamCalendarEntry"
+            }
+          }
+        }
       }
     },
     "responses": {

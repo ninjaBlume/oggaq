@@ -1,0 +1,22 @@
+import { test, expect } from '@playwright/test';
+import { mkdirSync } from 'node:fs';
+import { fixture, login } from './student';
+import { mobilePreviewUrl } from '../../playwright.config';
+
+test.beforeEach(() => { fixture('setup-study');fixture('calendar'); });
+test.afterAll(() => fixture('cleanup'));
+for (const platform of ['web','mobile'] as const) for (const scheme of ['light','dark'] as const) test(`${platform} ${scheme}: menüden takvim, temel/yenileme, eski veri ve boş yıl`, async ({browser}) => {
+  const context = await browser.newContext({baseURL:platform === 'web'?'http://127.0.0.1:5183':mobilePreviewUrl,colorScheme:scheme,viewport:{width:390,height:900}});const page = await context.newPage();
+  try {
+    if(platform === 'web') { await login(page);await page.getByRole('link',{name:'Sınav takvimi',exact:true}).click(); }
+    else {await page.goto('/');await page.getByLabel('E-posta adresi',{exact:true}).fill('e2e-student@example.test');await page.getByLabel('Parola',{exact:true}).fill('Synthetic-Browser-42!');await page.getByRole('button',{name:'Giriş yap',exact:true}).click();await expect(page.getByText('Merhaba, E2E.',{exact:true})).toBeVisible();await page.getByRole('button',{name:'Menüyü aç',exact:true}).click();await page.getByRole('button',{name:'Sınav takvimi',exact:true}).click();}
+    await expect(page.getByRole('heading',{name:'Sınav takvimi',exact:true})).toBeVisible();await expect(page.getByText('901. Temel',{exact:true})).toBeVisible();await expect(page.getByText('701. Yenileme',{exact:true})).toBeVisible();await expect(page.getByText(/Eğitim bitişi:/).first()).toBeVisible();
+    mkdirSync('artifacts/exam-calendar/screens',{recursive:true});
+    for(const width of [320,834,1280]) { await page.setViewportSize({width,height:900});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:`artifacts/exam-calendar/screens/${platform}-${scheme}-${width}.png`,fullPage:true,animations:'disabled'}); }
+    fixture('calendar-stale');if(platform==='web')await page.reload();else {await page.getByRole('tab',{name:'Profil',exact:true}).click();await page.getByRole('button',{name:'Menüyü aç',exact:true}).click();await page.getByRole('button',{name:'Sınav takvimi',exact:true}).click();}await expect(page.getByText('Takvim güncellenemedi veya son kontrolün üzerinden zaman geçti. Son doğrulanmış tarihler gösteriliyor.',{exact:true})).toBeVisible();await expect(page.getByText('901. Temel',{exact:true})).toBeVisible();
+    const year=new Date().getFullYear()+1;
+    if(platform==='web')await page.getByLabel('Takvim yılı',{exact:true}).selectOption(String(year));
+    else {await page.getByRole('button',{name:/Takvim yılı:/}).click();await page.getByRole('button',{name:String(year),exact:true}).click();}
+    await expect(page.getByText(`${year} takvimi henüz hazır değil`,{exact:true})).toBeVisible();await expect(page.getByText('901. Temel',{exact:true})).toHaveCount(0);
+  }finally{await context.close();}
+});

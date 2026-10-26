@@ -3,6 +3,7 @@
 use App\Http\Middleware\EnsureActiveAccount;
 use App\Http\Middleware\EnsureVerifiedEmail;
 use App\Http\Middleware\RequestContext;
+use App\Modules\Calendar\Commands\SyncExamCalendar;
 use App\Support\ProblemRenderer;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withCommands([SyncExamCalendar::class])
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
         $middleware->redirectGuestsTo(fn (Request $request) => rtrim(config('security.frontend_url'), '/').'/login');

@@ -19,3 +19,6 @@ Schedule::command('horizon:snapshot')->everyFiveMinutes();
 // Proof that the scheduler runs: GET /api/v1/health/ready reports "degraded" when this stops (App\Support\Readiness).
 Schedule::call(fn () => Cache::put(Readiness::HEARTBEAT_KEY, now()->timestamp, 600))->name('scheduler-heartbeat')->everyMinute();
 Schedule::command('exams:expire')->everyMinute()->withoutOverlapping();
+
+// Read-only source polling runs in the background; students only read the stored snapshot.
+Schedule::command('calendar:sync')->dailyAt('03:20')->timezone('Europe/Istanbul')->withoutOverlapping();

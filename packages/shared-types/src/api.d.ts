@@ -1707,6 +1707,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/exam-calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Resmî Temel/Yenileme takvimini oku */
+        get: operations["getExamCalendar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3121,6 +3138,27 @@ export interface components {
             action: "resume" | "pause" | "heartbeat";
             /** Format: uuid */
             session_id: string;
+        };
+        ExamCalendarEntry: {
+            basic_number: number;
+            renewal_number: number;
+            /** Format: date */
+            exam_date: string;
+            /** Format: date */
+            training_deadline: string;
+        };
+        ExamCalendar: {
+            year: number;
+            years: number[];
+            /** @enum {string} */
+            status: "ready" | "stale" | "unavailable";
+            /** Format: date-time */
+            checked_at: string | null;
+            /** Format: date-time */
+            verified_at: string | null;
+            /** Format: uri */
+            source_url: string;
+            entries: components["schemas"]["ExamCalendarEntry"][];
         };
     };
     responses: {
@@ -6250,6 +6288,35 @@ export interface operations {
             401: components["responses"]["Problem"];
             403: components["responses"]["Problem"];
             404: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    getExamCalendar: {
+        parameters: {
+            query?: {
+                /** @description Varsayılan Türkiye saatine göre bu yıl. */
+                year?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Saklanan doğrulanmış takvim; öğrenci isteğinde dış kaynak indirilmez. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExamCalendar"];
+                    };
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
             422: components["responses"]["Problem"];
             429: components["responses"]["Problem"];
         };

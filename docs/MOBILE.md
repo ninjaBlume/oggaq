@@ -280,3 +280,7 @@ Sınav ekranı yeniden açılınca indis 0'a dönmesi düzeltildi. Web ile ortak
 Deneme ekranı yalnız seçilen silah seçeneğinin tam sınavlarını, Ders ekranı yalnız seçilen dersin sınavlarını sunucudan ister. Ders seçimi için bütün sınavları indirmek yerine katalogdaki yayımlanmış sınav sayıları kullanılır. Merkezi katalog metaverisi en çok 12 anahtarlı, 60 saniyelik bellek cache'inde bağlam+filtre anahtarıyla tutulur; sekmeye geri dönmek aynı kataloğu yeniden indirmez. Kişisel geçmiş, sonuçlar, cevap anahtarları ve kimlik bilgileri bu cache'e girmez. Bağlam/hesap değişimi başka anahtar kullanır. Bu kalıcı çevrimdışı depolama değildir. Başarısız veya iptal edilmiş yükleme saklanmaz; süre dolduğunda yeniden sunucuya gidilir.
 
 Cevap yazmaları küçük kanonik seçim yanıtını kullanır; aynı sabit soru nesneleri korunur. Eski sürüm, bağlam karışması, eksik/tekrarlanan cevap kimliği ve süre dolması kontrolleri ortak modülde test edilir. Kayıt hatası ve başka cihazla çakışma akışları korunur. Tam deneme sonucu yine sunucudan değerlendirilir ve bütün sorular incelenebilir.
+
+## Sınav takvimi
+
+Yan menüde Sınav takvimi vardır; beş ana sekmenin sırası korunur, İş İlanları en altta kalır. Yıl seçimi, Temel/Yenileme çiftleri, eğitim bitişi, resmî kaynak bağlantısı ve güncel/eski/hazır değil durumları gerçek Calendar API'sine bağlıdır. API veriyi saklanan snapshot'tan okur; mobil cihazda kazıma veya zamanlayıcı yoktur. [Takvim işletimi](EXAM_CALENDAR.md).

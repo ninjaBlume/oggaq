@@ -31,3 +31,5 @@ export { default as Star } from "lucide-react-native/icons/star";
 
 export { default as Briefcase } from "lucide-react-native/icons/briefcase-business";
 export { default as ExternalLink } from "lucide-react-native/icons/external-link";
+
+export { default as CalendarDays } from "lucide-react-native/icons/calendar-days";

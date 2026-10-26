@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ReadinessController;
+use App\Modules\Calendar\Http\Controllers\ExamCalendarController;
 use App\Modules\Exams\Http\Controllers\ExamAttemptController;
 use App\Modules\Identity\Http\Controllers\AccountController;
 use App\Modules\Identity\Http\Controllers\AuthController;
@@ -46,6 +47,7 @@ Route::prefix('v1')->group(function () {
         Route::delete('me', [AccountController::class, 'destroy'])->middleware('throttle:account');
 
         Route::middleware('email.verified')->group(function () {
+            Route::get('exam-calendar', ExamCalendarController::class);
             Route::get('job-postings', [JobController::class, 'index']);
             Route::get('job-postings/{job}', [JobController::class, 'show'])->whereUuid('job');
             Route::post('job-postings/{job}/applications', [JobController::class, 'apply'])->whereUuid('job')->middleware('throttle:job-applications');
