@@ -8,12 +8,15 @@ COPY packages/ packages/
 RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY apps/admin/ apps/admin/
 COPY apps/web/ apps/web/
-COPY config/brand.json config/brand.json
+COPY apps/site/ apps/site/
+COPY config/brand.json config/store-links.json config/
+COPY docs/legal-values.json docs/legal-values.json
 COPY apps/mobile/assets/brand-logo.png apps/mobile/assets/brand-logo.png
 COPY apps/mobile/assets/fonts/ apps/mobile/assets/fonts/
 # Keep requests on the opened host: cookies also work on www and the transition hostname.
-RUN VITE_API_URL=/ npm run build:web \
-    && VITE_API_URL=/ VITE_ADMIN_BASE_PATH=/yonetim/ npm run build:admin
+RUN VITE_API_URL=/ VITE_WEB_MODE=account npm run build:web \
+    && VITE_API_URL=/ VITE_ADMIN_BASE_PATH=/yonetim/ npm run build:admin \
+    && npm run build:site
 
 FROM php:8.4-fpm-bookworm AS php-base
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -39,6 +42,7 @@ FROM nginx:stable-bookworm AS web
 COPY deploy/server-development/nginx.conf /etc/nginx/conf.d/default.conf
 COPY deploy/nginx/snippets/security-headers.conf /etc/nginx/snippets/security-headers.conf
 COPY --from=frontend /build/apps/web/dist/ /var/www/web/
+COPY --from=frontend /build/apps/site/dist/ /var/www/site/
 COPY --from=frontend /build/apps/admin/dist/ /var/www/admin/
 COPY backend/public/index.php /var/www/backend/public/index.php
 RUN chmod -R a+rX /var/www

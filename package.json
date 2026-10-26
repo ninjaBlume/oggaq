@@ -36,7 +36,10 @@
     "test:store": "node --test scripts/check-store-release.test.mjs scripts/apply-legal-values.test.mjs",
     "legal:apply": "node scripts/apply-legal-values.mjs",
     "brand:apply": "node scripts/apply-brand.mjs",
-    "check:brand": "node scripts/apply-brand.mjs --check"
+    "check:brand": "node scripts/apply-brand.mjs --check",
+    "build:site": "node apps/site/site.mjs",
+    "test:site": "node --test apps/site/site.test.mjs",
+    "test:site:e2e": "playwright test --config apps/site/playwright.config.ts"
   },
   "devDependencies": {
     "@redocly/cli": "2.60.0",

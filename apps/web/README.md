@@ -1,5 +1,7 @@
 # Öğrenci web uygulaması
 
+**26 Ekim 2026:** Genel oggsor.com sitesi `apps/site` üzerinden tanıtım/indirme sunar. Bu kaynak korunur; sunucuda `VITE_WEB_MODE=account` ile yalnız hesap ve e-posta bağlantıları için derlenir. Aşağıdaki öğrenci davranışları normal yerel geliştirme/test modu içindir. [Yeni site ve yayın yolları](../../docs/PUBLIC_WEBSITE.md).
+
 React 19/TypeScript, Vite, Tailwind ve TanStack Query ile gerçek Laravel API'sine bağlı öğrenci uygulaması. Yönetim panelinden ayrı uygulamadır; platform yöneticisi de kendi hesabıyla öğrenci akışını kullanabilir. Telefon, tablet ve masaüstü ekran boyutları desteklenir; ayrı Expo uygulaması [mobil belgede](../../docs/MOBILE.md) açıklanır.
 
 ## Yerelde açma
@@ -13,7 +15,7 @@ npm run dev:web
 
 Öğrenci uygulaması `http://127.0.0.1:5173`, API varsayılan `http://127.0.0.1:8000` adresindedir. `.env.example` dosyasını `.env.local` olarak kopyalayarak `VITE_API_URL` değiştirilebilir. Bu değer herkese açık yapılandırmadır; secret içermez. Backend `FRONTEND_URL`, `SANCTUM_STATEFUL_DOMAINS` ve CORS aynı origin ile eşleşmelidir. `localhost` ve `127.0.0.1` isimlerini karıştırmayın.
 
-Yayın paketi derlenirken API adresi açıkça verilmelidir: `VITE_API_URL=https://oggsor.com npm run build:web`. `VITE_API_URL` build sırasında JS'ye gömülür; servis ortamını sonradan değiştirmek derlenmiş paketi düzeltmez. Canlıya almadan önce paket adresi ve gerçek tarayıcı giriş/liste akışı kontrol edilir.
+Yayın paketi derlenirken API adresi açıkça verilmelidir: `VITE_API_URL=/ VITE_WEB_MODE=account npm run build:web`. `VITE_API_URL` build sırasında JS'ye gömülür; servis ortamını sonradan değiştirmek derlenmiş paketi düzeltmez. Canlıya almadan önce paket adresi ve gerçek tarayıcı giriş/liste akışı kontrol edilir.
 
 Yeni backend migration'ını PHP 8.4 ile `backend/` içinde `php artisan migrate` kullanarak uygulayın. Mevcut geliştirme verisini silmek için `migrate:fresh` kullanılmaz.
 

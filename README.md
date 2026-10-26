@@ -4,6 +4,8 @@ Türkiye'deki özel güvenlik görevlisi adayları için ücretsiz sınav hazır
 
 ## Mevcut durum
 
+26 Ekim 2026: **oggsor.com artık mobil uygulamanın tanıtım ve indirme sitesidir.** Genel sitede öğrenci soru çözme ekranları sunulmaz. Mobil uygulama ve API korunur; hesap, e-posta doğrulama ve parola yenileme bağlantıları webde çalışmaya devam eder. Gerçek mağaza adresleri henüz sağlanmadığı için indirme alanları “Yakında” gösterir. [Site, mağaza bağlantıları ve yayın düzeni](docs/PUBLIC_WEBSITE.md).
+
 9 Ekim 2026: **Identity/Tenancy ve merkezi QuestionBank API teslimleri** çalışıyor. Laravel 13, PostgreSQL 18, Redis ve Horizon kuruldu; migration, kimlik doğrulama, kurum/üyelik/çalışma bağlamı yetkilendirmesi ve API sözleşmesi oluşturuldu. E-posta doğrulama ve parola sıfırlama bildirimleri şifreli queue payload'larıyla yerel Mailpit'e ulaşıyor.
 
 Kayıt, cookie giriş/çıkış, cihaz bazlı süreli mobil token, e-posta doğrulama, parola sıfırlama, ad güncelleme, platform yöneticisi kurum/üyelik oluşturma ve iptali çalışır. Kullanıcı kişisel/aktif kurum bağlamlarını görebilir; kurum yöneticisi sadece kendi kurumunun üye dizinine erişebilir.
@@ -33,7 +35,8 @@ PostgreSQL/Redis otomatik testleri ve gerçek HTTP kimlik akışı doğrulandı.
 ```text
 apps/
   mobile/                 React Native + Expo
-  web/                    Çalışan React + Vite öğrenci uygulaması
+  site/                   Statik tanıtım ve indirme sitesi
+  web/                    React hesap işlemleri; yerel testte öğrenci ekranları
   admin/                  Çalışan React + Vite içerik yönetimi
 backend/                  Laravel 13 modüler monolit
 packages/

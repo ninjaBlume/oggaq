@@ -1,5 +1,5 @@
 import { UserIdentity } from './person';
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { Link, Navigate, NavLink, Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -7,7 +7,7 @@ import type { StudyContext } from '@oggaq/shared-types';
 import { vocabulary } from '@oggaq/study-core';
 import { api } from './api';
 import { AuthGate, ResetPassword, useLogout, useSession, VerifyEmail } from './auth';
-import { brand } from './config';
+import { accountOnly, brand } from './config';
 import { ScoreCalculator } from './scoring';
 import { ExamCalendarPage } from './calendar';
 import { Jobs } from './jobs';
@@ -44,7 +44,11 @@ function StudyLayout() {
 export function PageIntro({ eyebrow, title, children }: { eyebrow: string; title: string; children?: ReactNode }) {
   return <div className="page-intro"><span className="eyebrow">{eyebrow}</span><h1>{title}</h1>{children}</div>;
 }
+function WebsiteRedirect() {
+  useEffect(() => { window.location.replace('/'); }, []);
+  return <main className="center"><a href="/">ÖGG SOR sitesine dön</a></main>;
+}
 export function App() {
   // Auth routes preserve signed link/reset parameters until the server accepts them.
-  return <Routes><Route path="reset-password" element={<ResetPassword />} /><Route path="verify-email" element={<VerifyEmail />} /><Route path="confirm-email-change" element={<ConfirmEmailChange />} /><Route path="account-deleted" element={<AccountDeleted />} /><Route path="account" element={<AuthGate><AccountPage /></AuthGate>} /><Route path="study/:context/*" element={<AuthGate><StudyLayout /></AuthGate>} /><Route path="*" element={<AuthGate><StudyLayout /></AuthGate>} /></Routes>;
+  return <Routes><Route path="reset-password" element={<ResetPassword />} /><Route path="verify-email" element={<VerifyEmail />} /><Route path="confirm-email-change" element={<ConfirmEmailChange />} /><Route path="account-deleted" element={<AccountDeleted />} /><Route path="account" element={<AuthGate><AccountPage /></AuthGate>} />{!accountOnly && <Route path="study/:context/*" element={<AuthGate><StudyLayout /></AuthGate>} />}<Route path="*" element={accountOnly ? <WebsiteRedirect /> : <AuthGate><StudyLayout /></AuthGate>} /></Routes>;
 }

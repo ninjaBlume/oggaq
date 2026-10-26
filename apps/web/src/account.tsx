@@ -8,7 +8,7 @@ import { ApiError } from '@oggaq/api-client';
 import { deleteAccountConfirmation, displayPersonName, personInitials, vocabulary } from '@oggaq/study-core';
 import { api } from './api';
 import { AuthFrame, Login, replaceSession, useLogout, useSession } from './auth';
-import { brand } from './config';
+import { accountOnly, brand } from './config';
 import { ThemeSwitch } from './theme';
 import { BrandWordmark, BrandLogo, dateLabel, ErrorNotice, Field, Loading } from './ui';
 import { verificationInput } from './verification';
@@ -197,7 +197,7 @@ export function AccountPage() {
   const logout = useLogout();
   const user = session.data;
   if (!user) return null;
-  return <div className="app-shell"><header className="site-header"><Link to="/" className="brand"><BrandLogo /><span><BrandWordmark /><small>{brand.subtitle}</small></span></Link><nav aria-label="Ana menü"><Link to="/">← Çalışmaya dön</Link></nav><div className="user-menu"><UserIdentity name={user.name} /><ThemeSwitch /><button className="text-button" disabled={logout.isPending} onClick={() => logout.mutate()}>Çıkış yap</button></div></header>
+  return <div className="app-shell"><header className="site-header"><Link to="/" className="brand"><BrandLogo /><span><BrandWordmark /><small>{brand.subtitle}</small></span></Link><nav aria-label="Ana menü"><Link to="/">{accountOnly ? '← Siteye dön' : '← Çalışmaya dön'}</Link></nav><div className="user-menu"><UserIdentity name={user.name} /><ThemeSwitch /><button className="text-button" disabled={logout.isPending} onClick={() => logout.mutate()}>Çıkış yap</button></div></header>
     <main className="content account-page">
       <div className="page-intro"><span className="eyebrow">HESAP VE GİZLİLİK</span><div className="account-person-heading"><span className="person-avatar profile-avatar" data-testid="profile-initials" aria-hidden="true">{personInitials(user.name) || '?'}</span><div><h1>{vocabulary.account.title}</h1><p data-testid="profile-full-name">{displayPersonName(user.name)}</p><p>{user.email}{user.email_verified_at ? '' : ' (doğrulanmadı)'}</p></div></div></div>
       <div className="account-grid">
@@ -213,7 +213,7 @@ export function AccountPage() {
 }
 
 export function AccountDeleted() {
-  return <AuthFrame><h2>Hesabın silindi</h2><p>Hesabın ve çalışma geçmişin silindi. Eski e-posta adresine bir onay mesajı gönderdik.</p><Link to="/" className="button primary">Girişe dön</Link></AuthFrame>;
+  return <AuthFrame><h2>Hesabın silindi</h2><p>Hesabın ve çalışma geçmişin silindi. Eski e-posta adresine bir onay mesajı gönderdik.</p><Link to="/" className="button primary">{accountOnly ? 'Siteye dön' : 'Girişe dön'}</Link></AuthFrame>;
 }
 
 // The signed link of the mail sent to the NEW address; the account owner opens it signed in.

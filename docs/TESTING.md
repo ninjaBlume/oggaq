@@ -1,5 +1,12 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, tanıtım ve indirme sitesi
+
+- Genel web sitesi `apps/site` ile statik tanıtım/indirme sayfasına ayrıldı; sunucudaki `apps/web` paketi yalnız hesap işlemleri için `VITE_WEB_MODE=account` kullanır. Normal yerel öğrenci modu ve mobil kaynaklar korunur. [Kapsam, mağaza bağlantıları ve yollar](PUBLIC_WEBSITE.md).
+- **4 yeni Node testi**, mevcut **10 web Vitest** ve yasal değer betiğinin **6 Node testi** geçti. Tüm workspace strict TypeScript, marka tutarlılığı, statik site ve hesap modu üretim build'i başarılıdır. Mağaza URL doğrulaması, yayımlanmayan mağazaların açık bekleme durumu, gerçek bağlantıyla derleme ve sahte bağlantı olmaması test edildi.
+- **4 yeni Chromium E2E 2,6 saniyede geçti:** açık/koyu temada 320/390/834/1280 px taşma kontrolü, indirme durumu, form/JavaScript/API isteği olmayan ana sayfa, gizlilik bağlantısı ve hesap/parola yenileme yolları. Telefon/masaüstü açık ve koyu görüntüler gözle incelendi. Yalnız 5187/5188 statik önizlemeleri kullanıldı; veritabanı ve gerçek hesaplar kullanılmadı.
+- Backend/API/şema/mobil kaynak değişmediğinden PHPUnit, ortak veritabanlı tam E2E ve native export/cihaz testleri bu teslimde yeniden çalıştırılmadı. Mevcut yasal taslaklar ve mağaza yayın engelleri tamamlanmış sayılmaz. CI'ya bağımsız site test/build/tarayıcı adımı eklendi. Yerel kanıtlar `artifacts/public-site/` içindedir.
+
 ## Güncel doğrulama — 26 Ekim 2026, tam ad ve avatar desteği
 
 - Ortak ad/baş harf hesabı header ve profili eşitledi; iki/üç parçalı adlar sırasıyla AY/ADY gösterir, dört ve daha fazla kelimede ilk iki ve son kelimenin harfi kullanılır. Tam ad profilde kayıpsızdır. Web/mobile Hesabım ekranlarında mevcut API’ye bağlı Ad soyad düzenlemesi, kayıt alanlarında ad otomatik doldurma ve 100 karakter sınırı vardır. [Gösterim ve veri ilkesi](DESIGN.md#kişi-adları-ve-avatarlar--26-ekim-2026).

@@ -101,3 +101,9 @@ jobs:
         run: |
           npx playwright install --with-deps chromium
           npm run test:e2e
+      - name: Tanıtım sitesi ve hesap bağlantıları
+        run: |
+          npm run test:site
+          npm run build:site
+          VITE_API_URL=/ VITE_WEB_MODE=account npm run build:web
+          npm run test:site:e2e
