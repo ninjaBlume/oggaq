@@ -62,6 +62,8 @@ h1 em { font-style: normal; color: var(--c-primary); }
 .support > a { display: inline-flex; align-items: center; gap: 16px; min-height: 44px; color: var(--c-primary); overflow-wrap: anywhere; }
 .site-footer { padding-block: 24px; border-top: 1px solid var(--c-line); }
 .footer-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.site-footer .brand { min-height: 44px; }
+.site-footer .brand img { width: 32px; }
 .site-footer .brand-wordmark { font-size: 19px; }
 .site-footer nav { display: flex; flex-wrap: wrap; gap: 4px 20px; color: var(--c-muted); font-size: 12px; }
 .site-footer nav a { display: inline-flex; align-items: center; min-height: 44px; }
