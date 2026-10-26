@@ -2,7 +2,7 @@
 
 ## 26 Ekim 2026: yanıt sonrası anında değerlendirme
 
-Deneme/Ders/Tekrar akışında ilk seçim sunucuya kaydedilince doğru seçenek, doğru/yanlış ve varsa açıklama görünür. Yanıtlanan soru yeniden seçilemez/temizlenemez; geriye dönüş ve yeniden girişte de kilit/feedback sunucudan gelir. Diğer soruların anahtarları yanıtlanana kadar gizlidir. Kayıt hatasında aynı seçim yeniden denenebilir; sunucu farklı seçimi reddeder. Sayaç çıkışta durdurulmaz; süre davranışı değiştirilmedi. Web/mobil ortak durum birleştirmesi ve API sözleşmesi birlikte güncellendi.
+Deneme/Ders/Tekrar akışında ilk seçim sunucuya kaydedilince doğru seçenek, doğru/yanlış ve varsa açıklama görünür. Yanıtlanan soru yeniden seçilemez/temizlenemez; geriye dönüş ve yeniden girişte de kilit/feedback sunucudan gelir. Diğer soruların anahtarları yanıtlanana kadar gizlidir. Kayıt hatasında aynı seçim yeniden denenebilir; sunucu farklı seçimi reddeder. Sayaç çıkışta durdurulmaz; süre davranışı değiştirilmedi. Web/mobil ortak durum birleştirmesi ve API sözleşmesi birlikte güncellendi. Canlı API/web `74609f6` ile yayındadır; Expo Go projesini yenilemek gerekir. Fiziksel cihaz bu teslimde ayrıca denenmedi.
 
 ## 26 Ekim 2026: çıkmış soru açıklamaları
 
