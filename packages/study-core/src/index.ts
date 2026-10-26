@@ -134,7 +134,8 @@ export { jobStatusLabels, jobWeaponLabels, jobApplicationStatusLabels, jobApplic
 export * from './legal';
 export { examTimerChoices, ExamTimerSession, mergeExamTimer } from './exam-timer';
 export type { ExamTimerPolicy } from './exam-timer';
-export { calendarDate, calendarYears, calendarToday, calendarPhase, calendarNotice, calendarStaleNotice } from './calendar';
+export { calendarDate, calendarDaysRemaining, orderedCalendarEntries, calendarYears, calendarToday, calendarPhase, calendarNotice, calendarStaleNotice } from './calendar';
 export type { ExamCalendar, CalendarEntry } from './calendar';
 export { upcomingCountdown, nextExamRefreshDelay } from './upcoming';
 export type { UpcomingExam } from './upcoming';
+export { calendarRules } from './calendar-rules';

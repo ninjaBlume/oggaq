@@ -1422,13 +1422,39 @@ input::placeholder { color:var(--c-muted); opacity:1 }
 
 @media(min-width:600px) { .card[class*="card-tone-"] { padding-block:var(--card-padding-y-wide) } }
 
-.calendar-year { max-width:220px; margin-bottom:16px }
+.calendar-page { max-width:1060px; margin-inline:auto }
+.calendar-back { display:inline-flex; align-items:center; gap:8px; min-height:44px; margin-bottom:8px; font-size:14px; font-weight:600 }
+.calendar-rules { display:grid; gap:18px; margin-bottom:28px }
+.calendar-rules h2,.calendar-section-heading h2 { margin:0; font-size:20px; line-height:1.4 }
+.calendar-card-heading { display:flex; align-items:center; gap:12px; flex-wrap:wrap; min-width:0 }
+.calendar-card-heading h2 { flex:1; min-width:140px }
+.calendar-symbol { display:flex; align-items:center; justify-content:center; padding:10px; border-radius:14px; background:var(--c-soft-primary); color:var(--c-primary); flex-shrink:0 }
+.calendar-rule-list { display:grid; gap:18px; list-style:none; margin:0; padding:0 }
+.calendar-rule-list li { display:flex; align-items:flex-start; gap:10px; min-width:0 }
+.calendar-rule-list li>svg { color:var(--c-primary); flex-shrink:0; margin-top:2px }
+.calendar-rule-list h3 { font-size:15px; line-height:1.5; margin:0 0 3px }
+.calendar-rule-list p { font-size:15px; line-height:1.6 }
+.calendar-rules p,.calendar-entry p { margin:0 }
+.calendar-rule-links { display:flex; flex-wrap:wrap; align-items:center; gap:12px 20px }
+.calendar-rule-links .button { display:inline-flex; align-items:center; justify-content:center; gap:10px; min-height:44px }
+.calendar-rule-links>a:last-child { display:inline-flex; align-items:center; min-height:44px; font-size:14px }
+.calendar-section-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:16px }
+.calendar-year { flex:0 1 160px; max-width:220px }
+.calendar-year label { margin:0 }
 .calendar-grid { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; margin-bottom:20px }
-.calendar-entry,.calendar-source { display:grid; gap:10px; min-width:0; overflow-wrap:anywhere }
-.calendar-entry h2 { font-size:19px; line-height:1.45; margin:0 }
-.calendar-entry p,.calendar-source p { margin:0 }
-.calendar-labels { display:flex; flex-wrap:wrap; gap:8px }
-@media(min-width:840px) { .calendar-grid { grid-template-columns:repeat(2,minmax(0,1fr)) } }
+.calendar-entry { display:grid; align-content:start; gap:14px; min-width:0; overflow-wrap:anywhere }
+.calendar-entry-name { flex:1; min-width:130px }
+.calendar-entry-name .eyebrow { font-size:11px; letter-spacing:.6px; margin:0 0 4px; color:var(--c-muted) }
+.calendar-entry-next .eyebrow { color:var(--c-primary) }
+.calendar-entry h3 { font-size:17px; line-height:1.5; margin:0 }
+.calendar-countdown { white-space:normal; font-size:12px; line-height:1.5; font-variant-numeric:tabular-nums }
+.calendar-exam-date { display:grid; gap:2px }
+.calendar-exam-date time { font-size:21px; line-height:1.4; font-weight:700; font-variant-numeric:tabular-nums }
+.calendar-exam-date span,.calendar-entry>p { font-size:14px }
+.calendar-source { display:grid; gap:6px; color:var(--c-muted); font-size:13px; line-height:1.6 }
+.calendar-source p { margin:0 }
+.calendar-source a { display:inline-flex; align-items:center; min-height:44px; justify-self:start }
+@media(min-width:840px) { .calendar-grid,.calendar-rule-list { grid-template-columns:repeat(2,minmax(0,1fr)) } }
 
 .upcoming-container,.upcoming-placeholder { margin-bottom:20px }
 .upcoming-exam { display:flex; flex-wrap:wrap; align-items:center; gap:12px 24px; text-decoration:none; color:var(--c-ink) }

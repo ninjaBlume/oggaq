@@ -1,6 +1,10 @@
 import type { CSSProperties } from 'react';
 
 const paths = {
+  calendar: 'M8 2v4m8-4v4M3 10h18M3 5h18v16H3zM7 14h2m3 0h2m3 0h1M7 17h2m3 0h2',
+  check: 'M22 11a10 10 0 1 1-6-9M8 11l4 4L22 4',
+  external: 'M15 3h6v6m0-6L10 14M11 3H3v18h18v-8',
+  arrowLeft: 'm12 5-7 7 7 7M5 12h16',
   briefcase: 'M3 7h18v14H3zM8 7V3h8v4M3 12c6 3 12 3 18 0M12 12v4',
   shield: 'M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7l-9-4Zm-4 9 3 3 5-6',
   mail: 'M3 5h18v14H3zM3 6l9 7 9-7',

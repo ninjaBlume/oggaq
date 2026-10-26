@@ -1,8 +1,18 @@
 # Otomatik sınav takvimi
 
-Takvim, Deneme/Ders soru bankasından ve puanlama dönemlerinden ayrı bir merkezi veridir. Web ve mobil öğrenci menüsündeki **Sınav takvimi** ekranı Temel/Yenileme numaralarını, sınav gününü, eğitim bitişini ve kaynak/son doğrulama bilgisini birlikte gösterir. Eğitim bitişi başvuru son günü olarak sunulmaz; sınav saati veya açıklanmamış tarih üretilmez.
+Takvim, Deneme/Ders soru bankasından ve puanlama dönemlerinden ayrı bir merkezi veridir. Web ve mobil öğrenci menüsündeki **Sınav takvimi**, **Sınav tarihleri ve kurallar** sayfasını açar. Aynı sayfa ana sayfadaki Sıradaki sınav kartından da açılır; Temel/Yenileme numaralarını, sınav gününü, eğitim bitişini ve kaynak/son doğrulama bilgisini birlikte gösterir. Eğitim bitişi başvuru son günü olarak sunulmaz; sınav saati veya açıklanmamış tarih üretilmez.
 
 26 Ekim 2026: `b63538f` web/API ve mevcut scheduler üzerinde yayındadır. İlk canlı kontrol 2026 için altı doğrulanmış dönem kaydetti; 2027 henüz yayımlanmış değildir. Mobil geliştirme kaynağı aynı canlı API'yi kullanır.
+
+## Tarih ve kural sayfası — 26 Ekim 2026
+
+Üstte mevcut indigo/mavi paletle kısa bir **Sınav sistemi ve başarı kuralları** kartı; altında yıl seçimi ve kompakt tarih kartları bulunur. Yaklaşan sınavlar tarih sırasıyla önce, geçmiş sınavlar en yeniden eskiye sonra gösterilir. İlk yaklaşan kart mavi yüzeyle vurgulanır; bugün için `Bugün`, gelecek günlerde kalan gün rozeti vardır. Geçmiş tarihlere negatif sayaç eklenmez. Temel ve Yenileme sınav numaraları ayrı gösterilir; kaynak sırası ve snapshot değiştirilmez.
+
+Ortak `packages/study-core/src/calendar-rules.ts` metinleri web ve mobilde aynıdır. [Güncel konsolide yönetmelik](https://www.mevzuat.gov.tr/mevzuatmetin/yonetmelik/7.5.7190.pdf) bu teslimde doğrudan indirildi; madde 38–39'dan silahsız temel için 60 puan, uygulamalı atışta 5 fişek ve yenilemenin seviye tespiti oluşu doğrulandı. Silahlı değerlendirme bileşenleri özetlenir; döneme özgü soru sayısı/süre/puanlama için ilgili EGM kılavuzuna yönlendirilir. Referans görseldeki 100+25, atış başına 10 puan veya başarı formülü bütün gelecek dönemlere kesin kural olarak kopyalanmadı; [mevcut dönem doğrulama sınırları](EXAM_SCORING_RULES.md) ve puanlama motoru korunur.
+
+Resmî EGM sayfası ve güncel yönetmelik bağlantıları kural kartında, yıla ait EGM takvimi ve son doğrulama bilgisi tarihlerin altında yer alır. Eğitim bitişi **başvuru aralığı/son günü olarak yeniden adlandırılmaz**. Kurallar takvim isteğini beklemez; yavaş, hatalı veya boş yıl durumunda da okunabilir. Yeni API isteği, paket bağımlılığı, geçiş animasyonu veya yapay bekleme eklenmedi. Ana sayfaya dönüş, mevcut menü, açık/koyu tema, tablet ve mobil üç aşamalı yazı boyutu desteklenir.
+
+Uygulama kaynakları ve derlemeleri hazırdır; bu teslimde sunucuda web yayını yapılmadı. Deploy sorumluluğu Claude'da kalır. Mobil geliştirme kaynağı mevcut Metro üzerinden yenilenir; servis yeniden başlatılmadı. Doğrulama [TESTING](TESTING.md) içinde kaydedilir.
 
 ## Kaynak ve kontrol
 

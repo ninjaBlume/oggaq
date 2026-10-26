@@ -16,3 +16,17 @@ export function calendarToday(now = new Date()) {
 export function calendarPhase(date: string, today = calendarToday()) {
   return date < today ? 'Sınav tarihi geçti' : date === today ? 'Bugün' : 'Yaklaşan sınav';
 }
+
+// ISO dates represent Turkish calendar days, so daylight-saving or time-of-day
+// differences must never turn ten calendar days into nine.
+export function calendarDaysRemaining(date: string, today = calendarToday()): number | null {
+  if (date < today) return null;
+  return Math.round((Date.parse(`${date}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86400000);
+}
+export function orderedCalendarEntries(entries: readonly CalendarEntry[], today = calendarToday()): CalendarEntry[] {
+  return [...entries].sort((a, b) => {
+    const aPast = a.exam_date < today;const bPast = b.exam_date < today;
+    if (aPast !== bPast) return aPast ? 1 : -1;
+    return aPast ? b.exam_date.localeCompare(a.exam_date) : a.exam_date.localeCompare(b.exam_date);
+  });
+}

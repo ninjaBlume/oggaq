@@ -17,7 +17,15 @@ for(const platform of ['web','mobile']as const)for(const scheme of ['light','dar
   const card=page.getByTestId('upcoming-exam');await expect(card).toContainText('990. Temel');await expect(card).toContainText('790. Yenileme');await expect(card).toContainText('10');await expect(card).toContainText('gün kaldı');
   mkdirSync('artifacts/upcoming-exam/screens',{recursive:true});
   for(const width of [320,390,834,1280]){await page.setViewportSize({width,height:900});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);if(platform==='mobile'){const hero=await page.getByTestId('home-focus').boundingBox();const upcoming=await card.boundingBox();expect(upcoming!.y).toBeGreaterThanOrEqual(hero!.y+hero!.height);const header=await page.getByTestId('main-header').boundingBox();const brand=await page.getByTestId('header-brand-content').boundingBox();expect(Math.abs((brand!.x+brand!.width/2)-(header!.x+header!.width/2))).toBeLessThanOrEqual(1);}await page.screenshot({path:`artifacts/upcoming-exam/screens/${platform}-${scheme}-${width}.png`,fullPage:true,animations:'disabled'});}
-  await card.click();await expect(page.getByRole('heading',{name:'Sınav takvimi',exact:true})).toBeVisible();await expect(page.getByText('990. Temel',{exact:true})).toBeVisible();
+  let showCalendar!:()=>void;const calendarHeld = new Promise<void>(resolve => showCalendar=resolve);
+  await page.route(/\/exam-calendar\?/,async route=>{await calendarHeld;await route.continue();});
+  try {
+    await card.click();await expect(page.getByRole('heading',{name:'Sınav tarihleri ve kurallar',exact:true})).toBeVisible();
+    await expect(page.getByTestId('calendar-rules')).toContainText('Sınav sistemi ve başarı kuralları');
+  } finally { showCalendar(); }
+  await expect(page.getByText('990. Temel',{exact:true})).toBeVisible();
+  await expect(page.getByTestId('calendar-entry').first()).toContainText('10 gün kaldı');
+  if(platform==='web')await page.getByRole('link',{name:'Ana sayfaya dön',exact:true}).click();else await page.getByRole('button',{name:'Ana sayfaya dön',exact:true}).click();
   if(platform==='web')await page.getByRole('link',{name:'Deneme sınavları',exact:true}).click();else await page.getByRole('tab',{name:'Ana sayfa',exact:true}).click();
   fixture('calendar-stale');await refresh();await expect(page.getByTestId('upcoming-exam')).toContainText('Son doğrulanmış takvim');await expect(page.getByTestId('upcoming-exam')).toContainText('10');
   fixture('upcoming-empty');await refresh();await expect(page.getByText('Yaklaşan sınav tarihi henüz doğrulanmadı.',{exact:true})).toBeVisible();await expect(page.getByTestId('upcoming-exam')).toHaveCount(0);

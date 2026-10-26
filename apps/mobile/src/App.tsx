@@ -191,7 +191,7 @@ function MainTabs({
                   ) : page === "score" ? (
                     <ScoreCalculator />
                   ) : page === "calendar" ? (
-                    <ExamCalendarScreen initialYear={calendarYear} />
+                    <ExamCalendarScreen initialYear={calendarYear} back={() => selectTab("home")} />
                   ) : page === "jobs" ? (
                     <Jobs user={user} />
                   ) : page === "stats" ? (
