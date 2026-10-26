@@ -32,7 +32,10 @@ class SyncCalendarYear
             try {
                 $response = Http::withHeaders(['User-Agent' => 'OggSorCalendar/1.0 (+https://oggsor.com)', 'Accept' => 'text/html'])->connectTimeout(5)->timeout(15)->withoutRedirecting()->withOptions(['stream' => true])->get($url);
                 if (! $response->successful()) {
-                    return $this->failed($year, $response->status() === 404 ? 'not_published' : 'fetch_failed');
+                    // EGM returns this fixed relative error redirect for an unpublished year. Never follow it.
+                    $notPublished = $response->status() === 404 || ($response->status() === 302 && $response->header('Location') === '/Hata/Page404');
+
+                    return $this->failed($year, $notPublished ? 'not_published' : 'fetch_failed');
                 }
                 $body = $response->toPsrResponse()->getBody();
                 if ($body->isSeekable()) {

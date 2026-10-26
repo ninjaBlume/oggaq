@@ -4,7 +4,7 @@ Takvim, Deneme/Ders soru bankasından ve puanlama dönemlerinden ayrı bir merke
 
 ## Kaynak ve kontrol
 
-Birincil kaynak [EGM Özel Güvenlik 2026 sınav takvimi](https://www.egm.gov.tr/ozelguvenlik/2026-sinav-takvimi). 26 Ekim 2026 incelemesinde resmî HTML tablo doğrudan indirildi ve altı Temel/Yenileme çifti ayrıştırıldı. Son satır 124. Temel / 100. Yenileme, 27 Aralık 2026; eğitim bitişi 13 Kasım 2026'dır. Aynı gün uygulama sunucusundan bot kimliğiyle bu sayfa 200, 2027 adresi 404 döndürdü. Üçüncü taraf kurs takvimleri doğrulanmış veri kaynağı değildir.
+Birincil kaynak [EGM Özel Güvenlik 2026 sınav takvimi](https://www.egm.gov.tr/ozelguvenlik/2026-sinav-takvimi). 26 Ekim 2026 incelemesinde resmî HTML tablo doğrudan indirildi ve altı Temel/Yenileme çifti ayrıştırıldı. Son satır 124. Temel / 100. Yenileme, 27 Aralık 2026; eğitim bitişi 13 Kasım 2026'dır. Aynı gün uygulama sunucusundan bot kimliğiyle bu sayfa 200, 2027 adresi `/Hata/Page404` yoluna 302 döndürdü (normal istemcinin takip ettiği son sayfa 404). Bot bu sabit hata yönlendirmesini takip etmeden yayımlanmamış yıl olarak tanır. Üçüncü taraf kurs takvimleri doğrulanmış veri kaynağı değildir.
 
 `calendar:sync` Türkiye saatiyle her gün **03.20**'de bu yıl ve gelecek yılı kontrol eder. Elle tek yıl: `php artisan calendar:sync --year=2026`. Öğrenci API isteği EGM'ye gitmez; yalnız yerel snapshot okunur. Web sorgusu beş dakika önbellekte kalır. Mevcut scheduler ve cache kilidi kullanılır; yeni servis/bot hesabı veya bağımlı tarayıcı çalışmaz.
 

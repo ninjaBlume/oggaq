@@ -156,4 +156,12 @@ class ExamCalendarTest extends TestCase
         $this->artisan('calendar:sync', ['--year' => '2026'])->assertFailed();
         Http::assertNothingSent();
     }
+
+    public function test_only_known_official_error_redirect_is_treated_as_unpublished(): void
+    {
+        Http::fake([SyncCalendarYear::url(2027) => Http::sequence()->push('', 302, ['Location' => '/Hata/Page404'])->push('', 302, ['Location' => 'https://example.test/calendar'])]);
+        $this->assertSame('not_published', app(SyncCalendarYear::class)->execute(2027)['status']);
+        $this->assertSame('fetch_failed', app(SyncCalendarYear::class)->execute(2027)['status']);
+        Http::assertSentCount(2);
+    }
 }
