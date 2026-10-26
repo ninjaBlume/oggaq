@@ -134,7 +134,7 @@ test("mobil sekmeler gerçek Bearer API ile deneme sınavı, sonuçlar ve çık�
   await expect(
     page.getByRole("heading", { name: "Deneme sınavları", exact: true }),
   ).toBeVisible();
-  await expect(page.getByText("1. Deneme Sınavı", { exact: true })).toBeVisible();
+  await expect(page.getByText("1. Temel Eğitim Sınav Soruları", { exact: true })).toBeVisible();
   await expect(page.getByText(/önerilen süre 150 dk/)).toBeVisible();
   await screenshot(page, "deneme");
   await page.getByRole("button", { name: "Sınava gir", exact: true }).click();
@@ -581,12 +581,12 @@ test("sistem hareket azaltma tercihi canlı değişince Expressive hareket kapan
 test("mobil deneme ve ders sınavları ayrı listelenir", async ({ page }) => {
   await login(page);
   await page.getByRole("tab", { name: "Deneme", exact: true }).click();
-  await expect(page.getByText("1. Deneme Sınavı", { exact: true })).toBeVisible();
+  await expect(page.getByText("1. Temel Eğitim Sınav Soruları", { exact: true })).toBeVisible();
   await expect(page.getByText("1. Ders Sınavı", { exact: true })).toHaveCount(0);
   await page.getByRole("tab", { name: "Ders", exact: true }).click();
   await expect(page.getByText("1. Ders Sınavı", { exact: true })).toBeVisible();
-  await expect(page.getByText("1. Deneme Sınavı", { exact: true })).not.toBeVisible();
-  await expect(page.getByRole("heading", { name: "1. Deneme Sınavı", exact: true })).toHaveCount(0);
+  await expect(page.getByText("1. Temel Eğitim Sınav Soruları", { exact: true })).not.toBeVisible();
+  await expect(page.getByRole("heading", { name: "1. Temel Eğitim Sınav Soruları", exact: true })).toHaveCount(0);
 });
 test("mobil tekrar sınavı hatalardan kurulur; başarı durumu ve sınavlar gerçek API ile çalışır", async ({
   page,
@@ -692,7 +692,7 @@ test("liste beklerken iskelet gösterir, hata sonrası yeniden deneme gerçek li
   await expect(page.getByRole("alert")).toContainText("Sınav hizmeti geçici olarak kullanılamıyor.");
   fail = false;
   await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
-  await expect(page.getByText("1. Deneme Sınavı", { exact: true })).toBeVisible();
+  await expect(page.getByText("1. Temel Eğitim Sınav Soruları", { exact: true })).toBeVisible();
   await expect(page.getByRole("alert")).toHaveCount(0);
 });
 

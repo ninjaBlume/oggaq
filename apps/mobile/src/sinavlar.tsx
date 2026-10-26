@@ -6,7 +6,7 @@ import { Pressable, View } from "react-native";
 import { newId } from "./ids";
 import { ApiError, cursorFromLink } from "@oggaq/api-client";
 import type { ExamAttempt, Page, StudyContext, components } from "@oggaq/shared-types";
-import { examDisplayTitle, examPeriodLabel, suggestedMinutes, vocabulary, examTimerChoices, type ExamTimerPolicy } from "@oggaq/study-core";
+import { examDisplayTitle, examPeriodLabel, examQuestionTitle, suggestedMinutes, vocabulary, examTimerChoices, type ExamTimerPolicy } from "@oggaq/study-core";
 import { api } from "./api";
 import { useOnReturn, useResource, useTask } from "./hooks";
 import {
@@ -108,7 +108,7 @@ function ExamEntry({
   const locked = task.pending || (submission.current !== null && !(task.error instanceof ApiError && ([409, 422].includes(task.error.status) || task.error.problem.code === 'timer_unavailable')));
   const valid = Number(minutes) >= 1 && Number(minutes) <= 180;
   return (
-    <View style={{ paddingHorizontal: 14, paddingVertical: cardDensity.paddingY, gap: cardDensity.rowGap, borderRadius: shape.large, backgroundColor: tint.surface, borderWidth: 1, borderColor: progress.open && !expired ? palette.primary : tint.line }}>
+    <View testID="official-exam-entry" style={{ paddingHorizontal: 14, paddingVertical: cardDensity.paddingY, gap: cardDensity.rowGap, borderRadius: shape.large, backgroundColor: tint.surface, borderWidth: 1, borderColor: progress.open && !expired ? palette.primary : tint.line }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
         <View style={{ width: cardDensity.iconSize, height: cardDensity.iconSize, borderRadius: shape.control, alignItems: "center", justifyContent: "center", backgroundColor: tint.iconSurface }}>
           <BookOpen size={21} color={tint.accent} />
@@ -299,7 +299,7 @@ export function ExamList({
                 key={exam.id}
                 context={context}
                 exam={exam}
-                title={`${exam.exam_number ? `${exam.exam_number}. ` : ""}${kind === "deneme" ? "Deneme Sınavı" : "Ders Sınavı"}`}
+                title={kind === "deneme" ? examQuestionTitle(exam) : `${exam.exam_number ? `${exam.exam_number}. ` : ""}Ders Sınavı`}
                 attempts={attempts.data?.data ?? []}
                 open={open}
               />

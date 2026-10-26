@@ -49,6 +49,15 @@ export function examTypeShort(name: string): string {
 export function examDisplayTitle(title: string): string {
   return title.replace(/\s*\((?:\d{1,2}[./-]\d{1,2}[./-]\d{4}|\d{4}-\d{2}-\d{2})\)/gu, '').trim();
 }
+// List labels use explicit education metadata; renewal numbers are never derived
+// from a basic exam number. Stored titles and historical attempts stay intact.
+export function examQuestionTitle(exam: { exam_number: string | null; education_type?: 'basic' | 'renewal' | 'weapon_difference' }): string {
+  const name = exam.education_type === 'renewal' ? 'Yenileme Sınav Soruları'
+    : exam.education_type === 'weapon_difference' ? 'Silah Farkı Sınav Soruları'
+    : 'Temel Eğitim Sınav Soruları';
+  const number = exam.exam_number?.trim();
+  return number ? `${number}. ${name}` : name;
+}
 const monthLabels = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'] as const;
 export function examPeriodLabel(exam: { term: string | null; year: number }): string {
   const term = exam.term?.trim();

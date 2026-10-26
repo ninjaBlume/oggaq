@@ -71,6 +71,15 @@ Merkezi `official_exams` (künye: sınav türü, yıl, dönem, numara, başlık,
 
 Soruların `exam_type_id` alanı sınıflandırma içindir; çıkmış sınav aidiyeti `official_exam_questions` ile tutulur. Gerçek çıkmış sınav verisi bu teslimde içe aktarılmadı; import ayrıca onay ister. Resmî sınav süresi/geçme kuralı modellenmez.
 
+## Öğrenci sınav listelerinin başlıkları — 26 Ekim 2026
+
+Web ve mobil **Deneme sınavları** listesinde tam çıkmış sınavlar eğitim türünü açıkça belirtir:
+
+- Temel: **122. Temel Eğitim Sınav Soruları**.
+- Yenileme: **98. Yenileme Sınav Soruları**; numara kaydın kendi `exam_number` alanıdır.
+
+Ortak `examQuestionTitle` yordamı `education_type` ve `exam_number` alanlarını kullanır. Temel numarasından yenileme numarası hesaplanmaz. Numarası olmayan kayıtta hayalî yıl/numara eklenmez. Silahlı/silahsız filtreleri aynı eğitim başlığını kullanır; ay/yıl, soru sayısı ve süre bilgisi alt satırda kalır. Ders listesi kendi ders başlıklarını kullanmayı sürdürür. Bu yalnızca liste sunumudur; veritabanındaki yayımlanmış başlıklar/sürümler ve geçmiş deneme kayıtları değiştirilmez.
+
 ## Soru bildirimleri
 
 Kaynak veri eski bir veritabanından geldi ve 19 düzeltme kuralı gerekti; kalan hataları öğrenciler bildirir, platform yöneticisi inceler. Soru bankası gezintisi veya tek soru çözme yoktur: bildirim yalnız **biten bir denemenin sonucundan** yapılır.

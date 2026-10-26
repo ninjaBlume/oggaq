@@ -8,7 +8,7 @@ test.beforeEach(() => { fixture('setup-study'); fixture('official-exam'); fixtur
 test.afterAll(() => fixture('cleanup'));
 
 for (const mobile of [false, true]) {
- for (const width of [390, 834]) {
+ for (const width of [320, 390, 834]) {
   test(`${mobile ? 'mobil' : 'web'} eğitim seçimi denemeleri ayırır; derslerde seçim yok (${width}px)`, async ({ page }) => {
    await page.setViewportSize({width, height: 1000});
    await page.goto(mobile ? mobilePreviewUrl : 'http://127.0.0.1:5183');
@@ -20,6 +20,10 @@ for (const mobile of [false, true]) {
    const basic = page.getByRole('button',{name:mobile ? 'Temel eğitim sınavları' : 'Temel eğitim',exact:true});
    const renewal = page.getByRole('button',{name:mobile ? 'Yenileme eğitimi sınavları' : 'Yenileme eğitimi',exact:true});
    await expect(basic).toHaveAttribute(mobile ? 'aria-selected' : 'aria-pressed','true');
+   await expect(page.getByRole('heading',{name:'1. Temel Eğitim Sınav Soruları',exact:true})).toBeVisible();
+   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+   mkdirSync('artifacts/education',{recursive:true});
+   await page.screenshot({path:`artifacts/education/${mobile ? 'mobile' : 'web'}-${width}-basic.png`});
    const answer = page.waitForResponse(r => {
     const u=new URL(r.url());
     return u.pathname === '/api/v1/official-exams' && u.searchParams.get('education_type') === 'renewal' && u.searchParams.get('weapon_status') === 'armed';
@@ -29,7 +33,7 @@ for (const mobile of [false, true]) {
    expect(data).toHaveLength(1);
    expect(data[0].education_type).toBe('renewal');
    await expect(renewal).toHaveAttribute(mobile ? 'aria-selected' : 'aria-pressed','true');
-   await expect(page.getByRole('heading',{name:'1. Deneme Sınavı',exact:true})).toBeVisible();
+   await expect(page.getByRole('heading',{name:'1. Yenileme Sınav Soruları',exact:true})).toBeVisible();
    await expect(page.getByText('Ağustos 2026',{exact:false})).toBeVisible();
    const unarmedResponse = page.waitForResponse(r => {
     const u=new URL(r.url());
@@ -39,6 +43,8 @@ for (const mobile of [false, true]) {
    const unarmed = (await (await unarmedResponse).json()).data;
    expect(unarmed).toHaveLength(1);
    expect(unarmed[0].education_type).toBe('renewal');
+   await expect(page.getByRole('heading',{name:'1. Yenileme Sınav Soruları',exact:true})).toBeVisible();
+   await expect(page.getByRole('heading',{name:'1. Temel Eğitim Sınav Soruları',exact:true})).toHaveCount(0);
    await expect(renewal).toHaveAttribute(mobile ? 'aria-selected' : 'aria-pressed','true');
    mkdirSync('artifacts/education',{recursive:true});
    await page.screenshot({path:`artifacts/education/${mobile ? 'mobile' : 'web'}-${width}.png`});
@@ -57,7 +63,7 @@ for (const mobile of [false, true]) {
    await expect(page.getByRole('heading',{name:'1. Ders Sınavı',exact:true})).toBeVisible();
    const lessonHeading = page.getByRole('heading',{name:'98. Ders Sınavı',exact:true});
    await expect(lessonHeading).toBeVisible();
-   const lesson = mobile ? lessonHeading.locator('..') : page.locator('.sinav-row').filter({has:lessonHeading});
+   const lesson = mobile ? page.getByTestId('official-exam-entry').filter({has:lessonHeading}) : page.locator('.sinav-row').filter({has:lessonHeading});
    await lesson.getByRole('button',{name:'Sınava gir',exact:true}).click();
    const lessonStarted = page.waitForResponse(r => r.request().method() === 'POST' && new URL(r.url()).pathname.endsWith('/exam-attempts'));
    await lesson.getByRole('button',{name:'Sınavı başlat',exact:true}).click();

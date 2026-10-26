@@ -12,7 +12,7 @@ Ortak `packages/study-core/src/calendar-rules.ts` metinleri web ve mobilde aynı
 
 Resmî EGM sayfası ve güncel yönetmelik bağlantıları kural kartında, yıla ait EGM takvimi ve son doğrulama bilgisi tarihlerin altında yer alır. Eğitim bitişi **başvuru aralığı/son günü olarak yeniden adlandırılmaz**. Kurallar takvim isteğini beklemez; yavaş, hatalı veya boş yıl durumunda da okunabilir. Yeni API isteği, paket bağımlılığı, geçiş animasyonu veya yapay bekleme eklenmedi. Ana sayfaya dönüş, mevcut menü, açık/koyu tema, tablet ve mobil üç aşamalı yazı boyutu desteklenir.
 
-Uygulama kaynakları ve derlemeleri hazırdır; bu teslimde sunucuda web yayını yapılmadı. Deploy sorumluluğu Claude'da kalır. Mobil geliştirme kaynağı mevcut Metro üzerinden yenilenir; servis yeniden başlatılmadı. Doğrulama [TESTING](TESTING.md) içinde kaydedilir.
+Kural/tarih arayüzü kullanıcının sunucu operasyonlarını Codex’e devretmesiyle **oggsor.com üzerinde yayımlandı**. İlk yayın `oggaq-development-web:calendar-rules-597f46b` imajıdır; yalnız web konteyneri yenilendi. Üretim build aynı host üzerinden API kullanır (`VITE_API_URL=/`). Origin üzerinde 17 dosyanın hash’i, genel HTTPS üzerinde yeni JS/CSS hash’leri, öğrenci hesabıyla kurallar/124. Temel takvimi ve 390/1280 px düzen doğrulandı. Cloudflare HTML’e ek içerik eklediğinden dış HTML’in bayt özeti yerine referans verdiği build varlıkları karşılaştırılır. Diğer yedi servis ve veri korunur; otomatik geri dönüş girdileri `publication/calendar-rules-597f46b/` içindedir. Mobil geliştirme kaynağı mevcut Metro üzerinden yenilenir. Doğrulama [TESTING](TESTING.md) içinde kaydedilir.
 
 ## Kaynak ve kontrol
 

@@ -27,7 +27,7 @@ async function enter(page: Page, title: string, minutes: string) {
 // The fixture Deneme Sınavı is an armed exam of three questions (in reverse order); the Ders Sınavı holds the same questions in order.
 export async function enterDeneme(page: Page, minutes = "5") {
   await page.getByRole("link", { name: "Deneme sınavları", exact: true }).click();
-  await enter(page, "1. Deneme Sınavı", minutes);
+  await enter(page, "1. Temel Eğitim Sınav Soruları", minutes);
 }
 export async function enterDers(page: Page, minutes = "5") {
   await page.getByRole("link", { name: "Ders sınavları", exact: true }).click();

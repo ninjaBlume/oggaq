@@ -59,7 +59,7 @@ test("deneme ve ders sınavları ayrı listelenir", async ({ page }) => {
   await login(page);
   // The Deneme list has the whole exam only, the Ders list has the subject exam only.
   await expect(page.locator(".sinav-row")).toHaveCount(1);
-  await expect(page.locator(".sinav-row")).toContainText("1. Deneme Sınavı");
+  await expect(page.locator(".sinav-row")).toContainText("1. Temel Eğitim Sınav Soruları");
   await page.getByRole("link", { name: "Ders sınavları", exact: true }).click();
   await expect(page.locator(".sinav-row")).toHaveCount(1);
   await expect(page.locator(".sinav-row")).toContainText("1. Ders Sınavı");

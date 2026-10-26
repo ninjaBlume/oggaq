@@ -60,7 +60,7 @@ test('öğrenci deneme sınavına girer; cevaplar, sonuç ve geçmiş kalır', a
   // Only the two kinds of exam exist in the app: there is no question bank to browse.
   await expect(page.getByRole('link', { name: 'Soru çöz' })).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Çalışma geçmişim' })).toHaveCount(0);
-  const row = page.locator('.sinav-row').filter({ hasText: '1. Deneme Sınavı' });
+  const row = page.locator('.sinav-row').filter({ hasText: '1. Temel Eğitim Sınav Soruları' });
   await expect(row).toContainText('3 soru');
   await expect(row).toContainText('önerilen süre 150 dk');
   await expect(row).toContainText('Henüz girmedin');
@@ -90,7 +90,7 @@ test('öğrenci deneme sınavına girer; cevaplar, sonuç ve geçmiş kalır', a
   await page.getByRole('link', { name: 'Sonuçlarım', exact: true }).click();
   await expect(page.getByRole('region', { name: 'Sınav sonuçları' }).getByRole('link')).toHaveCount(1);
   await page.getByRole('link', { name: 'Deneme sınavları', exact: true }).click();
-  await expect(page.locator('.sinav-row').filter({ hasText: '1. Deneme Sınavı' })).toContainText('1 kez tamamlandı');
+  await expect(page.locator('.sinav-row').filter({ hasText: '1. Temel Eğitim Sınav Soruları' })).toContainText('1 kez tamamlandı');
   expect(errors).toEqual([]);
 });
 
@@ -122,7 +122,7 @@ test('yarım kalan sınav sürdürülür; kişisel ve kurum sonuçları ayrıdı
   await expect(page).toHaveURL(examUrl);
   await expect(page.getByRole('heading', { name: 'Denemen devam ediyor' })).toBeVisible();
   await page.getByRole('link', { name: 'Deneme sınavları', exact: true }).click();
-  await expect(page.locator('.sinav-row').filter({ hasText: '1. Deneme Sınavı' }).getByRole('link', { name: 'Devam et' })).toBeVisible();
+  await expect(page.locator('.sinav-row').filter({ hasText: '1. Temel Eğitim Sınav Soruları' }).getByRole('link', { name: 'Devam et' })).toBeVisible();
   await page.getByLabel('Çalışma alanı').selectOption({ label: 'Sentetik eğitim kurumu' });
   await expect(page.getByRole('heading', { name: 'Deneme sınavları' })).toBeVisible();
   await page.getByRole('link', { name: 'Sonuçlarım', exact: true }).click();
@@ -188,7 +188,7 @@ test('başlatma yanıtı kaybolduğunda aynı işlem kimliğiyle tekrar edilir',
     if (ids.length === 1) { await route.fetch(); await route.abort('internetdisconnected'); }
     else await route.continue();
   });
-  const row = page.locator('.sinav-row').filter({ hasText: '1. Deneme Sınavı' });
+  const row = page.locator('.sinav-row').filter({ hasText: '1. Temel Eğitim Sınav Soruları' });
   await row.getByRole('button', { name: 'Sınava gir', exact: true }).click();
   await row.getByLabel('Süre (dakika)', { exact: true }).fill('5');
   await row.getByRole('button', { name: 'Sınavı başlat' }).click();

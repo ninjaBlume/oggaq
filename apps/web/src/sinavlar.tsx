@@ -4,7 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, cursorFromLink } from '@oggaq/api-client';
 import type { components } from '@oggaq/shared-types';
-import { examDisplayTitle, examPeriodLabel, randomId, scoreBand, suggestedMinutes, vocabulary, examTimerChoices, type ExamTimerPolicy } from '@oggaq/study-core';
+import { examDisplayTitle, examPeriodLabel, examQuestionTitle, randomId, scoreBand, suggestedMinutes, vocabulary, examTimerChoices, type ExamTimerPolicy } from '@oggaq/study-core';
 import { api } from './api';
 import { Icon } from './icons';
 import { PageIntro, useStudyContext } from './App';
@@ -111,7 +111,7 @@ export function DenemeSinavlari() {
     <nav className="tab-bar" aria-label="Eğitim türü">{([['basic', 'Temel eğitim'], ['renewal', 'Yenileme eğitimi']] as const).map(([value, label]) => <button key={value} type="button" className={`tab-button${education === value ? ' active' : ''}`} aria-pressed={education === value} onClick={() => setParams({ egitim: value, silah: weapon })}>{label}</button>)}</nav>
     <nav className="tab-bar" aria-label="Silah durumu">{([['armed', 'Silahlı sınav'], ['unarmed', 'Silahsız sınav']] as const).map(([value, label]) => <button key={value} type="button" className={`tab-button${weapon === value ? ' active' : ''}`} aria-pressed={weapon === value} onClick={() => setParams({ egitim: education, silah: value })}>{label}</button>)}</nav>
     {exams.isPending ? <Loading /> : exams.isError ? <ErrorNotice error={exams.error} retry={() => { void exams.refetch(); }} /> : list.length === 0 ? <section className="card empty"><h2>Henüz deneme sınavı yok</h2><p>Seçtiğin {education === 'basic' ? 'temel' : 'yenileme'} eğitimi için yayımlanmış sınav olduğunda burada görünür.</p></section>
-      : <>{attempts.isError && <ErrorNotice error={attempts.error} retry={() => { void attempts.refetch(); }} />}<div className="sinav-list">{list.map((exam) => <ExamRow key={exam.id} exam={exam} title={`${exam.exam_number ? `${exam.exam_number}. ` : ''}Deneme Sınavı`} attempts={attempts.data?.data ?? []} />)}</div></>}
+      : <>{attempts.isError && <ErrorNotice error={attempts.error} retry={() => { void attempts.refetch(); }} />}<div className="sinav-list">{list.map((exam) => <ExamRow key={exam.id} exam={exam} title={examQuestionTitle(exam)} attempts={attempts.data?.data ?? []} />)}</div></>}
   </>;
 }
 

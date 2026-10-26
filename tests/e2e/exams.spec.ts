@@ -76,7 +76,7 @@ test("geçersiz süre ile sınav başlatılamaz", async ({ page }) => {
     if (route.request().method() === "POST") started = true;
     await route.continue();
   });
-  const row = page.locator(".sinav-row").filter({ hasText: "1. Deneme Sınavı" });
+  const row = page.locator(".sinav-row").filter({ hasText: "1. Temel Eğitim Sınav Soruları" });
   await row.getByRole("button", { name: "Sınava gir", exact: true }).click();
   await row.getByLabel("Süre (dakika)", { exact: true }).fill("0");
   await row.getByRole("button", { name: "Sınavı başlat" }).click();
