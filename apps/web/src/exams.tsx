@@ -5,6 +5,7 @@ import { ApiError } from "@oggaq/api-client";
 import {
   anchorClock,
   mergeExamAnswerState,
+  mergeExamTimer,
   resumeQuestionIndex,
   ExamPositionSaver,
   remainingSeconds,
@@ -15,6 +16,7 @@ import { api } from "./api";
 import { PageIntro, useStudyContext } from "./App";
 import { CompletedExam } from "./exam-results";
 import { ErrorNotice, Loading } from "./ui";
+import { useExamTimer } from "./use-exam-timer";
 import { takeExamLaunch } from "./exam-launch";
 
 export function Exam() {
@@ -115,8 +117,16 @@ function ExamContent({
   const [awaitingResult, setAwaitingResult] = useState(false);
   const expiredRequest = useRef(false);
   const done = exam.status === "completed";
+  const timer = useExamTimer(exam, summary => {
+    if (summary.status === 'completed') { void reload(); return; }
+    const current = cache.getQueryData<{ data: ExamAttempt }>(['exam', context.id, exam.id]);
+    if (current) cache.setQueryData(['exam', context.id, exam.id], {data: mergeExamTimer(current.data, summary)});
+    if (summary.remaining_seconds > 0) setAwaitingResult(false);
+    void cache.invalidateQueries({queryKey: ['exams', context.id]});
+  });
   useEffect(() => {
     if (done) return;
+    if (exam.timer_paused) { setSeconds(exam.remaining_seconds); setAwaitingResult(false); return; }
     const clock = anchorClock(
       exam.deadline_at,
       exam.server_time,
@@ -138,7 +148,7 @@ function ExamContent({
     return () => window.clearInterval(interval);
     // Each server response anchors a new monotonic clock; local time never grades an exam.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exam.server_time, exam.deadline_at, done]);
+  }, [exam.server_time, exam.deadline_at, exam.timer_paused, exam.remaining_seconds, done]);
   useEffect(() => {
     if (done) {
       setSubmission(null);
@@ -164,7 +174,7 @@ function ExamContent({
     mutationFn: async (s: Save) => {
       const response = await api.request("put", "/api/v1/contexts/{context}/exam-attempts/{exam}/answers/{answer}", {
         params: { context: context.id, exam: exam.id, answer: s.row },
-        query: { compact: true }, body: { base_version: s.revision, selected_option_id: s.option },
+        query: { compact: true }, body: { base_version: s.revision, selected_option_id: s.option, timer_session_id: exam.timer_policy === 'pause_on_exit' ? timer.sessionId : undefined },
       });
       if ('questions' in response.data) return { data: response.data };
       if (response.data.status === 'completed') return api.request('get', '/api/v1/contexts/{context}/exam-attempts/{exam}', { params: { context: context.id, exam: exam.id } });
@@ -183,7 +193,7 @@ function ExamContent({
         "/api/v1/contexts/{context}/exam-attempts/{exam}/finish",
         {
           params: { context: context.id, exam: exam.id },
-          body: { base_version: revision },
+          body: { base_version: revision, timer_session_id: exam.timer_policy === 'pause_on_exit' ? timer.sessionId : undefined },
         },
       ),
     onSuccess: (response) => {
@@ -197,7 +207,7 @@ function ExamContent({
     finish.isPending ||
     submission !== null ||
     finishSubmission !== null;
-  const locked = done || blocked || awaitingResult;
+  const locked = done || blocked || awaitingResult || exam.timer_paused || timer.pending || timer.error != null;
   const navigationBlocked = finish.isPending || finishSubmission !== null;
   const row = exam.questions[index];
   const answered = exam.questions.filter(
@@ -235,6 +245,11 @@ function ExamContent({
             : "Cevapların seçtikçe kaydedilir. Doğru yanıt hemen gösterilir; seçimin değiştirilemez."}
         </p>
       </PageIntro>
+      {exam.timer_policy === 'pause_on_exit' && <section className="notice" aria-label="Süre tercihi">
+        <p>{exam.timer_paused ? 'Süre duraklatıldı.' : 'Çıkınca süre dursun seçili.'}</p>
+        <button className="button secondary" disabled={timer.pending} onClick={() => { void (exam.timer_paused || timer.error ? timer.resume() : timer.pause()); }}>{timer.pending ? 'Süre ayarlanıyor…' : exam.timer_paused || timer.error ? 'Süreyi devam ettir' : 'Süreyi duraklat'}</button>
+        {timer.error != null && <ErrorNotice error={timer.error} retry={() => { void timer.resume(); }} />}
+      </section>}
       <div className="practice-layout">
         <section className="card practice-card">
           <div className="question-meta">

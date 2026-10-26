@@ -3,9 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Modules\Exams\Actions\FinalizeExam;
+use App\Modules\Exams\ExamClock;
 use App\Modules\Exams\Models\ExamAttempt;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class ExpireExamAttempts extends Command
 {
@@ -16,11 +18,14 @@ class ExpireExamAttempts extends Command
     public function handle(): int
     {
         $count = 0;
-        ExamAttempt::whereNull('finished_at')->where('deadline_at', '<=', now())->chunkById(100, function ($attempts) use (&$count) {
+        ExamAttempt::whereNull('finished_at')->when(Schema::hasColumn('exam_attempts', 'paused_at'), fn ($query) => $query->whereNull('paused_at'))->where('deadline_at', '<=', now())->chunkById(100, function ($attempts) use (&$count) {
             foreach ($attempts as $attempt) {
                 $count += DB::transaction(function () use ($attempt) {
                     $locked = ExamAttempt::whereKey($attempt->id)->lockForUpdate()->first();
-                    if (! $locked || $locked->finished_at !== null || now()->lessThan($locked->deadline_at)) {
+                    if ($locked) {
+                        app(ExamClock::class)->synchronize($locked);
+                    }
+                    if (! $locked || $locked->finished_at !== null || $locked->pauseMoment() !== null || now()->lessThan($locked->deadline_at)) {
                         return 0;
                     }
                     app(FinalizeExam::class)->execute($locked);

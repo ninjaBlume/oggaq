@@ -7,6 +7,7 @@ import type { User } from '@oggaq/shared-types';
 import { ApiError } from '@oggaq/api-client';
 import { notOfficialNotice } from '@oggaq/study-core';
 import { api } from './api';
+import { pauseExamBeforeSignOut } from './use-exam-timer';
 import { brand } from './config';
 import { verificationInput } from './verification';
 import { BrandWordmark, BrandLogo, ErrorNotice, Field, Loading, PasswordField } from './ui';
@@ -29,6 +30,7 @@ export function useSession() {
 export function useLogout() {
   const cache = useQueryClient();
   return useMutation({ mutationFn: async () => {
+    await pauseExamBeforeSignOut();
     try { await api.request('post', '/api/v1/auth/logout', {}); }
     catch (error) { if (!(error instanceof ApiError && error.status === 401)) throw error; }
   }, onSuccess: () => replaceSession(cache, null) });

@@ -10,24 +10,29 @@ class ExamSummaryResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $now = now()->startOfSecond();
+        $pause = $this->resource->pauseMoment();
+        $remaining = $this->finished_at !== null ? 0 : max(0, (int) ceil(($pause ?? $now)->diffInSeconds($this->deadline_at, false)));
+
         return [
             'id' => $this->id, 'context_id' => $this->study_context_id, 'revision' => $this->revision,
             'status' => $this->finished_at === null ? 'active' : 'completed',
             'resume_position' => $this->bookmark?->position,
+            'timer_policy' => $this->timer_policy ?? 'continuous', 'timer_paused' => $pause !== null, 'remaining_seconds' => $remaining,
             'question_count' => $this->question_count, 'duration_seconds' => $this->duration_seconds,
             'subject_id' => $this->subject_id, 'topic_id' => $this->topic_id, 'scoring_rule' => $this->scoring_rule,
             'official_exam' => $this->officialExam === null ? null : [
                 'id' => $this->officialExam->id, 'title' => $this->officialExam->title, 'year' => $this->officialExam->year,
                 'term' => $this->officialExam->term, 'exam_number' => $this->officialExam->exam_number,
             ],
-            'started_at' => $this->started_at->toISOString(), 'deadline_at' => $this->deadline_at->toISOString(),
+            'started_at' => $this->started_at->toISOString(), 'deadline_at' => ($pause === null ? $this->deadline_at : $now->copy()->addSeconds($remaining))->toISOString(),
             'server_time' => now()->toISOString(), 'finished_at' => $this->finished_at?->toISOString(), 'finish_reason' => $this->finish_reason,
             'scoring_available' => $this->officialExam?->scoringLink !== null,
             'score_result' => $this->finished_at === null || $this->scoreResult?->output === null ? null : new ScoreResultResource($this->scoreResult),
             'result' => $this->finished_at === null ? null : [
                 'correct' => $this->correct_count, 'incorrect' => $this->incorrect_count, 'blank' => $this->blank_count,
                 'score_percent' => $this->score_percent,
-                'elapsed_seconds' => min($this->duration_seconds, max(0, (int) $this->started_at->diffInSeconds($this->finished_at))),
+                'elapsed_seconds' => min($this->duration_seconds, max(0, (int) $this->started_at->diffInSeconds($this->finished_at) - (int) $this->paused_seconds)),
             ],
         ];
     }

@@ -3,6 +3,7 @@
 namespace App\Modules\Exams\Actions;
 
 use App\Models\User;
+use App\Modules\Exams\ExamClock;
 use App\Modules\Exams\Models\ExamAttempt;
 use App\Modules\Exams\Models\ExamBookmark;
 use App\Modules\Study\Actions\ResolveStudyContext;
@@ -21,7 +22,8 @@ class SaveExamPosition
             if ($position > $attempt->question_count) {
                 throw ValidationException::withMessages(['position' => ['Soru konumu bu sınavın soru sayısını aşamaz.']]);
             }
-            if ($attempt->finished_at === null && now()->greaterThanOrEqualTo($attempt->deadline_at)) {
+            app(ExamClock::class)->synchronize($attempt);
+            if ($attempt->finished_at === null && $attempt->pauseMoment() === null && now()->greaterThanOrEqualTo($attempt->deadline_at)) {
                 $this->finalize->execute($attempt);
             }
             if ($attempt->finished_at === null) {

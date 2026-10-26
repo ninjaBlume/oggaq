@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, cursorFromLink } from '@oggaq/api-client';
 import type { components } from '@oggaq/shared-types';
-import { examDisplayTitle, examPeriodLabel, randomId, scoreBand, suggestedMinutes, vocabulary } from '@oggaq/study-core';
+import { examDisplayTitle, examPeriodLabel, randomId, scoreBand, suggestedMinutes, vocabulary, examTimerChoices, type ExamTimerPolicy } from '@oggaq/study-core';
 import { api } from './api';
 import { Icon } from './icons';
 import { PageIntro, useStudyContext } from './App';
@@ -53,6 +53,7 @@ function ExamRow({ exam, title, attempts }: { exam: OfficialExam; title: string;
   const cache = useQueryClient();
   const [open, setOpen] = useState(false);
   const [minutes, setMinutes] = useState(() => suggestedMinutes(exam));
+  const [timerPolicy, setTimerPolicy] = useState<ExamTimerPolicy>('continuous');
   const submission = useRef<StartInput | null>(null);
   const progress = progressOf(attempts, exam.id);
   const start = useMutation({
@@ -63,10 +64,10 @@ function ExamRow({ exam, title, attempts }: { exam: OfficialExam; title: string;
       navigate(`/study/${context.id}/exams/${response.data.id}`);
     },
     // A rejected start (409/422) is not a lost response: the next try is a new attempt id.
-    onError: (error) => { if (error instanceof ApiError && [409, 422].includes(error.status)) submission.current = null; },
+    onError: (error) => { if (error instanceof ApiError && ([409, 422].includes(error.status) || error.problem.code === 'timer_unavailable')) submission.current = null; },
   });
   function begin() {
-    submission.current ??= { id: randomId(), official_exam_id: exam.id, duration_seconds: Math.round(minutes) * 60 };
+    submission.current ??= { id: randomId(), official_exam_id: exam.id, duration_seconds: Math.round(minutes) * 60, timer_policy: timerPolicy };
     start.mutate(submission.current);
   }
   const locked = start.isPending || submission.current !== null;
@@ -75,7 +76,7 @@ function ExamRow({ exam, title, attempts }: { exam: OfficialExam; title: string;
     <div className="sinav-main">
       <div className="sinav-title"><span className="exam-mark"><Icon name="book" size={22} /></span><h2>{title}</h2></div>
       <p>{[examPeriodLabel(exam), `${exam.question_count} soru`, `önerilen süre ${suggestedMinutes(exam)} dk`].join(' · ')}</p>
-      <p className="sinav-progress">{progress.runs === 0 && !progress.open ? 'Henüz girmedin' : [progress.open ? (expired ? 'Süresi dolmuş deneme var' : 'Devam eden denemen var') : null, progress.runs > 0 ? `${progress.runs} kez tamamlandı · en iyi %${progress.best}` : null].filter(Boolean).join(' · ')}</p>
+      <p className="sinav-progress">{progress.runs === 0 && !progress.open ? 'Henüz girmedin' : [progress.open ? (progress.open.timer_paused ? 'Süre duraklatıldı' : expired ? 'Süresi dolmuş deneme var' : 'Devam eden denemen var') : null, progress.runs > 0 ? `${progress.runs} kez tamamlandı · en iyi %${progress.best}` : null].filter(Boolean).join(' · ')}</p>
     </div>
     <div className="sinav-action">
       {progress.open ? <Link className="button primary" to={`/study/${context.id}/exams/${progress.open.id}`}>{expired ? 'Sonucu gör' : 'Devam et'}</Link>
@@ -84,6 +85,7 @@ function ExamRow({ exam, title, attempts }: { exam: OfficialExam; title: string;
     {open && !progress.open && <form className="start-panel" onSubmit={(event) => { event.preventDefault(); begin(); }}>
       <fieldset disabled={locked}>
         <Field label="Süre (dakika)" hint={`Sınav başlayınca süre işler; süre dolunca sınav kendiliğinden biter. Önerilen: ${suggestedMinutes(exam)} dakika.`}>{(props) => <input {...props} type="number" min={1} max={180} required value={minutes} onChange={(event) => setMinutes(Number(event.target.value))} />}</Field>
+        <Field label="Uygulamadan ayrılınca" hint={timerPolicy === 'pause_on_exit' ? 'Normal çıkışta süre durur. Ani kapanma veya bağlantı kaybında 30 saniyeye kadar işlemeye devam edebilir.' : undefined}>{(props) => <select {...props} value={timerPolicy} onChange={(event) => setTimerPolicy(event.target.value as ExamTimerPolicy)}>{examTimerChoices.map(choice => <option key={choice.value} value={choice.value}>{choice.label}</option>)}</select>}</Field>
         <div className="actions"><button className="button primary" type="submit">{start.isPending ? 'Sınav hazırlanıyor…' : 'Sınavı başlat'}</button><button className="button secondary" type="button" onClick={() => setOpen(false)}>Vazgeç</button></div>
       </fieldset>
       {start.isError && <ErrorNotice error={start.error} retry={() => begin()} />}

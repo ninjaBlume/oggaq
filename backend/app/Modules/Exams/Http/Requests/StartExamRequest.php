@@ -21,6 +21,7 @@ class StartExamRequest extends FormRequest
             'official_exam_id' => ['sometimes', 'uuid', 'prohibits:question_count,subject_id,topic_id,review_kind', Rule::exists('official_exams', 'id')->whereNotNull('published_at')],
             'review_kind' => ['sometimes', Rule::in(ReviewQuestionSet::KINDS)],
             'duration_seconds' => ['required', 'integer', 'min:60', 'max:10800'],
+            'timer_policy' => ['sometimes', Rule::in(['continuous', 'pause_on_exit'])],
             'subject_id' => ['nullable', 'required_with:topic_id', 'uuid', Rule::exists('subjects', 'id')],
             'topic_id' => ['nullable', 'uuid', Rule::exists('topics', 'id')->where('subject_id', $this->input('subject_id'))],
             'user_id' => ['prohibited'], 'tenant_id' => ['prohibited'], 'study_context_id' => ['prohibited'],

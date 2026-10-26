@@ -3,6 +3,7 @@
 namespace App\Modules\Exams\Actions;
 
 use App\Models\User;
+use App\Modules\Exams\ExamClock;
 use App\Modules\Exams\Models\ExamAttempt;
 use App\Modules\Study\Actions\ResolveStudyContext;
 use App\Support\ApiProblem;
@@ -15,19 +16,23 @@ class AccessExam
     public function __construct(private ResolveStudyContext $contexts, private FinalizeExam $finalize) {}
 
     // Every read/write returns the canonical state and automatically closes an expired attempt.
-    public function execute(User $actor, string $contextId, string $id, ?array $answer = null, ?int $finishRevision = null, bool $compact = false): ExamAttempt
+    public function execute(User $actor, string $contextId, string $id, ?array $answer = null, ?int $finishRevision = null, bool $compact = false, ?string $timerSession = null): ExamAttempt
     {
         try {
-            return DB::transaction(function () use ($actor, $contextId, $id, $answer, $finishRevision, $compact) {
+            return DB::transaction(function () use ($actor, $contextId, $id, $answer, $finishRevision, $compact, $timerSession) {
                 $context = $this->contexts->execute($actor, $contextId, true);
                 $attempt = ExamAttempt::where('study_context_id', $context->id)->whereKey($id)->lockForUpdate()->firstOrFail();
-                if ($attempt->finished_at === null && now()->greaterThanOrEqualTo($attempt->deadline_at)) {
+                $clock = app(ExamClock::class);
+                $clock->synchronize($attempt);
+                if ($attempt->finished_at === null && $attempt->pauseMoment() === null && now()->greaterThanOrEqualTo($attempt->deadline_at)) {
                     $this->finalize->execute($attempt);
                 }
                 if ($attempt->finished_at === null && $answer !== null) {
+                    $clock->assertRunning($attempt, $answer['timer_session_id'] ?? $timerSession);
                     $this->saveAnswer($attempt, $answer);
                 }
                 if ($attempt->finished_at === null && $finishRevision !== null) {
+                    $clock->assertRunning($attempt, $timerSession);
                     if ($attempt->revision !== $finishRevision) {
                         throw new ApiProblem(409, 'version_conflict', 'Deneme başka bir işlemde güncellendi. Bitirmeden önce kaydı yenileyin.');
                     }

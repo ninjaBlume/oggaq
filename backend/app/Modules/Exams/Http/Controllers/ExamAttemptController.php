@@ -9,11 +9,13 @@ use App\Modules\Exams\Actions\ListExams;
 use App\Modules\Exams\Actions\ReportExamQuestion;
 use App\Modules\Exams\Actions\SaveExamPosition;
 use App\Modules\Exams\Actions\StartExam;
+use App\Modules\Exams\Actions\UpdateExamTimer;
 use App\Modules\Exams\Http\Requests\FinishExamRequest;
 use App\Modules\Exams\Http\Requests\ReportQuestionRequest;
 use App\Modules\Exams\Http\Requests\SaveExamAnswerRequest;
 use App\Modules\Exams\Http\Requests\SaveExamPositionRequest;
 use App\Modules\Exams\Http\Requests\StartExamRequest;
+use App\Modules\Exams\Http\Requests\UpdateExamTimerRequest;
 use App\Modules\Exams\Http\Resources\ExamAnswerStateResource;
 use App\Modules\Exams\Http\Resources\ExamAttemptResource;
 use App\Modules\Exams\Http\Resources\ExamSummaryResource;
@@ -55,9 +57,14 @@ class ExamAttemptController extends Controller
         return new ExamSummaryResource($action->execute($request->user(), $context, $exam, $request->integer('position')));
     }
 
+    public function timer(UpdateExamTimerRequest $request, string $context, string $exam, UpdateExamTimer $action): ExamSummaryResource
+    {
+        return new ExamSummaryResource($action->execute($request->user(), $context, $exam, $request->validated('action'), $request->validated('session_id')));
+    }
+
     public function finish(FinishExamRequest $request, string $context, string $exam, AccessExam $action): ExamAttemptResource
     {
-        return new ExamAttemptResource($action->execute($request->user(), $context, $exam, finishRevision: $request->integer('base_version')));
+        return new ExamAttemptResource($action->execute($request->user(), $context, $exam, finishRevision: $request->integer('base_version'), timerSession: $request->validated('timer_session_id')));
     }
 
     // 201 when the report is new, 200 with the same report when the student had already reported this question.

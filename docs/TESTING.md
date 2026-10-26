@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, öğrencinin süre tercihi
+
+- Deneme ve Ders başlangıcında öğrenci `continuous` veya `pause_on_exit` seçer. Tercih sınav snapshot'ında sabittir; kalan süre, duraklama ve cihaz oturumu sunucuda doğrulanır. Normal çıkış duraklatır; ani kapanma/ağ kaybında son heartbeat'ten itibaren en çok 30 saniye çalışabilir. Eski cihazın geciken yazıları yeni oturumu durduramaz. Yerel ortak `oggaq` migration yapılmadan korunur: mevcut sürekli sayaç çalışır, yeni duraklama seçimi açıklanmış `timer_unavailable` 503 döndürür.
+- PHP 8.4/PostgreSQL tam **260 test / 2.837 assertion** geçti; yeni süre testleri **7 test / 79 assertion**. Duraklama/devam, eski cihaz ve gecikmiş pause, tekrar, süre sonu, cevap/bitirme kilidi, geçmiş snapshot, yetki ve eski şema uyumluluğu doğrulandı. Pint, Composer strict validate/audit, OpenAPI lint/tip üretimi ve strict TypeScript geçti. **104 Vitest** (36 study-core + 16 admin + 10 web + 42 mobil), admin/web build ve iOS/Android/web Expo export başarılıdır. Web oturum kapatma düzeltmesinden sonra typecheck, 10 web testi ve üretim web build tekrar geçti.
+- İlgili **20 E2E tek koşumda geçti**: altı yeni süre, altı sınav ve sekiz senkronizasyon senaryosu. Web/Expo web üzerinde Deneme ve Ders, süre tercihi, duraklatılmış sayacın sabitliği, geri dönüşte süre/cevap kilidinin korunması ve sürekli sayaç doğrulandı. Web çıkış yap akışı eklendikten sonra **3/3 web süre testi** tekrar geçti. 390 px web/mobil ekranları gözle incelendi. Fiziksel iOS/Android cihaz denenmedi.
+- Tam 129 E2E denemesi temiz tamamlanmadı: **34 geçti, 3 mevcut tasarım/sonuç çoklu ekran testi 45 saniye timeout aldı, 1 test kesildi ve 91 çalışmadı**. Yoğun yerel CPU yükü altında kendi test süreci durduruldu; bu başarısızlıklar geçti sayılmaz. İlgili 20 ve son 3 test için yalnız geçici QA yapılandırmasında 90 saniye test/30 saniye beklenti kullanıldı; deponun normal timeout değerleri değiştirilmedi. Kanıtlar `artifacts/exam-timer-choice/` içindedir.
+- PHPUnit/E2E sırayla yalnız `oggaq_test` üzerinde çalıştı; mobil önizleme 5186 kullanıldı. Ortak geliştirme servisleri, yerel içerik DB'si/hesaplar ve deploy/backup betikleri değiştirilmedi. Git push yapılmadı.
+
 ## Güncel doğrulama — 26 Ekim 2026, ilk cevap kilidi ve anında değerlendirme
 
 - PHP 8.4/PostgreSQL: **253 test / 2.758 assertion** geçti. İlk seçimin yalnız kendi anahtarını açması, aynı seçim tekrarının revision artırmaması, değiştirme/temizlemenin API ve PostgreSQL'de reddi, eski cevap/konum/sonuçların korunması doğrulandı. İlk tam koşumda test DB yeniden kurulumunda kalan fonksiyonla çakışma çıktı; migration `CREATE OR REPLACE FUNCTION` biçimine alındı, sonraki tam 253 başarılıdır. Pint, Composer strict validate/audit geçti.

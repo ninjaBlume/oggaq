@@ -3,6 +3,7 @@
 namespace App\Modules\Exams\Actions;
 
 use App\Models\User;
+use App\Modules\Exams\ExamClock;
 use App\Modules\Exams\Models\ExamAnswer;
 use App\Modules\Exams\Models\ExamAttempt;
 use App\Modules\Exams\Models\ExamBookmark;
@@ -15,6 +16,7 @@ use App\Support\ApiProblem;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 
 class StartExam
@@ -31,7 +33,15 @@ class StartExam
                 $settings = [
                     'question_count' => $template?->count() ?? (int) $input['question_count'], 'duration_seconds' => (int) $input['duration_seconds'],
                     'subject_id' => $input['subject_id'] ?? null, 'topic_id' => $input['topic_id'] ?? null, 'official_exam_id' => $input['official_exam_id'] ?? null,
+                    'timer_policy' => $input['timer_policy'] ?? 'continuous',
                 ];
+                $timerSchema = Schema::hasColumn('exam_attempts', 'timer_policy');
+                if (! $timerSchema) {
+                    if ($settings['timer_policy'] !== 'continuous') {
+                        throw new ApiProblem(503, 'timer_unavailable', 'Süre tercihi için sunucu güncellemesi gerekiyor.');
+                    }
+                    unset($settings['timer_policy']);
+                }
                 $existing = ExamAttempt::where('study_context_id', $context->id)->whereKey($input['id'])->lockForUpdate()->first();
                 if ($existing) {
                     foreach ($settings as $key => $value) {
@@ -39,7 +49,8 @@ class StartExam
                             throw new ApiProblem(409, 'idempotency_conflict', 'Bu işlem kimliği farklı bir deneme için kullanılmış.');
                         }
                     }
-                    if ($existing->finished_at === null && now()->greaterThanOrEqualTo($existing->deadline_at)) {
+                    app(ExamClock::class)->synchronize($existing);
+                    if ($existing->finished_at === null && $existing->pauseMoment() === null && now()->greaterThanOrEqualTo($existing->deadline_at)) {
                         app(FinalizeExam::class)->execute($existing);
                     }
 
@@ -54,6 +65,7 @@ class StartExam
                 $attempt->forceFill($settings + [
                     'id' => $input['id'], 'study_context_id' => $context->id, 'scoring_rule' => 'correct_ratio_v1',
                     'revision' => 1, 'started_at' => $startedAt, 'deadline_at' => $startedAt->copy()->addSeconds($settings['duration_seconds']),
+                    ...($timerSchema ? ['paused_at' => $settings['timer_policy'] === 'pause_on_exit' ? $startedAt : null] : []),
                 ])->save();
                 foreach ($picked as $position => $question) {
                     (new ExamAnswer)->forceFill($question + ['exam_attempt_id' => $attempt->id, 'position' => $position + 1])->save();

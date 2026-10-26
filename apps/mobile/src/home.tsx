@@ -113,7 +113,7 @@ export function Home({
               ? activeExam.official_exam ? examDisplayTitle(activeExam.official_exam.title) : `${activeExam.question_count} soruluk deneme`
               : "Silahlı veya silahsız sınavını seç, soruları çöz ve sonucunu incele."}
           </Text>
-          {activeExam && <Text style={{ color: palette.onNavyMuted, fontSize: 12, lineHeight: 18 }}>{activeExam.question_count} soru · Süren işlemeye devam ediyor</Text>}
+          {activeExam && <Text style={{ color: palette.onNavyMuted, fontSize: 12, lineHeight: 18 }}>{activeExam.question_count} soru · {activeExam.timer_paused ? "Süre duraklatıldı" : "Süren işlemeye devam ediyor"}</Text>}
         </View>
         <ExpressivePressable radius={shape.control} pressedRadius={shape.controlPressed}
           accessibilityRole="button" accessibilityLabel={activeExam ? "Denemene devam et" : "Sınava gir"}

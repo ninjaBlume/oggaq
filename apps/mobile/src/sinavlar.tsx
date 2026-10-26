@@ -5,7 +5,7 @@ import { Pressable, View } from "react-native";
 import { newId } from "./ids";
 import { ApiError, cursorFromLink } from "@oggaq/api-client";
 import type { ExamAttempt, Page, StudyContext, components } from "@oggaq/shared-types";
-import { examDisplayTitle, examPeriodLabel, suggestedMinutes, vocabulary } from "@oggaq/study-core";
+import { examDisplayTitle, examPeriodLabel, suggestedMinutes, vocabulary, examTimerChoices, type ExamTimerPolicy } from "@oggaq/study-core";
 import { api } from "./api";
 import { useOnReturn, useResource, useTask } from "./hooks";
 import {
@@ -76,6 +76,7 @@ function ExamEntry({
   const { styles, palette } = useTheme();
   const [expanded, setExpanded] = useState(false);
   const [minutes, setMinutes] = useState(String(suggestedMinutes(exam)));
+  const [timerPolicy, setTimerPolicy] = useState<ExamTimerPolicy>('continuous');
   const submission = useRef<StartInput | null>(null);
   const task = useTask<{ data: ExamAttempt }>();
   const progress = progressOf(attempts, exam.id);
@@ -84,7 +85,7 @@ function ExamEntry({
     submission.current ??= {
       id: newId(),
       official_exam_id: exam.id,
-      duration_seconds: Math.round(Number(minutes)) * 60,
+      duration_seconds: Math.round(Number(minutes)) * 60, timer_policy: timerPolicy,
     };
     void task.run(
       () =>
@@ -100,9 +101,9 @@ function ExamEntry({
   }
   // A rejected start (409/422) is not a lost response: the next try is a new attempt id.
   useEffect(() => {
-    if (task.error instanceof ApiError && [409, 422].includes(task.error.status)) submission.current = null;
+    if (task.error instanceof ApiError && ([409, 422].includes(task.error.status) || task.error.problem.code === 'timer_unavailable')) submission.current = null;
   }, [task.error]);
-  const locked = task.pending || (submission.current !== null && !(task.error instanceof ApiError && [409, 422].includes(task.error.status)));
+  const locked = task.pending || (submission.current !== null && !(task.error instanceof ApiError && ([409, 422].includes(task.error.status) || task.error.problem.code === 'timer_unavailable')));
   const valid = Number(minutes) >= 1 && Number(minutes) <= 180;
   return (
     <View style={{ padding: 14, gap: 10, borderRadius: shape.large, backgroundColor: palette.surface, borderWidth: 1, borderColor: progress.open && !expired ? palette.primary : palette.line }}>
@@ -113,7 +114,7 @@ function ExamEntry({
       <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
         <View style={{ flexGrow: 1, flexBasis: 100 }}>
           <Text style={[styles.muted, progress.open && !expired && { color: palette.primary, fontWeight: "700" }]}>
-            {progress.open ? (expired ? "Süresi doldu" : "Devam ediyor") : progress.runs > 0 ? `${progress.runs} kez · en iyi %${progress.best}` : "Henüz girmedin"}
+            {progress.open ? (progress.open.timer_paused ? "Süre duraklatıldı" : expired ? "Süresi doldu" : "Devam ediyor") : progress.runs > 0 ? `${progress.runs} kez · en iyi %${progress.best}` : "Henüz girmedin"}
           </Text>
         </View>
         {progress.open ? (
@@ -125,7 +126,9 @@ function ExamEntry({
       {expanded && !progress.open && (
         <View style={{ gap: 12 }}>
           <Field label="Süre (dakika)" numeric value={minutes} onChange={setMinutes} editable={!locked} />
-          <Text style={styles.muted}>Sınav başlayınca süre işler; süre dolunca sınav kendiliğinden biter.</Text>
+          <Text style={styles.muted}>Süre tercihini seç. Süre dolunca sınav kendiliğinden biter.</Text>
+          <ChoiceGroup choices={examTimerChoices.map(choice => ({...choice, accessibilityLabel: choice.label}))} value={timerPolicy} disabled={locked} onChange={value => setTimerPolicy(value as ExamTimerPolicy)} />
+          {timerPolicy === 'pause_on_exit' && <Text style={styles.muted}>Normal çıkışta süre durur. Ani kapanma veya bağlantı kaybında 30 saniyeye kadar işlemeye devam edebilir.</Text>}
           <Button disabled={locked || !valid} onPress={begin}>
             {task.pending ? "Sınav hazırlanıyor…" : "Sınavı başlat"}
           </Button>
@@ -344,7 +347,7 @@ function ResultCard({ attempt: e, open }: { attempt: Summary; open: () => void }
         </View>
       ) : (
         <View style={{ alignSelf: "flex-start" }}>
-          <Badge>{live ? "Devam ediyor" : e.status === "active" ? "Süresi doldu" : "Sonuç bekleniyor"}</Badge>
+          <Badge>{e.timer_paused ? "Duraklatıldı" : live ? "Devam ediyor" : e.status === "active" ? "Süresi doldu" : "Sonuç bekleniyor"}</Badge>
         </View>
       )}
     </Pressable>

@@ -6551,6 +6551,89 @@
           }
         ]
       }
+    },
+    "/api/v1/contexts/{context}/exam-attempts/{exam}/timer": {
+      "post": {
+        "operationId": "updateExamTimer",
+        "summary": "Öğrencinin duraklatılabilir sınav süresini yönetme",
+        "description": "Yalnız sahip/aktif bağlam. resume bu ekranın oturumunu etkinleştirir, pause aynı oturumu durdurur, heartbeat aynı aktif oturumu canlı tutar. Zaman sunucuda hesaplanır. Başka oturum 409; sessiz bağlantı kaybında son heartbeat +30 saniyede duraklar. Continuous tercihi değişmez, süre dolmuşsa kanonik tamamlanmış özet döner.",
+        "tags": [
+          "Exams"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ExamSummary"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "exam",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExamTimerInput"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -8370,6 +8453,21 @@
           },
           "scoring_available": {
             "type": "boolean"
+          },
+          "timer_policy": {
+            "type": "string",
+            "enum": [
+              "continuous",
+              "pause_on_exit"
+            ],
+            "description": "Öğrencinin başlangıçta seçtiği süre davranışı; eski istemciler continuous kullanır."
+          },
+          "timer_paused": {
+            "type": "boolean"
+          },
+          "remaining_seconds": {
+            "type": "integer",
+            "minimum": 0
           }
         },
         "required": [
@@ -8390,7 +8488,10 @@
           "result",
           "official_exam",
           "score_result",
-          "scoring_available"
+          "scoring_available",
+          "timer_policy",
+          "timer_paused",
+          "remaining_seconds"
         ]
       },
       "ExamQuestion": {
@@ -8563,6 +8664,21 @@
           },
           "scoring_available": {
             "type": "boolean"
+          },
+          "timer_policy": {
+            "type": "string",
+            "enum": [
+              "continuous",
+              "pause_on_exit"
+            ],
+            "description": "Öğrencinin başlangıçta seçtiği süre davranışı; eski istemciler continuous kullanır."
+          },
+          "timer_paused": {
+            "type": "boolean"
+          },
+          "remaining_seconds": {
+            "type": "integer",
+            "minimum": 0
           }
         },
         "required": [
@@ -8584,7 +8700,10 @@
           "questions",
           "official_exam",
           "score_result",
-          "scoring_available"
+          "scoring_available",
+          "timer_policy",
+          "timer_paused",
+          "remaining_seconds"
         ]
       },
       "ExamAttemptResponse": {
@@ -8665,6 +8784,14 @@
               "favorite"
             ],
             "description": "Tekrar sınavı: sorular öğrencinin o çalışma alanındaki yanlış, boş veya favori sorularından seçilir. official_exam_id ile birlikte gönderilemez; subject_id ile daraltılabilir. Yeterli soru yoksa 422."
+          },
+          "timer_policy": {
+            "type": "string",
+            "enum": [
+              "continuous",
+              "pause_on_exit"
+            ],
+            "description": "Öğrencinin başlangıçta seçtiği süre davranışı; eski istemciler continuous kullanır."
           }
         },
         "required": [
@@ -8685,6 +8812,11 @@
           "base_version": {
             "type": "integer",
             "minimum": 1
+          },
+          "timer_session_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Duraklatılabilir sınavda bu ekranın süre oturumu; başka oturumdan cevap/bitirme reddedilir."
           }
         },
         "required": [
@@ -8699,6 +8831,11 @@
           "base_version": {
             "type": "integer",
             "minimum": 1
+          },
+          "timer_session_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Duraklatılabilir sınavda bu ekranın süre oturumu; başka oturumdan cevap/bitirme reddedilir."
           }
         },
         "required": [
@@ -11951,6 +12088,28 @@
         "required": [
           "data"
         ]
+      },
+      "UpdateExamTimerInput": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "resume",
+              "pause",
+              "heartbeat"
+            ]
+          },
+          "session_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "action",
+          "session_id"
+        ],
+        "additionalProperties": false
       }
     },
     "responses": {

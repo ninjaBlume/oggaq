@@ -1687,6 +1687,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/contexts/{context}/exam-attempts/{exam}/timer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Öğrencinin duraklatılabilir sınav süresini yönetme
+         * @description Yalnız sahip/aktif bağlam. resume bu ekranın oturumunu etkinleştirir, pause aynı oturumu durdurur, heartbeat aynı aktif oturumu canlı tutar. Zaman sunucuda hesaplanır. Başka oturum 409; sessiz bağlantı kaybında son heartbeat +30 saniyede duraklar. Continuous tercihi değişmez, süre dolmuşsa kanonik tamamlanmış özet döner.
+         */
+        post: operations["updateExamTimer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2156,6 +2176,13 @@ export interface components {
             resume_position?: number | null;
             score_result: components["schemas"]["ScoreResult"] | null;
             scoring_available: boolean;
+            /**
+             * @description Öğrencinin başlangıçta seçtiği süre davranışı; eski istemciler continuous kullanır.
+             * @enum {string}
+             */
+            timer_policy: "continuous" | "pause_on_exit";
+            timer_paused: boolean;
+            remaining_seconds: number;
         };
         ExamQuestion: {
             /** Format: uuid */
@@ -2204,6 +2231,13 @@ export interface components {
             official_exam: components["schemas"]["OfficialExamRef"] | null;
             score_result: components["schemas"]["ScoreResult"] | null;
             scoring_available: boolean;
+            /**
+             * @description Öğrencinin başlangıçta seçtiği süre davranışı; eski istemciler continuous kullanır.
+             * @enum {string}
+             */
+            timer_policy: "continuous" | "pause_on_exit";
+            timer_paused: boolean;
+            remaining_seconds: number;
         };
         ExamAttemptResponse: {
             data: components["schemas"]["ExamAttempt"];
@@ -2233,15 +2267,30 @@ export interface components {
              * @enum {string}
              */
             review_kind?: "incorrect" | "blank" | "favorite";
+            /**
+             * @description Öğrencinin başlangıçta seçtiği süre davranışı; eski istemciler continuous kullanır.
+             * @enum {string}
+             */
+            timer_policy?: "continuous" | "pause_on_exit";
         };
         /** @description İlk kaydedilmiş seçim kesindir; farklı seçim veya temizleme 409 answer_locked döndürür. Aynı seçimin tekrarı idempotenttir. */
         SaveExamAnswerInput: {
             /** Format: uuid */
             selected_option_id: string | null;
             base_version: number;
+            /**
+             * Format: uuid
+             * @description Duraklatılabilir sınavda bu ekranın süre oturumu; başka oturumdan cevap/bitirme reddedilir.
+             */
+            timer_session_id?: string;
         };
         FinishExamInput: {
             base_version: number;
+            /**
+             * Format: uuid
+             * @description Duraklatılabilir sınavda bu ekranın süre oturumu; başka oturumdan cevap/bitirme reddedilir.
+             */
+            timer_session_id?: string;
         };
         ExamFeedback: {
             /** Format: uuid */
@@ -3066,6 +3115,12 @@ export interface components {
         };
         ExamAnswerStateResponse: {
             data: components["schemas"]["ExamAnswerState"];
+        };
+        UpdateExamTimerInput: {
+            /** @enum {string} */
+            action: "resume" | "pause" | "heartbeat";
+            /** Format: uuid */
+            session_id: string;
         };
     };
     responses: {
@@ -6161,6 +6216,40 @@ export interface operations {
             403: components["responses"]["Problem"];
             404: components["responses"]["Problem"];
             409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    updateExamTimer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+                exam: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateExamTimerInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExamSummary"];
+                    };
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
             422: components["responses"]["Problem"];
             429: components["responses"]["Problem"];
         };

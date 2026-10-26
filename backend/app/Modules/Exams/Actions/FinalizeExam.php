@@ -17,6 +17,9 @@ class FinalizeExam
         if ($attempt->finished_at !== null) {
             return $attempt;
         }
+        if ($attempt->pauseMoment() !== null) {
+            throw new \LogicException('A paused exam must resume before finalization.');
+        }
         $currentTime = now()->startOfSecond();
         $expired = $currentTime->greaterThanOrEqualTo($attempt->deadline_at);
         $finishedAt = $expired ? $attempt->deadline_at : $currentTime;

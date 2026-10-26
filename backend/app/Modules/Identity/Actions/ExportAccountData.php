@@ -9,6 +9,7 @@ use Closure;
 use Generator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 // Writes the actor's own data as one JSON document, piece by piece, so even a long history never sits in memory at once.
 // Everything is reached through the user's own study contexts: other members' data cannot enter the file.
@@ -61,6 +62,9 @@ class ExportAccountData
         $attempts = DB::table('exam_attempts as a')->leftJoin('official_exams as e', 'e.id', '=', 'a.official_exam_id')->leftJoin('exam_bookmarks as b', 'b.exam_attempt_id', '=', 'a.id')->whereIn('a.study_context_id', $contextIds)
             ->select('a.id', 'a.study_context_id', 'b.position as resume_position', 'e.title as exam', 'a.started_at', 'a.deadline_at', 'a.finished_at', 'a.finish_reason', 'a.duration_seconds',
                 'a.question_count', 'a.correct_count', 'a.incorrect_count', 'a.blank_count', 'a.score_percent');
+        if (Schema::hasColumn('exam_attempts', 'timer_policy')) {
+            $attempts->addSelect('a.timer_policy', 'a.paused_at', 'a.paused_seconds');
+        }
         foreach ($attempts->lazyById(self::CHUNK, 'a.id', 'id')->chunk(self::CHUNK) as $chunk) {
             $answers = DB::table('exam_answers as x')->join('question_versions as v', 'v.id', '=', 'x.question_version_id')
                 ->whereIn('x.exam_attempt_id', $chunk->pluck('id')->all())->orderBy('x.exam_attempt_id')->orderBy('x.position')
@@ -71,6 +75,7 @@ class ExportAccountData
             foreach ($chunk as $attempt) {
                 $finished = $attempt->finished_at !== null;
                 yield [
+                    'timer_policy' => $attempt->timer_policy ?? 'continuous', 'paused_at' => $attempt->paused_at ?? null, 'paused_seconds' => $attempt->paused_seconds ?? 0,
                     'context_id' => $attempt->study_context_id, 'exam' => $attempt->exam, 'started_at' => $attempt->started_at, 'deadline_at' => $attempt->deadline_at,
                     'finished_at' => $attempt->finished_at, 'finish_reason' => $attempt->finish_reason, 'duration_seconds' => $attempt->duration_seconds,
                     'question_count' => $attempt->question_count, 'resume_position' => $attempt->resume_position, 'correct' => $attempt->correct_count, 'incorrect' => $attempt->incorrect_count,

@@ -13,6 +13,6 @@ class FinishExamRequest extends FormRequest
 
     public function rules(): array
     {
-        return ['base_version' => ['required', 'integer', 'min:1'], 'score_percent' => ['prohibited'], 'is_correct' => ['prohibited'], 'finished_at' => ['prohibited']];
+        return ['timer_session_id' => ['sometimes', 'nullable', 'uuid'], 'base_version' => ['required', 'integer', 'min:1'], 'score_percent' => ['prohibited'], 'is_correct' => ['prohibited'], 'finished_at' => ['prohibited']];
     }
 }

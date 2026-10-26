@@ -12,7 +12,8 @@ import {
 } from "./icons";
 import type { ExamAttempt, StudyContext } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
-import { mergeExamAnswerState, anchorClock, remainingSeconds, timeLabel, resumeQuestionIndex, ExamPositionSaver } from "@oggaq/study-core";
+import { mergeExamAnswerState, mergeExamTimer, anchorClock, remainingSeconds, timeLabel, resumeQuestionIndex, ExamPositionSaver } from "@oggaq/study-core";
+import { useExamTimer } from "./useExamTimer";
 import { api } from "./api";
 import { CompletedExam } from "./exam-results";
 import { useResource, useResume, useTask } from "./hooks";
@@ -175,6 +176,10 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
   const [seconds, setSeconds] = useState(0);
   const [confirm, setConfirm] = useState(false);
   const exam = query.data?.data;
+  const timer = useExamTimer(exam, summary => {
+    if (summary.status === 'completed') { void query.reload(); return; }
+    if (latest.current) { const data = mergeExamTimer(latest.current, summary);latest.current = data;query.setData({data}); }
+  });
   // Polling and another device may refresh the bookmark; only opening this screen restores it.
   const initialIndex = useRef<number | null>(null);
   if (initialIndex.current === null && exam) initialIndex.current = resumeQuestionIndex(exam);
@@ -203,6 +208,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
   }, [done, exam?.id]);
   useEffect(() => {
     if (!exam || done) return;
+    if (exam.timer_paused) { setSeconds(exam.remaining_seconds); return; }
     const clock = anchorClock(
       exam.deadline_at,
       exam.server_time,
@@ -220,7 +226,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
     tick();
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [exam?.server_time, done]);
+  }, [exam?.server_time, exam?.timer_paused, exam?.remaining_seconds, done]);
   function updateQuestion(questionId: string, patch: { is_favorite?: boolean; reported?: boolean }) {
     const mark = (value: ExamAttempt): ExamAttempt => ({
       ...value, questions: value.questions.map((item) => item.question_id === questionId ? { ...item, ...patch } : item),
@@ -245,7 +251,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
       async () => {
         const response = await api.request("put", "/api/v1/contexts/{context}/exam-attempts/{exam}/answers/{answer}", {
           params: { context: context.id, exam: id, answer: s.row }, query: { compact: true },
-          body: { base_version: s.revision, selected_option_id: s.option },
+          body: { base_version: s.revision, selected_option_id: s.option, timer_session_id: exam?.timer_policy === 'pause_on_exit' ? timer.sessionId : undefined },
         });
         if ('questions' in response.data) return { data: response.data };
         if (response.data.status === 'completed') return api.request('get', '/api/v1/contexts/{context}/exam-attempts/{exam}', { params: { context: context.id, exam: id } });
@@ -265,7 +271,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
           "/api/v1/contexts/{context}/exam-attempts/{exam}/finish",
           {
             params: { context: context.id, exam: id },
-            body: { base_version: revision },
+            body: { base_version: revision, timer_session_id: exam?.timer_policy === 'pause_on_exit' ? timer.sessionId : undefined },
           },
         ),
       accept,
@@ -290,7 +296,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
     );
   if (done) return <CompletedExam exam={exam} context={context} updateQuestion={updateQuestion} error={query.error} reload={() => { void query.reload(); }} />;
   const blocked = task.pending || submission !== null || finishing !== null;
-  const locked = done || blocked || seconds === 0;
+  const locked = done || blocked || seconds === 0 || exam.timer_paused || timer.pending || timer.error != null;
   const navigationBlocked = finishing !== null;
   const row = exam.questions[index];
   const answered = exam.questions.filter(
@@ -312,6 +318,11 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
         cancel={() => setConfirm(false)}
         disabled={blocked}
       />
+      {exam.timer_policy === 'pause_on_exit' && <View style={{gap: 8, padding: 12}} accessibilityLabel="Süre tercihi">
+        <Text style={styles.muted}>{exam.timer_paused ? 'Süre duraklatıldı.' : 'Çıkınca süre dursun seçili.'}</Text>
+        <Button secondary disabled={timer.pending} onPress={() => { void (exam.timer_paused || timer.error ? timer.resume() : timer.pause()); }}>{timer.pending ? 'Süre ayarlanıyor…' : exam.timer_paused || timer.error ? 'Süreyi devam ettir' : 'Süreyi duraklat'}</Button>
+        <ErrorNotice error={timer.error} retry={() => { void timer.resume(); }} />
+      </View>}
       {positionState.pending && <Text accessibilityRole="text" style={styles.muted}>Soru konumu kaydediliyor…</Text>}
       {positionState.error != null && <ErrorNotice title="Son baktığın soru kaydedilemedi" error={positionState.error} retry={() => positionSaver.current!.retry()} />}
       <Sheet

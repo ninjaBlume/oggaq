@@ -131,3 +131,5 @@ export { mergeExamAnswerState } from './exam-state';
 export { jobStatusLabels, jobWeaponLabels, jobApplicationStatusLabels, jobApplicationNotice } from './jobs';
 
 export * from './legal';
+export { examTimerChoices, ExamTimerSession, mergeExamTimer } from './exam-timer';
+export type { ExamTimerPolicy } from './exam-timer';

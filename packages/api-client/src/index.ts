@@ -11,7 +11,7 @@ type ResponseOf<O> = O extends { responses: infer R }
 type BodyOf<O> = O extends { requestBody: { content: { 'application/json': infer T } } } ? T : never;
 type QueryOf<O> = O extends { parameters: { query?: infer T } } ? NonNullable<T> : never;
 type PathOf<O> = O extends { parameters: { path?: infer T } } ? NonNullable<T> : never;
-type RequestOptions<O> = { signal?: AbortSignal } &
+type RequestOptions<O> = { signal?: AbortSignal; keepalive?: boolean } &
   (BodyOf<O> extends never ? { body?: never } : { body: BodyOf<O> }) &
   (QueryOf<O> extends never ? { query?: never } : { query?: QueryOf<O> }) &
   (PathOf<O> extends never ? { params?: never } : { params: PathOf<O> });
@@ -58,10 +58,10 @@ export class ApiClient {
       if (value !== undefined && value !== null && value !== '') query.set(key, String(value));
     }
     const suffix = query.size ? `?${query.toString()}` : '';
-    return this.send(method.toUpperCase(), urlPath + suffix, options.body, options.signal) as Promise<ResponseOf<Operation<P, M>>>;
+    return this.send(method.toUpperCase(), urlPath + suffix, options.body, options.signal, options.keepalive) as Promise<ResponseOf<Operation<P, M>>>;
   }
 
-  private async send(method: string, path: string, body?: unknown, signal?: AbortSignal): Promise<unknown> {
+  private async send(method: string, path: string, body?: unknown, signal?: AbortSignal, keepalive = false): Promise<unknown> {
     const headers: Record<string, string> = { Accept: 'application/json' };
     if (body !== undefined) headers['Content-Type'] = 'application/json';
     let sentToken: string | null = null;
@@ -91,7 +91,7 @@ export class ApiClient {
       let response: Response;
       try {
         response = await this.fetcher(this.base + path, {
-          method, credentials: this.options.auth === 'bearer' ? 'omit' : 'include', cache: 'no-store', headers,
+          ...(keepalive ? { keepalive: true } : {}), method, credentials: this.options.auth === 'bearer' ? 'omit' : 'include', cache: 'no-store', headers,
           ...(body === undefined ? {} : { body: JSON.stringify(body) }), signal: controller.signal,
         });
       } catch (error) { return transportError(error); }

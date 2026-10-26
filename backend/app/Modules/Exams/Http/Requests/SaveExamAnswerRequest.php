@@ -22,7 +22,7 @@ class SaveExamAnswerRequest extends FormRequest
     {
         return [
             'compact' => ['sometimes', 'boolean'],
-            'base_version' => ['required', 'integer', 'min:1'], 'selected_option_id' => ['present', 'nullable', 'uuid'],
+            'timer_session_id' => ['sometimes', 'nullable', 'uuid'], 'base_version' => ['required', 'integer', 'min:1'], 'selected_option_id' => ['present', 'nullable', 'uuid'],
             'is_correct' => ['prohibited'], 'user_id' => ['prohibited'], 'tenant_id' => ['prohibited'], 'score_percent' => ['prohibited'],
         ];
     }

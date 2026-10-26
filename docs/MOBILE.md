@@ -1,5 +1,9 @@
 # Expo mobil uygulaması
 
+## Öğrenci süre tercihi — 26 Ekim 2026
+
+Deneme/Ders başlangıç formunda `Çıkınca süre devam etsin` / `Çıkınca süre dursun` seçilir. Tercih sunucuda denemeye kaydolur. Duraklatılabilir ekranda odak/AppState çıkışı durdurur, dönüş devam ettirir; başka cihazda kalan süre aynı kayıttan gelir. Eski oturumun gecikmiş yazısı yeni ekranı durduramaz. Kalan süre saat:dakika:saniye gösterilir; duraklatıldığında ilerlemez. Ani kapanma/ağ kaybında 30 saniyeye kadar işlemeye devam edebilir; formda açıklanır. Süre hatası ve devam eylemi görünür; durakta cevap/bitirme kilitlidir. Sürekli süre seçeneği eski davranışı korur.
+
 ## 26 Ekim 2026: yanıt sonrası anında değerlendirme
 
 Deneme/Ders/Tekrar akışında ilk seçim sunucuya kaydedilince doğru seçenek, doğru/yanlış ve varsa açıklama görünür. Yanıtlanan soru yeniden seçilemez/temizlenemez; geriye dönüş ve yeniden girişte de kilit/feedback sunucudan gelir. Diğer soruların anahtarları yanıtlanana kadar gizlidir. Kayıt hatasında aynı seçim yeniden denenebilir; sunucu farklı seçimi reddeder. Sayaç çıkışta durdurulmaz; süre davranışı değiştirilmedi. Web/mobil ortak durum birleştirmesi ve API sözleşmesi birlikte güncellendi. Canlı API/web `74609f6` ile yayındadır; Expo Go projesini yenilemek gerekir. Fiziksel cihaz bu teslimde ayrıca denenmedi.
