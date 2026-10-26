@@ -4,7 +4,7 @@
 
 - Kullanıcının son talimatıyla yalnız iki filtre etiketi kısaltıldı: **Silahlı**, ardından **Silahsız**. Mobil erişilebilir adlar aynı metinleri kullanır. Eğitim türü ve 125/100 soruluk sınav akışları korunur.
 - Strict TypeScript, üretim web build ve iOS/Android/web Expo QA export geçti. **9 mevcut E2E 23,1 saniyede başarılı:** web/mobil 320/390/834 px eğitim ayrımı, iki etiketin sırası, silahlı/silahsız 125/100 soru başlatma ve yönetici yayını. İlgili test seçicileri güncellendi; düşük etkili metin değişikliği için yeni birim testi eklenmedi. Backend/API/DB değişmedi; PHPUnit ve tam test matrisi yeniden çalıştırılmadı. Fiziksel cihaz kontrolü yapılmadı.
-- Yalnız ortak `oggaq_test` ve 8001/5183/5184/5186 test portları kullanıldı; kendi test servisleri kapandı. Yerel içerik veritabanı/hesaplar ve diğer geliştirme servisleri korunur. Kanıtlar `artifacts/weapon-labels/` içindedir. Git push yapılmadı.
+- Yalnız ortak `oggaq_test` ve 8001/5183/5184/5186 test portları kullanıldı; kendi test servisleri kapandı. Yerel içerik veritabanı/hesaplar ve diğer geliştirme servisleri korunur. Web, **`oggaq-development-web:weapon-labels-b555f7d`** imajıyla oggsor.com üzerinde yayımlandı. Yalnız web yenilendi; diğer yedi servisin kimlikleri korundu. Origin 17 dosya hash’i/readiness ve genel HTTPS JS/CSS hash’leri doğrulandı. Gerçek öğrenci oturumunda Silahlı → Silahsız sırası ve 125/100 soru seçenekleri kontrol edildi; sınav/cevap oluşturulmadı, kontrol oturumu kapatıldı. Geri dönüş girdileri sunucuda `publication/weapon-labels-b555f7d/`, yerel kanıtlar `artifacts/weapon-labels/` içindedir. Git push yapılmadı.
 
 ## Güncel doğrulama — 26 Ekim 2026, sınav başlıkları ve sunucu yayını
 
