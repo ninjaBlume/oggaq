@@ -3,13 +3,14 @@ import brand from "../../../config/brand.json";
 import { useState } from "react";
 import { Platform, ScrollView, Share, View } from "react-native";
 import type { User } from "@oggaq/shared-types";
-import { deleteAccountConfirmation, vocabulary } from "@oggaq/study-core";
+import { deleteAccountConfirmation, displayPersonName, vocabulary } from "@oggaq/study-core";
 import { api } from "./api";
 import { useResource, useTask } from "./hooks";
 import { Badge, Button, Card, ErrorNotice, Field, Heading, Loading, ScreenTitle, SectionTitle } from "./ui";
 import { useBody, useTheme } from "./themeContext";
 
-// Hesabım: one card per task. Every change that matters asks for the current password again.
+// Sensitive e-mail/password/session changes ask for the current password again.
+// Editing the display name uses the authenticated profile endpoint.
 const visibleSessions = 5;
 const dateTime = (value: string) => new Date(value).toLocaleString("tr-TR", { dateStyle: "medium", timeStyle: "short" });
 
@@ -20,6 +21,27 @@ function Notice({ children }: { children: string }) {
       <Text style={{ color: palette.success, fontSize: 14, lineHeight: 20 }}>{children}</Text>
     </View>
   );
+}
+
+function ChangeName({ user, refresh }: { user: User; refresh: () => void }) {
+  const { styles } = useTheme();
+  const [name, setName] = useState(user.name);
+  const [saved, setSaved] = useState(false);
+  const task = useTask<{ data: User }>();
+  const normalized = displayPersonName(name);
+  return <>
+    <SectionTitle>Ad soyad</SectionTitle>
+    <Card tone="blue">
+      <Text style={styles.muted}>İkinci adın varsa aynı alana ekleyebilirsin. Tam adın profilinde gösterilir.</Text>
+      <Field label="Ad soyad" personName maxLength={100} value={name} onChange={value => { setName(value); setSaved(false); }} editable={!task.pending} placeholder="Örn. Ayşe Deniz Yılmaz" />
+      {saved && <Notice>Ad soyadın güncellendi.</Notice>}
+      <ErrorNotice error={task.error} />
+      <Button disabled={task.pending || !normalized || normalized === displayPersonName(user.name)} onPress={() => {
+        setSaved(false);
+        void task.run(() => api.request("patch", "/api/v1/me", { body: { name: normalized } }), response => { setName(response.data.name); setSaved(true); refresh(); });
+      }}>{task.pending ? "Kaydediliyor…" : "Ad soyadı kaydet"}</Button>
+    </Card>
+  </>;
 }
 
 function ChangeEmail({ user, refresh }: { user: User; refresh: () => void }) {
@@ -302,7 +324,8 @@ export function AccountScreen({ user, refresh, finished }: { user: User; refresh
     );
   return (
     <ScrollView contentContainerStyle={body} keyboardShouldPersistTaps="handled">
-      <ScreenTitle title={vocabulary.account.title} eyebrow="HESAP VE GİZLİLİK" subtitle={`${user.name} · ${user.email}`} />
+      <ScreenTitle title={vocabulary.account.title} eyebrow="HESAP VE GİZLİLİK" subtitle={`${displayPersonName(user.name)} · ${user.email}`} />
+      <ChangeName key={user.id} user={user} refresh={refresh} />
       <ChangeEmail user={user} refresh={refresh} />
       <ChangePassword />
       <Sessions />

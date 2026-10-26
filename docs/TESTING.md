@@ -1,5 +1,12 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, tam ad ve avatar desteği
+
+- Ortak ad/baş harf hesabı header ve profili eşitledi; iki/üç parçalı adlar sırasıyla AY/ADY gösterir, dört ve daha fazla kelimede ilk iki ve son kelimenin harfi kullanılır. Tam ad profilde kayıpsızdır. Web/mobile Hesabım ekranlarında mevcut API’ye bağlı Ad soyad düzenlemesi, kayıt alanlarında ad otomatik doldurma ve 100 karakter sınırı vardır. [Gösterim ve veri ilkesi](DESIGN.md#kişi-adları-ve-avatarlar--26-ekim-2026).
+- **56 study-core + 42 mobil + 10 web testi**, tüm workspace strict TypeScript, web üretim build ve iOS/Android/web Expo QA export geçti. 12 yeni ortak kontrol; Türkçe i/ı, Unicode birleşimleri, farklı boşluklar, tire/apostrof, tek/iki/üç/dört kelime ve boş değerleri kapsar. PHP 8.4 ile mevcut **AuthenticationTest: 22 test / 98 assertion** yalnız `oggaq_test` üzerinde başarılıdır; profil yetkisi/korunan alanlar mevcut API ile korunur. Backend/şema/sözleşme değiştirilmedi.
+- Mevcut hesap ve yazı boyutu akışlarının **10 E2E’si** geçti. Yeni **4 E2E** web/mobil × açık/koyu temada gerçek API üzerinden iki/üç/dört parçalı ad kaydı, başlık/profil eşleşmesi, ağ hatasında taslak korunması ve yeniden deneme, web reload/mobil yeniden girişte kalıcılık, 320/834/1280 px ve mobil büyük yazı/merkez marka geometrisini doğruladı (**57,0 saniye**). Görüntüler gözle incelendi. İlk QA koşumlarındaki fixture baş harfi, genel hata metni ve mobil tarayıcı önizlemesinin bellek oturumu beklentileri düzeltilerek senaryolar tekrar çalıştırıldı.
+- PHPUnit ve E2E sırayla, yalnız ortak `oggaq_test` ile yürütüldü. Test portları 8001/5183/5184/5186’dır; yerel içerik DB’si/hesaplar ve diğer geliştirme servisleri korunur. Tam backend/E2E matrisi, native derleme ve fiziksel iOS/Android cihaz bu teslimde ayrıca denenmedi. Kanıtlar `artifacts/person-names/`; Git push yapılmadı.
+
 ## Güncel doğrulama — 26 Ekim 2026, kısa silah seçimi etiketleri
 
 - Kullanıcının son talimatıyla yalnız iki filtre etiketi kısaltıldı: **Silahlı**, ardından **Silahsız**. Mobil erişilebilir adlar aynı metinleri kullanır. Eğitim türü ve 125/100 soruluk sınav akışları korunur.

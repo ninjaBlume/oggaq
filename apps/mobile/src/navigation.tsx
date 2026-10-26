@@ -24,7 +24,7 @@ import {
   UserRound,
   X,
 } from "./icons";
-import { vocabulary } from "@oggaq/study-core";
+import { displayPersonName, personInitials, vocabulary } from "@oggaq/study-core";
 import { textSizeFactors } from "./textSize";
 import { motion, shape } from "./theme";
 import type { AppPalette } from "./theme";
@@ -72,6 +72,7 @@ export function MainHeader({
   const { palette, textSize } = useTheme();
   const navStyles = useNavStyles();
   const layout = useLayout();
+  const initials = personInitials(user.name);
   return (
     <View
       testID="main-header"
@@ -121,15 +122,17 @@ export function MainHeader({
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Profilimi aç"
+        accessibilityHint={displayPersonName(user.name)}
+        testID="header-person"
         onPress={profile}
         style={({ pressed }) => [
           navStyles.avatarButton,
           pressed && navStyles.pressed,
         ]}
       >
-        <Text style={navStyles.avatarLetter}>
-          {user.name.trim().slice(0, 1).toLocaleUpperCase("tr-TR")}
-        </Text>
+        {initials ? <Text testID="header-initials" numberOfLines={1} adjustsFontSizeToFit style={[navStyles.avatarLetter, { fontSize: initials.length > 2 ? 13 : 16 }]}>
+          {initials}
+        </Text> : <UserRound size={22} color={palette.primary} />}
       </Pressable>
     </View>
   );
@@ -331,7 +334,7 @@ export function SideMenu({
                 <X size={23} color={palette.onNavy} strokeWidth={1.8} />
               </Pressable>
             </View>
-            <Text style={navStyles.accountName}>{user.name}</Text>
+            <Text style={navStyles.accountName}>{displayPersonName(user.name)}</Text>
             <Text style={navStyles.accountEmail}>{user.email}</Text>
           </View>
           <ScrollView

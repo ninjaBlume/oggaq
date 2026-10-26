@@ -23,7 +23,7 @@ import {
 import { useTheme } from "./themeContext";
 import { ChoiceGroup } from "./expressive";
 import { LegalSection } from "./legal";
-import { vocabulary } from "@oggaq/study-core";
+import { displayPersonName, personInitials, vocabulary } from "@oggaq/study-core";
 import { cardTone, themePreferenceLabels, themePreferences } from "@oggaq/design-tokens";
 import { textSizes, textSizeLabels } from "./textSize";
 export function Profile({
@@ -47,6 +47,7 @@ export function Profile({
 }) {
   const { palette, styles, preference, setPreference, textSize, setTextSize, textSizeError } = useTheme();
   const accountTint = cardTone(palette, "indigo");
+  const initials = personInitials(user.name);
   return (
     <>
       <ScreenTitle
@@ -66,19 +67,11 @@ export function Profile({
             borderColor: palette.surface,
           }}
         >
-          <Text
-            style={{ fontSize: 29, fontWeight: "800", color: palette.primary }}
-          >
-            {user.name
-              .trim()
-              .split(/\s+/)
-              .slice(0, 2)
-              .map((s) => s.slice(0, 1))
-              .join("")
-              .toLocaleUpperCase("tr-TR")}
-          </Text>
+          {initials ? <Text testID="profile-initials" numberOfLines={1} adjustsFontSizeToFit style={{ fontSize: initials.length > 2 ? 24 : 29, fontWeight: "800", color: palette.primary }}>
+            {initials}
+          </Text> : <UserRound size={32} color={palette.primary} />}
         </View>
-        <Text style={[styles.heading, { fontSize: 22 }]}>{user.name}</Text>
+        <Text testID="profile-full-name" style={[styles.heading, { fontSize: 22, textAlign: "center", alignSelf: "stretch" }]}>{displayPersonName(user.name)}</Text>
         <Badge tone="success">E-posta doğrulandı</Badge>
       </View>
       <SectionTitle>Hesap bilgilerin</SectionTitle>
@@ -87,7 +80,7 @@ export function Profile({
           <UserRound size={19} color={palette.muted} />
           <Text style={styles.muted}>Ad soyad</Text>
         </View>
-        <Text style={styles.text}>{user.name}</Text>
+        <Text style={styles.text}>{displayPersonName(user.name)}</Text>
         <View style={{ height: 1, backgroundColor: palette.line }} />
         <View style={styles.row}>
           <Mail size={19} color={palette.muted} />

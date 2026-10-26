@@ -1470,3 +1470,13 @@ input::placeholder { color:var(--c-muted); opacity:1 }
 .upcoming-count span { font-size:13px }
 .upcoming-placeholder { display:grid; gap:8px }
 .upcoming-placeholder p { margin:0 }
+
+.user-identity { display:inline-flex; align-items:center; gap:9px; min-height:44px; min-width:44px; max-width:240px; color:var(--c-ink) }
+.person-avatar { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; width:38px; height:38px; border-radius:14px; background:var(--c-soft-primary); color:var(--c-primary); font-size:13px; line-height:1; font-weight:700 }
+.user-identity-copy { display:grid; gap:2px; min-width:0 }
+.user-identity-copy small { color:var(--c-muted); font-size:11px }
+.user-identity-copy strong { font-size:13px; max-width:170px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.account-person-heading { display:flex; align-items:center; gap:16px; min-width:0 }
+.account-person-heading>div { min-width:0; overflow-wrap:anywhere }
+.profile-avatar { width:68px; height:68px; border-radius:24px; font-size:23px }
+@media(max-width:839px) { .user-identity-copy { display:none } }

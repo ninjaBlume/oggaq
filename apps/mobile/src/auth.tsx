@@ -125,7 +125,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
           <Text style={styles.muted}>{description}</Text>
         </View>
         {mode === "register" && (
-          <Field label="Ad soyad" value={name} onChange={setName} editable={!task.pending} outlined />
+          <Field label="Ad soyad" personName maxLength={100} placeholder="Örn. Ayşe Deniz Yılmaz" value={name} onChange={setName} editable={!task.pending} outlined />
         )}
         <Field label="E-posta adresi" email value={email} onChange={setEmail} editable={!task.pending} placeholder="ornek@eposta.com" outlined />
         {mode !== "forgot" && (

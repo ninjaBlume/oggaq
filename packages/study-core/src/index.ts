@@ -148,3 +148,4 @@ export type { ExamCalendar, CalendarEntry } from './calendar';
 export { upcomingCountdown, nextExamRefreshDelay } from './upcoming';
 export type { UpcomingExam } from './upcoming';
 export { calendarRules } from './calendar-rules';
+export { displayPersonName, personInitials } from './person-name';

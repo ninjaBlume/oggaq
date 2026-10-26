@@ -1,9 +1,11 @@
+import type { User } from '@oggaq/shared-types';
+import { UserIdentity } from './person';
 import { useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError } from '@oggaq/api-client';
-import { deleteAccountConfirmation, vocabulary } from '@oggaq/study-core';
+import { deleteAccountConfirmation, displayPersonName, personInitials, vocabulary } from '@oggaq/study-core';
 import { api } from './api';
 import { AuthFrame, Login, replaceSession, useLogout, useSession } from './auth';
 import { brand } from './config';
@@ -23,6 +25,30 @@ function Section({ title, intro, children, danger }: { title: string; intro?: st
 
 function PasswordField({ label = 'Mevcut parola', value, onChange, error }: { label?: string; value: string; onChange: (value: string) => void; error?: string }) {
   return <Field label={label} error={error}>{(props) => <input {...props} required type="password" maxLength={128} autoComplete="current-password" value={value} onChange={(event) => onChange(event.target.value)} />}</Field>;
+}
+
+function ChangeName({ user }: { user: User }) {
+  const cache = useQueryClient();
+  const [name, setName] = useState(user.name);
+  const normalized = displayPersonName(name);
+  const change = useMutation({
+    mutationFn: () => api.request('patch', '/api/v1/me', { body: { name: normalized } }),
+    onSuccess: response => {
+      // A response from a signed-out/different account must not restore its session.
+      if (cache.getQueryData<User | null>(['session'])?.id === user.id) cache.setQueryData(['session'], response.data);
+      setName(response.data.name);
+    },
+  });
+  return <Section title="Ad soyad" intro="İkinci adın varsa aynı alana ekleyebilirsin. Tam adın profilinde gösterilir.">
+    <form onSubmit={(event: FormEvent) => { event.preventDefault(); change.mutate(); }}>
+      <fieldset disabled={change.isPending}>
+        {change.isSuccess && <p className="notice success" role="status">Ad soyadın güncellendi.</p>}
+        {change.isError && !fieldError(change.error, 'name') && <ErrorNotice error={change.error} />}
+        <Field label="Ad soyad" error={fieldError(change.error, 'name')}>{props => <input {...props} required maxLength={100} autoComplete="name" placeholder="Örn. Ayşe Deniz Yılmaz" value={name} onChange={event => { setName(event.target.value); change.reset(); }} />}</Field>
+        <button className="button primary" type="submit" disabled={!normalized || normalized === displayPersonName(user.name)}>{change.isPending ? 'Kaydediliyor…' : 'Ad soyadı kaydet'}</button>
+      </fieldset>
+    </form>
+  </Section>;
 }
 
 function ChangeEmail({ pending }: { pending: string | null }) {
@@ -171,10 +197,11 @@ export function AccountPage() {
   const logout = useLogout();
   const user = session.data;
   if (!user) return null;
-  return <div className="app-shell"><header className="site-header"><Link to="/" className="brand"><BrandLogo /><span><BrandWordmark /><small>{brand.subtitle}</small></span></Link><nav aria-label="Ana menü"><Link to="/">← Çalışmaya dön</Link></nav><div className="user-menu"><span>{user.name}</span><ThemeSwitch /><button className="text-button" disabled={logout.isPending} onClick={() => logout.mutate()}>Çıkış yap</button></div></header>
+  return <div className="app-shell"><header className="site-header"><Link to="/" className="brand"><BrandLogo /><span><BrandWordmark /><small>{brand.subtitle}</small></span></Link><nav aria-label="Ana menü"><Link to="/">← Çalışmaya dön</Link></nav><div className="user-menu"><UserIdentity name={user.name} /><ThemeSwitch /><button className="text-button" disabled={logout.isPending} onClick={() => logout.mutate()}>Çıkış yap</button></div></header>
     <main className="content account-page">
-      <div className="page-intro"><span className="eyebrow">HESAP VE GİZLİLİK</span><h1>{vocabulary.account.title}</h1><p>{user.name} · {user.email}{user.email_verified_at ? '' : ' (doğrulanmadı)'}</p></div>
+      <div className="page-intro"><span className="eyebrow">HESAP VE GİZLİLİK</span><div className="account-person-heading"><span className="person-avatar profile-avatar" data-testid="profile-initials" aria-hidden="true">{personInitials(user.name) || '?'}</span><div><h1>{vocabulary.account.title}</h1><p data-testid="profile-full-name">{displayPersonName(user.name)}</p><p>{user.email}{user.email_verified_at ? '' : ' (doğrulanmadı)'}</p></div></div></div>
       <div className="account-grid">
+        <ChangeName key={user.id} user={user} />
         <ChangeEmail pending={user.pending_email} />
         <ChangePassword />
         <Sessions />
