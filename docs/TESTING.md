@@ -1,5 +1,7 @@
 # Test ve doğrulama stratejisi
 
+26 Ekim 2026, footer logosu: mevcut ÖGG SOR yazısının yanına 32 px marka logosu eklendi; grup ana sayfa bağlantısıdır. Site build ve **4 mevcut Chromium E2E** geçti (2,7 saniye); yeni test eklenmedi. Açık/koyu telefon/tablet/masaüstü düzen kontrol edildi. Yalnız site `oggaq-development-web:site-footer-b8262e2` ile yayımlandı; origin 20 hash/readiness başarılı, diğer yedi servis/DB korundu. Genel HTTPS'te footer logosunun yüklenmesi/ölçüsü, bağlantı hedefi, 390/1280 px görünüm ve CSS hash'i doğrulandı. Backend/mobil/tam DB test matrisi yeniden çalıştırılmadı; kanıtlar `artifacts/site-footer-logo/`, Git push yapılmadı.
+
 ## Güncel doğrulama — 26 Ekim 2026, yayıncı adının tanıtımdan kaldırılması
 
 - Tanıtım altbilgisindeki şirket adı kaldırıldı; normal web/mobil/yönetim ekranlarında başka bir Codentum gösterimi bulunmadı. Yasal metinler ve şirket/mağaza kimlik değerleri değiştirilmedi. **4 mevcut Node + 4 mevcut Chromium testi** geçti (tarayıcı 2,6 saniye); site build başarılıdır. Düşük etkili metin/biçim değişikliği için yeni test eklenmedi; backend/mobil test matrisi yeniden çalıştırılmadı.
