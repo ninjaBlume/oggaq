@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, gerçek mobil ekranla tanıtım tasarımı
+
+- Tanıtım sayfasındaki HTML taklidi telefon ekranı, mevcut Expo bileşenlerinden alınmış 390×844 px / 2× ana ekran JPEG'iyle değiştirildi. Kişisel ad/geçmiş yayımlanmadı: tarayıcıda anonim tanıtım hesabı ve boş özet, çekim anındaki sunucu takvimi gösterildi. Ekran yakalama yalnız 5189 statik mobil önizlemesini kullandı; geliştirme/test DB'sine yazılmadı. Takvim okuma oturumu kapatıldı. Görsel native cihaz testi sayılmaz; kaynak ve statik tarih sınırı [SCREENSHOTS](../apps/site/SCREENSHOTS.md) içindedir.
+- Sayfa yeni kısa başlık, mağaza alanı, gerçek ekran görseli, düz özellik listesi ve kısa destek satırıyla yeniden düzenlendi. Mobil uygulama, API, hesap yardımcı ekranları ve mağazaların Yakında durumu korunur. Mevcut dört site Node testi ve dört site Chromium E2E'si, görselin derlenmesi/yüklenmesi/doğru boyutu kontrolleriyle genişletildi; yeni test sayısı eklenmedi.
+- **4 Node + 4 Chromium testi geçti**; son tarayıcı koşumu 1,9 saniyedir. Site build başarılı, 320/390/834/1280 px açık/koyu taşma ve sıfır ana sayfa API isteği kontrol edildi; masaüstü ve telefon görüntüleri gözle incelendi. Yalnız 5187/5188 statik test portları kullanıldı. Backend/mobil kaynaklar değişmedi; PHPUnit/tam DB E2E/native cihaz testi bu teslimde yeniden çalıştırılmadı.
+
 ## Güncel doğrulama — 26 Ekim 2026, tanıtım sitesinin tipografi ve boşlukları
 
 - Telefon çizimi ve sayfa düzeni korundu; ana başlık 66 yerine en çok 52 px, telefonda 48 yerine 38 px (320 px ekranda 34 px), satır aralığı 1,17 oldu. Ana başlığın aşırı sıkışık harfleri ve küçük metinlerin geniş harf aralıkları düzeltildi. Bölümler/kartlar arasındaki boşluklar azaltıldı; üst etiketler normal cümle düzeninde. Marka League Spartan Bold 700 olarak kalır.

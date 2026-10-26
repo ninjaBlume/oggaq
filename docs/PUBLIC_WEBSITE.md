@@ -2,7 +2,7 @@
 
 26 Ekim 2026 ürün kararı: **oggsor.com**, mobil uygulamayı tanıtan ve App Store / Google Play bağlantılarını sunan sitedir. Genel web sitesinde soru çözme, öğrenci kaydı veya sınav sonuçları sunulmaz. iOS/Android uygulaması, API, yönetim paneli ve mevcut öğrenci verileri korunur.
 
-`apps/site` bağımlılıksız, Node 24 ile derlenen statik HTML/CSS'tir; ana sayfa JavaScript, oturum veya soru API isteği olmadan açılır. Telefon çizimi dekoratif bir arayüz temsilidir. Marka `config/brand.json`, renkler ortak `design-tokens`, başlık League Spartan Bold 700 kaynağından gelir. Destek ve yasal sayfalar korunur; bu geçiş yasal taslakların onaylandığı anlamına gelmez.
+`apps/site` bağımlılıksız, Node 24 ile derlenen statik HTML/CSS'tir; ana sayfa JavaScript, oturum veya soru API isteği olmadan açılır. Telefon çerçevesinde gerçek Expo mobil bileşenlerinden alınmış statik ana ekran görüntüsü kullanılır. Kişisel veri göstermeyen tanıtım hesabıyla hazırlanmıştır; görüntünün kaynağı ve yenilenmesi [SCREENSHOTS](../apps/site/SCREENSHOTS.md) içindedir. Marka `config/brand.json`, renkler ortak `design-tokens`, başlık League Spartan Bold 700 kaynağından gelir. Destek ve yasal sayfalar korunur; bu geçiş yasal taslakların onaylandığı anlamına gelmez.
 
 ## Mağaza bağlantıları
 

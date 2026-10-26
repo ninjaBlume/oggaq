@@ -6,7 +6,10 @@ for (const colorScheme of ['light', 'dark'] as const) test(`tanıtım sitesi: ${
   page.on('request', request => { if (new URL(request.url()).pathname.startsWith('/api/')) apiRequests.push(request.url()); });
   try {
     await page.goto('http://127.0.0.1:5187/');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Hazırlığın');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Çıkmış sorularla');
+    const screen = page.getByRole('img', { name: /^ÖGG SOR ana ekranı:/ });
+    await expect(screen).toBeVisible();
+    await expect.poll(() => screen.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth === 780 && img.naturalHeight === 1688)).toBe(true);
     await expect(page.getByRole('group', { name: 'App Store: yakında', exact: true })).toBeVisible();
     await expect(page.getByRole('group', { name: 'Google Play: yakında', exact: true })).toBeVisible();
     await expect(page.getByRole('textbox')).toHaveCount(0);

@@ -12,40 +12,45 @@
 <body>
 <a class="skip-link" href="#icerik">İçeriğe geç</a>
 <header class="site-header wrap">
-<a class="brand" href="/" aria-label="{{name}} ana sayfa"><img src="/brand-logo.png" width="44" height="44" alt=""><span><span class="brand-wordmark">{{name}}</span><small>{{subtitle}}</small></span></a>
-<nav aria-label="Ana menü"><a href="#ozellikler">Uygulama</a><a href="/legal/destek.html">Destek</a><a class="nav-download" href="#indir">İndirme seçenekleri <span aria-hidden="true">↗</span></a></nav>
+  <a class="brand" href="/" aria-label="{{name}} ana sayfa"><img src="/brand-logo.png" width="42" height="42" alt=""><span><span class="brand-wordmark">{{name}}</span><small>{{subtitle}}</small></span></a>
+  <nav aria-label="Ana menü"><a href="#uygulama">Uygulama hakkında</a><a href="/legal/destek.html">Destek</a><a class="nav-download" href="#indir">Mağazalar <span aria-hidden="true">↓</span></a></nav>
 </header>
 <main id="icerik">
-<section class="hero wrap" aria-labelledby="hero-title">
-<div class="hero-copy">
-<p class="eyebrow"><span></span>Özel güvenlik sınavlarına hazırlık</p>
-<h1 id="hero-title">Hazırlığın<br>her zaman <em>yanında.</em></h1>
-<p class="hero-description">Çıkmış sorularla çalış, bilgilerini tazele, kaldığın yerden devam et. <strong>{{name}}</strong> ile sınav hazırlığını telefonuna taşı.</p>
-<div class="hero-tags" aria-label="Eğitim türleri"><span>Temel eğitim</span><span>Yenileme eğitimi</span></div>
-<div id="indir" class="download-section"><h2>Uygulamayı edin</h2><p class="download-caption">Ücretsiz. iOS ve Android için.</p><div class="store-list">{{stores}}</div>{{storeNotice}}</div>
-</div>
-<div class="hero-visual" aria-hidden="true">
-<div class="visual-orbit orbit-one"></div><div class="visual-orbit orbit-two"></div>
-<div class="visual-label"><span>Öğren. Tekrar et. Hazırlan.</span><i></i></div>
-<div class="phone"><div class="phone-camera"></div><div class="phone-screen">
-<div class="phone-brand"><img src="/brand-logo.png" width="35" height="35" alt=""><div><span class="brand-wordmark">{{name}}</span><small>{{subtitle}}</small></div><span class="phone-menu">☰</span></div>
-<div class="phone-heading">Bugün ne<br><strong>çalışmak istersin?</strong></div>
-<div class="phone-focus"><span>ÇIKMIŞ SINAV SORULARI</span><strong>Sınava hazırlığın<br>burada başlar.</strong><div class="phone-focus-arrow">↗</div></div>
-<div class="phone-section-title">Hızlı başla</div>
-<div class="phone-row"><span class="row-symbol">01</span><div><strong>Ders sınavları</strong><small>Konularını pekiştir</small></div><span>↗</span></div>
-<div class="phone-row"><span class="row-symbol">02</span><div><strong>Deneme sınavları</strong><small>Kendini değerlendir</small></div><span>↗</span></div>
-<div class="phone-row"><span class="row-symbol">03</span><div><strong>Tekrar çalışmaları</strong><small>Eksiklerine odaklan</small></div><span>↗</span></div>
-<div class="phone-home"></div></div></div>
-<div class="visual-caption"><span class="caption-line"></span><span>Sınav hazırlığı, cebinde.</span></div>
-</div>
-</section>
-<section class="features wrap" id="ozellikler" aria-labelledby="features-title"><div class="section-intro"><p class="eyebrow">Uygulamada neler var?</p><h2 id="features-title">İhtiyacın olan çalışma düzeni.</h2><p>Hazırlığını tek uygulamada sürdür.</p></div>
-<div class="feature-grid">
-<article class="feature-card"><span class="feature-number">01</span><h3>Çıkmış sorularla hazırlan</h3><p>Temel ve yenileme eğitimine ait sınav sorularına ulaş. Ders ders çalış veya deneme sınavını seç.</p></article>
-<article class="feature-card"><span class="feature-number">02</span><h3>Kaldığın yerden devam et</h3><p>Çalışmana ara verdiğinde geri dön. Soruların ve yanıtların hesabında kalsın.</p></article>
-<article class="feature-card"><span class="feature-number">03</span><h3>Eksiklerini gör, tekrar et</h3><p>Sonuçlarını incele, yanlışlarını gözden geçir ve tekrar çalışmalarınla bilgilerini pekiştir.</p></article>
-</div></section>
-<section class="support wrap" aria-label="Destek"><div><p class="eyebrow">Destek</p><h2>Bir soruna mı takıldın?</h2><p>Uygulama ve hesabınla ilgili yardım için bize ulaş.</p></div><a href="mailto:{{support}}">{{support}} <span aria-hidden="true">↗</span></a></section>
+  <section class="hero wrap" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="kicker">Özel güvenlik sınavlarına hazırlık</p>
+      <h1 id="hero-title">Çıkmış sorularla<br><em>sınavına hazırlan.</em></h1>
+      <p class="hero-description">Temel ve yenileme eğitimi için ders sınavları, denemeler ve tekrar çalışmaları. Hepsi {{name}} uygulamasında.</p>
+      <p class="exam-types">Temel ve yenileme <span aria-hidden="true">/</span> Silahlı ve silahsız</p>
+      <div class="download-section" id="indir">
+        <h2>Telefonuna indir</h2>
+        <p class="download-caption">iPhone, iPad ve Android için. Ücretsiz.</p>
+        <div class="store-list">{{stores}}</div>
+        {{storeNotice}}
+      </div>
+    </div>
+    <figure class="app-preview">
+      <div class="preview-backdrop" aria-hidden="true"></div>
+      <div class="phone">
+        <div class="phone-top" aria-hidden="true"><span></span></div>
+        <img class="app-screen" src="{{homeScreen}}" width="780" height="1688" fetchpriority="high" alt="ÖGG SOR ana ekranı: deneme sınavına başla, sıradaki sınav, çalışma özeti ve hızlı başla bölümleri.">
+        <div class="phone-bottom" aria-hidden="true"><span></span></div>
+      </div>
+      <figcaption>Uygulamanın ana ekranı <span>Tanıtım hesabı</span></figcaption>
+    </figure>
+  </section>
+  <section class="app-details wrap" id="uygulama" aria-labelledby="details-title">
+    <div class="details-intro"><p class="kicker">Çalışma biçimini sen seç</p><h2 id="details-title">Bir ders, bir deneme<br>ya da kaldığın yer.</h2><p>İster konu konu ilerle, ister bir sınavı baştan sona çöz.</p></div>
+    <dl class="feature-list">
+      <div><dt>Ders sınavları</dt><dd>Çalışacağın dersi seç. Çıkmış soruları konularına göre çöz.</dd></div>
+      <div><dt>Deneme sınavları</dt><dd>Temel veya yenileme sınavını, silahlı ya da silahsız olarak aç. Ara verdiğinde kaldığın yerden devam et.</dd></div>
+      <div><dt>Sonuçlar ve tekrar</dt><dd>Doğru ve yanlışlarını incele. Yanlış, boş ve favori sorularınla yeniden çalış.</dd></div>
+    </dl>
+  </section>
+  <section class="support wrap" aria-label="Destek"><p>Uygulama veya hesabınla ilgili bir sorun mu var?</p><a href="mailto:{{support}}">{{support}} <span aria-hidden="true">↗</span></a></section>
 </main>
-<footer class="site-footer wrap"><div class="footer-top"><a class="brand" href="/"><span class="brand-wordmark">{{name}}</span></a><nav aria-label="Yasal sayfalar">{{legal}}</nav></div><div class="footer-bottom"><span>{{publisher}}</span><p>{{notice}}</p></div></footer>
+<footer class="site-footer wrap">
+  <div class="footer-top"><a class="brand" href="/"><span class="brand-wordmark">{{name}}</span></a><nav aria-label="Yasal sayfalar">{{legal}}</nav></div>
+  <div class="footer-bottom"><span>{{publisher}}</span><p>{{notice}}</p></div>
+</footer>
 </body></html>

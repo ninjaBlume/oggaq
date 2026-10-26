@@ -38,8 +38,9 @@ export async function buildSite({ output = path.join(root, 'apps/site/dist'), li
     name: brand.name, subtitle: brand.subtitle, title: brand.displayName, themeColor: lightPalette.navy,
     website: brand.websiteUrl, support: brand.supportEmail, publisher: legal.degerler['yayinci-adi'],
     css: `/site-assets/${cssName}`, notice: notOfficialNotice,
+    homeScreen: `/screens/mobile-home.jpg?v=${createHash('sha256').update(await readFile(path.join(root, 'apps/site/public/screens/mobile-home.jpg'))).digest('hex').slice(0, 12)}`,
     stores: storeCard('appStore', links.appStore)+storeCard('googlePlay', links.googlePlay),
-    storeNotice: links.appStore || links.googlePlay ? '' : '<p class="store-notice">Mağaza bağlantıları uygulama yayımlandığında burada yer alacak.</p>',
+    storeNotice: links.appStore || links.googlePlay ? '' : '<p class="store-notice">Mağaza yayını hazırlanıyor. Bağlantılar burada yer alacak.</p>',
     legal: legalPages.map(page => `<a href="${page.file}">${escapeHtml(page.title)}</a>`).join(''),
   };
   const template = await readFile(path.join(root, 'apps/site/index.html'), 'utf8');
@@ -50,6 +51,7 @@ export async function buildSite({ output = path.join(root, 'apps/site/dist'), li
   await rm(output, { recursive: true, force: true });await mkdir(path.join(output, 'site-assets'), { recursive: true });
   await writeFile(path.join(output, 'index.html'), html);await writeFile(path.join(output, 'site-assets', cssName), css);
   for (const name of ['brand-logo.png', 'favicon.png', 'fonts', 'legal']) await cp(path.join(root, 'apps/web/public', name), path.join(output, name), { recursive: true });
+  await cp(path.join(root, 'apps/site/public/screens'), path.join(output, 'screens'), { recursive: true });
   return { output, links, files: ['index.html', `site-assets/${cssName}`] };
 }
 

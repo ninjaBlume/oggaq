@@ -23,6 +23,8 @@ test('the site renders without scripts, session requests or study forms and pres
     assert.match(html, /<html lang="tr">/);assert.match(html, /ÖGG SOR/);assert.match(html, /App Store: yakında/);assert.match(html, /Google Play: yakında/);
     assert.doesNotMatch(html, /<script\b|<form\b|\/api\/|href="#"|\{\{/i);
     assert.match(html, /href="\/legal\/hesap-silme.html"/);
+    assert.match(html, /class="app-screen" src="\/screens\/mobile-home.jpg\?v=[a-f0-9]{12}"/);
+    assert.ok((await readFile(path.join(temp, 'screens/mobile-home.jpg'))).length > 0);
     assert.ok((await readFile(path.join(temp, 'fonts/LeagueSpartan-Bold.woff2'))).length > 0);
     assert.match(await readFile(path.join(temp, 'legal/gizlilik.html'), 'utf8'), /Gizlilik/);
   } finally { await rm(temp, { recursive: true, force: true }); }
@@ -36,7 +38,7 @@ test('configured store pages become working external links while unavailable sto
     const html = await readFile(path.join(temp, 'index.html'), 'utf8');
     assert.ok(html.includes(`href="${apple}"`));assert.ok(html.includes(`href="${google}"`));
     assert.equal((html.match(/rel="noopener noreferrer"/g) ?? []).length, 2);
-    assert.doesNotMatch(html, /yakında|Mağaza bağlantıları uygulama yayımlandığında/i);
+    assert.doesNotMatch(html, /yakında|Mağaza yayını hazırlanıyor/i);
     await buildSite({ output: temp, links: { appStoreUrl: apple, googlePlayUrl: null } });
     assert.match(await readFile(path.join(temp, 'index.html'), 'utf8'), /Google Play: yakında/);
   } finally { await rm(temp, { recursive: true, force: true }); }
