@@ -1,5 +1,12 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, diğer öğrenci sayfalarının kartları
+
+- Merkezi mavi/indigo/kum aileleri sonuç listesi/özeti, ders başarı kartları, tekrar, puan hesaplama/geçmiş, profil/hesap, yasal bağlantı ve iş ilanı/başvuru kartlarına taşındı. Mobil `Card` isteğe bağlı `tone` alır; varsayılan okuma/soru yüzeyi korunur. Boş durum kartları da mavi aileyi kullanır. Hesap silme ve doğru/yanlış geri bildiriminin anlam renkleri değişmedi; yeni API, veri yazısı, animasyon veya bağımlılık eklenmedi.
+- **97 palet/kontrast testi**, strict TypeScript, **10 web + 42 mobil Vitest**, üretim web build ve iOS/Android/web Expo export geçti. İlk genişletilmiş kontrast kontrolünde basılı sonuç kartının daha koyu yüzeyinde bazı kırmızı/yeşil metin eşleşmeleri AA altında kaldı. Basılı sonuç kartı yüzeyi sabit tutulup kenarlık belirginleştirildi; gerçek geri bildirim yüzeyleriyle son 97 başarılıdır. Diğer kart aileleri önceki AA matrisini kullanır.
+- Mevcut **12 E2E tek koşumda geçti**: açık/koyu web/mobil tasarım (4), uzun sonuç sayfası çoklu pencere (2), iş ilanı/liste/detay/başvuru çoklu pencere (2), web/mobil kaydırmalı puan hesaplama (2), web veri export ve mobil Hesabım (2). 320–1280 px genişlikler doğrulandı. Tekrar ve ilan detay ekranları açık/koyu örneklerde gözle incelendi. Geçici QA konfigürasyonu 90 saniye test/30 saniye beklenti kullandı; normal timeout değişmedi. Tüm koşum 55,4 saniyede bitti.
+- Yalnız `oggaq_test` kullanıldı; başka test süreçleri/portlar önceden kontrol edildi. PHPUnit/E2E çakışmadı; mobil önizleme 5186, ortak geliştirme servisleri/yerel içerik DB'si/hesaplar korunur. Backend/SQL değişmediği için PHPUnit/API matrisi yeniden çalıştırılmadı. Fiziksel iOS/Android denenmedi. Kanıtlar `artifacts/page-colors/` içindedir. Git push yapılmadı.
+
 ## Güncel doğrulama — 26 Ekim 2026, uyumlu kart renkleri
 
 - Deneme kartlarına yumuşak mavi, Ders kartlarına indigo; mobil Tekrar ve küçük tamamlanma özetlerine kum tonu eklendi. Mobil ana sayfa kısayol/özetleri ve web başarı özetleri aynı merkezi renk ailesini kullanır. Açık/koyu paletler `packages/design-tokens` içindedir. Soru/cevap/puanlama davranışı ve veri modeli değişmedi.

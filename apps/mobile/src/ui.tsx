@@ -1,3 +1,4 @@
+import { cardTone, type CardTone } from "@oggaq/design-tokens";
 import { Text, TextInput } from "./text";
 import { Children } from "react";
 import type { ReactNode } from "react";
@@ -118,11 +119,12 @@ export function TextLink({ children, onPress, disabled = false }: {
     </Pressable>
   );
 }
-export function Card({ children }: { children: ReactNode }) {
-  const { styles } = useTheme();
+export function Card({ children, tone }: { children: ReactNode; tone?: CardTone }) {
+  const { styles, palette } = useTheme();
+  const tint = tone ? cardTone(palette, tone) : null;
   const { cardPadding } = useLayout();
   return (
-    <View style={[styles.card, { padding: cardPadding }]}>{children}</View>
+    <View style={[styles.card, { padding: cardPadding }, tint && { backgroundColor: tint.surface, borderColor: tint.line }]}>{children}</View>
   );
 }
 // Independent items (cards, exam rows) flow into two columns on an expanded window and stay one column elsewhere.
@@ -248,9 +250,9 @@ export function EmptyState({
         paddingHorizontal: 22,
         paddingVertical: 32,
         borderRadius: 20,
-        backgroundColor: palette.surface,
+        backgroundColor: palette.softPrimary,
         borderWidth: 1,
-        borderColor: palette.line,
+        borderColor: palette.primaryContainer,
       }}
     >
       <View

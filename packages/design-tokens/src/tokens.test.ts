@@ -18,6 +18,9 @@ const pairs: [ColorRole, ColorRole, number][] = [
   ['onSuccess', 'success', 4.5], ['onRed', 'red', 4.5], ['onNavy', 'navy', 4.5], ['onNavyMuted', 'navy', 4.5], ['accent', 'navy', 3],
   ['red', 'paper', 3], ['success', 'paper', 3],
   ['muted', 'softPrimary', 4.5],
+  ...(['softPrimary', 'cardIndigoSurface'] as const).flatMap(background => [
+    ['success', background, 4.5], ['red', background, 4.5],
+  ] as [ColorRole, ColorRole, number][]),
   ...(['cardIndigoSurface', 'cardSandSurface', 'cardIndigoLine', 'cardSandLine'] as const).flatMap(background => [
     ['ink', background, 4.5], ['muted', background, 4.5],
   ] as [ColorRole, ColorRole, number][]),

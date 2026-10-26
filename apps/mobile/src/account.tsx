@@ -31,7 +31,7 @@ function ChangeEmail({ user, refresh }: { user: User; refresh: () => void }) {
   return (
     <>
       <SectionTitle>E-posta adresini değiştir</SectionTitle>
-      <Card>
+      <Card tone="blue">
         <Text style={styles.muted}>
           Yeni adrese bir doğrulama bağlantısı gönderilir. Bağlantıyı açana kadar adresin değişmez; eski adresine de haber verilir.
         </Text>
@@ -75,7 +75,7 @@ function ChangePassword() {
   return (
     <>
       <SectionTitle>Parolayı değiştir</SectionTitle>
-      <Card>
+      <Card tone="indigo">
         <Text style={styles.muted}>Parolayı değiştirince bu cihaz dışındaki bütün cihazların oturumu kapanır.</Text>
         {changed && <Notice>Parolan değiştirildi; diğer cihazlardaki oturumlar kapatıldı.</Notice>}
         <ErrorNotice error={task.error} />
@@ -120,7 +120,7 @@ function Sessions() {
   return (
     <>
       <SectionTitle>Cihazlar ve oturumlar</SectionTitle>
-      <Card>
+      <Card tone="blue">
         <Text style={styles.muted}>Hesabına giriş yapılmış yerler. Tanımadığın bir oturumu kapat ve gerekirse parolanı değiştir.</Text>
         {list.loading ? (
           <Loading />
@@ -217,7 +217,7 @@ function ExportData() {
   return (
     <>
       <SectionTitle>Verilerimi indir</SectionTitle>
-      <Card>
+      <Card tone="sand">
         <Text style={styles.muted}>
           Profilin, çalışma geçmişin, sınav sonuçların, favorilerin ve soru bildirimlerin tek bir JSON dosyası olarak hazırlanır. Günde en fazla 3 kez indirebilirsin.
         </Text>
@@ -293,7 +293,7 @@ export function AccountScreen({ user, refresh, finished }: { user: User; refresh
   if (deleted)
     return (
       <ScrollView contentContainerStyle={body}>
-        <Card>
+        <Card tone="blue">
           <Heading>Hesabın silindi</Heading>
           <Text style={styles.text}>Hesabın ve çalışma geçmişin silindi. Eski e-posta adresine bir onay mesajı gönderdik.</Text>
           <Button onPress={finished}>Girişe dön</Button>

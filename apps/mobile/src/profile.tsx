@@ -24,7 +24,7 @@ import { useTheme } from "./themeContext";
 import { ChoiceGroup } from "./expressive";
 import { LegalSection } from "./legal";
 import { vocabulary } from "@oggaq/study-core";
-import { themePreferenceLabels, themePreferences } from "@oggaq/design-tokens";
+import { cardTone, themePreferenceLabels, themePreferences } from "@oggaq/design-tokens";
 import { textSizes, textSizeLabels } from "./textSize";
 export function Profile({
   user,
@@ -46,6 +46,7 @@ export function Profile({
   home: () => void;
 }) {
   const { palette, styles, preference, setPreference, textSize, setTextSize, textSizeError } = useTheme();
+  const accountTint = cardTone(palette, "indigo");
   return (
     <>
       <ScreenTitle
@@ -81,7 +82,7 @@ export function Profile({
         <Badge tone="success">E-posta doğrulandı</Badge>
       </View>
       <SectionTitle>Hesap bilgilerin</SectionTitle>
-      <Card>
+      <Card tone="blue">
         <View style={styles.row}>
           <UserRound size={19} color={palette.muted} />
           <Text style={styles.muted}>Ad soyad</Text>
@@ -102,8 +103,8 @@ export function Profile({
           {
             borderRadius: 20,
             borderWidth: 1.5,
-            borderColor: palette.line,
-            backgroundColor: palette.surface,
+            borderColor: accountTint.line,
+            backgroundColor: accountTint.surface,
             padding: 14,
             flexDirection: "row",
             alignItems: "center",
@@ -113,7 +114,7 @@ export function Profile({
           pressed && { opacity: 0.8 },
         ]}
       >
-        <ShieldCheck size={22} color={palette.primary} />
+        <ShieldCheck size={22} color={accountTint.accent} />
         <View style={{ flex: 1, gap: 4 }}>
           <Text style={{ color: palette.ink, fontSize: 14, fontWeight: "700" }}>
             {vocabulary.account.title}
@@ -144,7 +145,7 @@ export function Profile({
         value={textSize}
         onChange={setTextSize}
       />
-      <Card>
+      <Card tone="indigo">
         <Text style={styles.text}>Örnek metin: Soruları ve seçenekleri rahatça oku.</Text>
       </Card>
       <ErrorNotice title="Yazı boyutu tercihi saklanamadı" error={textSizeError} retry={() => setTextSize(textSize)} />

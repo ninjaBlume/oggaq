@@ -319,6 +319,7 @@ function ResultCard({ attempt: e, open }: { attempt: Summary; open: () => void }
   const result = e.result;
   const title = e.official_exam ? examDisplayTitle(e.official_exam.title) : `${e.question_count} soruluk deneme`;
   const kind = e.official_exam ? (/Ders Sınavı/.test(e.official_exam.title) ? "DERS SINAVI" : "DENEME SINAVI") : "DENEME";
+  const tint = cardTone(palette, kind === "DERS SINAVI" ? "indigo" : "blue");
   const tone = result ? scoreTone(result.score_percent, palette) : { backgroundColor: palette.softPrimary, color: palette.primary };
   const date = new Date(e.started_at).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" });
   const minutes = Math.round((result ? result.elapsed_seconds : e.duration_seconds) / 60);
@@ -328,8 +329,8 @@ function ResultCard({ attempt: e, open }: { attempt: Summary; open: () => void }
       accessibilityLabel={live ? "Sınava dön" : `${title} sonucunu incele`}
       onPress={open}
       style={({ pressed }) => [
-        { backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.line, borderRadius: 24, padding: layout.cardPadding, gap: 14 },
-        pressed && { backgroundColor: palette.softPrimary },
+        { backgroundColor: tint.surface, borderWidth: 1, borderColor: tint.line, borderRadius: 24, padding: layout.cardPadding, gap: 14 },
+        pressed && { borderColor: palette.primary },
       ]}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>

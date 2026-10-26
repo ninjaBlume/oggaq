@@ -161,6 +161,7 @@ small {
   border-radius:24px;
   padding:14px
 }
+.card.empty { background:var(--c-soft-primary); border-color:var(--c-primary-container) }
 /* Quiet card families: blue remains dominant; indigo and sand distinguish related tasks. */
 .card-tone-blue { --card-surface:var(--c-soft-primary); --card-line:var(--c-primary-container); --card-accent:var(--c-primary) }
 .card-tone-indigo { --card-surface:var(--c-card-indigo-surface); --card-line:var(--c-card-indigo-line); --card-accent:var(--c-card-indigo-accent) }
@@ -1415,3 +1416,6 @@ input::placeholder { color:var(--c-muted); opacity:1 }
 .auth-content .legal-links { margin-top: 18px; }
 .auth-content .legal-official { font-size: 11px; }
 .site-footer p { margin: 4px 0; }
+
+/* Keep the hover affordance visible on tinted result links. */
+.card.history-row:hover { border-color:var(--c-primary) }

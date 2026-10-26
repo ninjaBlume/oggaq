@@ -18,7 +18,7 @@ const sessionsKey = ['account', 'sessions'] as const;
 const fieldError = (error: unknown, name: string) => (error instanceof ApiError ? error.field(name) : undefined);
 
 function Section({ title, intro, children, danger }: { title: string; intro?: string; children: ReactNode; danger?: boolean }) {
-  return <section className={`card account-section${danger ? ' danger-zone' : ''}`}><h2>{title}</h2>{intro && <p className="muted">{intro}</p>}{children}</section>;
+  return <section className={`card account-section${danger ? ' danger-zone' : ' card-tone-blue'}`}><h2>{title}</h2>{intro && <p className="muted">{intro}</p>}{children}</section>;
 }
 
 function PasswordField({ label = 'Mevcut parola', value, onChange, error }: { label?: string; value: string; onChange: (value: string) => void; error?: string }) {

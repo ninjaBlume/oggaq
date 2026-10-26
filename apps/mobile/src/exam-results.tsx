@@ -50,7 +50,7 @@ export function CompletedExam({ exam, context, updateQuestion, error, reload }: 
 }
 function ResultSummary({ exam }: { exam: ExamAttempt }) {
   const { palette, styles } = useTheme();
-  return <><Heading>Deneme sonucun</Heading>{exam.result && <Enter><Card>
+  return <><Heading>Deneme sonucun</Heading>{exam.result && <Enter><Card tone="blue">
     <View style={{ alignItems: 'center', gap: 12, paddingVertical: 10 }}><ExpressiveEmblem size={160}><Text style={{ color: palette.onPrimaryContainer, fontSize: 32, fontWeight: '800', letterSpacing: -1 }}>%{exam.result.score_percent}</Text><Text style={[styles.muted, { color: palette.onPrimaryContainer }]}>doğru oranı</Text></ExpressiveEmblem><Text style={styles.heading}>Bir prova daha tamam!</Text></View>
     <View style={{ flexDirection: 'row', gap: 10 }}>{[{ value: exam.result.correct, label: 'Doğru', color: palette.success, bg: palette.softSuccess }, { value: exam.result.incorrect, label: 'Yanlış', color: palette.red, bg: palette.softRed }, { value: exam.result.blank, label: 'Boş', color: palette.muted, bg: palette.paper }].map((stat) => <View key={stat.label} style={{ flex: 1, alignItems: 'center', padding: 14, backgroundColor: stat.bg, borderRadius: 16, gap: 4 }}><Text style={{ fontSize: 22, fontWeight: '800', color: stat.color }}>{stat.value}</Text><Text style={{ fontSize: 11, fontWeight: '600', color: stat.color }}>{stat.label}</Text></View>)}</View>
     <Text style={[styles.muted, { textAlign: 'center' }]}>{exam.result.correct} doğru · {exam.result.incorrect} yanlış · {exam.result.blank} boş</Text>

@@ -140,7 +140,7 @@ function ResultRow({ exam, to }: { exam: Summary; to: string }) {
   const kind = exam.official_exam ? (/Ders Sınavı/.test(exam.official_exam.title) ? 'DERS SINAVI' : 'DENEME SINAVI') : 'DENEME';
   const tone = result ? scoreBand(result.score_percent) : 'pending';
   const minutes = Math.round((result ? result.elapsed_seconds : exam.duration_seconds) / 60);
-  return <Link className="history-row" to={to}>
+  return <Link className={`card history-row card-tone-${kind === 'DERS SINAVI' ? 'indigo' : 'blue'}`} to={to}>
     <span className={`result-score ${tone}`}>{result ? percent(result.score_percent) : expired ? 'Sonucu gör' : 'Devam et'}</span>
     <div className="history-main"><span className="eyebrow">{kind}</span><h3>{title}</h3><p>{dateLabel(exam.started_at)} · {minutes} dk · {exam.question_count} soru</p></div>
     <span className="history-arrow" aria-hidden="true">→</span>

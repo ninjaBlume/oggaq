@@ -151,7 +151,7 @@ function ReviewExam({
     Number(minutes) >= 1 &&
     Number(minutes) <= 180;
   return (
-    <Card>
+    <Card tone="sand">
       <Text style={styles.heading}>{kind.label}</Text>
       <Text style={styles.muted}>
         {count === 0 ? kind.empty : `${count} soru · ${kind.hint}`}
@@ -229,7 +229,7 @@ export function Stats({ context }: { context: StudyContext }) {
         />
       ) : (
         <>
-          <Card>
+          <Card tone="indigo">
             <Text style={styles.muted}>DOĞRULUK</Text>
             <Text style={[styles.heading, typography.display]}>
               {percent(stats.answers.accuracy_percent)}
@@ -247,7 +247,7 @@ export function Stats({ context }: { context: StudyContext }) {
           <SectionTitle>Derslere göre</SectionTitle>
           <Columns>
             {stats.subjects.map((subject) => (
-              <Card key={subject.subject_id}>
+              <Card key={subject.subject_id} tone="indigo">
                 <Text style={styles.heading}>{subject.name}</Text>
                 <View
                   style={{ flexDirection: "row", alignItems: "center", gap: 12 }}

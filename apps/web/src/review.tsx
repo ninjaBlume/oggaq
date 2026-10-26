@@ -50,7 +50,7 @@ function ReviewExam({ kind, count }: { kind: (typeof kinds)[number]; count: numb
     start.mutate(submission.current);
   }
   const locked = start.isPending || submission.current !== null;
-  return <article className="card sinav-row">
+  return <article className="card sinav-row card-tone-sand">
     <div className="sinav-main">
       <h2>{kind.label}</h2>
       <p>{count === 0 ? kind.empty : `${count} soru · ${kind.hint}`}</p>
