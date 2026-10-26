@@ -1,6 +1,6 @@
 {
   "name": "@oggaq/mobile",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "main": "index.ts",
   "scripts": {
@@ -27,6 +27,7 @@
     "expo-splash-screen": "58.0.11",
     "expo-status-bar": "58.0.4",
     "expo-system-ui": "58.0.6",
+    "expo-updates": "58.0.18",
     "lucide-react-native": "1.55.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",

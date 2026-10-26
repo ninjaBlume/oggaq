@@ -27,7 +27,7 @@
     "test:core": "npm run test --workspace @oggaq/study-core",
     "postinstall": "node scripts/forge-security-patch.mjs",
     "security:prepare": "node scripts/forge-security-patch.mjs",
-    "test:toolchain": "node --test scripts/expo-toolchain.test.mjs scripts/forge-security.test.mjs scripts/forge-security-patch.test.mjs scripts/audit-node.test.mjs scripts/eas-sdk58.test.cjs",
+    "test:toolchain": "node --test scripts/expo-toolchain.test.mjs scripts/forge-security.test.mjs scripts/forge-security-patch.test.mjs scripts/audit-node.test.mjs scripts/eas-sdk58.test.cjs scripts/mobile-updates.test.mjs",
     "audit": "node scripts/audit-node.mjs",
     "export:mobile:preview": "EXPO_PUBLIC_LOCAL_PREVIEW=1 EXPO_PUBLIC_API_URL=http://127.0.0.1:8001 npm run export:mobile",
     "test:tokens": "npm run test --workspace @oggaq/design-tokens",
@@ -40,7 +40,8 @@
     "build:site": "node apps/site/site.mjs",
     "test:site": "node --test apps/site/site.test.mjs",
     "test:site:e2e": "playwright test --config apps/site/playwright.config.ts",
-    "build:ios:beta": "npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs build --platform ios --profile testflight --freeze-credentials"
+    "build:ios:beta": "npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs build --platform ios --profile testflight --freeze-credentials",
+    "update:ios:beta": "npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs update --channel testflight --platform ios --environment preview"
   },
   "devDependencies": {
     "@redocly/cli": "2.60.0",

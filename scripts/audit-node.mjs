@@ -7,6 +7,7 @@ const forgeAdvisory = 'GHSA-86w9-cpqp-85rv';
 const forgeChains = new Set([
   '@oggaq/mobile>expo>@expo/cli>node-forge',
   '@oggaq/mobile>expo>@expo/cli>@expo/code-signing-certificates>node-forge',
+  '@oggaq/mobile>expo-updates>@expo/code-signing-certificates>node-forge',
 ]);
 export function inspectAudit(report, tree, forgeVerified) {
   const failures = [];

@@ -26,6 +26,8 @@ import { LegalSection } from "./legal";
 import { displayPersonName, personInitials, vocabulary } from "@oggaq/study-core";
 import { cardTone, themePreferenceLabels, themePreferences } from "@oggaq/design-tokens";
 import { textSizes, textSizeLabels } from "./textSize";
+import Constants from "expo-constants";
+import * as Updates from "expo-updates";
 export function Profile({
   user,
   context,
@@ -211,6 +213,12 @@ export function Profile({
           <BrandWordmark />{` - ${brand.subtitle}`}
         </Text>
       </Pressable>
+      <Text testID="app-release" style={[styles.muted, { fontSize: 11, textAlign: "center" }]}>
+        {`Sürüm ${Constants.expoConfig?.version ?? "—"}`}
+        {Updates.isEnabled && !Updates.isEmbeddedLaunch && Updates.updateId
+          ? ` · Güncelleme ${Updates.updateId.slice(0, 8)}`
+          : ""}
+      </Text>
     </>
   );
 }

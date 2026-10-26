@@ -9,7 +9,17 @@ const config: ExpoConfig = {
   name: localPreview ? `${brand.displayName} Önizleme` : brand.displayName,
   slug: "oggaq",
   owner: "ninjablume",
-  version: "0.1.0",
+  version: "0.1.1",
+  // Native dependency/config changes produce a different OTA compatibility key.
+  runtimeVersion: { policy: "fingerprint" },
+  updates: {
+    enabled: !localPreview,
+    url: "https://u.expo.dev/edf67d8f-aa02-429b-99f7-68f1e1bf6e9d",
+    checkAutomatically: "ON_LOAD",
+    // Launch the cached/embedded app immediately; download for the next cold start.
+    fallbackToCacheTimeout: 0,
+    useEmbeddedUpdate: true,
+  },
   scheme: ["oggsor", "oggaq"],
   orientation: "default",
   userInterfaceStyle: "automatic",

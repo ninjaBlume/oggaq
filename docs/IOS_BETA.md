@@ -24,11 +24,40 @@ Kullanıcı iPhone ve iPad'e Apple TestFlight uygulamasını kurup hesap sahibin
 
 Görünen uygulama sürümü `apps/mobile/app.config.ts` içindeki `version` değeridir; mevcut sürüm **0.1.0**. Parantez içindeki **3** iOS build numarasıdır. `appVersionSource: remote` ve kalıtılan `autoIncrement: true` ile EAS her yeni pakette build numarasını artırır; başarısız derlemeler nedeniyle numaralar atlayabilir. Aynı sürüm için birden fazla build çıkarılabilir. Hata düzeltme sürümleri için `0.1.1`, yeni özellik grubu için `0.2.0`, ilk genel yayın için hazır olduğunda `1.0.0` düzeni kullanılır; bu numaralar henüz yayımlanmış değildir.
 
-Şu an mobil projede `expo-updates`, güncelleme kanalı veya `runtimeVersion` yapılandırması **yoktur**. Dolayısıyla mobil kod/tasarım değişikliği mevcut kurulu pakete kendiliğinden ulaşmaz: ilgili testler, yeni imzalı build, Apple'a yükleme, işleme, kişisel grupta Testing kontrolü ve değişiklik notları gerekir. Her Git commit'i ayrı beta yayını değildir; doğrulanmış değişiklikler paketlenir. Kullanıcı TestFlight'tan Güncelle seçer veya uygulama için otomatik güncellemeleri açar. Her build 90 gün test edilebilir.
+İlk beta **0.1.0 (3)** içinde `expo-updates`, güncelleme kanalı veya `runtimeVersion` yapılandırması **yoktur**. Dolayısıyla bu eski pakete mobil kod/tasarım değişikliği kendiliğinden ulaşmaz; önce aşağıdaki OTA destekli yeni native paket kurulmalıdır. Her Git commit'i ayrı beta yayını değildir; doğrulanmış değişiklikler paketlenir. Kullanıcı TestFlight'tan Güncelle seçer veya uygulama için otomatik güncellemeleri açar. Her build 90 gün test edilebilir.
 
 API/soru içeriği güncellemeleri sunucudan sonraki veri alma/yenileme ile gelir; yerel cache süresi ve uygulama uyumluluğu dikkate alınır. Geriye uyumlu API korunmalı, yayımlanmış soru sürümleri ve geçmiş sınavlar değiştirilmemelidir. Sunucu değişikliği ile mobil paket değişikliği ayrı kaydedilir.
 
-İleride EAS Update istenirse uyumlu JavaScript/görsel düzeltmeleri için kanal ve runtime uyumluluğu hazırlanıp bunları içeren yeni bir native paket dağıtılmalıdır; mevcut build 3'e geriye dönük eklenemez. Native bağımlılık/SDK/izin değişiklikleri yeni paket gerektirir. Bu özellik bu görüşmede kurulmadı. [Expo kurulumu](https://docs.expo.dev/eas-update/getting-started/), [runtime uyumluluğu](https://docs.expo.dev/versions/latest/sdk/updates/), [TestFlight güncellemeleri](https://testflight.apple.com/).
+Native bağımlılık/SDK/izin değişiklikleri yeni paket gerektirir. [Expo kurulumu](https://docs.expo.dev/eas-update/getting-started/), [runtime uyumluluğu](https://docs.expo.dev/versions/latest/sdk/updates/), [TestFlight güncellemeleri](https://testflight.apple.com/).
+
+## EAS Update kurulumu — 27 Ekim 2026
+
+Kullanıcının onayıyla `expo-updates@58.0.18` SDK 58'e uygun ve tam sürümle kilitlendi. Hazırlanan yeni uygulama sürümü **0.1.1**; yeni native build, TestFlight dağıtımı ve ilk OTA doğrulaması henüz tamamlanmadı. İlk beta 3 korunur; bu özelliği geriye dönük kazanamaz.
+
+- `runtimeVersion.policy: fingerprint`, yerel SDK/bağımlılık/config uyumluluğunu belirler. JavaScript profil değişikliğinden önce/sonra gerçek `expo-updates runtimeversion:resolve` aynı iOS hash'ini verdi. Yeni native bağımlılık veya izin/config değişikliği yeni runtime ve paket gerektirir; uyumsuz güncelleme eski pakete sunulmaz.
+- `testflight` kanalı ve `preview` EAS ortamı yalnız kişisel beta içindir. Genel mağaza `production` kanalından, ad hoc önizleme `preview` kanalından ayrıdır. EAS preview ortamında yalnız üç açık yapılandırma vardır: HTTPS API/web adresleri ve `EXPO_PUBLIC_LOCAL_PREVIEW=0`. Bu değerler parola değildir. Kaynak `env` ayarlarının EAS Update'e kendiliğinden taşınacağı varsayılmaz; yayın komutu ortamı açık seçer.
+- Açılış kontrolü `ON_LOAD`, bekleme **0 ms**, gömülü paket açık ve varsayılan hata kurtarma korunur. İlk açılış mevcut yerel paketle ilerler; indirilen düzeltme sonraki soğuk açılışta seçilir. Sınav sırasında `reloadAsync` veya zorunlu yeniden başlatma eklenmedi. Çevrimdışı çalışabilen yerel paket, sunucuya ihtiyaç duyan ürün akışlarının offline olduğu anlamına gelmez.
+- Yerel web önizlemelerinde OTA kapalıdır. Profilin altında sürüm; OTA ile çalışırken ayrıca güncellemenin ilk sekiz karakteri gösterilir. Böylece cihazdaki güncelleme geri bildirimi EAS update ID'siyle eşleştirilebilir.
+- Yeni OTA araç bağımlılığının forge çözüm yolu mevcut kesin hash yamasına eklendi; başka yol/advisory istisnası açılmadı. `npm run audit` doğrulandı; ham registry audit'i mevcut forge sürümünü hâlâ işaretler.
+
+Yayın akışı (depo kökünde, doğrulanmış değişikliklerle):
+
+```sh
+npm run test:mobile
+npm run test:toolchain
+npm run typecheck
+npm run update:ios:beta -- --message "Düzeltmenin kısa Türkçe açıklaması" --non-interactive
+```
+
+EAS çıktısındaki grup/iOS update kimliği ve runtime kaydedilir; cihazdaki yeni paket runtime'ıyla eşleşmesi kontrol edilir. Kullanıcı sınav dışındayken uygulamayı tamamen kapatıp açar, indirmeye fırsat verir ve tekrar açar; Profil'deki güncelleme koduyla alınması teyit edilir. Sunucuya publish başarısı gerçek cihazın güncellemeyi aldığının kanıtı değildir. Üretim kanalına otomatik yayın yapılmaz; Android paketi bu kurulumda yayımlanmaz.
+
+Hatalı OTA için, incelenmiş ilgili runtime'a geri dönüş (kimlikler yayın kaydından alınır):
+
+```sh
+npm exec --yes --package=eas-cli@26.0.0 -- eas update:roll-back-to-embedded --channel testflight --platform ios --runtime-version RUNTIME --message "Gömülü beta sürümüne geri dönüş" --non-interactive
+```
+
+Bu komut `apps/mobile` dizininde çalıştırılır; yalnız hedef runtime'ın güncellemesini gömülü pakete döndürür. Gerçek hata yokken sırf prova için çalışan tester'a rollback gönderilmez. [Expo geri dönüş açıklaması](https://docs.expo.dev/eas-update/rollbacks/).
 
 ## Kurulum sırası
 

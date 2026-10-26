@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 27 Ekim 2026, EAS Update hazırlığı
+
+- `expo-updates@58.0.18`, fingerprint uyumluluğu, ayrı testflight/production kanalları, açık preview ortam değişkenleri, 0 ms açılış beklemesi ve gömülü paket kurtarması hazırlandı. Yerel önizleme OTA alamaz; sınav sırasında zorunlu reload yoktur. Profil sürümü ve OTA kimliğini gösterir.
+- **42 mobil + 28 araç/güvenlik + 19 mağaza/değer testi**, tüm workspace strict TypeScript, SDK bağımlılık uyumluluğu ve iOS Hermes export geçti. Dört yeni yapılandırma testi kanal ayrımı, native fingerprint, yerel önizleme izolasyonu ve beklemesiz/gömülü açılışı; yeni audit testi OTA signing yardımcısının doğrulanmış yamaya bağlılığını ve diğer yolların reddini kapsar. Gerçek SDK CLI'ıyla JavaScript değişikliğinden önce/sonra aynı iOS runtime hash'i elde edildi. `npm run audit`: 0 incelenmemiş/yamasız bulgu; ham npm audit'te mevcut yerel forge advisory'si sürer.
+- Yeni native IPA, Apple yükleme/işleme ve cihazda OTA alma doğrulaması henüz yapılmadı. Backend/API/DB değişmedi; PHPUnit veya ortak DB E2E çalıştırılmadı. Kanıt `artifacts/eas-update/`, yayın akışı [IOS_BETA](IOS_BETA.md).
+
 ## Güncel doğrulama — 27 Ekim 2026, kişisel iOS beta hazırlığı
 
 - Ayrı `testflight` EAS profili; production kalıtımı, gerçek cihaz/store dağıtımı, otomatik build numarası, Node 24.22.0 ve mevcut HTTPS API ile hazırlandı. Expo projesi bağlandı, Apple bundle ID ve App Store Connect kaydı oluşturuldu; yalnız hesap sahibinin bulunduğu iç test grubu doğrulandı. [Durum ve kaynaklar](IOS_BETA.md).

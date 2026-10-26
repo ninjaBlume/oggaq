@@ -15,6 +15,8 @@
     },
     "preview": {
       "distribution": "internal",
+      "channel": "preview",
+      "environment": "preview",
       "android": {
         "buildType": "apk"
       },
@@ -25,13 +27,18 @@
     },
     "production": {
       "autoIncrement": true,
+      "channel": "production",
+      "environment": "production",
       "env": {
+        "EXPO_PUBLIC_LOCAL_PREVIEW": "0",
         "EXPO_PUBLIC_API_URL": "https://oggsor.com",
         "EXPO_PUBLIC_WEB_URL": "https://oggsor.com"
       }
     },
     "testflight": {
       "extends": "production",
+      "channel": "testflight",
+      "environment": "preview",
       "distribution": "store",
       "ios": {
         "simulator": false

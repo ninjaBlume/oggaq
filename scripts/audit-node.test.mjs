@@ -28,3 +28,10 @@ test('the Expo signing helper is accepted only inside the reviewed CLI chain', (
 test('a clean registry report is accepted without inventing advisory exceptions', () => {
   assert.deepEqual(inspectAudit({ vulnerabilities: {} }, tree, true), { patched: [], failures: [] });
 });
+test('the OTA signing helper uses the same verified patch and no other update dependency is exempt', () => {
+  const updates = { dependencies: { '@oggaq/mobile': { dependencies: { 'expo-updates': { dependencies: { '@expo/code-signing-certificates': { dependencies: { 'node-forge': {} } } } } } } } };
+  assert.deepEqual(inspectAudit(report('node-forge', 'GHSA-86w9-cpqp-85rv'), updates, true).failures, []);
+  assert.equal(inspectAudit(report('node-forge', 'GHSA-86w9-cpqp-85rv'), updates, false).failures.length, 1);
+  updates.dependencies['@oggaq/mobile'].dependencies['expo-updates'].dependencies['node-forge'] = {};
+  assert.equal(inspectAudit(report('node-forge', 'GHSA-86w9-cpqp-85rv'), updates, true).failures.length, 1);
+});

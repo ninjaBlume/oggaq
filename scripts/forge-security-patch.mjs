@@ -24,8 +24,10 @@ function installedForges() {
   const expoRequire = createRequire(mobileRequire.resolve('expo/package.json'));
   const cliRequire = createRequire(expoRequire.resolve('@expo/cli/package.json'));
   const signingRequire = createRequire(cliRequire.resolve('@expo/code-signing-certificates/package.json'));
+  const updatesRequire = createRequire(mobileRequire.resolve('expo-updates/package.json'));
+  const updateSigningRequire = createRequire(updatesRequire.resolve('@expo/code-signing-certificates/package.json'));
   const files = new Map();
-  for (const loader of [cliRequire, signingRequire]) {
+  for (const loader of [cliRequire, signingRequire, updateSigningRequire]) {
     const filename = loader.resolve('node-forge/lib/rsa.js');
     files.set(filename, { version: loader('node-forge/package.json').version, filename });
   }
