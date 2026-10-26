@@ -50,6 +50,10 @@ Silme işlemi aynı veritabanı işleminde `account_erasures` tablosuna yalnızc
 
 Eski bir yedek geri yüklenirse silinmiş hesaplar yeniden ortaya çıkar. `php artisan accounts:reapply-erasures` listedeki özetlerle eşleşen kullanıcıları mevcut silme yoluyla (tüm bağlı veriyle) siler; varsayılan olarak yalnızca sayar, `--force` ile siler, platform yöneticisi hesaplarını otomatik silmez. Yedekten **daha yeni** silmeler için liste yedekten ayrı saklanır (`accounts:export-erasures`, saatlik) ve `--from` ile verilir. Prosedür ve sınırlar [DEPLOYMENT](DEPLOYMENT.md) §17.4 içindedir. `ERASURE_LEDGER_KEY` veritabanı yedeğiyle aynı yerde saklanmamalı, kaybolursa eski kayıtlar eşleşmez. Bu mekanizma yerelde geri yüklenmiş bir veritabanı kopyasında denendi; gerçek bir geri yükleme felaketi yaşanmadı.
 
+## Kapalı beta güncelleme hizmeti — 27 Ekim 2026
+
+`expo-updates@58.0.18` ile güncelleme kontrolü/indirmesi Expo/EAS (`u.expo.dev` ve varlık CDN'i) üzerinden yapılır. SDK kaynak kontrolünde isteklerin iOS platformu, runtime/kanal, kurulum için rastgele `EAS-Client-ID` ve varsa son ölümcül hata metninin sınırlanmış bölümünü taşıdığı görüldü (`FileDownloader.swift`); hizmet ağ isteğinde IP adresini de görebilir. Uygulama bu isteklere hesap adı, e-posta, oturum tokenı veya soru yanıtını bilerek eklemez. Expo/EAS'in güncelleme sağlayıcısı rolü, teknik tanımlayıcı/hata verisi, saklama ve yurt dışı işleme durumu genel kullanıma geçmeden önce gizlilik/mağaza beyanlarında değerlendirilmelidir. Bu yalnız hesap sahibinin kapalı betasıdır; mevcut hukuki inceleme tamamlandı sayılmaz.
+
 ## Açık kalanlar
 
 - **Hukuki metinler:** herkese açık **taslak** sayfalar `apps/web/public/legal/` altında hazırdır (gizlilik/KVKK aydınlatma, koşullar, destek, hesap silme; işaretli yer tutucular ve "TASLAK" bandı hukukçu onayına kadar durur, bkz. [STORE_RELEASE](STORE_RELEASE.md)). Onaylanmamıştır: aydınlatma metni, kullanım koşulları, veri sorumlusu (henüz belirlenmedi) ve işleyen rolleri, VERBİS uygulanabilirliği, saklama sürelerinin hukuki dayanağı ve yurt dışı aktarım koşulları kararlaştırılmadı; hukukçu gerekir. Bu belge o kararların yerine geçmez.
