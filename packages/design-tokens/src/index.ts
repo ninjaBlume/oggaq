@@ -7,6 +7,7 @@ export const colorRoles = [
   'ink', 'muted',
   'primary', 'onPrimary', 'primaryContainer', 'onPrimaryContainer', 'softPrimary', 'secondaryContainer', 'onSecondaryContainer',
   'success', 'onSuccess', 'softSuccess', 'red', 'onRed', 'softRed', 'warning', 'softWarning',
+  'cardIndigoSurface', 'cardIndigoLine', 'cardIndigoAccent', 'cardSandSurface', 'cardSandLine', 'cardSandAccent',
   'navy', 'onNavy', 'onNavyMuted', 'accent', 'scrim',
 ] as const;
 export type ColorRole = (typeof colorRoles)[number];
@@ -18,6 +19,8 @@ export const lightPalette: Palette = {
   primary: '#2459A6', onPrimary: '#FFFFFF', primaryContainer: '#DEE9FC', onPrimaryContainer: '#173968', softPrimary: '#E9F0FD',
   secondaryContainer: '#E8EDF7', onSecondaryContainer: '#2E4262',
   success: '#237A4B', onSuccess: '#FFFFFF', softSuccess: '#EDF5EF', red: '#B9384A', onRed: '#FFFFFF', softRed: '#FBEDEF', warning: '#8A5A00', softWarning: '#FBF1DC',
+  cardIndigoSurface: '#F0F1FC', cardIndigoLine: '#DCDFF2', cardIndigoAccent: '#565CA2',
+  cardSandSurface: '#FBF5E9', cardSandLine: '#EADFC9', cardSandAccent: '#805A2D',
   navy: '#142D50', onNavy: '#FFFFFF', onNavyMuted: '#C8D9F1', accent: '#D6A64F', scrim: 'rgba(20, 45, 80, 0.48)',
 };
 
@@ -29,6 +32,8 @@ export const darkPalette: Palette = {
   primary: '#9EC5FF', onPrimary: '#102E54', primaryContainer: '#213F6B', onPrimaryContainer: '#D4E5FF', softPrimary: '#192F4E',
   secondaryContainer: '#2B3A52', onSecondaryContainer: '#DEE7F6',
   success: '#6FD39A', onSuccess: '#00210F', softSuccess: '#17301F', red: '#F2808F', onRed: '#3A0010', softRed: '#3A1D22', warning: '#E9B84F', softWarning: '#3A2E12',
+  cardIndigoSurface: '#22263E', cardIndigoLine: '#3E4568', cardIndigoAccent: '#BAC2FF',
+  cardSandSurface: '#2D2922', cardSandLine: '#4F4532', cardSandAccent: '#E2C38B',
   navy: '#173763', onNavy: '#FFFFFF', onNavyMuted: '#C8D9F1', accent: '#D6A64F', scrim: 'rgba(0, 0, 0, 0.6)',
 };
 
@@ -69,3 +74,13 @@ export const typeScale = {
 
 // Minimum touch target (px); buttons are larger.
 export const minTouchTarget = 44;
+
+// Decorative card families stay separate from correct/incorrect/warning feedback.
+export type CardTone = 'blue' | 'indigo' | 'sand';
+export function cardTone(palette: Palette, tone: CardTone) {
+  switch (tone) {
+    case 'indigo': return { surface: palette.cardIndigoSurface, line: palette.cardIndigoLine, accent: palette.cardIndigoAccent, iconSurface: palette.cardIndigoLine };
+    case 'sand': return { surface: palette.cardSandSurface, line: palette.cardSandLine, accent: palette.cardSandAccent, iconSurface: palette.cardSandLine };
+    default: return { surface: palette.softPrimary, line: palette.primaryContainer, accent: palette.primary, iconSurface: palette.primaryContainer };
+  }
+}

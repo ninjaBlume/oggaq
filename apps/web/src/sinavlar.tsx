@@ -72,7 +72,7 @@ function ExamRow({ exam, title, attempts }: { exam: OfficialExam; title: string;
   }
   const locked = start.isPending || submission.current !== null;
   const expired = progress.open && Date.parse(progress.open.deadline_at) <= Date.parse(progress.open.server_time);
-  return <article className="card sinav-row">
+  return <article className={`card sinav-row card-tone-${exam.subject ? 'indigo' : 'blue'}`}>
     <div className="sinav-main">
       <div className="sinav-title"><span className="exam-mark"><Icon name="book" size={22} /></span><h2>{title}</h2></div>
       <p>{[examPeriodLabel(exam), `${exam.question_count} soru`, `önerilen süre ${suggestedMinutes(exam)} dk`].join(' · ')}</p>

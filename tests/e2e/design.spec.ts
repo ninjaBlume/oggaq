@@ -128,6 +128,10 @@ for (const scheme of schemes) {
         await page.getByRole("tab", { name: tab, exact: true }).click();
         await page.waitForTimeout(500);
         await expectFits(page);
+        if (width === 390 && ["Ana sayfa", "Deneme", "Ders"].includes(tab)) {
+          mkdirSync('artifacts/web-preview/redesign', { recursive: true });
+          await page.screenshot({ path: `artifacts/web-preview/redesign/mobile-${scheme}-${width}-${tab}.png`, fullPage: true, animations: 'disabled' });
+        }
       }
       // Compact windows have the tab bar at the bottom, wider ones a rail at the left.
       const box = await page.getByRole("tab", { name: "Ders", exact: true }).boundingBox();

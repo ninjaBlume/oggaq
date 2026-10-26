@@ -16,6 +16,7 @@ import {
 import type { StudyContext, User } from "@oggaq/shared-types";
 import { ExpressivePressable } from "./expressive";
 import { examDisplayTitle, vocabulary } from "@oggaq/study-core";
+import { cardTone, type CardTone } from "@oggaq/design-tokens";
 import { scoreTone, shape } from "./theme";
 import { api } from "./api";
 import { useResource, useOnReturn } from "./hooks";
@@ -76,9 +77,9 @@ export function Home({
   const activeExam = recentExams.data?.data.find((e) => e.status === "active" && Date.parse(e.deadline_at) > Date.parse(e.server_time));
   const totals = summary.data?.data;
   const metrics = [
-    { label: "Soru", accessible: "Değerlendirilen soru", value: totals?.answers.total.toLocaleString("tr-TR"), icon: BookOpen },
-    { label: "Doğruluk", accessible: "Doğruluk", value: typeof accuracy === "number" ? `%${accuracy.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}` : undefined, icon: ChartColumn },
-    { label: "Biten sınav", accessible: "Tamamlanan sınav", value: totals?.exams.completed.toLocaleString("tr-TR"), icon: ListChecks },
+    { label: "Soru", accessible: "Değerlendirilen soru", tone: "blue" as const, value: totals?.answers.total.toLocaleString("tr-TR"), icon: BookOpen },
+    { label: "Doğruluk", accessible: "Doğruluk", tone: "indigo" as const, value: typeof accuracy === "number" ? `%${accuracy.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}` : undefined, icon: ChartColumn },
+    { label: "Biten sınav", accessible: "Tamamlanan sınav", tone: "sand" as const, value: totals?.exams.completed.toLocaleString("tr-TR"), icon: ListChecks },
   ];
   return (
     <>
@@ -137,16 +138,18 @@ export function Home({
           <TextLink onPress={stats}>Detayları gör</TextLink>
         </View>
         <View style={{ flexDirection: "row", gap: 8 }}>
-          {metrics.map(({ label, accessible, value, icon: Icon }) => (
+          {metrics.map(({ label, accessible, value, icon: Icon, tone }) => {
+            const tint = cardTone(palette, tone);
+            return (
             <View key={label} accessible accessibilityLabel={`${accessible}: ${value ?? (summary.loading ? "yükleniyor" : "henüz yok")}`}
-              style={{ flex: 1, minWidth: 0, gap: 5, padding: 10, backgroundColor: palette.surface, borderWidth: 1, borderRadius: shape.control, borderColor: palette.line }}>
-              <View style={{ width: 28, height: 28, borderRadius: shape.small, alignItems: "center", justifyContent: "center", backgroundColor: palette.softPrimary }}>
-                <Icon size={17} color={palette.primary} strokeWidth={1.8} />
+              style={{ flex: 1, minWidth: 0, gap: 5, padding: 10, backgroundColor: tint.surface, borderWidth: 1, borderRadius: shape.control, borderColor: tint.line }}>
+              <View style={{ width: 28, height: 28, borderRadius: shape.small, alignItems: "center", justifyContent: "center", backgroundColor: tint.iconSurface }}>
+                <Icon size={17} color={tint.accent} strokeWidth={1.8} />
               </View>
               <Text style={{ color: palette.ink, fontSize: 22, lineHeight: 29, fontWeight: "700", fontVariant: ["tabular-nums"] }}>{value ?? "—"}</Text>
               <Text style={{ color: palette.muted, fontSize: 12, lineHeight: 18 }}>{label}</Text>
             </View>
-          ))}
+          );})}
         </View>
         <ErrorNotice title="Özet bilgilerin yüklenemedi" error={summary.error} retry={() => void summary.reload()} />
       </View>
@@ -156,17 +159,17 @@ export function Home({
       <View testID="home-quick-start" style={{ flex: layout.columns === 2 ? 1 : undefined, gap: 12 }}>
       <SectionTitle>Hızlı başla</SectionTitle>
       <HomeGroup>
-        <HomeRow icon={BookOpen} title={vocabulary.ders.title} description="Dersini seç, ilgili sınavlara ulaş" onPress={() => ders()} />
-        <HomeRow icon={Clock3} title={vocabulary.deneme.title} description="Silahlı veya silahsız sınavını seç" onPress={deneme} />
-        <HomeRow icon={ListChecks} title={vocabulary.review.title} description="Yanlış, boş ve favori sorularından sınav yap"
+        <HomeRow icon={BookOpen} tone="indigo" title={vocabulary.ders.title} description="Dersini seç, ilgili sınavlara ulaş" onPress={() => ders()} />
+        <HomeRow icon={Clock3} tone="blue" title={vocabulary.deneme.title} description="Silahlı veya silahsız sınavını seç" onPress={deneme} />
+        <HomeRow icon={ListChecks} tone="sand" title={vocabulary.review.title} description="Yanlış, boş ve favori sorularından sınav yap"
           accessibilityLabel={`${vocabulary.review.title} ekranını aç`} onPress={review} />
       </HomeGroup>
       </View>
       <View style={{ flex: layout.columns === 2 ? 1 : undefined, gap: 12 }}>
       <SectionTitle>Çalışmaların</SectionTitle>
       <HomeGroup>
-        <HomeRow icon={History} title={vocabulary.results.title} description="Girdiğin sınavları ve cevaplarını incele" onPress={history} />
-        <HomeRow icon={ChartColumn} title={vocabulary.stats.title}
+        <HomeRow icon={History} tone="blue" title={vocabulary.results.title} description="Girdiğin sınavları ve cevaplarını incele" onPress={history} />
+        <HomeRow icon={ChartColumn} tone="indigo" title={vocabulary.stats.title}
           description={typeof accuracy === "number" ? `Doğruluk %${accuracy.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}` : "İlerlemeni ve derslere göre durumunu gör"}
           accessibilityLabel={`${vocabulary.stats.title} ekranını aç`} onPress={stats} />
       </HomeGroup>
@@ -208,20 +211,22 @@ function HomeGroup({ children }: { children: ReactNode }) {
   return <View style={{ gap: 10 }}>{children}</View>;
 }
 
-function HomeRow({ icon: Icon, title, description, accessibilityLabel, onPress, badge }: {
+function HomeRow({ icon: Icon, title, description, accessibilityLabel, onPress, badge, tone }: {
   icon: LucideIcon;
   title: string;
   description?: string;
   accessibilityLabel?: string;
   onPress: () => void;
   badge?: ReactNode;
+  tone?: CardTone;
 }) {
   const { palette } = useTheme();
+  const tint = tone ? cardTone(palette, tone) : null;
   return <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? `${title} ekranını aç`} onPress={onPress}
-    style={({ pressed }) => ({ minHeight: 76, padding: 14, flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: pressed ? palette.softPrimary : palette.surface,
-      borderWidth: 1, borderColor: palette.line, borderRadius: shape.control })}>
-    <View style={{ width: 44, height: 44, borderRadius: shape.control, alignItems: "center", justifyContent: "center", backgroundColor: palette.softPrimary }}>
-      <Icon size={21} color={palette.primary} strokeWidth={1.8} />
+    style={({ pressed }) => ({ minHeight: 76, padding: 14, flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: pressed ? (tint?.iconSurface ?? palette.softPrimary) : (tint?.surface ?? palette.surface),
+      borderWidth: 1, borderColor: tint?.line ?? palette.line, borderRadius: shape.control })}>
+    <View style={{ width: 44, height: 44, borderRadius: shape.control, alignItems: "center", justifyContent: "center", backgroundColor: tint?.iconSurface ?? palette.softPrimary }}>
+      <Icon size={21} color={tint?.accent ?? palette.primary} strokeWidth={1.8} />
     </View>
     <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
       <Text style={{ color: palette.ink, fontSize: 15, lineHeight: 22, fontWeight: "600" }}>{title}</Text>

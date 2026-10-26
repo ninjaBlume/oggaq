@@ -23,6 +23,12 @@
   --c-soft-red: #FBEDEF;
   --c-warning: #8A5A00;
   --c-soft-warning: #FBF1DC;
+  --c-card-indigo-surface: #F0F1FC;
+  --c-card-indigo-line: #DCDFF2;
+  --c-card-indigo-accent: #565CA2;
+  --c-card-sand-surface: #FBF5E9;
+  --c-card-sand-line: #EADFC9;
+  --c-card-sand-accent: #805A2D;
   --c-navy: #142D50;
   --c-on-navy: #FFFFFF;
   --c-on-navy-muted: #C8D9F1;
@@ -58,6 +64,12 @@
     --c-soft-red: #3A1D22;
     --c-warning: #E9B84F;
     --c-soft-warning: #3A2E12;
+    --c-card-indigo-surface: #22263E;
+    --c-card-indigo-line: #3E4568;
+    --c-card-indigo-accent: #BAC2FF;
+    --c-card-sand-surface: #2D2922;
+    --c-card-sand-line: #4F4532;
+    --c-card-sand-accent: #E2C38B;
     --c-navy: #173763;
     --c-on-navy: #FFFFFF;
     --c-on-navy-muted: #C8D9F1;
@@ -89,6 +101,12 @@
   --c-soft-red: #3A1D22;
   --c-warning: #E9B84F;
   --c-soft-warning: #3A2E12;
+  --c-card-indigo-surface: #22263E;
+  --c-card-indigo-line: #3E4568;
+  --c-card-indigo-accent: #BAC2FF;
+  --c-card-sand-surface: #2D2922;
+  --c-card-sand-line: #4F4532;
+  --c-card-sand-accent: #E2C38B;
   --c-navy: #173763;
   --c-on-navy: #FFFFFF;
   --c-on-navy-muted: #C8D9F1;

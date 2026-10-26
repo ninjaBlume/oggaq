@@ -1,4 +1,5 @@
 import { Text } from "./text";
+import { cardTone } from "@oggaq/design-tokens";
 import { CatalogCache } from "./catalog-cache";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, View } from "react-native";
@@ -74,6 +75,7 @@ function ExamEntry({
   open: (id: string, initialExam?: ExamAttempt) => void;
 }) {
   const { styles, palette } = useTheme();
+  const tint = cardTone(palette, exam.subject ? "indigo" : "blue");
   const [expanded, setExpanded] = useState(false);
   const [minutes, setMinutes] = useState(String(suggestedMinutes(exam)));
   const [timerPolicy, setTimerPolicy] = useState<ExamTimerPolicy>('continuous');
@@ -106,8 +108,13 @@ function ExamEntry({
   const locked = task.pending || (submission.current !== null && !(task.error instanceof ApiError && ([409, 422].includes(task.error.status) || task.error.problem.code === 'timer_unavailable')));
   const valid = Number(minutes) >= 1 && Number(minutes) <= 180;
   return (
-    <View style={{ padding: 14, gap: 10, borderRadius: shape.large, backgroundColor: palette.surface, borderWidth: 1, borderColor: progress.open && !expired ? palette.primary : palette.line }}>
-      <Text accessibilityRole="header" style={[styles.heading, { fontSize: 17, lineHeight: 24 }]}>{title}</Text>
+    <View style={{ padding: 14, gap: 10, borderRadius: shape.large, backgroundColor: tint.surface, borderWidth: 1, borderColor: progress.open && !expired ? palette.primary : tint.line }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+        <View style={{ width: 40, height: 40, borderRadius: shape.control, alignItems: "center", justifyContent: "center", backgroundColor: tint.iconSurface }}>
+          <BookOpen size={21} color={tint.accent} />
+        </View>
+        <Text accessibilityRole="header" style={[styles.heading, { flex: 1, fontSize: 17, lineHeight: 24 }]}>{title}</Text>
+      </View>
       <Text style={styles.muted}>
         {[examPeriodLabel(exam), `${exam.question_count} soru`, `önerilen süre ${suggestedMinutes(exam)} dk`].join(" · ")}
       </Text>

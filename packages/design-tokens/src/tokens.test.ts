@@ -17,6 +17,12 @@ const pairs: [ColorRole, ColorRole, number][] = [
   ['warning', 'surface', 4.5], ['warning', 'softWarning', 4.5],
   ['onSuccess', 'success', 4.5], ['onRed', 'red', 4.5], ['onNavy', 'navy', 4.5], ['onNavyMuted', 'navy', 4.5], ['accent', 'navy', 3],
   ['red', 'paper', 3], ['success', 'paper', 3],
+  ['muted', 'softPrimary', 4.5],
+  ...(['cardIndigoSurface', 'cardSandSurface', 'cardIndigoLine', 'cardSandLine'] as const).flatMap(background => [
+    ['ink', background, 4.5], ['muted', background, 4.5],
+  ] as [ColorRole, ColorRole, number][]),
+  ['cardIndigoAccent', 'cardIndigoSurface', 4.5], ['cardIndigoAccent', 'cardIndigoLine', 3],
+  ['cardSandAccent', 'cardSandSurface', 4.5], ['cardSandAccent', 'cardSandLine', 3],
 ];
 
 describe.each([['light', lightPalette], ['dark', darkPalette]] as const)('%s palette', (_scheme, palette) => {

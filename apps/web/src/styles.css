@@ -161,6 +161,13 @@ small {
   border-radius:24px;
   padding:14px
 }
+/* Quiet card families: blue remains dominant; indigo and sand distinguish related tasks. */
+.card-tone-blue { --card-surface:var(--c-soft-primary); --card-line:var(--c-primary-container); --card-accent:var(--c-primary) }
+.card-tone-indigo { --card-surface:var(--c-card-indigo-surface); --card-line:var(--c-card-indigo-line); --card-accent:var(--c-card-indigo-accent) }
+.card-tone-sand { --card-surface:var(--c-card-sand-surface); --card-line:var(--c-card-sand-line); --card-accent:var(--c-card-sand-accent) }
+.card[class*="card-tone-"] { background:var(--card-surface); border-color:var(--card-line) }
+.card[class*="card-tone-"] .exam-mark { background:var(--card-line); color:var(--card-accent) }
+.card[class*="card-tone-"] .eyebrow { color:var(--card-accent) }
 .notice {
   border-radius:16px;
   padding:16px;

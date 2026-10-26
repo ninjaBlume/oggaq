@@ -1,5 +1,12 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, uyumlu kart renkleri
+
+- Deneme kartlarına yumuşak mavi, Ders kartlarına indigo; mobil Tekrar ve küçük tamamlanma özetlerine kum tonu eklendi. Mobil ana sayfa kısayol/özetleri ve web başarı özetleri aynı merkezi renk ailesini kullanır. Açık/koyu paletler `packages/design-tokens` içindedir. Soru/cevap/puanlama davranışı ve veri modeli değişmedi.
+- **89 token/kontrast testi**, strict TypeScript, **10 web + 42 mobil Vitest**, admin/web production build ve iOS/Android/web Expo export geçti. Yeni dekoratif yüzeylerde ve basılı kart yüzeylerinde metin AA kontrastı, ikonlar en az 3:1 sağlar. Mevcut test matrisi yeni rol çiftleriyle genişletildi; uygulamayı taklit eden yeni test eklenmedi.
+- Mevcut **4 tasarım E2E** tek koşumda geçti: açık/koyu × web/mobil önizleme; 320/390/834/1280 px taşma, web başlık kontrastı ve mobil gezinme düzeni. 390 px ana sayfa, Deneme ve Ders görüntüleri iki temada gözle incelendi. Önceden görülen yerel yük nedeniyle yalnız geçici QA konfigürasyonu 90 saniye test/30 saniye beklenti kullanır; gerçek koşumda tüm testler bu sınırların çok altında tamamlandı. Depodaki normal timeout değişmedi.
+- PHPUnit/E2E çakışması ve test portları önceden kontrol edildi; yalnız `oggaq_test`, mobil 5186 kullanıldı. Yerel ortak içerik DB'si/hesaplar ve Claude'un servisleri değiştirilmedi. Backend/SQL değişikliği olmadığı için PHPUnit/API testleri tekrar çalıştırılmadı. Fiziksel iOS/Android denenmedi. Kanıtlar `artifacts/card-colors/` içinde; Git push yapılmadı.
+
 ## Güncel doğrulama — 26 Ekim 2026, öğrencinin süre tercihi
 
 - Deneme ve Ders başlangıcında öğrenci `continuous` veya `pause_on_exit` seçer. Tercih sınav snapshot'ında sabittir; kalan süre, duraklama ve cihaz oturumu sunucuda doğrulanır. Normal çıkış duraklatır; ani kapanma/ağ kaybında son heartbeat'ten itibaren en çok 30 saniye çalışabilir. Eski cihazın geciken yazıları yeni oturumu durduramaz. Yerel ortak `oggaq` migration yapılmadan korunur: mevcut sürekli sayaç çalışır, yeni duraklama seçimi açıklanmış `timer_unavailable` 503 döndürür.
