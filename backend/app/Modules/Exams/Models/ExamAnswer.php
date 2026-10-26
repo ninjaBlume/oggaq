@@ -22,4 +22,17 @@ class ExamAnswer extends Model
     {
         return $this->belongsTo(QuestionVersion::class);
     }
+
+    public function feedback(bool $finished): ?array
+    {
+        if (! $finished && $this->selected_option_id === null) {
+            return null;
+        }
+
+        return [
+            'outcome' => $this->selected_option_id === null ? 'skipped' : ($this->selected_option_id === $this->questionVersion->correct_option_id ? 'correct' : 'incorrect'),
+            'correct_option_id' => $this->questionVersion->correct_option_id,
+            'explanation' => $this->questionVersion->explanation,
+        ];
+    }
 }

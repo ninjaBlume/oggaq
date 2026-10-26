@@ -1,5 +1,7 @@
 # Veritabanı tasarımı
 
+26 Ekim 2026 cevap kilidi: `2026_10_26_000002_lock_submitted_exam_answers` yeni tablo/alan eklemeden `submitted_exam_answer_lock` trigger'ını kurar. Önceden null olmayan `exam_answers.selected_option_id` farklı bir seçenek veya null olamaz; aynı değer ve sonuç değerlendirmesinin `is_correct` yazması geçerlidir. Migration mevcut soru, cevap, sonuç ve kullanıcı satırlarını değiştirmez. Doğru yanıt aktif denemede kaynak anahtardan hesaplanarak yalnız cevaplanmış soruda gösterilir; toplam sonuç yine bitirmede kaydedilir. Ortak yerel `oggaq` veritabanına bu migration kullanıcı onayı olmadan uygulanmaz.
+
 26 Ekim 2026 arşiv genişletmesi: 76–82. yenileme için mevcut modelde **14 tam seçenek + 77 ders şablonu** eklendi; güncel yenileme toplamı **46 tam + 253 ders** (76–98). 875 soru kaydında **368 yeni soru / 507 tekrar kullanılan sürüm** vardır. Dersler tam sınavla aynı sürümleri kullanır; kısmi derslere puanlama bağlantısı eklenmez. Yeni şema/migration yok; her dönem işleminde 19 tablonun eski satırları korundu. Gerçek aktarım yalnız canlı sunucudadır, yerel ortak içerik veritabanına yazılmadı. Ayrıntılar [EXAM_SOURCES](EXAM_SOURCES.md) içinde.
 
 ## Uygulanan eğitim ayrımı — 26 Ekim 2026

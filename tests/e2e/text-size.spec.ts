@@ -49,7 +49,7 @@ test("boyut değişimi açık sınav formunu ve kaldığı soruyu korur", async 
  const stem = page.getByText("Sentetik üçüncü soru",{exact:true});
  await expect(stem).toBeVisible(); await expect.poll(() => fontSize(stem)).toBeCloseTo(25.2,1);
  await expect.poll(() => fontSize(page.getByText("Sınav",{exact:true}))).toBeCloseTo(19.2,1);
- await page.getByRole("radio",{name:"Sentetik A",exact:true}).click();
+ await page.getByRole("radio",{name:/Sentetik A/}).click();
  await expect(page.getByText("Cevaplar sunucuda kayıtlı",{exact:true})).toBeVisible();
  const position = page.waitForResponse(response => new URL(response.url()).pathname.endsWith("/position"));
  await page.getByRole("button",{name:"Sonraki soru",exact:true}).click(); await position;
@@ -60,7 +60,7 @@ test("boyut değişimi açık sınav formunu ve kaldığı soruyu korur", async 
  await page.getByRole("button",{name:"Devam et",exact:true}).click();
  await expect(page.getByText("Soru 2 / 3",{exact:true})).toBeVisible();
  await page.getByRole("button",{name:"Önceki soru",exact:true}).click();
- await expect(page.getByRole("radio",{name:"Sentetik A",exact:true})).toBeChecked();
+ await expect(page.getByRole("radio",{name:/Sentetik A/})).toBeChecked();
 });
 test("kaydetme hatası boyutu geri almaz; yeniden deneme tercihi saklar", async ({page}) => {
  await page.addInitScript(() => {

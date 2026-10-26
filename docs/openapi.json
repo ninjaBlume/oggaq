@@ -2733,7 +2733,7 @@
       "get": {
         "operationId": "showExam",
         "summary": "Denemeyi sürdürme veya sonucu okuma",
-        "description": "Sunucu zamanı ve son süre döner. Süre dolduysa atomik olarak tamamlanır. Cevap anahtarı yalnız tamamlanınca görünür.",
+        "description": "Sunucu zamanı ve son süre döner. Süre dolduysa atomik olarak tamamlanır. Yanıtlanan sorunun anahtarı ve açıklaması hemen görünür; cevapsız soruların anahtarları tamamlanana kadar gizlidir.",
         "tags": [
           "Exams"
         ],
@@ -2800,8 +2800,8 @@
     "/api/v1/contexts/{context}/exam-attempts/{exam}/answers/{answer}": {
       "put": {
         "operationId": "saveExamAnswer",
-        "summary": "Süre içinde deneme cevabını kaydetme veya değiştirme",
-        "description": "base_version, istemcinin gördüğü deneme revision değeridir. Çakışma cevap bazındadır: aynı cevap istemcinin revision değerinden sonra başka bir değere değiştiyse 409 version_conflict; başka sorulara ait eski revision ile yazılar kabul edilir. Zaten kaydedilmiş aynı seçimin tekrarı revision artırmaz. null cevabı temizler. Biten/süresi dolan denemeye geç gelen yazı değiştirilmez; tamamlanmış kayıt 200 döner.",
+        "summary": "İlk deneme cevabını kaydetme ve doğru cevabı görme",
+        "description": "İlk seçim kaydedilince yalnız o sorunun doğru seçeneği ve açıklaması açılır; yanıt kilitlenir. Farklı seçenek veya null ile temizleme 409 answer_locked döndürür. Aynı seçimin tekrarı revision artırmaz. Diğer sorular eski base_version ile yanıtlanabilir. Cevapsız soruya null gönderimi bir değişiklik yapmaz. Biten/süresi dolan denemeye geç gelen yazı değiştirilmez; tamamlanmış kayıt 200 döner.",
         "tags": [
           "Exams"
         ],
@@ -8425,7 +8425,8 @@
               {
                 "type": "null"
               }
-            ]
+            ],
+            "description": "Seçim kaydedilince doğru seçenek ve açıklama gösterilir; cevap kilitlenir. Cevapsız soruların anahtarı yalnız sınav bitince açılır."
           },
           "is_favorite": {
             "type": "boolean",
@@ -8689,7 +8690,8 @@
         "required": [
           "selected_option_id",
           "base_version"
-        ]
+        ],
+        "description": "İlk kaydedilmiş seçim kesindir; farklı seçim veya temizleme 409 answer_locked döndürür. Aynı seçimin tekrarı idempotenttir."
       },
       "FinishExamInput": {
         "type": "object",
@@ -11912,11 +11914,23 @@
                         "null"
                       ],
                       "format": "uuid"
+                    },
+                    "feedback": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/ExamFeedback"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Yanıt kaydedildikten sonra doğru seçenek ve açıklama; cevaplanmamış soruda null."
                     }
                   },
                   "required": [
                     "id",
-                    "selected_option_id"
+                    "selected_option_id",
+                    "feedback"
                   ]
                 }
               }

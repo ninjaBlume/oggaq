@@ -36,8 +36,11 @@ class ExamTest extends TestCase
                 ->assertJsonPath('data.answers.1.selected_option_id', $exam['questions'][1]['selected_option_id'])
                 ->assertJsonMissingPath('data.questions')
                 ->assertJsonMissingPath('data.answers.0.question')
-                ->assertJsonMissingPath('data.answers.0.feedback');
-            $this->assertStringNotContainsString('from "question_versions"', implode(' ', array_column(DB::getQueryLog(), 'query')));
+                ->assertJsonPath('data.answers.0.feedback', null);
+            $queries = implode(' ', array_column(DB::getQueryLog(), 'query'));
+            $this->assertStringNotContainsString('question_options', $queries);
+            $this->assertStringNotContainsString('stem', $queries);
+            $this->assertSame('correct', $state->json('data.answers.1.feedback.outcome'));
         } finally {
             DB::disableQueryLog();
             DB::flushQueryLog();
@@ -72,7 +75,7 @@ class ExamTest extends TestCase
         $first = $exam['questions'][0];
         $second = $exam['questions'][1];
         $body = ['base_version' => 1, 'selected_option_id' => $first['question']['options'][0]['id']];
-        $compact = $this->putJson($path.'/answers/'.$first['id'].'?compact=true', $body)->assertOk()->assertJsonPath('data.revision', 2)->assertJsonMissingPath('data.questions')->assertJsonMissingPath('data.answers.0.feedback')->assertJsonMissingPath('data.answers.0.question');
+        $compact = $this->putJson($path.'/answers/'.$first['id'].'?compact=true', $body)->assertOk()->assertJsonPath('data.revision', 2)->assertJsonMissingPath('data.questions')->assertJsonPath('data.answers.0.feedback.outcome', 'correct')->assertJsonMissingPath('data.answers.0.question');
         $this->assertLessThan(strlen(json_encode($exam)) / 3, strlen($compact->getContent()));
         $this->putJson($path.'/answers/'.$second['id'], ['base_version' => 1, 'selected_option_id' => $second['question']['options'][1]['id']])->assertOk()->assertJsonPath('data.revision', 3);
         $this->putJson($path.'/answers/'.$first['id'].'?compact=1', $body)->assertOk()->assertJsonPath('data.revision', 3)->assertJsonPath('data.answers.0.selected_option_id', $first['question']['options'][0]['id'])->assertJsonPath('data.answers.1.selected_option_id', $second['question']['options'][1]['id']);
@@ -176,7 +179,7 @@ class ExamTest extends TestCase
         $exam = $this->start();
         $exam = $this->answer($exam, 0, 0);
         $exam = $this->answer($exam, 1, 1);
-        $this->assertNull($exam['questions'][0]['feedback']);
+        $this->assertSame('correct', $exam['questions'][0]['feedback']['outcome']);
         $body = ['base_version' => $exam['revision']];
         $done = $this->postJson($this->url($exam, '/finish'), $body)->assertOk()->assertJsonPath('data.result.correct', 1)->assertJsonPath('data.result.incorrect', 1)->assertJsonPath('data.result.blank', 1)->assertJsonPath('data.result.score_percent', 33.33)->json('data');
         $this->assertSame('manual', $done['finish_reason']);
@@ -188,18 +191,44 @@ class ExamTest extends TestCase
         $this->assertDatabaseCount('exam_attempts', 1);
     }
 
-    public function test_answer_can_be_changed_cleared_and_retried_without_duplicate_revision(): void
+    public function test_first_answer_reveals_only_its_key_and_cannot_be_changed_or_cleared(): void
     {
         $this->pool();
         $this->asToken($this->createUser());
         $exam = $this->start();
-        $new = $this->answer($exam, 0, 0);
-        $again = $this->answer($exam, 0, 0);
+        $new = $this->answer($exam, 0, 1);
+        $this->assertSame('incorrect', $new['questions'][0]['feedback']['outcome']);
+        $this->assertSame($exam['questions'][0]['question']['options'][0]['id'], $new['questions'][0]['feedback']['correct_option_id']);
+        $this->assertSame('Yalnız test açıklaması', $new['questions'][0]['feedback']['explanation']);
+        $this->assertNull($new['questions'][1]['feedback']);
+        $this->assertArrayNotHasKey('correct_option_id', $new['questions'][1]['question']);
+        $again = $this->answer($exam, 0, 1);
         $this->assertSame($new['revision'], $again['revision']);
-        $exam = $this->answer($new, 0, 1);
-        $exam = $this->answer($exam, 0, null);
-        $this->assertSame(4, $exam['revision']);
-        $this->postJson($this->url($exam, '/finish'), ['base_version' => 4])->assertOk()->assertJsonPath('data.result.blank', 3)->assertJsonPath('data.result.score_percent', 0);
+        foreach ([null, $exam['questions'][0]['question']['options'][0]['id']] as $option) {
+            $this->putJson($this->url($new, '/answers/'.$new['questions'][0]['id']), ['base_version' => $new['revision'], 'selected_option_id' => $option])
+                ->assertConflict()->assertJsonPath('code', 'answer_locked');
+        }
+        $this->getJson($this->url($new))->assertOk()->assertJsonPath('data.questions.0.feedback', $new['questions'][0]['feedback'])
+            ->assertJsonPath('data.questions.0.selected_option_id', $new['questions'][0]['selected_option_id']);
+        $this->postJson($this->url($new, '/finish'), ['base_version' => $new['revision']])->assertOk()
+            ->assertJsonPath('data.result.incorrect', 1)->assertJsonPath('data.result.blank', 2);
+    }
+
+    public function test_database_locks_submitted_choice_without_preventing_final_grading(): void
+    {
+        $this->pool();
+        $this->asToken($this->createUser());
+        $exam = $this->answer($this->start(), 0, 0);
+        $row = $exam['questions'][0];
+        foreach ([null, $row['question']['options'][1]['id']] as $option) {
+            try {
+                DB::transaction(fn () => DB::table('exam_answers')->where('id', $row['id'])->update(['selected_option_id' => $option]));
+                $this->fail('Submitted answer changed.');
+            } catch (QueryException $error) {
+                $this->assertSame('23514', $error->getCode());
+            }
+        }
+        $this->postJson($this->url($exam, '/finish'), ['base_version' => $exam['revision']])->assertOk()->assertJsonPath('data.result.correct', 1);
     }
 
     public function test_start_retry_returns_same_questions_and_settings_conflict_is_rejected(): void
@@ -224,7 +253,7 @@ class ExamTest extends TestCase
         // Another question answered with the pre-change revision is an independent write and succeeds.
         $this->putJson($this->url($exam, '/answers/'.$second['id']), ['base_version' => 1, 'selected_option_id' => $second['question']['options'][1]['id']])->assertOk()->assertJsonPath('data.revision', 3)->assertJsonPath('data.questions.1.selected_option_id', $second['question']['options'][1]['id']);
         // The same question changed to a different value after the client's revision still conflicts.
-        $this->putJson($this->url($exam, '/answers/'.$first['id']), ['base_version' => 1, 'selected_option_id' => $first['question']['options'][1]['id']])->assertConflict()->assertJsonPath('code', 'version_conflict');
+        $this->putJson($this->url($exam, '/answers/'.$first['id']), ['base_version' => 1, 'selected_option_id' => $first['question']['options'][1]['id']])->assertConflict()->assertJsonPath('code', 'answer_locked');
         // Repeating the already saved value with a stale revision is a safe no-op.
         $this->putJson($this->url($exam, '/answers/'.$first['id']), ['base_version' => 1, 'selected_option_id' => $first['question']['options'][0]['id']])->assertOk()->assertJsonPath('data.revision', 3);
         $this->postJson($this->url($exam, '/finish'), ['base_version' => 1])->assertConflict();

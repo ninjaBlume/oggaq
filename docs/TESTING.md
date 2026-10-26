@@ -1,5 +1,12 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, ilk cevap kilidi ve anında değerlendirme
+
+- PHP 8.4/PostgreSQL: **253 test / 2.758 assertion** geçti. İlk seçimin yalnız kendi anahtarını açması, aynı seçim tekrarının revision artırmaması, değiştirme/temizlemenin API ve PostgreSQL'de reddi, eski cevap/konum/sonuçların korunması doğrulandı. İlk tam koşumda test DB yeniden kurulumunda kalan fonksiyonla çakışma çıktı; migration `CREATE OR REPLACE FUNCTION` biçimine alındı, sonraki tam 253 başarılıdır. Pint, Composer strict validate/audit geçti.
+- Ortak strict TypeScript, API tip üretimi/OpenAPI lint, **33 study-core + 16 admin + 10 web + 42 mobil Vitest**, admin/web build ve iOS/Android/web Expo export geçti. Üretim web paketi `VITE_API_URL=https://oggsor.com` ile derlendi; Expo export yalnız test API'sini kullanan geçici önizlemedir.
+- Tam E2E koşumunda mevcut **119 senaryo geçti**, yeni 4 senaryo ilkinde test seçicileri/Expo önizlemede yeniden giriş ihtiyacı nedeniyle başarısızdı. Web seçicileri tema radyolarından ayrıldı ve seçenek adlarındaki harf/geri bildirim eki hesaba katıldı; mobil yeniden giriş açıkça yapıldı. Son hedefli **4/4** geçti: web/mobil Deneme ve Ders, anında doğru/yanlış ve açıklama, tüm cevap seçeneklerinin kilidi, API değiştirme/temizleme 409, aynı seçim tekrarı, yeniden açma ve sonraki cevapsız sorunun yanıtlanabilmesi. Sonuçta 123 senaryo doğrulandı; tek temiz 123 koşumu olarak raporlanmaz. Yeni ekranlar 390 px'de gözle incelendi; mevcut 320–1280 px kontrolleri tam koşumda geçti.
+- PHPUnit/E2E öncesi ortak süreç/portlar kontrol edildi, sırayla yalnız `oggaq_test` üzerinde çalışıldı. Mobil 5186 kullanıldı; Claude'un servisleri ve ortak yerel `oggaq`/hesaplar değiştirilmedi. Fiziksel iOS/Android bu teslimde ayrıca denenmedi. Sayaç çıkışta devam eder; bu işte süre politikasına değişiklik yapılmadı. Kanıtlar `artifacts/answer-feedback/` ve `artifacts/exam-feedback/` içinde.
+
 ## Güncel doğrulama — 26 Ekim 2026, soru yanıtlama ve devam denetimi
 
 - Uygulama kodu değiştirilmeden PHP 8.4/PostgreSQL üzerinde `ExamTest.php` **21 test / 239 assertion**, ardından `ExamConcurrencyTest.php` **1 test / 7 assertion** geçti. Cevap seçme/değiştirme/temizleme, aynı yazının tekrarı, cevap bazlı çakışma, son soru konumu, sabit süre/soru sürümü, geç cevap reddi, bitirme yarışı, değişmez sonuç ve yetki/kurum sınırları doğrulandı.

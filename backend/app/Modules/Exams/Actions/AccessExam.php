@@ -34,7 +34,7 @@ class AccessExam
                     $this->finalize->execute($attempt);
                 }
 
-                return $attempt->load($compact ? ['answers'] : ['answers.questionVersion.options', 'answers.questionVersion.source']);
+                return $attempt->load($compact ? ['answers.questionVersion:id,correct_option_id,explanation'] : ['answers.questionVersion.options', 'answers.questionVersion.source']);
             });
         } catch (QueryException $exception) {
             // A deadline can cross between the application check and the database write.
@@ -46,7 +46,7 @@ class AccessExam
         }
     }
 
-    // Conflicts are per answer: a stale revision only blocks a different value for an answer changed after it.
+    // Revealing the key commits the first choice; an identical retry remains safe.
     private function saveAnswer(ExamAttempt $attempt, array $input): void
     {
         $row = $attempt->answers()->whereKey($input['answer_id'])->with('questionVersion.options')->firstOrFail();
@@ -56,6 +56,9 @@ class AccessExam
         }
         if ($row->selected_option_id === $option) {
             return;
+        }
+        if ($row->selected_option_id !== null) {
+            throw new ApiProblem(409, 'answer_locked', 'Bu soru yanıtlandı. Doğru cevap gösterildiği için yanıt değiştirilemez.');
         }
         if ($row->changed_revision > (int) $input['base_version']) {
             throw new ApiProblem(409, 'version_conflict', 'Deneme başka bir işlemde güncellendi. Güncel kaydı yükleyin.');

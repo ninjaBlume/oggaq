@@ -147,7 +147,7 @@ test("mobil sekmeler gerçek Bearer API ile deneme sınavı, sonuçlar ve çık�
   await expect(
     page.getByText("DENEMEN DEVAM EDİYOR", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("radio", { name: "Sentetik A", exact: true }).click();
+  await page.getByRole("radio", { name: /Sentetik A/ }).click();
   await expect(
     page.getByText("Cevaplar sunucuda kayıtlı", { exact: true }),
   ).toBeVisible();
@@ -212,7 +212,7 @@ test("ders sınavı dersine göre bulunur ve çözülür; çalışma alanı değ
   await expect(
     page.getByText("DENEMEN DEVAM EDİYOR", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("radio", { name: "Sentetik A", exact: true }).click();
+  await page.getByRole("radio", { name: /Sentetik A/ }).click();
   await page.getByRole("button", { name: "Geri dön" }).click();
   await expect(page.getByText("Devam ediyor", { exact: true })).toBeVisible();
   await page.getByRole("tab", { name: "Profil", exact: true }).click();
@@ -364,7 +364,7 @@ test("yan menü çalışma alanını ayırır ve gerçek tokenı iptal ederek ç
 }) => {
   await login(page);
   await enter(page, "Deneme");
-  await page.getByRole("radio", { name: "Sentetik A", exact: true }).click();
+  await page.getByRole("radio", { name: /Sentetik A/ }).click();
   await page.getByRole("button", { name: "Geri dön" }).click();
   await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
   const menu = page.getByRole("dialog");
@@ -660,7 +660,7 @@ test("mobil tekrar sınavı hatalardan kurulur; başarı durumu ve sınavlar ger
 test("ana sayfa devam eden sınavı önce gösterir ve tekrar başlatmadan açar", async ({ page }) => {
   await login(page);
   await enter(page, "Deneme");
-  await page.getByRole("radio", { name: "Sentetik A", exact: true }).click();
+  await page.getByRole("radio", { name: /Sentetik A/ }).click();
   await expect(page.getByText("Cevaplar sunucuda kayıtlı", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Geri dön", exact: true }).click();
   await page.getByRole("tab", { name: "Ana sayfa", exact: true }).click();
@@ -671,7 +671,7 @@ test("ana sayfa devam eden sınavı önce gösterir ve tekrar başlatmadan açar
   expect(resumeBox!.y).toBeLessThan(toolsBox!.y);
   await expect(page.getByText("Özel güvenlik sınavlarına hazırlan.", { exact: true })).toHaveCount(0);
   await resume.click();
-  await expect(page.getByRole("radio", { name: "Sentetik A", exact: true })).toHaveAttribute("aria-checked", "true");
+  await expect(page.getByRole("radio", { name: /Sentetik A/ })).toHaveAttribute("aria-checked", "true");
 });
 
 test("liste beklerken iskelet gösterir, hata sonrası yeniden deneme gerçek listeyi yükler", async ({ page }) => {
@@ -793,7 +793,7 @@ test("giriş isteği sürerken form ve yön değiştiren bağlantılar kilitleni
 
 test('mobil devam son görüntülenen cevapsız soruya döner; yeniden girişte ve cihaz değişiminde konum korunur', async ({ page, browser }) => {
   await login(page); await enter(page, 'Deneme');
-  await page.getByRole('radio', { name: 'Sentetik A', exact: true }).click();
+  await page.getByRole('radio', { name: /Sentetik A/ }).click();
   await expect(page.getByText('Cevaplar sunucuda kayıtlı', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Sonraki soru', exact: true }).click();
   const saved = page.waitForResponse((r) => r.url().endsWith('/position') && r.status() === 200 && r.request().postDataJSON().position === 3);
@@ -818,6 +818,6 @@ test('mobil devam son görüntülenen cevapsız soruya döner; yeniden girişte 
     await other.getByRole('button', { name: 'Denemene devam et', exact: true }).click();
     await expect(other.getByText('Soru 2 / 3', { exact: true })).toBeVisible();
     await other.getByRole('button', { name: 'Önceki soru', exact: true }).click();
-    await expect(other.getByRole('radio', { name: 'Sentetik A', exact: true })).toHaveAttribute('aria-checked', 'true');
+    await expect(other.getByRole('radio', { name: /Sentetik A/ })).toHaveAttribute('aria-checked', 'true');
   } finally { await otherContext.close(); }
 });

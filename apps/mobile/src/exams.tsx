@@ -237,6 +237,8 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
     setFinishing(null);
   }
   function save(s: Save) {
+    const saved = latest.current?.questions.find((question) => question.id === s.row)?.selected_option_id;
+    if (saved != null && saved !== s.option) return;
     query.cancel();
     setSubmission(s);
     void task.run(
@@ -430,7 +432,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
                       ? submission.option === o.id
                       : row.selected_option_id === o.id;
                   const correct =
-                    done && row.feedback?.correct_option_id === o.id;
+                    row.feedback?.correct_option_id === o.id;
                   return (
                     <Option
                       key={o.id}
@@ -438,8 +440,8 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
                       text={o.text}
                       selected={selected}
                       correct={Boolean(correct)}
-                      incorrect={Boolean(done && selected && !correct)}
-                      disabled={locked}
+                      incorrect={Boolean(row.feedback && selected && !correct)}
+                      disabled={locked || row.selected_option_id !== null}
                       onPress={() =>
                         save({
                           row: row.id,
@@ -460,19 +462,9 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
                         ? "Kayıt doğrulanmalı"
                         : "Cevaplar sunucuda kayıtlı"}
                   </Text>
-                  <Button
-                    secondary
-                    disabled={locked || row.selected_option_id === null}
-                    onPress={() =>
-                      save({
-                        row: row.id,
-                        option: null,
-                        revision: exam.revision,
-                      })
-                    }
-                  >
-                    Cevabı temizle
-                  </Button>
+                  {row.feedback ? <Text accessibilityLiveRegion="polite" style={styles.text}>{row.feedback.outcome === 'correct' ? 'Doğru yanıt.' : 'Yanlış yanıt.'} Doğru cevap: {String.fromCharCode(65 + row.question.options.findIndex((option) => option.id === row.feedback!.correct_option_id))}. Yanıtın kaydedildi ve kilitlendi.</Text>
+                    : <Text style={styles.muted}>Seçimin kaydedilince doğru cevap gösterilir. Yanıtını değiştiremezsin.</Text>}
+                  {row.feedback?.explanation && <Text style={styles.text}>{row.feedback.explanation}</Text>}
                 </>
               )}
               <ErrorNotice

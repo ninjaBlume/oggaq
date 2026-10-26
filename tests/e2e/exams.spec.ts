@@ -63,7 +63,7 @@ test("eski sekme diğer cevabı ezemez; güncel kayıtla devam eder", async ({ p
   await expect(other.getByRole("heading", { name: "Denemen devam ediyor" })).toBeVisible();
   await answer(page, "A");
   await other.getByRole("radio", { name: /Sentetik B/ }).check();
-  await expect(other.getByRole("alert")).toContainText("Deneme başka bir işlemde güncellendi.");
+  await expect(other.getByRole("alert")).toContainText("Bu soru yanıtlandı.");
   await other.getByRole("button", { name: "Güncel kaydı yükle" }).click();
   await expect(other.getByRole("radio", { name: /Sentetik A/ })).toBeChecked();
   await other.close();

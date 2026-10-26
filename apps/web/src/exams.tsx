@@ -204,6 +204,7 @@ function ExamContent({
     (q) => q.selected_option_id !== null,
   ).length;
   function choose(option: string | null) {
+    if (locked || row.selected_option_id !== null) return;
     const s = { row: row.id, option, revision: exam.revision };
     setSubmission(s);
     save.mutate(s);
@@ -245,17 +246,17 @@ function ExamContent({
             )}
           </div>
           <h2 className="question-stem">{row.question.stem}</h2>
-          <fieldset className="answer-options" disabled={locked}>
+          <fieldset className="answer-options" disabled={locked || row.selected_option_id !== null}>
             <legend className="sr-only">Deneme cevap seçenekleri</legend>
             {row.question.options.map((o) => {
               const selected =
                 submission?.row === row.id
                   ? submission.option === o.id
                   : row.selected_option_id === o.id;
-              const correct = done && row.feedback?.correct_option_id === o.id;
+              const correct = row.feedback?.correct_option_id === o.id;
               return (
                 <label
-                  className={`answer-option ${correct ? "correct-option" : done && selected ? "incorrect-option" : selected ? "selected-option" : ""}`}
+                  className={`answer-option ${correct ? "correct-option" : row.feedback && selected ? "incorrect-option" : selected ? "selected-option" : ""}`}
                   key={o.id}
                 >
                   <input
@@ -275,13 +276,8 @@ function ExamContent({
           </fieldset>
           {!done && (
             <div className="answer-actions">
-              <button
-                className="text-button"
-                disabled={locked || row.selected_option_id === null}
-                onClick={() => choose(null)}
-              >
-                Cevabı temizle
-              </button>
+              {row.feedback ? <p role="status">{row.feedback.outcome === 'correct' ? 'Doğru yanıt.' : 'Yanlış yanıt.'} Doğru cevap: {String.fromCharCode(65 + row.question.options.findIndex((option) => option.id === row.feedback!.correct_option_id))}. Yanıtın kaydedildi ve kilitlendi.</p>
+                : <p className="muted">Seçimin kaydedilince doğru cevap gösterilir. Yanıtını değiştiremezsin.</p>}
               <span role="status">
                 {save.isPending
                   ? "Kaydediliyor…"
@@ -291,6 +287,7 @@ function ExamContent({
               </span>
             </div>
           )}
+          {!done && row.feedback?.explanation && <p className="notice">{row.feedback.explanation}</p>}
           {positionState.pending && <p role="status" className="muted">Soru konumu kaydediliyor…</p>}
           {positionState.error != null && <div className="notice error" role="alert"><p>Son baktığın soru kaydedilemedi. Cevapların ayrıca kaydedilir.</p><button className="text-button" onClick={() => positionSaver.current!.retry()}>Konumu yeniden kaydet</button></div>}
           {error && (

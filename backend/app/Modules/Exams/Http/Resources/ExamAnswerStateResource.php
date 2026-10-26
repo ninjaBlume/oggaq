@@ -11,6 +11,7 @@ class ExamAnswerStateResource extends ExamSummaryResource
     {
         return parent::toArray($request) + ['answers' => $this->answers->map(fn ($answer) => [
             'id' => $answer->id, 'selected_option_id' => $answer->selected_option_id,
+            'feedback' => $answer->feedback($this->finished_at !== null),
         ])->all()];
     }
 }

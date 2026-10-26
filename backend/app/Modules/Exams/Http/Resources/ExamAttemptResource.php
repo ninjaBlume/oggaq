@@ -23,10 +23,7 @@ class ExamAttemptResource extends ExamSummaryResource
             'question' => new QuestionVersionResource($answer->questionVersion), 'selected_option_id' => $answer->selected_option_id,
             'is_favorite' => isset($favorites[$answer->question_id]),
             'reported' => isset($reported[$answer->question_id]),
-            'feedback' => $this->finished_at === null ? null : [
-                'outcome' => $answer->selected_option_id === null ? 'skipped' : ($answer->is_correct ? 'correct' : 'incorrect'),
-                'correct_option_id' => $answer->questionVersion->correct_option_id, 'explanation' => $answer->questionVersion->explanation,
-            ],
+            'feedback' => $answer->feedback($this->finished_at !== null),
         ])->all()];
     }
 }

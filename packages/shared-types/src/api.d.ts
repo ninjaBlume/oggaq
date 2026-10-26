@@ -757,7 +757,7 @@ export interface paths {
         };
         /**
          * Denemeyi sürdürme veya sonucu okuma
-         * @description Sunucu zamanı ve son süre döner. Süre dolduysa atomik olarak tamamlanır. Cevap anahtarı yalnız tamamlanınca görünür.
+         * @description Sunucu zamanı ve son süre döner. Süre dolduysa atomik olarak tamamlanır. Yanıtlanan sorunun anahtarı ve açıklaması hemen görünür; cevapsız soruların anahtarları tamamlanana kadar gizlidir.
          */
         get: operations["showExam"];
         put?: never;
@@ -777,8 +777,8 @@ export interface paths {
         };
         get?: never;
         /**
-         * Süre içinde deneme cevabını kaydetme veya değiştirme
-         * @description base_version, istemcinin gördüğü deneme revision değeridir. Çakışma cevap bazındadır: aynı cevap istemcinin revision değerinden sonra başka bir değere değiştiyse 409 version_conflict; başka sorulara ait eski revision ile yazılar kabul edilir. Zaten kaydedilmiş aynı seçimin tekrarı revision artırmaz. null cevabı temizler. Biten/süresi dolan denemeye geç gelen yazı değiştirilmez; tamamlanmış kayıt 200 döner.
+         * İlk deneme cevabını kaydetme ve doğru cevabı görme
+         * @description İlk seçim kaydedilince yalnız o sorunun doğru seçeneği ve açıklaması açılır; yanıt kilitlenir. Farklı seçenek veya null ile temizleme 409 answer_locked döndürür. Aynı seçimin tekrarı revision artırmaz. Diğer sorular eski base_version ile yanıtlanabilir. Cevapsız soruya null gönderimi bir değişiklik yapmaz. Biten/süresi dolan denemeye geç gelen yazı değiştirilmez; tamamlanmış kayıt 200 döner.
          */
         put: operations["saveExamAnswer"];
         post?: never;
@@ -2166,6 +2166,7 @@ export interface components {
             question: components["schemas"]["QuestionVersion"];
             /** Format: uuid */
             selected_option_id: string | null;
+            /** @description Seçim kaydedilince doğru seçenek ve açıklama gösterilir; cevap kilitlenir. Cevapsız soruların anahtarı yalnız sınav bitince açılır. */
             feedback: components["schemas"]["ExamFeedback"] | null;
             /** @description Soru bu bağlamın favorilerinde mi; favoriler PUT/DELETE /contexts/{context}/favorites/{question} ile değişir. */
             is_favorite: boolean;
@@ -2233,6 +2234,7 @@ export interface components {
              */
             review_kind?: "incorrect" | "blank" | "favorite";
         };
+        /** @description İlk kaydedilmiş seçim kesindir; farklı seçim veya temizleme 409 answer_locked döndürür. Aynı seçimin tekrarı idempotenttir. */
         SaveExamAnswerInput: {
             /** Format: uuid */
             selected_option_id: string | null;
@@ -3058,6 +3060,8 @@ export interface components {
                 id: string;
                 /** Format: uuid */
                 selected_option_id: string | null;
+                /** @description Yanıt kaydedildikten sonra doğru seçenek ve açıklama; cevaplanmamış soruda null. */
+                feedback: components["schemas"]["ExamFeedback"] | null;
             }[];
         };
         ExamAnswerStateResponse: {
