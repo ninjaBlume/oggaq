@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, mobil marka yazılarının satır aralığı
+
+- Üst başlıkta ÖGG SOR ve alt başlık aynı sol hizaya getirildi; marka 18 px, alt başlık 11/14 px olarak ayrıldı. Alt satırın optik boşluğu yazı boyutuyla ölçeklenir. Grup merkezde kalır; 40 px logo, 44 px yan düğmeler, League Spartan Bold 700, Ö harfi için wordmark üst payı ve ana sayfaya dönüş korunur. Değişiklik yalnız mobil üst başlıktadır.
+- Tüm workspace strict TypeScript, **42 mobil birim testi** ve iOS/Android/web Expo export geçti. **7 mevcut E2E** tek koşumda başarılı: iki temada 320–1280 px merkez/taşma, büyük yazıda 320 px, logo/yazı/klavye ile ana sayfaya dönüş ve ana sayfa/takvim durumları. Açık/koyu ve büyük yazı görüntüleri gözle incelendi. Geçici QA timeout 90/30 saniye, normal depo timeout'u korunur. Koşum 14,8 saniyedir. Düşük etkili tipografi değişikliği için yeni test eklenmedi.
+- Backend, API, DB ve web ürünü değişmedi; PHPUnit/web backend matrisi yeniden çalıştırılmadı. E2E öncesi ortak süreç/portlar kontrol edildi; yalnız `oggaq_test` ve mobil 5186 kullanıldı. Ortak geliştirme servisleri/yerel içerik DB'si/hesaplar, deploy/backup kaynakları korunur. Metro yeniden başlatılmadı; mobil kaynaklar mevcut Expo projesinden yenilenir. Fiziksel iOS/Android bu teslimde denenmedi. Kanıtlar `artifacts/brand-lockup/`; Git push yapılmadı.
+
 ## Güncel doğrulama — 26 Ekim 2026, mobil başlık ortalama ve kısa sınav kartı
 
 - Mobil Sıradaki sınav kartı Sınava hazırlık kartının hemen altına taşındı; tablette aynı sütunda korunur. Daha kısa yatay düzende başlık 15 px, tarih 21 px, gün sayısı 34 px oldu. Görünen tarihte hafta günü kaldırıldı; ekran okuyucu tam tarihi okumaya devam eder. Logo/ÖGG SOR/alt başlık grubu üst başlığın merkezine yerleştirildi; menü/profil 44 px dokunma alanları ve markadan ana sayfaya dönüş korunur. Sabit kart yüksekliği eklenmedi.

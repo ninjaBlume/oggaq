@@ -71,7 +71,7 @@ Kurallar: okuma sütunu (soru, form) 720 pikseli geçmez; satır uzunluğu yakla
 
 Web ve yönetim paneli aynı sınıfları kullanır: telefonda üst gezinme kaydırılır, tablette içerik ortalanır ve iki sütuna geçer, masaüstünde yönetim paneli yan menülüdür.
 
-Üst başlıkta logo ve ÖGG SOR/alt başlık grubu eşit 44 px yan düğmelerin arasında ortalanır. Grup tek dokunma alanıyla ana sayfaya döner; uzun kurum adı ve büyük yazı boyutunda yan düğmelerin üzerine taşmaz. Mobil ana sayfada Sınava hazırlık ve altında kompakt Sıradaki sınav kartı birlikte bir sütundur; tablette kişisel özet bu sütunun yanındadır.
+Üst başlıkta logo ve ÖGG SOR/alt başlık grubu eşit 44 px yan düğmelerin arasında ortalanır. Marka yazısı 18 px kalın League Spartan, alt başlık 11/14 px ve aynı sol hizada dar satır aralığıyla kullanılır; alt başlığın optik üst boşluğu yazı boyutu tercihine göre ayarlanır, Ö noktalarını koruyan wordmark yüksekliği değiştirilmez. Grup tek dokunma alanıyla ana sayfaya döner; uzun kurum adı ve büyük yazı boyutunda yan düğmelerin üzerine taşmaz. Mobil ana sayfada Sınava hazırlık ve altında kompakt Sıradaki sınav kartı birlikte bir sütundur; tablette kişisel özet bu sütunun yanındadır.
 
 ## 6. Kalıplar
 

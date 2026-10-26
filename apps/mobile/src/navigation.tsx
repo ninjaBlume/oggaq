@@ -25,6 +25,7 @@ import {
   X,
 } from "./icons";
 import { vocabulary } from "@oggaq/study-core";
+import { textSizeFactors } from "./textSize";
 import { motion, shape } from "./theme";
 import type { AppPalette } from "./theme";
 import { Briefcase } from "./icons";
@@ -68,7 +69,7 @@ export function MainHeader({
   home: () => void;
   expanded: boolean;
 }) {
-  const { palette } = useTheme();
+  const { palette, textSize } = useTheme();
   const navStyles = useNavStyles();
   const layout = useLayout();
   return (
@@ -105,9 +106,13 @@ export function MainHeader({
       >
         <View testID="header-brand-content" style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, flexShrink: 1, maxWidth: "100%" }}>
           <BrandLogo size={40} />
-          <View style={{ flexShrink: 1, minWidth: 0, gap: 0, alignItems: "center" }}>
-            <BrandWordmark style={[navStyles.wordmark, { textAlign: "center" }]} />
-            <Text numberOfLines={1} style={[navStyles.contextLabel, { textAlign: "center" }]}>
+          <View style={{ flexShrink: 1, minWidth: 0, alignItems: "flex-start" }}>
+            <BrandWordmark style={[navStyles.wordmark, { fontSize: 18, textAlign: "left" }]} />
+            <Text numberOfLines={1} style={[navStyles.contextLabel, {
+              // Optical leading closes the font's spare descent space; the wordmark keeps its Ö headroom.
+              marginTop: -4 * textSizeFactors[textSize], fontSize: 11, lineHeight: 14,
+              fontWeight: "500", letterSpacing: 0.2, textAlign: "left",
+            }]}>
               {context.kind === "personal" ? brand.subtitle : context.name}
             </Text>
           </View>
