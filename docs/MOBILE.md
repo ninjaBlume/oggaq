@@ -1,5 +1,9 @@
 # Expo mobil uygulaması
 
+## 26 Ekim 2026: çıkmış soru açıklamaları
+
+Deneme/Ders açıklamaları web ile ortak sözlükten gelir ve soruların geçmiş ÖGG sınavlarında çıkmış olduğunu belirtir. Ana sayfa rozeti `Çıkmış sorular` olarak güncellendi. `Öğrenciler için ücretsiz.` yalnız giriş ekranında bir kez görünür; kayıt/parola yenileme ve oturum açık ekranlarda tekrarlanmaz. Fiziksel cihaz ayrıca denenmedi; Expo Go projesini yenilemek yeterli. Doğrulamalar [TESTING](TESTING.md) içindedir.
+
 ## 26 Ekim 2026: sayısal ayların Türkçe gösterimi
 
 Deneme ve Ders kartlarında `08 2026` yerine **Ağustos 2026**, diğer sayısal aylarda da Türkçe ay adı gösterilir. Ortak `examPeriodLabel` web ve mobilde aynı sonucu üretir; hazır ay adları ve `1. dönem` gibi etiketler korunur. Bu bir görünüm dönüşümüdür, yayımlanmış sınav künyesi/veritabanı değiştirilmez. Web `930613c` paketiyle yayındadır; mobil için mevcut Expo Go projesini yenilemek yeterlidir. Fiziksel cihaz bu teslimde ayrıca denenmedi; doğrulama ve dar kapsamlı web yayını [TESTING](TESTING.md) içinde.

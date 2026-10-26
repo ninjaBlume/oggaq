@@ -13,6 +13,8 @@ npm run dev:web
 
 Öğrenci uygulaması `http://127.0.0.1:5173`, API varsayılan `http://127.0.0.1:8000` adresindedir. `.env.example` dosyasını `.env.local` olarak kopyalayarak `VITE_API_URL` değiştirilebilir. Bu değer herkese açık yapılandırmadır; secret içermez. Backend `FRONTEND_URL`, `SANCTUM_STATEFUL_DOMAINS` ve CORS aynı origin ile eşleşmelidir. `localhost` ve `127.0.0.1` isimlerini karıştırmayın.
 
+Yayın paketi derlenirken API adresi açıkça verilmelidir: `VITE_API_URL=https://oggsor.com npm run build:web`. `VITE_API_URL` build sırasında JS'ye gömülür; servis ortamını sonradan değiştirmek derlenmiş paketi düzeltmez. Canlıya almadan önce paket adresi ve gerçek tarayıcı giriş/liste akışı kontrol edilir.
+
 Yeni backend migration'ını PHP 8.4 ile `backend/` içinde `php artisan migrate` kullanarak uygulayın. Mevcut geliştirme verisini silmek için `migrate:fresh` kullanılmaz.
 
 **Gezinme.** Üst menü: **Deneme sınavları**, **Ders sınavları**, **Sonuçlarım**, **Tekrar**, **Başarım**. Soru bankası ve çalışma geçmişi yoktur; öğrenci iki sınav türüne girer. *Deneme sınavları* silahlı/silahsız seçtirip tam sınavları listeler (silahlı 125, silahsız 100 soru); *Ders sınavları* dersi seçtirip o dersin her sınav numarasındaki sınavını listeler. Her sınav satırı önceki sonucu (kez, en iyi %) gösterir; “Sınava gir” süre sorar (önerilen: silahlı 150, silahsız 120 dk — EGM sınav talimatı 4.3; ders sınavında 1,2 dk/soru; en çok 180) ve açık denemede “Devam et” verir. *Sonuçlarım* girilen tüm sınavları saklar. *Tekrar* yanlış, boş ve favori soruları listeler ve tek soru çalışması olarak çözdürür. Eski adresler (`questions`, `exams`, `history`) yeni sayfalara yönlenir.
