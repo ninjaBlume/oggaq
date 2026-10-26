@@ -2,6 +2,27 @@
 
 Durum: **76–98. yenileme arşivi ve 122. temel, deneme ve ders sınavlarıyla oggsor.com üzerinde yayında.** 122. temel, kullanıcının açık aktarım talimatıyla ayrıca tamamlandı. Yerel eğitim migration'ı önce ayrı onayla tamamlandı. 98. yenileme aktarımında telefonun API'si olan sunucudaki gerekli migration/kod güncellemesi de kullanıcıya bildirilerek dar kapsamda yapıldı. Normal sunucu operasyonu/backup sorumluluğu Claude'da kalır; deploy ve backup betikleri değiştirilmedi.
 
+## Eski temel arşivindeki eksik içerikler — 26 Ekim 2026
+
+Kullanıcının eksik şık/yanıtları tamamlama talimatıyla canlı soru bankası tarandı: **5 taslak soruda seçenekler ve doğru cevap boştu; 1 taslakta soru kökü yerine kaynak-boş yer tutucusu vardı.** Yayımdaki 4.120 sorunun beş seçeneği ve seçeneklerine ait bir doğru cevap kimliği zaten bulunuyordu. Yangın sınıfı sorularındaki `A`, `B` gibi kısa seçenekler eksik içerik sayılmadı.
+
+| Temel sınav | Cevaplı A kitapçığı sorusu | Önceki uygulama sırası | Tamamlanan içerik | Anahtar |
+| --- | --- | --- | --- | --- |
+| 115 | 59 | 63 | Yangın sınıfı sorusunun eksik kökü; mevcut beş şık doğrulandı | A |
+| 118 | 37 | 41 | Kamera çeşitleri: beş şık ve doğru cevap | E |
+| 119 | 19 | 28 | Parmak izi özellikleri: beş şık ve doğru cevap | C |
+| 119 | 61 | 67 | Narkotik madde: beş şık ve doğru cevap | A |
+| 119 | 71 | 77 | Sempati tanımı: beş şık ve doğru cevap | B |
+| 121 | Silah 25 (toplam 125) | 125 | İç balistik: beş şık ve doğru cevap | D |
+
+**Kanıt:** [118 EGM A](https://www.egm.gov.tr/kurumlar/egm.gov.tr/IcSite/ozelguvenlik/Sinav-Kitapcik/Ozel-Guvenlik-Sinavi/118-94/TEMEL-A-CEVAPLI.pdf), [119 EGM A](https://www.egm.gov.tr/kurumlar/egm.gov.tr/IcSite/ozelguvenlik/Sinav-Kitapcik/Ozel-Guvenlik-Sinavi/119-95/TEMEL-A-KITAPCIGI.pdf) ve [121 EGM A](https://www.egm.gov.tr/kurumlar/egm.gov.tr/IcSite/ozelguvenlik/Sinav-Kitapcik/Ozel-Guvenlik-Sinavi/121-97/TEMEL_A-KITAPCIGI.pdf) bu işlemde doğrudan indirildi. İlgili soruların kökü, beş seçeneği ve doğru cevap metni EGM B kitapçıklarıyla da eşleşti; B sıraları sırasıyla 60; 67/41/37; silah 6'dır. A'nın ilgili sayfaları görsel incelendi. Dosyalar Alo Güvenlik kopyalarıyla bayt düzeyinde aynıdır. 115 için [Akademi Güvenlik cevaplı A PDF'si](https://www.guvenlikegitimi.com/wp-content/uploads/2025/07/115.-Temel-Sinavi.pdf), sayfa 8 kullanıldı; mevcut beş şık aynı sırayla eşleşir. **115'in EGM asıl dosyasına erişildiği iddia edilmez.** Kaynak URL/hash/inceleme notları yeni sürümlerin dört ayrı kaynak kaydında ve işlem manifestindedir.
+
+**Uygulama:** Altı eski taslak sürüm değiştirilmeden saklandı; mevcut yönetici yetkilendirmeli `SaveQuestion` / `PublishQuestion` eylemleriyle altı yeni yayımlanmış sürüm üretildi. `ApplyQuestionVersionToExams` ile yalnız 17 mevcut soru bağlantısı yeni sürüme taşındı. Bu eksikler yüzünden bekleyen **7 tam deneme seçeneği ve 6 ders sınavı**, `PublishOfficialExam` ile yayımlandı; yeni sınav/soru kaydı eklenmedi, önceki arşiv sıralaması değiştirilmedi. Altı düzeltilmiş soru ve 13 sınav öğrenci HTTP API'sinde doğrulandı; sınav başlatılmadı, cevap/sonuç oluşturulmadı.
+
+**Koruma/doğrulama:** Önce REPEATABLE READ transaction içinde tüm işlem uygulanıp geri alındı; önizleme başarılı olunca aynı manifest canlıya uygulandı. Hesap/kurum/üyelik/çalışma bağlamı, deneme/cevap/puan, favori/konum ve puanlama bağlantılarını içeren 13 tablonun özetleri değişmedi. Önceden var olan bütün soru sürümleri, seçenekler ve kaynak satırları; kapsam dışı soru başlıkları, sınavlar ve bağlantılar da aynı kaldı. Tekrar çalıştırma altı mevcut yeni sürümü tanıdı, ek sürüm üretmedi. Son tarama: **4.126 yayımlanmış soru; güncel sürümlerde eksik şık/doğru cevap 0**. Tarihsel eksik taslaklar sürüm geçmişinde kalır.
+
+İncelenmiş manifest SHA-256: `95f078548d1cc7f95aa1f8a1696a93286ec11b4d9fa0ac77c828b028866c105c`. Kaynak PDF'ler, yürütücü, önizleme ve receipt sunucuda `storage/app/private/imports/question-completeness-20261026/`, yerelde `artifacts/question-completeness/` içindedir. Yerel ortak `oggaq` veritabanı, uygulama kodu, migration, servisler, deploy/backup kaynakları ve Git uzak dalı değiştirilmedi. İlgili mevcut **50 PostgreSQL testi / 520 assertion** geçti; fiziksel cihazda yeniden çözüm denenmedi.
+
 ## Ekim 2022’ye uzatılan yenileme arşivi — tamamlandı
 
 Kullanıcının açık aktarım/yayın talimatıyla **30 Ekim 2022–17 Aralık 2023 arasındaki 76–82. yenileme** eklendi: **875 soru kaydı, 14 deneme seçeneği ve 77 ders sınavı**. Böylece canlı `oggsor.com` API'sinde **76–98 arasında 23 yenileme dönemi, 46 tam seçenek ve 253 ders sınavı** vardır. Her dönem 125 silahlı / aynı sürümlerin ilk 100'ünü paylaşan silahsız seçeneği ve 11 ders içerir. Dersler ortak Ders listesine eklenir; ayrı eğitim filtresi yoktur. Aşağıdaki 2024–2026 bölümü önceki aktarımın tarihsel kaydıdır.

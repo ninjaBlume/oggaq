@@ -1,5 +1,12 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 26 Ekim 2026, eksik arşiv sorularının tamamlanması
+
+- Canlı içerikte beş sorunun boş şıkları/anahtarı ve bir sorunun boş kökü kaynak kitapçıklardan doğrulandı. Altı yeni yayımlanmış sürüm, 17 mevcut bağlantı ve eksikler nedeniyle bekleyen 13 deneme/ders yayını tamamlandı. [Kaynak, kapsam ve koruma kanıtı](EXAM_SOURCES.md#eski-temel-arşivindeki-eksik-içerikler--26-ekim-2026).
+- Paylaşılan test süreçleri önceden kontrol edildi. PHP 8.4 ile `php artisan test --compact --filter='QuestionBankTest|OfficialExamTest'`: yalnız `oggaq_test` üzerinde **50 test / 520 assertion geçti**. Mevcut testler yetkilendirme, eski sürümlerin korunması, eski sürümle yazma çatışması, sürümü sınavlara uygulama, taslak/yayın engelleri ve geçmiş deneme sabitliğini kapsar. Veri düzeltmesi için uygulamayı taklit eden yeni test yazılmadı.
+- Önce gerçek eylemlerle geri alınan önizleme, sonra aynı hash ile canlı transaction başarılıdır. 13 korunan tablonun ve eski sürüm/seçenek/kaynak satırlarının özetleri aynı kaldı. Tekrar çalıştırma yeni kayıt üretmedi. Bağımsız son taramada **4.126 güncel yayımlanmış soru, eksik şık/doğru cevap 0**; öğrenci HTTP API'sinde altı soru beşer şıkla, 13 sınav yayımlanmış olarak göründü. API soru anahtarını cevap öncesi sızdırmıyor. Kontrolün kendi oturumu kapatıldı; deneme başlatılmadı, cevap/puan yazılmadı.
+- Uygulama kodu/API sözleşmesi/şema/arayüz değişmedi; tam PHPUnit, lint/build ve E2E matrisi bu veri tesliminde yeniden çalıştırılmadı. Fiziksel iOS/Android kontrolü yapılmadı. Ortak yerel içerik DB'si/hesaplar ve Claude'un servisleri korunur. Kanıtlar `artifacts/question-completeness/`; Git push yapılmadı.
+
 ## Güncel doğrulama — 26 Ekim 2026, mobil marka yazılarının satır aralığı
 
 - Üst başlıkta ÖGG SOR ve alt başlık aynı sol hizaya getirildi; marka 18 px, alt başlık 11/14 px olarak ayrıldı. Alt satırın optik boşluğu yazı boyutuyla ölçeklenir. Grup merkezde kalır; 40 px logo, 44 px yan düğmeler, League Spartan Bold 700, Ö harfi için wordmark üst payı ve ana sayfaya dönüş korunur. Değişiklik yalnız mobil üst başlıktadır.
