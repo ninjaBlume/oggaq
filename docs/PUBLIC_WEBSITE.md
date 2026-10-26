@@ -28,3 +28,5 @@ npm run test:site:e2e
 Son komut yalnız 5187/5188 portlarında statik önizlemeler açar; API/PostgreSQL kullanmaz. Telefon/tablet/masaüstü, açık/koyu görünüm, mağazaların bekleme durumu, ana sayfada API isteği olmaması ve hesap/parola bağlantılarını kontrol eder. Standart öğrenci E2E'si ayrı mevcut test yapılandırmasıyla çalışır.
 
 Sunucu Dockerfile'ı her iki ön yüzü oluşturur. Yalnız web yayını yeterlidir; backend, veritabanı veya DNS değişikliği gerekmez. Yayın öncesinde aday Nginx yapılandırması, site/hesap dosyaları ve API/yönetim yolları kontrol edilir; önceki web imajı geri dönüş için korunur.
+
+26 Ekim 2026 yayını: `public-site-cf356dc`, yalnız web imajı güncellendi. Origin statik dosyaları/hesap yolları ve genel HTTPS üzerinde tanıtım, www, hesap girişi/çıkışı, parola bağlantısı, API/yönetim erişimi doğrulandı. Mobil kaynak ve veritabanı değiştirilmedi. Mağaza bağlantıları hâlâ `null` / Yakında durumundadır. Ayrıntılı doğrulama [TESTING](TESTING.md) içindedir.
