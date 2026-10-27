@@ -19,6 +19,10 @@ class SendTestMailTest extends TestCase
         $messages = Mail::mailer('array')->getSymfonyTransport()->messages();
         $this->assertCount(1, $messages);
         $this->assertSame('deneme@example.test', $messages[0]->getEnvelope()->getRecipients()[0]->getAddress());
+        $mail = $messages[0]->getOriginalMessage();
+        $this->assertSame(config('brand.supportEmail'), $mail->getReplyTo()[0]->getAddress());
+        $this->assertSame(config('brand.displayName'), $mail->getReplyTo()[0]->getName());
+        $this->assertSame(config('mail.from.address'), $mail->getFrom()[0]->getAddress());
     }
 
     public function test_command_rejects_an_invalid_address(): void

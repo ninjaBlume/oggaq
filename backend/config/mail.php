@@ -115,4 +115,10 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', (require __DIR__.'/brand.php')['displayName'])),
     ],
 
+    // Account messages can be answered at the project's existing support mailbox.
+    'reply_to' => [
+        'address' => env('MAIL_REPLY_TO_ADDRESS', (require __DIR__.'/brand.php')['supportEmail']),
+        'name' => env('MAIL_REPLY_TO_NAME', (require __DIR__.'/brand.php')['displayName']),
+    ],
+
 ];
