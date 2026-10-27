@@ -37,6 +37,12 @@ Sınav başlıklarının parantez içindeki tarihleri gösterilmez: `ÖGG 104. D
 - **Marka metni tek yerde:** ad (ÖGG SOR), tam uygulama adı (ÖGG SOR - Soru Bankası), alt başlık (Soru Bankası), slogan ve iletişim değerleri `config/brand.json` içindedir. Web, yönetim paneli ve mobil bu dosyayı okur. `npm run brand:apply` statik başlıkları, yasal sayfa marka alanlarını, mağaza taslağını ve backend marka yapılandırmasını günceller; `npm run check:brand` sapmayı denetler. Ekranlar bu değerleri okur; metni ekrana yazmak yerine yapılandırmadan alın.
 - **Başlık altı etiketi:** bireysel kullanımda logonun altında platform alt başlığı görünür; kurumda kurumun adı görünür. Tek erişim alanı olan mobil ve web öğrencisine “kişisel çalışma alanı” etiketi veya seçici gösterilmez. Alan seçimi yalnız birden fazla seçenek olduğunda sunulur.
 
+## Sonuç özeti yoğunluğu
+
+“Deneme sonucun” ekranında doğru oranı ve cevap sayıları tek kompakt kartta gösterilir. Büyük rozet/çiçek/yıldız, kutlama cümlesi ve aynı sayıların tekrarlandığı ikinci satır kullanılmaz. Doğru oranı üst satırda, dört piksel dağılım çubuğu altında doğru/yanlış/boş adetleri bulunur. Sayılar renk yanında metin etiketiyle anlaşılır; standart 390 px görünümde özet 160 px altında kalır. Büyük yazıda doğal büyür, sabit yükseklik veya metin kırpma uygulanmaz.
+
+Sonucun altındaki ÖGG puan hesabı aynı ekranda kompakt kart/32 px sayı/6 px bölüm boşluklarını kullanır; bağımsız Puan hesapla ekranının normal yoğunluğu korunur. Çalışma oranının geçme/kalma kararı olmadığı bilgisi, atış güncellemesi, koşullar ve kaynaklara erişim korunur. Sonuç soruları tek sanallaştırılmış listede kaydırılır.
+
 ## 3. Renk
 
 - **Rol temelli:** bileşen renk adını değil rolü kullanır (`surface`, `ink`, `primary`, `onPrimary`, `softRed` …). Koddaki sabit renk kodu hatadır; yeni renk önce rol olarak eklenir.

@@ -1,6 +1,15 @@
 # Test ve doğrulama stratejisi
 
 
+## 28 Ekim 2026 — Kompakt Deneme sonucun ekranı
+
+Mobil sonuç özetinden 160 px dekoratif yıldız/çiçek, kutlama cümlesi, büyük iç istatistik kutuları ve tekrar eden sayı satırı kaldırıldı. Doğru oranı, ince dağılım çubuğu ve üç cevap adedi tek kompakt kartta; tamamlanma/çalışma puanı açıklaması kart altında. ÖGG puan paneli de yalnız sınav sonucunda kompakt gösterilir; hesaplama, atış düzenleme, koşullar ve kaynaklar değişmez. Bağımsız Puan hesapla normal yoğunlukta kalır. Soru/sonuç sürümleri ve API/veritabanı değişmedi.
+
+**57 mobil birim testi, workspace strict TypeScript, Expo web QA export ve 9 ilgili E2E geçti.** Mevcut 200 soruluk sonuç testine yüzde ve doğru/yanlış/boş verilerinin korunması, dekoratif SVG/kutlama yazısının yokluğu, standart özet yüksekliği ≤160 px, 320 px Koyu/Büyük yazıda taşmama/görünürlük eklendi. Açık/koyu 320/834/1280 px yerleşim, 200 sorunun sanallaştırılması, favori ve bildirim hatası/yeniden deneme, 125 soruluk sınavda otomatik puan + atış ekleme ve mobilde doğru puanın görünmesi doğrulandı. E2E yalnız oggaq_test ve 8001/5183/5184/5186 üzerinde, başka PHPUnit/E2E yokken yürütüldü. 125 soruluk puan/atış senaryosu ek görüntü kontrolü için tekrar geçti; puan paneli 320/390/834 px ölçülerde incelendi. Bu tekrar 9 senaryonun alt kümesidir. Kanıtlar artifacts/compact-result-summary/ içinde.
+
+Backend/API/DB/native modül değişmedi; PHPUnit/Composer ve ilgisiz admin/web build/testleri tekrar çalıştırılmadı. Web öğrenci QA ekranı değişmedi; genel web soru çözme yayını kapalı. Native/fiziksel TestFlight/Play alımı ayrıca teyit edilmeli. Beta teslimi ayrıca kaydedilir.
+
+
 ## 28 Ekim 2026 — Özgün matbu metinler ve gg/aa/yyyy
 
 Kullanıcı kararıyla kurum/firma kataloglarına ait bağlantılar kaldırıldı. 14 belge için ÖGG SOR'a özgü doldurulabilir metinler yazıldı (sürüm 2026-10-28.2). Matbu PDF yalnız etiket/boş çizgi değildir; türe özel açıklama ve sonuç cümleleri içerir. API `sources` alanı eski istemciler için yalnız boş dizi olarak kalır; yeni mobil ekranda kurumsal atıf veya dış belge bağlantısı yoktur. Dilekçelerde boş adres/iletişim alanları bulunur. Eski kurum PDF'leri ürün şablonu olarak kullanılmaz.

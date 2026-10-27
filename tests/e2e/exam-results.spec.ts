@@ -54,6 +54,17 @@ test('mobil: 200 soruluk sonuç kaydırılarak son soruya ulaşır, kartları sa
   await expect(page.getByTestId('result-question-1')).toContainText('Senin cevabın');
   await expect(page.getByTestId('result-question-1').getByRole('radio', { name: /Doğru cevap/ })).toHaveAttribute('aria-checked', 'true');
   expect(await page.getByTestId(/^result-question-/).count()).toBeLessThan(40);
+  const summary = page.getByTestId('exam-result-summary');
+  await expect(summary).toBeVisible();
+  await expect(summary.getByTestId('exam-result-ratio')).toHaveText('%0,5');
+  await expect(summary.getByTestId('exam-result-correct')).toHaveText('1Doğru');
+  await expect(summary.getByTestId('exam-result-incorrect')).toHaveText('1Yanlış');
+  await expect(summary.getByTestId('exam-result-blank')).toHaveText('198Boş');
+  await expect(summary.locator('svg')).toHaveCount(0);
+  await expect(page.getByText('Bir prova daha tamam!', { exact: true })).toHaveCount(0);
+  expect((await summary.boundingBox())!.height).toBeLessThanOrEqual(160);
+  mkdirSync('artifacts/compact-result-summary/screens', { recursive: true });
+  await page.screenshot({ path: 'artifacts/compact-result-summary/screens/result-light-390.png' });
   const list = page.getByTestId('exam-review-list'); const last = page.getByTestId('result-question-200');
   await scrollToLastQuestion(page);
   await last.scrollIntoViewIfNeeded(); await expect(last).toContainText('Sentetik açıklama 200');
@@ -111,4 +122,9 @@ test('mobil sonuç listesi kompakttır; puan, cevap dağılımı ve ayrıntıya 
   await card.click();
   await expect(page.getByText('Deneme sonucun', { exact: true })).toBeVisible();
   await expect(page.getByTestId('result-question-1')).toBeVisible();
+  const summary = page.getByTestId('exam-result-summary');
+  await expect(summary.getByTestId('exam-result-blank')).toHaveText('198Boş');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  mkdirSync('artifacts/compact-result-summary/screens', { recursive: true });
+  await page.screenshot({ path: 'artifacts/compact-result-summary/screens/result-dark-large-320.png' });
 });

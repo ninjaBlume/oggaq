@@ -44,7 +44,14 @@ test('125 soruluk deneme otomatik puanlanır; atış eklenir, eski doğru yüzde
   const result = page.getByRole('region', { name: 'ÖGG puan hesabı', exact: true }); await expect(result).toContainText('Atış sonucu bekleniyor'); await expect(result.locator('.score-value')).toHaveText('0,5–25,5/100');
   await page.getByRole('button', { name: 'Atış / puan bilgisini güncelle', exact: true }).click(); await page.getByLabel('Atış sonucumu biliyorum').check(); await range(page, 'Atış isabet sayısı', 3); const response = page.waitForResponse((r) => r.url().endsWith('/score') && r.request().method() === 'POST'); await page.getByRole('button', { name: 'Puanı güncelle', exact: true }).click(); expect((await (await response).json()).data.output.final_score).toBe(15.5); await expect(result.locator('.score-value')).toHaveText('15,5/100'); await page.reload(); await expect(result.locator('.score-value')).toHaveText('15,5/100'); await expect(page.locator('.exam-result')).toContainText('%0.8');
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 } }); const mobile = await phone.newPage();
-  try { await mobileLogin(mobile); await mobile.getByRole('tab', { name: 'Sonuçlar', exact: true }).click(); await mobile.getByRole('button', { name: 'Tek giriş sentetik sınav sonucunu incele', exact: true }).click(); await expect(mobile.getByText('15,5 /100', { exact: true })).toBeVisible(); } finally { await phone.close(); }
+  try { await mobileLogin(mobile); await mobile.getByRole('tab', { name: 'Sonuçlar', exact: true }).click(); await mobile.getByRole('button', { name: 'Tek giriş sentetik sınav sonucunu incele', exact: true }).click(); await expect(mobile.getByText('15,5 /100', { exact: true })).toBeVisible();
+    mkdirSync('artifacts/compact-result-summary/screens', { recursive: true });
+    for (const width of [320, 390, 834]) {
+      await mobile.setViewportSize({ width, height: 900 });
+      expect(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await mobile.screenshot({ path: `artifacts/compact-result-summary/screens/scored-result-${width}.png` });
+    }
+  } finally { await phone.close(); }
 });
 test('mobil menüden kaydırmalı hesaplayıcı: eksik atış, yenileme ve telefon/tablet yerleşimi', async ({ page }) => {
   test.setTimeout(90_000); await page.setViewportSize({ width: 390, height: 844 }); await mobileLogin(page); await range(page, 'Genel bilgi doğru', 60); await expect(page.getByText('Başarı koşulları sağlanıyor', { exact: true })).toBeVisible(); await page.getByRole('button', { name: 'Silahlı', exact: true }).click(); await expect(page.getByText('Atış sonucu bekleniyor', { exact: true })).toBeVisible(); await page.getByRole('button', { name: 'Sonucumu biliyorum', exact: true }).click(); await range(page, 'Genel bilgi doğru', 70); await range(page, 'Silah bilgisi doğru', 15); await range(page, 'Atış isabet sayısı', 2); await expect(page.getByText('Tahmini puan — başarı koşulu doğrulanmadı', { exact: true })).toBeVisible();
