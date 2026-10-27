@@ -1,5 +1,9 @@
 # Expo mobil uygulaması
 
+## 27 Ekim 2026: kompakt profil
+
+Profilde büyük, ortalanmış avatar ve tekrarlanan hesap bilgileri birleştirildi: 56 px avatar yanında tam ad ve e-posta tek kartta gösterilir. Hesabım satırı, örnek metin kartı ve varsa çalışma alanları daraltıldı. Görünüm/yazı ayarları kendi içinde 8 px, bölüm grupları 12 px aralıkla toplanır. Uzun ad/e-posta, üç yazı boyutu ve mevcut cihaz tercihleri korunur. Hesabım erişiminden e-posta/parola, oturum, dışa aktarma ve hesap silme; gizlilik/koşullar, güncelleme ve çıkış işlemleri çalışmayı sürdürür. Güncelleme ve çıkış düğmeleri kompakt olsa da en az 44 px'dir. Genel kartların varsayılanı değiştirilmedi; `Card` kompakt görünümü yalnız profil kimliği ve örnek metinde seçilir. Doğrulama/beta kayıtları [TESTING](TESTING.md) içindedir.
+
 ## 27 Ekim 2026: sade header ve kompakt sınav kartları
 
 Header profil düğmesi kaldırıldı; Profil alt sekmeden veya tablet gezinme rayından açılır. Menü ve marka ana sayfa bağlantısı korunur; marka etkileşimsiz sağ boşlukla ortada kalır. Profil içindeki tam ad ve baş harfler değişmez.

@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## 27 Ekim 2026 — Kompakt profil kartları
+
+Profilde 56 px avatar/tam ad/e-posta tek kartta toplandı; tekrarlanan hesap bilgi kartı kaldırıldı. Grup boşlukları 12 px, ayar iç aralıkları 8 px; Hesabım/örnek metin/çalışma alanı boşlukları daraltıldı. `Card` isteğe bağlı kompakt görünümünü yalnız profil kimliği/örneği kullanır, diğer kartların varsayılanı aynı kalır. Güncelleme ve çıkış düğmeleri 44 px altına inmez; yetki, veri ve güncelleme motoru değişmedi.
+
+**57 mobil birim testi, workspace strict TypeScript, Expo web QA export ve 19 ilgili E2E geçti.** Tam ad/e-posta tek kimlik satırında, standart sentetik kimlik satırı ve Hesabım eylemi en çok 80 px, Hesabım en az 44 px olarak doğrulandı. İki/üç/dört isim, kaydetme hatası/kalıcılık, Koyu/Büyük yazıda 320 px ve 320–1280 px yerleşim, tema/boyut tercihleri, açık sınav formunun korunması, gizlilik bağlantıları/SSS test edildi. Device Hub iPhone 18 Pro / iOS 27 profil görünümü mevcut Koyu/Büyük tercihle gözle incelendi; hesap/veri işlemi veya güncelleme uygulaması çalıştırılmadı. Android native ve fiziksel TestFlight/Play alımı doğrulanmadı.
+
+E2E yalnız `oggaq_test` ve 8001/5183/5184/5186 portlarında, başka test süreci yokken çalıştı. Backend/API/DB/üretim webi değişmedi; PHPUnit/Composer ve tam ürün E2E paketi yeniden çalıştırılmadı. Bilinen yasal sayfa testleri bu turda yeniden koşulmadı. Kanıtlar `artifacts/compact-profile/`; native runtime'lar aynı kaldı. Beta dağıtım sonucu ayrıca kaydedilir.
+
 ## 27 Ekim 2026 — Sınav kartlarında ikinci yoğunluk ayarı
 
 Kullanıcının biraz daha kısa kart isteğiyle yalnız Deneme/Ders ortak kartının dikey iç boşluğu **10 → 6 px**, başlık/bilgi aralığı **6 → 4 px** yapıldı. Tek sütun kartlar ayrı bir grup içinde **20 → 10 px** aralıkla gösterilir; iki sütunlu tablet düzeni korunur. Başlık/metin boyutları, içerik, 44 px eylemler, doğal yükseklik ve açılır süre/çıkış formu değişmez.

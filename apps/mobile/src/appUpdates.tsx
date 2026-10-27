@@ -50,8 +50,8 @@ export function AppUpdateControls() {
   return <View style={{ gap: 8 }}>
     <SectionTitle>Uygulama güncellemesi</SectionTitle>
     <Text accessibilityLiveRegion="polite" style={styles.muted}>{label}</Text>
-    {updates.pending ? <Button disabled={updates.busy || !focused} onPress={() => updates.apply(focused)}>Güncellemeyi uygula</Button>
-      : <Button secondary disabled={updates.busy || !focused} onPress={updates.check}>Güncellemeleri denetle</Button>}
+    {updates.pending ? <Button compact disabled={updates.busy || !focused} onPress={() => updates.apply(focused)}>Güncellemeyi uygula</Button>
+      : <Button compact secondary disabled={updates.busy || !focused} onPress={updates.check}>Güncellemeleri denetle</Button>}
     <ErrorNotice title="Güncelleme işlemi tamamlanamadı" error={updates.status.error} retry={updates.pending ? () => updates.apply(focused) : updates.check} />
   </View>;
 }

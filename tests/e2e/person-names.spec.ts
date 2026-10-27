@@ -34,6 +34,17 @@ for (const platform of ['web', 'mobile'] as const) for (const scheme of ['light'
         await expect(page.getByTestId('header-person')).toHaveCount(0);
       }
       await openProfile();
+      if (platform === 'mobile') {
+        const identity = page.getByTestId('profile-identity');
+        await expect(identity.getByTestId('profile-full-name')).toBeVisible();
+        await expect(identity.getByTestId('profile-email')).toHaveText('e2e-student@example.test');
+        const accountButton = page.getByRole('button', { name: /^Hesabım:/ });
+        expect((await accountButton.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+        if (scheme === 'light') {
+          expect((await identity.boundingBox())!.height).toBeLessThanOrEqual(80);
+          expect((await accountButton.boundingBox())!.height).toBeLessThanOrEqual(80);
+        }
+      }
       for (const [name, initials] of [['Ayşe Yılmaz', 'AY'], ['Ayşe Deniz Yılmaz', 'ADY'], ['Ayşe Deniz Nur Yılmaz', 'ADY']] as const) {
         await edit();
         const field = page.getByLabel('Ad soyad', { exact: true });

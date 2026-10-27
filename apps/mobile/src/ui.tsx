@@ -119,12 +119,12 @@ export function TextLink({ children, onPress, disabled = false }: {
     </Pressable>
   );
 }
-export function Card({ children, tone }: { children: ReactNode; tone?: CardTone }) {
+export function Card({ children, tone, compact = false }: { children: ReactNode; tone?: CardTone; compact?: boolean }) {
   const { styles, palette } = useTheme();
   const tint = tone ? cardTone(palette, tone) : null;
   const { cardPadding, cls } = useLayout();
   return (
-    <View style={[styles.card, { padding: cardPadding }, tint && { backgroundColor: tint.surface, borderColor: tint.line, paddingVertical: cls === "compact" ? cardDensity.paddingY : cardDensity.paddingYWide, gap: cardDensity.gap }]}>{children}</View>
+    <View style={[styles.card, { padding: cardPadding }, tint && { backgroundColor: tint.surface, borderColor: tint.line, paddingVertical: cls === "compact" ? cardDensity.paddingY : cardDensity.paddingYWide, gap: cardDensity.gap }, compact && { paddingHorizontal: 12, paddingVertical: 8, gap: 8, borderRadius: shape.control }]}>{children}</View>
   );
 }
 // Independent items (cards, exam rows) flow into two columns on an expanded window and stay one column elsewhere.

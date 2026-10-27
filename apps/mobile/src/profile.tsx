@@ -6,7 +6,6 @@ import {
   Check,
   ChevronRight,
   LogOut,
-  Mail,
   ShieldCheck,
   UserRound,
 } from "./icons";
@@ -51,43 +50,34 @@ export function Profile({
   const accountTint = cardTone(palette, "indigo");
   const initials = personInitials(user.name);
   return (
-    <>
+    <View style={{ gap: 12 }}>
       <ScreenTitle
         title={vocabulary.profile.title}
         subtitle="Hesabın ve uygulama tercihlerin."
       />
-      <View style={{ alignItems: "center", paddingVertical: 20, gap: 12 }}>
+      <Card tone="blue" compact>
+      <View testID="profile-identity" style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
         <View
           style={{
-            width: 84,
-            height: 84,
-            borderRadius: 30,
+            width: 56,
+            height: 56,
+            borderRadius: 20,
             backgroundColor: palette.softPrimary,
             alignItems: "center",
             justifyContent: "center",
-            borderWidth: 6,
+            borderWidth: 3,
             borderColor: palette.surface,
           }}
         >
-          {initials ? <Text testID="profile-initials" numberOfLines={1} adjustsFontSizeToFit style={{ fontSize: initials.length > 2 ? 24 : 29, fontWeight: "800", color: palette.primary }}>
+          {initials ? <Text testID="profile-initials" numberOfLines={1} adjustsFontSizeToFit style={{ fontSize: initials.length > 2 ? 20 : 24, fontWeight: "800", color: palette.primary }}>
             {initials}
-          </Text> : <UserRound size={32} color={palette.primary} />}
+          </Text> : <UserRound size={24} color={palette.primary} />}
         </View>
-        <Text testID="profile-full-name" style={[styles.heading, { fontSize: 22, textAlign: "center", alignSelf: "stretch" }]}>{displayPersonName(user.name)}</Text>
+        <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+          <Text testID="profile-full-name" style={[styles.heading, { fontSize: 18, lineHeight: 25 }]}>{displayPersonName(user.name)}</Text>
+          <Text testID="profile-email" accessibilityLabel={`E-posta adresi: ${user.email}`} style={[styles.muted, { fontSize: 13, lineHeight: 19 }]}>{user.email}</Text>
+        </View>
       </View>
-      <SectionTitle>Hesap bilgilerin</SectionTitle>
-      <Card tone="blue">
-        <View style={styles.row}>
-          <UserRound size={19} color={palette.muted} />
-          <Text style={styles.muted}>Ad soyad</Text>
-        </View>
-        <Text style={styles.text}>{displayPersonName(user.name)}</Text>
-        <View style={{ height: 1, backgroundColor: palette.line }} />
-        <View style={styles.row}>
-          <Mail size={19} color={palette.muted} />
-          <Text style={styles.muted}>E-posta adresi</Text>
-        </View>
-        <Text style={[styles.text, { fontSize: 14 }]}>{user.email}</Text>
       </Card>
       <Pressable
         accessibilityRole="button"
@@ -95,30 +85,32 @@ export function Profile({
         onPress={account}
         style={({ pressed }) => [
           {
-            borderRadius: 20,
+            borderRadius: 16,
             borderWidth: 1.5,
             borderColor: accountTint.line,
             backgroundColor: accountTint.surface,
-            padding: 14,
+            paddingHorizontal: 12,
+            paddingVertical: 8,
             flexDirection: "row",
             alignItems: "center",
-            gap: 14,
-            minHeight: 64,
+            gap: 10,
+            minHeight: 52,
           },
           pressed && { opacity: 0.8 },
         ]}
       >
         <ShieldCheck size={22} color={accountTint.accent} />
-        <View style={{ flex: 1, gap: 4 }}>
+        <View style={{ flex: 1, gap: 2 }}>
           <Text style={{ color: palette.ink, fontSize: 14, fontWeight: "700" }}>
             {vocabulary.account.title}
           </Text>
           <Text style={styles.muted}>
-            E-posta, parola, cihazlar, verilerini indir, hesabı sil.
+            Güvenlik ve hesap ayarları.
           </Text>
         </View>
         <ChevronRight size={20} color={palette.muted} />
       </Pressable>
+      <View style={{ gap: 8 }}>
       <SectionTitle>Görünüm</SectionTitle>
       <Text style={styles.muted}>
         İlk kurulumda Açık görünüm kullanılır. Koyu veya Cihaz ayarı seçebilirsin.
@@ -132,6 +124,8 @@ export function Profile({
         value={preference}
         onChange={setPreference}
       />
+      </View>
+      <View style={{ gap: 8 }}>
       <SectionTitle>Yazı boyutu</SectionTitle>
       <Text style={styles.muted}>Okumayı kolaylaştırmak için yazı boyutunu seç. Tercihin bu cihazda saklanır.</Text>
       <ChoiceGroup
@@ -139,10 +133,11 @@ export function Profile({
         value={textSize}
         onChange={setTextSize}
       />
-      <Card tone="indigo">
+      <Card tone="indigo" compact>
         <Text style={styles.text}>Örnek metin: Soruları ve seçenekleri rahatça oku.</Text>
       </Card>
       <ErrorNotice title="Yazı boyutu tercihi saklanamadı" error={textSizeError} retry={() => setTextSize(textSize)} />
+      </View>
       {contexts.length > 1 && (
         <>
           <SectionTitle>Çalışma alanın</SectionTitle>
@@ -158,15 +153,17 @@ export function Profile({
               onPress={() => choose(c.id)}
               style={({ pressed }) => [
                 {
-                  borderRadius: 20,
+                  borderRadius: 16,
                   borderWidth: 1.5,
                   borderColor: c.id === context.id ? palette.primary : palette.line,
                   backgroundColor:
                     c.id === context.id ? palette.softPrimary : palette.surface,
-                  padding: 14,
+                  paddingHorizontal: 12,
+                  paddingVertical: 8,
                   flexDirection: "row",
                   alignItems: "center",
-                  gap: 14,
+                  gap: 10,
+                  minHeight: 44,
                 },
                 pressed && { opacity: 0.8 },
               ]}
@@ -195,8 +192,8 @@ export function Profile({
       )}
       <LegalSection />
       <AppUpdateControls />
-      <View style={{ paddingTop: 12 }}>
-        <Button danger icon={LogOut} disabled={pending} onPress={logout}>
+      <View style={{ paddingTop: 4 }}>
+        <Button compact danger icon={LogOut} disabled={pending} onPress={logout}>
           {pending ? "Oturum kapatılıyor…" : "Çıkış yap"}
         </Button>
       </View>
@@ -205,7 +202,7 @@ export function Profile({
         accessibilityRole="button"
         accessibilityLabel={`${brand.name} ana sayfaya dön`}
         onPress={home}
-        style={[styles.row, { justifyContent: "center", paddingTop: 12, minHeight: 44 }]}
+        style={[styles.row, { justifyContent: "center", minHeight: 44 }]}
       >
         <ShieldCheck size={15} color={palette.muted} />
         <Text style={[styles.muted, { fontSize: 11 }]}>
@@ -218,6 +215,6 @@ export function Profile({
           ? ` · Güncelleme ${Updates.updateId.slice(0, 8)}`
           : ""}
       </Text>
-    </>
+    </View>
   );
 }
