@@ -4,6 +4,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { useResume } from "./hooks";
 import { ScreenActive } from "./screenActivity";
 import { UpdateManager, type UpdateStatus } from "./updateManager";
+import { appUpdatesEnabled } from "./appUpdateEnvironment";
 import { Button, ErrorNotice, SectionTitle } from "./ui";
 import { Text } from "./text";
 import { useTheme } from "./themeContext";
@@ -13,13 +14,18 @@ type UpdateContextValue = { status: UpdateStatus; pending: boolean; busy: boolea
 const UpdateContext = createContext<UpdateContextValue | null>(null);
 
 export function AppUpdatesProvider({ children }: { children: ReactNode }) {
+  if (!appUpdatesEnabled) return children;
+  return <NativeAppUpdatesProvider>{children}</NativeAppUpdatesProvider>;
+}
+
+function NativeAppUpdatesProvider({ children }: { children: ReactNode }) {
   const native = Updates.useUpdates();
   const latest = useRef(native); latest.current = native;
   const [status, setStatus] = useState<UpdateStatus>({ phase: "idle" });
   const mounted = useRef(true);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   const [manager] = useState(() => new UpdateManager({
-    enabled: Updates.isEnabled,
+    enabled: appUpdatesEnabled,
     busy: () => latest.current.isStartupProcedureRunning || latest.current.isChecking || latest.current.isDownloading || latest.current.isRestarting,
     pending: () => latest.current.isUpdatePending,
     check: Updates.checkForUpdateAsync,
@@ -42,7 +48,7 @@ export function AppUpdateControls() {
   const screenActive = useContext(ScreenActive);
   const focused = useIsFocused() && screenActive;
   const { styles } = useTheme();
-  if (!Updates.isEnabled || !updates) return null;
+  if (!appUpdatesEnabled || !updates) return null;
   const label = updates.busy ? (updates.status.phase === "applying" ? "Güncelleme uygulanıyor…" : "Güncelleme denetleniyor veya indiriliyor…")
     : updates.pending ? "Yeni güncelleme indirildi. Uygula dediğinde uygulama yeniden başlatılır; önce açık işlemlerini tamamla."
     : updates.status.phase === "current" ? "Kullandığın paket için en güncel sürümdesin."

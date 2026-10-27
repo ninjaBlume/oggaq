@@ -1,6 +1,18 @@
 # Test ve doğrulama stratejisi
 
 
+
+## 28 Ekim 2026 — Expo Go güncelleme uyarısının kaldırılması
+
+`Updates.isEnabled` tek başına OTA desteği sayılmıyor. Mevcut Expo `isRunningInExpoGo()` API'si, platform, debug/yerel önizleme ve native enabled değeri birlikte denetlenir. Expo Go/web/debug/önizlemede native update provider/hook/foreground denetimi monte edilmez; Profil'deki OTA kontrolü/hata alanı ve yanlış OTA kimliği gösterilmez. Dağıtım iOS/Android paketleri desteklenir; gerçek indirme hatası, tekrar deneme ve yalnız görünür profilde manuel reload davranışı korunur. Yeni native modül veya bağımlılık yoktur.
+
+**65 mobil birim testi, 5 güncelleme yapılandırma testi, workspace strict TypeScript ve Expo web export geçti.** Sekiz ortam vakası SDK enabled=true olsa bile Expo Go/web/debug/önizlemede check/fetch/reload çağrılmadığını; iOS/Android dağıtım paketlerinde desteğin sürdüğünü doğrular. Mevcut hata/yeniden deneme, indirilen paketin uygulanması ve aktif sınavı otomatik yeniden başlatmama testleri korunur.
+
+**25 ilgili E2E doğrulandı:** ilk geniş koşuda 24 geçti; bir test önceki kompakt sonuç tasarımında kaldırılmış tekrar eden sayı satırını bekliyordu. Beklenti mevcut üç istatistik alanına taşındı; bu akış ve yeni güncelleme önizleme testi birlikte tekrar geçti (2 tekrar, yeni toplam değildir). Önizlemede uygulama güncelleme başlığı/düğmesi/hata alanı/OTA kimliği yoktur ve u.expo.dev isteği atılmaz. Giriş, sekmeler, ders/deneme/tekrar/sonuç, hesap ve profil gezinmesi kontrol edildi. Yalnız oggaq_test ve 8001/5183/5184/5186 üzerinde başka PHPUnit/E2E yokken çalıştırıldı. Kanıtlar artifacts/expo-go-update-guard/ içinde.
+
+Device Hub kontrolünde kullanıcı Safari'ye geçtiği için native Expo Go profilinin son görünümü ayrıca teyit edilemedi; web QA native teyidi yerine sayılmaz. Backend/API/veritabanı değişmedi; PHPUnit/Composer/ilgisiz web-admin test/build tekrarı yok. Geliştirme ortamına özgü bu işte OTA veya yeni mağaza paketi yayımlanmadı; mevcut iOS 01a17f9a / Android 01a17f9b beta teslimleri aynı kaldı. Git push ve sunucu deploy'u yok.
+
+
 ## 28 Ekim 2026 — Kompakt Deneme sonucun ekranı
 
 Mobil sonuç özetinden 160 px dekoratif yıldız/çiçek, kutlama cümlesi, büyük iç istatistik kutuları ve tekrar eden sayı satırı kaldırıldı. Doğru oranı, ince dağılım çubuğu ve üç cevap adedi tek kompakt kartta; tamamlanma/çalışma puanı açıklaması kart altında. ÖGG puan paneli de yalnız sınav sonucunda kompakt gösterilir; hesaplama, atış düzenleme, koşullar ve kaynaklar değişmez. Bağımsız Puan hesapla normal yoğunlukta kalır. Soru/sonuç sürümleri ve API/veritabanı değişmedi.

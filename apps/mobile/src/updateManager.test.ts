@@ -1,5 +1,29 @@
 import { expect, it, vi } from "vitest";
-import { UpdateManager, type UpdateStatus } from "./updateManager";
+import { supportsAppUpdates, UpdateManager, type UpdateStatus } from "./updateManager";
+
+it.each([
+  { name: 'iOS store build', platform: 'ios', expoGo: false, development: false, localPreview: false, enabled: true, expected: true },
+  { name: 'Android store build', platform: 'android', expoGo: false, development: false, localPreview: false, enabled: true, expected: true },
+  { name: 'Expo Go with SDK updates enabled', platform: 'ios', expoGo: true, development: true, localPreview: false, enabled: true, expected: false },
+  { name: 'Expo Go with production JS', platform: 'android', expoGo: true, development: false, localPreview: false, enabled: true, expected: false },
+  { name: 'web with SDK updates enabled', platform: 'web', expoGo: false, development: false, localPreview: false, enabled: true, expected: false },
+  { name: 'native debug client', platform: 'ios', expoGo: false, development: true, localPreview: false, enabled: true, expected: false },
+  { name: 'local preview', platform: 'android', expoGo: false, development: false, localPreview: true, enabled: true, expected: false },
+  { name: 'disabled native updates', platform: 'ios', expoGo: false, development: false, localPreview: false, enabled: false, expected: false },
+])('$name uses only supported app update controls', async ({ name: _name, expected, ...environment }) => {
+  expect(supportsAppUpdates(environment)).toBe(expected);
+  if (!expected) {
+    const { driver, changed } = setup();
+    driver.enabled = supportsAppUpdates(environment);
+    driver.pending.mockReturnValue(true);
+    const manager = new UpdateManager(driver, changed);
+    await manager.check(true); await manager.apply(true);
+    expect(driver.check).not.toHaveBeenCalled();
+    expect(driver.fetch).not.toHaveBeenCalled();
+    expect(driver.reload).not.toHaveBeenCalled();
+    expect(changed).not.toHaveBeenCalled();
+  }
+});
 function setup() {
   const driver = { enabled: true, busy: vi.fn(() => false), pending: vi.fn(() => false),
     check: vi.fn(async () => ({ isAvailable: true, reason: undefined as string | undefined })),

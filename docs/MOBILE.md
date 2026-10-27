@@ -1,5 +1,13 @@
 # Expo mobil uygulaması
 
+## Expo Go ve mağaza güncellemelerinin ayrımı — 28 Ekim 2026
+
+Expo SDK 58, Expo Go veya web önizlemede `Updates.isEnabled` değerini etkin gösterebilir; bu tek başına mağaza OTA desteği anlamına gelmez. `appUpdateEnvironment` tek bir ortam kararı kullanır: OTA yalnız etkin iOS/Android dağıtım paketinde, Expo Go/debug/yerel önizleme dışında açılır. Expo'nun mevcut `isRunningInExpoGo()` API'si kullanılır; yeni native modül/izin/bağımlılık yoktur.
+
+Desteklenmeyen ortamda native update provider/hook/foreground denetimi monte edilmez; Profil'deki mağaza güncelleme düğmesi, hata alanı ve OTA kimliği gösterilmez. Expo Go geliştirme değişikliklerini Metro/Fast Refresh veya proje yenilemesiyle alır. TestFlight/Play paketlerinin indirme/manuel uygulama akışı ve gerçek hata/yeniden dene durumları korunur. Açılışta bekleme veya sınav sırasında zorunlu reload eklenmez.
+
+Bu geliştirme ortamı düzeltmesi için yeni OTA/native paket yayımlanmadı; telefonlardaki mevcut beta paketleri değişmedi. Kontroller [TESTING](TESTING.md) içinde.
+
 ## Deneme/Ders kartlarında tam sınav tarihi — 28 Ekim 2026
 
 Kartın tarih satırı mevcut kesin tarih varsa **29 Ağustos 2026** biçiminde gün/ay/yıl gösterir; tarih başlığa yeniden eklenmez. Ortak `examPeriodLabel` eski kayıtların başlığındaki parantezli tarihi veya incelenmiş kitapçık aktarımının kaynak künyesindeki sınav tarihini kullanır. Kitapçık künyesinde sınav numarası ve eğitim türü, her iki kaynakta gerçek takvim günü/yıl/varsa ay eşleşmesi kontrol edilir. Çelişkili veya kesin günü bulunmayan metadata için mevcut ay/yıl ya da dönem/yıl gösterimi korunur; yayın/indirme tarihinden gün çıkarılmaz. Sınav başlıkları, soru sürümleri, puanlama ve veritabanı değiştirilmez.

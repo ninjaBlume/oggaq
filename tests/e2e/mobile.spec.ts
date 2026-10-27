@@ -164,9 +164,10 @@ test("mobil sekmeler gerçek Bearer API ile deneme sınavı, sonuçlar ve çık�
     .click();
   await page.getByRole("button", { name: "Bitir ve değerlendir" }).click();
   await expect(page.getByText("Deneme sonucun", { exact: true })).toBeVisible();
-  await expect(
-    page.getByText("1 doğru · 0 yanlış · 2 boş", { exact: true }),
-  ).toBeVisible();
+  const summary = page.getByTestId("exam-result-summary");
+  await expect(summary.getByTestId("exam-result-correct")).toHaveText("1Doğru");
+  await expect(summary.getByTestId("exam-result-incorrect")).toHaveText("0Yanlış");
+  await expect(summary.getByTestId("exam-result-blank")).toHaveText("2Boş");
   await expect(
     page.getByRole("button", { name: "Bitir ve değerlendir" }),
   ).not.toBeVisible();

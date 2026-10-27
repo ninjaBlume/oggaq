@@ -27,6 +27,7 @@ import { textSizes, textSizeLabels } from "./textSize";
 import Constants from "expo-constants";
 import * as Updates from "expo-updates";
 import { AppUpdateControls } from "./appUpdates";
+import { appUpdatesEnabled } from "./appUpdateEnvironment";
 export function Profile({
   user,
   context,
@@ -211,7 +212,7 @@ export function Profile({
       </Pressable>
       <Text testID="app-release" style={[styles.muted, { fontSize: 11, textAlign: "center" }]}>
         {`Sürüm ${Constants.expoConfig?.version ?? "—"}`}
-        {Updates.isEnabled && !Updates.isEmbeddedLaunch && Updates.updateId
+        {appUpdatesEnabled && !Updates.isEmbeddedLaunch && Updates.updateId
           ? ` · Güncelleme ${Updates.updateId.slice(0, 8)}`
           : ""}
       </Text>

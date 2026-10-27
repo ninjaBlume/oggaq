@@ -1,5 +1,17 @@
 export type UpdatePhase = "idle" | "checking" | "downloading" | "current" | "ready" | "applying" | "failed";
 export type UpdateStatus = { phase: UpdatePhase; error?: unknown };
+
+export function supportsAppUpdates(environment: {
+  enabled: boolean;
+  platform: string;
+  expoGo: boolean;
+  development: boolean;
+  localPreview: boolean;
+}): boolean {
+  return environment.enabled && (environment.platform === 'ios' || environment.platform === 'android') &&
+    !environment.expoGo && !environment.development && !environment.localPreview;
+}
+
 type UpdateDriver = {
   enabled: boolean;
   busy: () => boolean;
