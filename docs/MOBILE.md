@@ -1,5 +1,11 @@
 # Expo mobil uygulaması
 
+## Deneme/Ders kartlarında tam sınav tarihi — 28 Ekim 2026
+
+Kartın tarih satırı mevcut kesin tarih varsa **29 Ağustos 2026** biçiminde gün/ay/yıl gösterir; tarih başlığa yeniden eklenmez. Ortak `examPeriodLabel` eski kayıtların başlığındaki parantezli tarihi veya incelenmiş kitapçık aktarımının kaynak künyesindeki sınav tarihini kullanır. Kitapçık künyesinde sınav numarası ve eğitim türü, her iki kaynakta gerçek takvim günü/yıl/varsa ay eşleşmesi kontrol edilir. Çelişkili veya kesin günü bulunmayan metadata için mevcut ay/yıl ya da dönem/yıl gösterimi korunur; yayın/indirme tarihinden gün çıkarılmaz. Sınav başlıkları, soru sürümleri, puanlama ve veritabanı değiştirilmez.
+
+Yayımdaki **598 kayıt** salt okunur incelendi: Temel 46 tam sınav + 253 ders, Yenileme 46 tam sınav + 253 ders; hepsinde kesin gün çözümlendi. Yeni kaynak veya soru içe aktarılmadı. Ek API isteği, bağımlılık veya bekleme yok; zaten gelen metadata kullanılır. Mobil ve yerel web QA kartları aynı gösterimi kullanır. Device Hub iOS'ta Temel/Yenileme Deneme ve Ders kartları gerçek API ile görüldü; sınav başlatılmadı/cevaplanmadı. [Test ve beta teslimi](TESTING.md).
+
 ## Parola yer tutucusu ve takvim metni — 28 Ekim 2026
 
 Ortak mobil `Field` bileşeni parola alanı boşken, açıkça başka yer tutucu verilmediyse `••••••••` gösterir. Giriş, kayıt ve parola tekrar alanları aynı görünümü kullanır; gerçek değer boş kalır, güvenli giriş/göster-gizle/otomatik doldurma davranışı değişmez. Takvimde kullanıcıya gösterilen “Son doğrulama” tarih-saat satırı mobil ve web arayüzünden kaldırıldı; resmî kaynak bağlantıları ve eski veri uyarıları korunur. API'nin kontrol zamanı ve takvim botu değiştirilmez.

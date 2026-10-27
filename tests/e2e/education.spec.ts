@@ -137,7 +137,7 @@ test('mobil derslerde eğitim değişimi ders seçimini korur; boş liste ve ba�
   } else await route.continue();
  });
  await page.getByRole('button',{name:'Yenileme eğitimi sınavları',exact:true}).click();
- await expect(page.getByText('Sınavlar yüklenemedi',{exact:true})).toBeVisible();
+ await expect(page.getByText('Bağlantı yenilenemedi',{exact:true})).toBeVisible();
  await expect(page.getByRole('heading',{name:'1. Temel Eğitim Sınav Soruları',exact:true})).toHaveCount(0);
  await page.unroute('**/api/v1/official-exams?**');
  await page.getByRole('button',{name:'Yeniden dene',exact:true}).click();

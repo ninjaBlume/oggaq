@@ -1,5 +1,17 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Deneme/Ders kartlarında gün/ay/yıl
+
+Ortak `examPeriodLabel` tam sınav gününü eski başlığın parantezli tarihinden veya incelenmiş EGM kitapçık aktarımının belirli kaynak künye biçiminden okur. Gerçek takvim günü, yıl/varsa ay, kitapçık sınav numarası/eğitim türü ve kaynaklar arası uyum kontrol edilir. Kesin gün yok/çelişkiliyse mevcut dönem/ay-yıl korunur; genel kaynak metnindeki indirme/yayın tarihi veya URL kullanılmaz. Sınav başlıkları, kaynak/soru verileri ve geçmiş sonuçlar değiştirilmedi.
+
+**68 core (mevcut yasal sayfa dosyası hariç), 57 mobil ve 10 web birim testi; workspace strict TypeScript, web build ve Expo web QA export geçti.** Yeni 18 tarih senaryosu başlık tarih biçimleri, kaynak künyesi, artık gün, geçersiz gün/ay/yıl, farklı eğitim/sınav numarası, çelişkili kaynak ve bilinmeyen günün korunmasını kapsar. Tarih/başlık dosyaları ayrıca 20 testle geçti; bu sayı core toplamının alt kümesidir. Bilinen yasal sayfa beklentileri yeniden koşulmadı, bütün core paketi yeşil diye raporlanmaz.
+
+**34 ilgili E2E senaryosu doğrulandı.** İlk geniş koşuda 32 geçti; daha önce değişen bağlantı uyarısına ait eski başlık beklentisi ve yeni web QA testinin Ders ekranında mobildeki eğitim seçicisini/adlandırmasını beklemesi düzeltildi. Eğitim dosyası tekrarında 8 senaryo, son tarih dosyası tekrarında web/mobil 2 senaryo geçti; ürün kodu bu tekrarlar arasında değişmedi. Mobil/web Deneme ve Ders tarihleri, Temel/Yenileme, silahlı/silahsız, fallback dönem etiketi, 320/390/834 px taşmama/kompakt kart, eğitim seçimi ve başlat/yanıt/kilit/devam/sonuç akışları kapsandı. Web QA Ders ekranına yeni eğitim seçicisi eklenmedi.
+
+Yayımdaki 598 sınav/ders kaydının mevcut metadata'sına salt okunur denetim uygulandı; 598'inde de kesin tarih çözümlendi (46+253 Temel, 46+253 Yenileme). Kontrol yeni bir resmî tarih araştırması değil, daha önce yüklenmiş kaynak verisinin gösterim denetimidir. Yalnız kamuya açık sınav metadata'sı yerel ignore edilen artefakta alındı; öğrenci verisi sorgulanmadı/değiştirilmedi. Device Hub iPhone 18 Pro / iOS 27 gerçek API ile dört mobil listeyi ve örnek 29 Ağustos 2026 / 5 Temmuz 2026 tarihlerini gösterdi. Hiçbir gerçek sınav başlatılmadı veya cevaplanmadı. Android native/fiziksel beta alımı ayrıca teyit edilmeli.
+
+E2E yalnız `oggaq_test` ve 8001/5183/5184/5186 üzerinde başka test yokken yürütüldü. API/DB/backend değişmedi; PHPUnit/Composer tekrar çalıştırılmadı, sunucu deploy'u yok. Web kaynak/build doğrulandı; üretim webi yeniden yayımlanmadı (genel öğrenci sınav ekranları kapalı). Kanıtlar `artifacts/full-exam-dates/` içinde; beta teslimi ayrıca kaydedilir.
+
 ## 28 Ekim 2026 — Parola yer tutucusu ve takvim kontrol tarihi
 
 Ortak mobil parola alanlarında varsayılan `••••••••` yer tutucusu eklendi; açıkça verilmiş yer tutucu varsa önceliği korunur. Gerçek değer veya kayıtlı parola üretilmez. Mobil ve web takvim arayüzünden “Son doğrulama” tarih-saat satırı kaldırıldı; veri doğrulama zamanı, takvim botu, eski veri uyarısı ve resmî kaynak bağlantıları değiştirilmedi.

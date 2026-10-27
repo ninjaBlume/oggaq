@@ -17,7 +17,7 @@ Durum: Bu belge web, yönetim paneli ve mobil uygulamanın ortak görsel ve etki
 
 Sayfa başlığı ve menü girişi `title`, alt sekme gibi dar yerler `short` kullanır. Başka ad kullanılmaz. Kaynak: `vocabulary` ([study-core](../packages/study-core/src/index.ts)).
 
-Sınav başlıklarının parantez içindeki tarihleri gösterilmez: `ÖGG 104. Deneme Sınavı (26.08.2023) — Silahlı` ekranda `ÖGG 104. Deneme Sınavı — Silahlı` olur. Web/mobil ana sayfa ve sonuç başlıkları ile yönetim başlıkları ortak `examDisplayTitle` gösterimini kullanır. Bu yalnız sunum kuralıdır; kayıtlı başlık, kaynak ve puanlama dönemi değiştirilmez. Tarih dışındaki parantezli açıklamalar korunur.
+Sınav başlıklarının parantez içindeki tarihleri gösterilmez: `ÖGG 104. Deneme Sınavı (26.08.2023) — Silahlı` ekranda `ÖGG 104. Deneme Sınavı — Silahlı` olur. Web/mobil ana sayfa ve sonuç başlıkları ile yönetim başlıkları ortak `examDisplayTitle` gösterimini kullanır. Bu yalnız sunum kuralıdır; kayıtlı başlık, kaynak ve puanlama dönemi değiştirilmez. Tarih dışındaki parantezli açıklamalar korunur. Deneme/Ders kartlarının ayrı tarih satırında mevcut kesin sınav günü Türkçe gün/ay/yıl olarak gösterilir (ör. 29 Ağustos 2026); kaynakta gün bulunmuyorsa ay/yıl veya dönem/yıl korunur.
 
 | Yer | Başlık / menü | Kısa |
 |---|---|---|
