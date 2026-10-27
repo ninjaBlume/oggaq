@@ -1,6 +1,6 @@
 # Android kişisel beta ve güncelleme düzeni
 
-27 Ekim 2026: Kullanıcı Android için Google Play Dahili Test ve EAS Update akışını hazırlamamızı istedi. Henüz indirilebilir Android beta veya Play yayını doğrulanmadı.
+27 Ekim 2026, 03:38 İstanbul: **0.1.1 (2)** yalnız Google Play **Dahili Test** kanalında yayımlandı. Kanal **Etkin**, sürüm **Dahili test kullanıcıları tarafından kullanılabilir**. Yalnız hesap sahibinin 1 kişilik listesi seçilidir; genel mağaza yayını yapılmadı. Fiziksel Android kurulumu ve OTA alımı henüz teyit edilmedi.
 
 ## Hazır yapılandırma ve kontroller
 
@@ -14,7 +14,9 @@ Günlük geliştirme Expo + Device Hub/Android emülatöründe; dağıtılan pak
 
 Google Play Codentum kurumsal hesabı **4811557576086495455** üzerinde başarılı kimlik doğrulama bildirimi görüldü. Kullanıcı zorunlu politika/ihracat beyanlarını ve Play App Signing şart/yetkisini işlem anında açıkça onayladı. **ÖGG SOR - Soru Bankası / net.codentum.oggsor / Türkçe / Uygulama / Ücretsiz** kaydı oluşturuldu; uygulama ID'si **4975640362108828692**, Dahili Test kanal ID'si **4701026732184970975**.
 
-Kullanıcı `Harun - Android` listesini kendi ekranında kaydetti. Gerçek listede **1 kullanıcı ve seçili** durum görüldü; kanalın Kaydet işlemi tamamlandı ve kurulum sayacı **3 görevden 1** oldu. İlk tester yalnız hesap sahibidir. Dahili Test sürüm taslağı açıldı; AAB yükleme/dağıtım henüz tamamlanmadı. Safari dosya seçicisinde doğru AAB seçili olmasına rağmen “Karşıya Yükle” pasif kaldı; kullanıcıdan kendi ekranında yüklemesi istendi. Özel anahtar/keystore/parolalar seçilmedi veya Google'a yüklenmedi.
+Kullanıcı `Harun - Android` listesini kendi ekranında kaydetti. Gerçek listede **1 kullanıcı ve seçili** durum görüldü; kanal kaydı tamamlandı. Kullanıcının dosya seçicide tamamladığı AAB yüklemesi Google tarafından işlendi. Sürüm önizlemesinde **Yayınlamaya hazır**, versionCode **2 / 0.1.1**, min API **24+**, target SDK **36**, ReTrace ve yerel hata sembolleri doğrulandı; engelleyici hata görülmedi. Türkçe notlarla **Kaydet ve yayınla** tamamlandı; **27 Eki 03:38 tarihinde kullanıma sunuldu** görüldü. Özel anahtar/keystore/parolalar seçilmedi veya Google'a yüklenmedi.
+
+[Teste katılım bağlantısı](https://play.google.com/apps/internaltest/4701026732184970975) gerçek oturumda açıldı; doğru `hcbilisimtr@gmail.com` hesabı ve **Accept invite** ekranı görüldü. Davet kabulü kullanıcıya bırakıldı. Ekran, Google'ın e-posta ve test kullanım bilgisini geliştiriciyle paylaşacağını belirtiyor. Android telefonda bu hesapla bağlantıyı açıp daveti kabul ederek Google Play'den indirmek gerekir. İlk Play kurulumu tamamlanana kadar geçici ad **net.codentum.oggsor (unreviewed)** görünür; bu durum uygulama içi markayı değiştirmez. İlk dağıtımın yayılması gecikebilir; konsol bildirimi genellikle 1 saat, bazen daha uzun der.
 
 EAS'te bu paket için Android credentials bulunmadığı doğrulandı. **oggsor-upload** takma adıyla RSA 2048/JKS upload keystore oluşturuldu. Anahtar/parolalar depo dışında 0700 klasör/0600 dosyalarda; geçici credentials.json Git/arşiv dışındaydı ve EAS yüklemesinden sonra kaldırıldı. EAS varsayılan Android credentials kaydı yerel sertifikayla eşleşti. SHA256:
 
@@ -37,6 +39,6 @@ npm run update:android:beta -- --message "Düzeltmenin kısa Türkçe açıklama
 
 İlk OTA başarılı native paket tamamlandıktan sonra yayımlanır. AAB'nin imzası, paket/sürüm/versionCode/SDK/izinleri, kanal/runtime/gömülü paket bilgisi kontrol edilir. Yanlış runtime ve iOS/production kanallarına Android güncellemesinin sunulmadığı doğrulanır. Geri dönüş yalnız ilgili kanal/platform/runtime'a `eas update:roll-back-to-embedded` ile yapılır; [iOS örneğinde](IOS_BETA.md) kanal/platform yerine `android-beta`/`android` seçilir.
 
-Kalan: AAB'yi yalnız **Dahili Test**'e yükleme ve kullanıma sunma; gerçek test bağlantısı ve cihazda kurulum/OTA teyidi. Başka tester veya genel mağaza yayını yapılmaz. EAS/Play yükleme başarısı cihaz doğrulaması sayılmaz.
+Kalan: kullanıcının daveti kabul etmesi, fiziksel Android kurulumu ve OTA teyidi. Profilde **Sürüm 0.1.1 · Güncelleme 01a17ac4** beklenir; uygulama bir kez açılıp arka planda güncelleme alındıktan sonra tekrar açılmalıdır (sınav sırasında kapatma istenmez). Başka tester veya genel mağaza yayını yapılmaz. EAS/Play yükleme başarısı cihaz doğrulaması sayılmaz.
 
 Kaynaklar (27 Ekim 2026): [Google test kanalları](https://support.google.com/googleplay/android-developer/answer/9845334?hl=tr), [Expo imzalama](https://docs.expo.dev/app-signing/app-credentials/), [Expo Android gönderimi](https://docs.expo.dev/submit/android/).
