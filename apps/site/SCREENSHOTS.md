@@ -14,3 +14,5 @@ Telefon çerçevesi, lacivert/mavi zemin ve öne gelen sonuç kartı sitenin HTM
 Mobil arayüz değiştiğinde aynı bileşenleri, pencereyi ve anonim örnek verileri kullanarak görselleri yenileyin. E-posta/parola veya oturum anahtarı yakalamayın. Derleyici her iki görselin SHA-256 içerik sürümünü URL'ye ekler. Mevcut site testleri iki görselin derlenmesini/yüklenmesini/doğru boyutlarını, örnek veri açıklamasını ve 320–1280 px taşmamayı doğrular.
 
 Yerel çekim/önizleme kanıtları `artifacts/site-visual-refresh/` içindedir. Çekim için açılan yalnız 127.0.0.1:5189 önizleme sunucusu (PID 38852) kapatıldı; paylaşılan geliştirme sunucularına dokunulmadı.
+
+Yayın: `8937c44` kaynaklı site görseli `oggaq-development-web:site-visual-20261028` ile oggsor.com'a alındı. Canlı görsel/CSS içerik hash’leri, görüntü boyutları, tam telefon çerçevesi ve mobil sıralama doğrulandı. İlgisiz servislerin kimlikleri ve hesap/yönetim/bilgi sayfaları korundu. Mobil uygulama veya OTA paketi değiştirilmedi.
