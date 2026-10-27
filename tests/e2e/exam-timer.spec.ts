@@ -30,7 +30,7 @@ for (const platform of ['web','mobile'] as const) {
     }
     for(const kind of ['deneme','ders']as const) test(`${kind}: öğrenci çıkınca süreyi durdurur; geri dönünce süre ve kilitli cevap korunur`,async({page})=>{
       await page.clock.install();await start(page,kind,true);
-      await page.getByRole('radio',{name:/Sentetik A/}).click();await expect(page.getByText('Cevaplar sunucuda kayıtlı',{exact:true})).toBeVisible();
+      await page.getByRole('radio',{name:/Sentetik A/}).click();await expect(page.getByText(/Yanıtın kaydedildi ve kilitlendi\./)).toBeVisible();
       const paused=timerResponse(page,'pause');await leave(page,kind);const frozen=(await(await paused).json()).data;expect(frozen.timer_paused).toBe(true);
       const resumed=timerResponse(page,'resume');
       if(platform==='web')await page.locator('.sinav-row').getByRole('link',{name:'Devam et',exact:true}).click();

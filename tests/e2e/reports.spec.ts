@@ -131,7 +131,7 @@ test.describe("mobil", () => {
     await expect(page.getByText("DENEMEN DEVAM EDİYOR", { exact: true })).toBeVisible();
     await expect(page.getByTestId("result-question-1").getByRole("button", { name: "Soruyu bildir", exact: true })).toHaveCount(0);
     await page.getByRole("radio", { name: "Sentetik A", exact: true }).click();
-    await expect(page.getByText("Cevaplar sunucuda kayıtlı", { exact: true })).toBeVisible();
+    await expect(page.getByText(/Yanıtın kaydedildi ve kilitlendi\./)).toBeVisible();
     await page.getByRole("button", { name: "Denemeyi bitir", exact: true }).click();
     await page.getByRole("button", { name: "Bitir ve değerlendir" }).click();
     await expect(page.getByText("Deneme sonucun", { exact: true })).toBeVisible();

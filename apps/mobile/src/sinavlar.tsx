@@ -1,5 +1,5 @@
 import { Text } from "./text";
-import { cardDensity, cardTone } from "@oggaq/design-tokens";
+import { cardTone } from "@oggaq/design-tokens";
 import { CatalogCache } from "./catalog-cache";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, View } from "react-native";
@@ -27,7 +27,7 @@ import {
 import { ChoiceGroup } from "./expressive";
 import { BookOpen, ChevronDown, ChevronRight, Clock3 } from "./icons";
 import { scoreTone, shape } from "./theme";
-import { useLayout, useTheme } from "./themeContext";
+import { useTheme } from "./themeContext";
 
 const catalogCache = new CatalogCache();
 
@@ -311,7 +311,6 @@ export function ExamList({
 // One attempt of the history: the score first, then what the exam was, then how the answers split.
 function ResultCard({ attempt: e, open }: { attempt: Summary; open: () => void }) {
   const { palette, styles } = useTheme();
-  const layout = useLayout();
   const live = e.status === "active" && Date.parse(e.deadline_at) > Date.parse(e.server_time);
   const result = e.result;
   const title = e.official_exam ? examDisplayTitle(e.official_exam.title) : `${e.question_count} soruluk deneme`;
@@ -322,33 +321,33 @@ function ResultCard({ attempt: e, open }: { attempt: Summary; open: () => void }
   const minutes = Math.round((result ? result.elapsed_seconds : e.duration_seconds) / 60);
   return (
     <Pressable
+      testID="exam-result-card"
       accessibilityRole="button"
       accessibilityLabel={live ? "Sınava dön" : `${title} sonucunu incele`}
       onPress={open}
       style={({ pressed }) => [
-        { backgroundColor: tint.surface, borderWidth: 1, borderColor: tint.line, borderRadius: 24, paddingHorizontal: layout.cardPadding, paddingVertical: layout.cls === "compact" ? cardDensity.paddingY : cardDensity.paddingYWide, gap: cardDensity.gap },
+        { backgroundColor: tint.surface, borderWidth: 1, borderColor: tint.line, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 8, gap: 6, minHeight: 44 },
         pressed && { borderColor: palette.primary },
       ]}
     >
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
-        <View style={{ minWidth: 76, height: 60, paddingHorizontal: 6, borderRadius: 20, alignItems: "center", justifyContent: "center", backgroundColor: tone.backgroundColor }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+        <View style={{ minWidth: 56, minHeight: 44, paddingHorizontal: 6, paddingVertical: 4, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: tone.backgroundColor }}>
           {result ? (
             <Text numberOfLines={1} style={{ fontSize: 20, lineHeight: 26, fontWeight: "800", color: tone.color }}>{percent(result.score_percent)}</Text>
           ) : (
-            <Clock3 size={26} color={tone.color} />
+            <Clock3 size={20} color={tone.color} />
           )}
         </View>
-        <View style={{ flex: 1, gap: 3 }}>
-          <Text style={[styles.eyebrow, { fontSize: 10 }]}>{kind}</Text>
-          <Text numberOfLines={3} style={{ fontSize: 15, lineHeight: 21, fontWeight: "700", color: palette.ink }}>{title}</Text>
-          <Text style={styles.muted}>{`${date} · ${minutes} dk · ${e.question_count} soru`}</Text>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text style={{ fontSize: 15, lineHeight: 20, fontWeight: "700", color: palette.ink }}>{title}</Text>
+          <Text style={[styles.muted, { fontSize: 12, lineHeight: 18 }]}>{`${date} · ${minutes}\u00a0dk · ${e.question_count}\u00a0soru`}</Text>
         </View>
         <ChevronRight size={20} color={palette.muted} />
       </View>
       {result ? (
-        <View style={{ gap: 8 }}>
-          <SplitBar correct={result.correct} incorrect={result.incorrect} blank={result.blank} />
-          <SplitLegend correct={result.correct} incorrect={result.incorrect} blank={result.blank} />
+        <View style={{ gap: 4 }}>
+          <SplitBar correct={result.correct} incorrect={result.incorrect} blank={result.blank} height={4} />
+          <SplitLegend correct={result.correct} incorrect={result.incorrect} blank={result.blank} compact />
         </View>
       ) : (
         <View style={{ alignSelf: "flex-start" }}>
@@ -384,9 +383,9 @@ export function Results({ context, openExam }: { context: StudyContext; openExam
       ) : exams.data?.data.length === 0 ? (
         <EmptyState icon={Clock3} title="Henüz bir sınava girmedin" message="Girdiğin sınavlar ve sonuçların burada görünür." />
       ) : (
-        <Columns>
+        <View style={{ gap: 10 }}><Columns>
           {exams.data?.data.map((e) => <ResultCard key={e.id} attempt={e} open={() => openExam(e.id)} />)}
-        </Columns>
+        </Columns></View>
       )}
       {exams.data && <Pagination page={exams.data} change={setCursor} />}
     </>

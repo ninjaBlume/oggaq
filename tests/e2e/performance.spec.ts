@@ -17,7 +17,7 @@ test('mobil sekmeye dönüşte katalog yeniden indirilmez; cevap küçük yanıt
  await page.goto(mobilePreviewUrl);await page.getByLabel('E-posta adresi',{exact:true}).fill('e2e-student@example.test');await page.getByLabel('Parola',{exact:true}).fill('Synthetic-Browser-42!');await page.getByRole('button',{name:'Giriş yap',exact:true}).click();await expect(page.getByText('Merhaba, E2E.',{exact:true})).toBeVisible();
  await page.getByRole('tab',{name:'Deneme',exact:true}).click();await expect(page.getByText('1. Temel Eğitim Sınav Soruları',{exact:true})).toBeVisible();expect(catalogs).toHaveLength(1);expect(catalogs[0]!.searchParams.get('scope')).toBe('whole');
  await page.getByRole('tab',{name:'Ana sayfa',exact:true}).click();await expect(page.getByText('Merhaba, E2E.',{exact:true})).toBeVisible();await page.getByRole('tab',{name:'Deneme',exact:true}).click();await expect(page.getByText('1. Temel Eğitim Sınav Soruları',{exact:true})).toBeVisible();expect(catalogs).toHaveLength(1);
- await page.getByRole('button',{name:'Sınava gir',exact:true}).click();await page.getByRole('button',{name:'Sınavı başlat',exact:true}).click();const saved=page.waitForResponse(r=>new URL(r.url()).pathname.includes('/answers/')&&r.request().method()==='PUT');await page.getByRole('radio').first().click();const response=await saved;expect(new URL(response.url()).searchParams.get('compact')).toBe('true');const data=(await response.json()).data;expect(data.questions).toBeUndefined();expect(data.answers).toHaveLength(3);await expect(page.getByText('Cevaplar sunucuda kayıtlı',{exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Sınava gir',exact:true}).click();await page.getByRole('button',{name:'Sınavı başlat',exact:true}).click();const saved=page.waitForResponse(r=>new URL(r.url()).pathname.includes('/answers/')&&r.request().method()==='PUT');await page.getByRole('radio').first().click();const response=await saved;expect(new URL(response.url()).searchParams.get('compact')).toBe('true');const data=(await response.json()).data;expect(data.questions).toBeUndefined();expect(data.answers).toHaveLength(3);await expect(page.getByText(/Yanıtın kaydedildi ve kilitlendi\./)).toBeVisible();
 });
 
 for (const mobile of [false, true]) {
@@ -56,7 +56,7 @@ for (const mobile of [false, true]) {
    await expect(page.getByRole('radio', {name:/Sentetik A/})).toBeDisabled();
    await position;
   } finally { release(); }
-  await expect(page.getByText('Cevaplar sunucuda kayıtlı',{exact:true})).toBeVisible();
+  await expect(page.getByText('Kaydediliyor…',{exact:true})).toHaveCount(0);
   await page.getByRole('button',{name:'Önceki soru',exact:true}).click();
   await expect(page.getByRole('radio', {name:/Sentetik A/})).toBeChecked();
   expect(detailRequests).toHaveLength(0);

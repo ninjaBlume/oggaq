@@ -469,13 +469,9 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
               </View>
               {!done && (
                 <>
-                  <Text style={[styles.muted, { fontSize: 11 }]}>
-                    {task.pending
-                      ? "Kaydediliyor…"
-                      : blocked
-                        ? "Kayıt doğrulanmalı"
-                        : "Cevaplar sunucuda kayıtlı"}
-                  </Text>
+                  {(task.pending || blocked) && <Text accessibilityLiveRegion="polite" style={[styles.muted, { fontSize: 11 }]}>
+                    {task.pending ? "Kaydediliyor…" : "Kayıt doğrulanmalı"}
+                  </Text>}
                   {row.feedback ? <Text accessibilityLiveRegion="polite" style={styles.text}>{row.feedback.outcome === 'correct' ? 'Doğru yanıt.' : 'Yanlış yanıt.'} Doğru cevap: {String.fromCharCode(65 + row.question.options.findIndex((option) => option.id === row.feedback!.correct_option_id))}. Yanıtın kaydedildi ve kilitlendi.</Text>
                     : <Text style={styles.muted}>Seçimin kaydedilince doğru cevap gösterilir. Yanıtını değiştiremezsin.</Text>}
                   {row.feedback?.explanation && <Text style={styles.text}>{row.feedback.explanation}</Text>}

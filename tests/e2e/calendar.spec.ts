@@ -62,3 +62,30 @@ test('mobil: büyük yazıda 320 px kurallar, tarih kartları ve geri dönüş',
     await expect(page.getByText('Merhaba, E2E.', { exact: true })).toBeVisible();
   } finally { await context.close(); }
 });
+
+test('mobil takvim standart yazıda kısa kartlar kullanır; tarihler ve kaynak eylemleri korunur', async ({ browser }) => {
+  const context = await browser.newContext({ baseURL: mobilePreviewUrl, viewport: { width: 390, height: 900 } });
+  const page = await context.newPage();
+  try {
+    await page.goto('/');
+    await page.getByLabel('E-posta adresi', { exact: true }).fill('e2e-student@example.test');
+    await page.getByLabel('Parola', { exact: true }).fill('Synthetic-Browser-42!');
+    await page.getByRole('button', { name: 'Giriş yap', exact: true }).click();
+    await page.getByRole('button', { name: 'Menüyü aç', exact: true }).click();
+    await page.getByRole('button', { name: 'Sınav takvimi', exact: true }).click();
+    for (const width of [320, 390, 834]) {
+      await page.setViewportSize({ width, height: 900 });
+      const rules = page.getByTestId('calendar-rules');
+      const card = page.getByTestId('calendar-entry').first().locator('..');
+      await expect(card).toContainText('Eğitim bitişi:');
+      await expect(card).toContainText('Sınav:');
+      const box = await card.boundingBox(); expect(box!.height).toBeLessThanOrEqual(160);
+      expect((await rules.boundingBox())!.height).toBeLessThanOrEqual(480);
+      for (const name of ['Silahsız temel eğitim:', 'Silahlı temel eğitim:', 'Uygulamalı atış:', 'Yenileme eğitimi:']) await expect(rules).toContainText(name);
+      expect((await rules.getByRole('button', { name: 'Resmî EGM sayfası', exact: true }).boundingBox())!.height).toBeGreaterThanOrEqual(44);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      mkdirSync('artifacts/compact-calendar-results/screens', { recursive: true });
+      await page.screenshot({ path: `artifacts/compact-calendar-results/screens/calendar-${width}.png`, fullPage: true });
+    }
+  } finally { await context.close(); }
+});

@@ -6,13 +6,14 @@ import { fixture, login } from './student';
 test.use({ baseURL: 'http://127.0.0.1:5183' });
 test.beforeEach(() => { fixture('setup-study'); });
 test.afterAll(() => { fixture('cleanup'); });
-async function mobileLogin(page: Page) {
+async function mobileLogin(page: Page, open = true) {
   await page.goto(mobilePreviewUrl);
   await page.getByLabel('E-posta adresi', { exact: true }).fill('e2e-student@example.test');
   await page.getByLabel('Parola', { exact: true }).fill('Synthetic-Browser-42!');
   await page.getByRole('button', { name: 'Giriş yap', exact: true }).click();
   await expect(page.getByText('Merhaba, E2E.', { exact: true })).toBeVisible();
   await page.getByRole('tab', { name: 'Sonuçlar', exact: true }).click();
+  if (!open) return;
   await page.getByRole('button', { name: /sonucunu incele$/ }).click();
   await expect(page.getByText('Deneme sonucun', { exact: true })).toBeVisible();
 }
@@ -82,4 +83,32 @@ for (const colorScheme of ['light', 'dark'] as const) test(`sonuçlar ${colorSch
       }
     } finally { await context.close(); }
   }
+});
+
+test('mobil sonuç listesi kompakttır; puan, cevap dağılımı ve ayrıntıya erişim korunur', async ({ page }) => {
+  fixture('long-result'); await mobileLogin(page, false);
+  const card = page.getByTestId('exam-result-card');
+  for (const width of [320, 390, 834]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect(card).toContainText('Uzun sentetik sınav');
+    await expect(card).toContainText(/200\s+soru/);
+    for (const label of ['doğru', 'yanlış', 'boş']) await expect(card).toContainText(label);
+    const box = await card.boundingBox();
+    expect(box!.height).toBeLessThanOrEqual(128); expect(box!.height).toBeGreaterThanOrEqual(44);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    mkdirSync('artifacts/compact-calendar-results/screens', { recursive: true });
+    await page.screenshot({ path: `artifacts/compact-calendar-results/screens/results-${width}.png` });
+  }
+  await page.getByRole('tab', { name: 'Profil', exact: true }).click();
+  await page.getByRole('button', { name: 'Yazı boyutu: Büyük', exact: true }).click();
+  await page.getByRole('button', { name: 'Görünüm: Koyu', exact: true }).click();
+  await page.getByRole('tab', { name: 'Sonuçlar', exact: true }).click();
+  await page.setViewportSize({ width: 320, height: 900 });
+  await expect(card).toContainText('Uzun sentetik sınav');
+  await expect(card).toContainText('198 boş');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: 'artifacts/compact-calendar-results/screens/results-dark-large-320.png' });
+  await card.click();
+  await expect(page.getByText('Deneme sonucun', { exact: true })).toBeVisible();
+  await expect(page.getByTestId('result-question-1')).toBeVisible();
 });

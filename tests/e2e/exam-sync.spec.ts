@@ -119,7 +119,7 @@ for (const platform of ['web', 'mobile'] as const) {
       const retried = (await (await retry).json()).data;
       expect(retried.revision).toBe(2);
       expect(retried.answers.filter((a: { selected_option_id: string | null }) => a.selected_option_id !== null)).toHaveLength(1);
-      await expect(page.getByText('Cevaplar sunucuda kayıtlı', { exact: true })).toBeVisible();
+      await expect(page.getByText(/Yanıtın kaydedildi ve kilitlendi\./)).toBeVisible();
       await page.unrouteAll({ behavior: 'ignoreErrors' });
     });
 
@@ -155,7 +155,7 @@ for (const platform of ['web', 'mobile'] as const) {
       await page.clock.fastForward(15_000);
       await expect.poll(() => calls).toBe(1);
       await page.getByRole('radio', { name: /Sentetik A/ }).click();
-      await expect(page.getByText('Cevaplar sunucuda kayıtlı', { exact: true })).toBeVisible();
+      await expect(page.getByText(/Yanıtın kaydedildi ve kilitlendi\./)).toBeVisible();
       const refreshed = page.waitForResponse(r => r.url().endsWith('/state') && r.status() === 200);
       await page.clock.fastForward(15_000);
       await refreshed;

@@ -147,10 +147,12 @@ test("mobil sekmeler gerçek Bearer API ile deneme sınavı, sonuçlar ve çık�
   await expect(
     page.getByText("DENEMEN DEVAM EDİYOR", { exact: true }),
   ).toBeVisible();
+  await expect(page.getByText("Cevaplar sunucuda kayıtlı", { exact: true })).toHaveCount(0);
   await page.getByRole("radio", { name: /Sentetik A/ }).click();
   await expect(
-    page.getByText("Cevaplar sunucuda kayıtlı", { exact: true }),
+    page.getByText(/Yanıtın kaydedildi ve kilitlendi\./),
   ).toBeVisible();
+  await expect(page.getByText("Cevaplar sunucuda kayıtlı", { exact: true })).toHaveCount(0);
   await screenshot(page, "exam-active");
   await page.getByRole("button", { name: "Soru listesi" }).click();
   await page.getByRole("button", { name: "Soru 2", exact: true }).click();
@@ -605,7 +607,7 @@ test("mobil tekrar sınavı hatalardan kurulur; başarı durumu ve sınavlar ger
   await enter(page, "Ders");
   await page.getByRole("radio", { name: "Sentetik B", exact: true }).click();
   await expect(
-    page.getByText("Cevaplar sunucuda kayıtlı", { exact: true }),
+    page.getByText(/Yanıtın kaydedildi ve kilitlendi\./),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Denemeyi bitir", exact: true })
@@ -668,7 +670,7 @@ test("ana sayfa devam eden sınavı önce gösterir ve tekrar başlatmadan açar
   await login(page);
   await enter(page, "Deneme");
   await page.getByRole("radio", { name: /Sentetik A/ }).click();
-  await expect(page.getByText("Cevaplar sunucuda kayıtlı", { exact: true })).toBeVisible();
+  await expect(page.getByText(/Yanıtın kaydedildi ve kilitlendi\./)).toBeVisible();
   await page.getByRole("button", { name: "Geri dön", exact: true }).click();
   await page.getByRole("tab", { name: "Ana sayfa", exact: true }).click();
   const resume = page.getByRole("button", { name: "Denemene devam et", exact: true });
@@ -822,7 +824,7 @@ test("giriş isteği sürerken form ve yön değiştiren bağlantılar kilitleni
 test('mobil devam son görüntülenen cevapsız soruya döner; yeniden girişte ve cihaz değişiminde konum korunur', async ({ page, browser }) => {
   await login(page); await enter(page, 'Deneme');
   await page.getByRole('radio', { name: /Sentetik A/ }).click();
-  await expect(page.getByText('Cevaplar sunucuda kayıtlı', { exact: true })).toBeVisible();
+  await expect(page.getByText(/Yanıtın kaydedildi ve kilitlendi\./)).toBeVisible();
   await page.getByRole('button', { name: 'Sonraki soru', exact: true }).click();
   const saved = page.waitForResponse((r) => r.url().endsWith('/position') && r.status() === 200 && r.request().postDataJSON().position === 3);
   await page.getByRole('button', { name: 'Sonraki soru', exact: true }).click();

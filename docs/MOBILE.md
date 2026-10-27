@@ -1,12 +1,20 @@
 # Expo mobil uygulaması
 
+## Kompakt takvim ve sonuç listesi — 28 Ekim 2026
+
+Sınavın altında sürekli görünen “Cevaplar sunucuda kayıtlı” metni kaldırıldı. İşlem sürerken “Kaydediliyor…”, uzlaştırma gerektiğinde “Kayıt doğrulanmalı” ve hata/yeniden deneme korunur. Doğru/yanlış geri bildirimi, cevap kilidi ve kayıt işlemleri değişmez.
+
+Takvim sayfasının bölüm arası 12 px, kural maddelerinin arası 8 px oldu. Madde başlığı ve açıklama 14/20 px ortak paragrafta yer alır; kaynak ve yönetmelik eylemleri korunur. Kural/tarih kartları mevcut `Card.compact` görünümünü kullanır (12 px yatay/8 px dikey). Sınav tarihi etiketi ve tarih aynı satırda, eğitim bitişi altında; gereksiz büyük ikonlar küçültüldü. Standart yazıda takvim kartları sentetik örneklerle 320/390/834 px'de en çok 160 px, kurallar en çok 480 px olarak kontrol edilir. Sabit yükseklik ve kırpma yoktur; Büyük yazıda kart büyür.
+
+Sonuçlarım satırı 16 px köşe, 12/8 px iç boşluk ve 6 px iç aralık kullanır. Skor alanı sabit 60 px yükseklik yerine en az 44 px'tir; başlık tam sarılır, meta 12/18 px'tir. Tekrarlanan tür etiketi kaldırıldı. Dağılım çubuğu 4 px, kısa doğru/yanlış/boş açıklaması 12/18 px, liste aralığı 10 px'tir. Yüzde ve dağılım hesabı/API değişmez. Detay ekranının bütün soruları kaydırma/favori/bildirim işlevleri korunur. Genel kartlar ve diğer `SplitLegend` kullanımları aynı kalır. [Doğrulama ve beta teslimi](TESTING.md).
+
 ## 27 Ekim 2026: daha ince butonlar
 
 Mobil eylem ölçüleri `src/theme.ts` içindeki `buttonDensity` üzerinden ortaklaştırıldı: standart eylem 48 px / 10 px dikey boşluk, kompakt eylem 44 px / 8 px, bağlı seçim düğmesi 44 px / 8 px. Ana sayfanın Sınava gir/Devam eylemi ve yan menü satırları da standart yoğunluğu izler. Seçim köşeleri 22 px, onay ikonu ve iç aralığı yeni yüksekliğe uyarlandı. Metin boyutları, seçili/disabled durumları ve basış geri bildirimi korunur; sabit yükseklik yoktur, uzun/büyük metin gerektiğinde büyür. Alt gezinme, soru seçenekleri ve içerik kartları bu buton ayarıyla sıkıştırılmaz. [Kontroller ve beta dağıtımı](TESTING.md).
 
 ## 27 Ekim 2026: kompakt profil
 
-Profilde büyük, ortalanmış avatar ve tekrarlanan hesap bilgileri birleştirildi: 56 px avatar yanında tam ad ve e-posta tek kartta gösterilir. Hesabım satırı, örnek metin kartı ve varsa çalışma alanları daraltıldı. Görünüm/yazı ayarları kendi içinde 8 px, bölüm grupları 12 px aralıkla toplanır. Uzun ad/e-posta, üç yazı boyutu ve mevcut cihaz tercihleri korunur. Hesabım erişiminden e-posta/parola, oturum, dışa aktarma ve hesap silme; gizlilik/koşullar, güncelleme ve çıkış işlemleri çalışmayı sürdürür. Güncelleme ve çıkış düğmeleri kompakt olsa da en az 44 px'dir. Genel kartların varsayılanı değiştirilmedi; `Card` kompakt görünümü yalnız profil kimliği ve örnek metinde seçilir. Doğrulama/beta kayıtları [TESTING](TESTING.md) içindedir.
+Profilde büyük, ortalanmış avatar ve tekrarlanan hesap bilgileri birleştirildi: 56 px avatar yanında tam ad ve e-posta tek kartta gösterilir. Hesabım satırı, örnek metin kartı ve varsa çalışma alanları daraltıldı. Görünüm/yazı ayarları kendi içinde 8 px, bölüm grupları 12 px aralıkla toplanır. Uzun ad/e-posta, üç yazı boyutu ve mevcut cihaz tercihleri korunur. Hesabım erişiminden e-posta/parola, oturum, dışa aktarma ve hesap silme; gizlilik/koşullar, güncelleme ve çıkış işlemleri çalışmayı sürdürür. Güncelleme ve çıkış düğmeleri kompakt olsa da en az 44 px'dir. Genel kartların varsayılanı değiştirilmedi; `Card` kompakt görünümü profil kimliği/örnek metinde ve takvimdeki kural/tarih kartlarında seçilir. Doğrulama/beta kayıtları [TESTING](TESTING.md) içindedir.
 
 ## 27 Ekim 2026: sade header ve kompakt sınav kartları
 

@@ -51,7 +51,7 @@ test("boyut değişimi açık sınav formunu ve kaldığı soruyu korur", async 
  await expect(stem).toBeVisible(); await expect.poll(() => fontSize(stem)).toBeCloseTo(25.2,1);
  await expect.poll(() => fontSize(page.getByText("Sınav",{exact:true}))).toBeCloseTo(19.2,1);
  await page.getByRole("radio",{name:/Sentetik A/}).click();
- await expect(page.getByText("Cevaplar sunucuda kayıtlı",{exact:true})).toBeVisible();
+ await expect(page.getByText(/Yanıtın kaydedildi ve kilitlendi\./)).toBeVisible();
  const position = page.waitForResponse(response => new URL(response.url()).pathname.endsWith("/position"));
  await page.getByRole("button",{name:"Sonraki soru",exact:true}).click(); await position;
  await page.getByRole("button",{name:"Geri dön",exact:true}).click();

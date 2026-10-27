@@ -749,15 +749,17 @@ export function SplitLegend({
   correct,
   incorrect,
   blank,
+  compact = false,
 }: {
   correct: number;
   incorrect: number;
   blank: number;
+  compact?: boolean;
 }) {
   const { palette, styles } = useTheme();
   return (
     <View
-      style={{ flexDirection: "row", flexWrap: "wrap", columnGap: 16, rowGap: 6 }}
+      style={{ flexDirection: "row", flexWrap: "wrap", columnGap: compact ? 10 : 16, rowGap: compact ? 4 : 6 }}
     >
       {[
         [palette.primary, correct, "doğru"],
@@ -766,17 +768,17 @@ export function SplitLegend({
       ].map(([color, count, label]) => (
         <View
           key={String(label)}
-          style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+          style={{ flexDirection: "row", alignItems: "center", gap: compact ? 4 : 6 }}
         >
           <View
             style={{
-              width: 10,
-              height: 10,
+              width: compact ? 6 : 10,
+              height: compact ? 6 : 10,
               borderRadius: 5,
               backgroundColor: String(color),
             }}
           />
-          <Text style={styles.muted}>{`${count} ${label}`}</Text>
+          <Text style={[styles.muted, compact && { fontSize: 12, lineHeight: 18 }]}>{`${count} ${label}`}</Text>
         </View>
       ))}
     </View>
