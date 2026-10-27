@@ -148,7 +148,7 @@ class ScoringTest extends TestCase
     {
         $admin = $this->createUser(['platform_role' => 'platform_admin']);
         $p = $this->period($admin);
-        $student = $this->createUser();
+        $student = $this->createUser(['email_verified_at' => null]);
         $this->asToken($student);
         $body = $this->input() + ['period_id' => $p->id, 'id' => (string) Str::uuid()];
         $this->postJson('/api/v1/me/score-calculations/preview', $body)->assertOk()->assertJsonPath('data.final_score', 60);

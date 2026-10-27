@@ -1,5 +1,17 @@
 # Test ve doğrulama stratejisi
 
+## 27 Ekim 2026 — Doğrudan öğrenci erişimi, iş başvurusuna özel doğrulama
+
+Kullanıcı kararı: aktif öğrenci kayıt sonrasında doğrudan kişisel ders/deneme/tekrar/sonuç/puan ekranlarına girer. Kayıtta kod/e-posta üretilmez; genel doğrulama kapısı ve profil rozeti kaldırıldı. Gerçek `email_verified_at` korunur. İlan okuma serbest, yalnız başvuru gönderimi ve yönetim/kurum işlemleri doğrulama ister. Kurumsal bağlamları tahmin ederek erişme policy ile engellenir. Başvuru için kod doğrulanınca aynı form açık kalır; bağlam listesi arka planda güncellenir.
+
+- PostgreSQL tam backend: **289 test / 3.013 assertion geçti**. Kayıtta sıfır bildirim/kod; doğrulanmamış kişisel soru çözme, sınav devam/bitiş/sonuç, puan geçmişi; kurumsal bağlam, başvuru ve yönetim engelleri test edildi. Mevcut kod tahmin/yeniden gönderim ve hesap güvenlik testleri korundu.
+- Tam Chromium E2E: **154 geçti / 2 mevcut yasal sayfa testi başarısız (156 toplam)**. Web ve mobil yeni kayıt, token hatasından dönüş, başvuru öncesi kod isteme, hatalı kod, aynı formda doğrulama ve gerçek API başvurusu geçti. İki hata `legal.spec.ts` içindeki artık bulunmayan `#taslak-bandi` beklentisidir; bu değişiklikte yasal sayfalar değiştirilmedi.
+- Birim testleri: **16 admin, 10 web, 57 mobil geçti**. Core: **52 geçti / 4 mevcut yasal sayfa beklentisi başarısız**; yine `taslak-bandi` aranıyor. İlgili test ve dört HTML'nin HEAD ile aynı SHA256'da olduğu kaydedildi; bütün kontroller yeşil diye raporlanmaz.
+- Strict TypeScript, OpenAPI lint/tip üretimi, Pint, Composer strict validate/audit, admin ve hesap modunda web build, Expo web QA export geçti. 132 HTTP route'un method/URI/action kümesi korunur; 81 route'un doğrulama sınırı ayrıca denetlendi.
+- Native runtime aynı: iOS `1223b533f37e49802bffbaeeaf657bde54e48337`, Android `ddd888fad4be168fb997d3e5994db524de32d6fb`. Bu çalışma sırasında fiziksel iOS/Android veya Device Hub native akışı yeniden denenmedi; Chromium mobil önizlemesi bunların yerine sayılmaz.
+- Kanıtlar: `artifacts/student-direct-access/`. Sunucu ve OTA dağıtım sonucu bu bölümün altında kaydedilir. Geliştirme DB kullanıcılarına dokunulmadı; migration veya gerçek test postası yok. Genel mağaza yayını ve Git push yok.
+
+
 ## 27 Ekim 2026 — destek adresinden hesap bildirimi gönderimi
 
 - Kullanıcının açık onayıyla merkezi `config/brand.json` → `mailFromAddress` **destek@oggsor.com** oldu; `brand:apply` backend marka dosyasını ve iki ortam örneğini eşitledi. Marka üreticisi posta kurulum betiğinin From/görünen ad varsayılanlarını da yönetir; script artık **destek@oggsor.com / ÖGG SOR - Soru Bankası** üretir. Reply-To aynı destek adresinde kaldı. Canlı kullanıcılara veya hesap verilerine yazılmadı.

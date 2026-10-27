@@ -110,13 +110,13 @@ class QuestionBankTest extends TestCase
         $this->getJson('/api/v1/admin/questions/'.$question->id.'/versions')->assertForbidden();
     }
 
-    public function test_question_bank_requires_authenticated_verified_active_accounts(): void
+    public function test_question_bank_requires_authenticated_active_accounts(): void
     {
         $this->getJson('/api/v1/questions')->assertUnauthorized();
         $user = $this->createUser(['email_verified_at' => null]);
-        $this->asToken($user)->getJson('/api/v1/questions')->assertForbidden();
+        $this->asToken($user)->getJson('/api/v1/questions')->assertOk();
         $user->forceFill(['email_verified_at' => now(), 'status' => 'suspended'])->save();
-        $this->getJson('/api/v1/questions')->assertForbidden();
+        $this->asToken($user)->getJson('/api/v1/questions')->assertForbidden();
     }
 
     public function test_drafts_and_answer_keys_are_not_visible_to_students(): void

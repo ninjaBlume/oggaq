@@ -1,5 +1,6 @@
-import { mobilePreviewUrl } from "../../playwright.config";
+import { browserTestEnv, phpBinary, mobilePreviewUrl } from "../../playwright.config";
 import { test, expect, type Page } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 import { fixture, login } from './student';
 const web = 'http://127.0.0.1:5183'; const admin = 'http://127.0.0.1:5184'; const mobile = mobilePreviewUrl;
@@ -40,6 +41,45 @@ test('web ilan hizmeti hatasını gösterir; tekrar yükler ve başvuru doğrula
   await page.getByLabel('Telefon', { exact: true }).fill('0555 444 33 22'); await page.getByRole('button', { name: 'Başvur', exact: true }).click(); await page.getByRole('button', { name: 'Başvurularımı gör', exact: true }).click(); await expect(page.getByText('Başvuru alındı', { exact: true })).toBeVisible();
   await page.route('**/api/v1/me/job-applications?*', (route) => route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ message: 'Başvurular şu anda yenilenemiyor.' }) }));
   await page.getByRole('button', { name: 'Başvuruları yenile' }).click(); await expect(page.getByRole('alert')).toBeVisible(); await expect(page.getByText('Başvuru alındı', { exact: true })).toBeVisible();
+});
+
+for (const surface of ['web', 'mobile'] as const) test(surface + ' öğrenci kod olmadan çalışır; yalnız iş başvurusunda e-posta doğrular', async ({ page }) => {
+  fixture('jobs');
+  const email = 'job-gate@example.test';
+  await page.goto(surface === 'mobile' ? mobile : web);
+  await page.getByRole('button', { name: 'Hesap oluştur', exact: true }).click();
+  await page.getByLabel('Ad soyad', { exact: true }).fill('Sentetik Aday');
+  await page.getByLabel('E-posta adresi', { exact: true }).fill(email);
+  await page.getByLabel('Parola', { exact: true }).fill('Test-42!');
+  await page.getByLabel('Parola tekrar', { exact: true }).fill('Test-42!');
+  await page.getByRole('button', { name: 'Hesap oluştur', exact: true }).click();
+  if (surface === 'web') {
+    await expect(page.getByRole('status')).toContainText('Hesabın oluşturuldu.');
+    await page.getByLabel('Parola', { exact: true }).fill('Test-42!');
+    await page.getByRole('button', { name: 'Giriş yap', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Deneme sınavları' })).toBeVisible();
+    await page.getByRole('link', { name: 'İş İlanları', exact: true }).click();
+  } else {
+    await expect(page.getByText('Merhaba, Sentetik.', { exact: true })).toBeVisible();
+    await expect(page.getByLabel('Doğrulama kodu', { exact: true })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Menüyü aç', exact: true }).click();
+    await page.getByRole('button', { name: 'İş İlanları', exact: true }).click();
+  }
+  await page.getByRole('button', { name: 'İlanı incele', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Başvuru için e-postanı doğrula', exact: true })).toBeVisible();
+  await expect(page.getByLabel('Telefon', { exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Doğrulama kodu gönder', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Yeni kod gönder', exact: true })).toBeVisible();
+  const code = execFileSync(phpBinary, ['scripts/e2e-fixtures.php', 'verification-code', email], { env: browserTestEnv, encoding: 'utf8' }).trim();
+  await page.getByLabel('Doğrulama kodu', { exact: true }).fill(code === '000000' ? '111111' : '000000');
+  await page.getByRole('button', { name: 'Doğrula ve başvuruya dön', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('Kod hatalı');
+  await page.getByLabel('Doğrulama kodu', { exact: true }).fill(code);
+  await page.getByRole('button', { name: 'Doğrula ve başvuruya dön', exact: true }).click();
+  await expect(page.getByLabel('Telefon', { exact: true })).toBeVisible();
+  await page.getByLabel('Telefon', { exact: true }).fill('0555 444 33 22');
+  await page.getByRole('button', { name: 'Başvur', exact: true }).click();
+  await expect(page.getByText('Başvurun alındı.', { exact: true })).toBeVisible();
 });
 
 for (const scheme of ['light', 'dark'] as const) test(`iş ilanı ekranları ${scheme} temada telefon/tablet/masaüstünde taşmaz`, async ({ browser }) => {

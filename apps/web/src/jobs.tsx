@@ -4,7 +4,7 @@ import { ApiError, cursorFromLink } from '@oggaq/api-client';
 import type { components, User } from '@oggaq/shared-types';
 import { jobApplicationStatusLabels, jobWeaponLabels, jobApplicationNotice } from '@oggaq/study-core';
 import { api } from './api';
-import { useSession } from './auth';
+import { useSession, VerifyForApplication } from './auth';
 import { PageIntro } from './App';
 import { ErrorNotice, Field, Loading, dateLabel } from './ui';
 import { Icon } from './icons';
@@ -40,7 +40,7 @@ function JobDetail({ job, user, applications }: { job: Job; user: User; applicat
   const apply = useMutation({ mutationFn: () => api.request('post', '/api/v1/job-postings/{job}/applications', { params: { job: job.id }, body: input }), onSuccess: () => { void cache.invalidateQueries({ queryKey: ['my-job-applications'] }); void cache.invalidateQueries({ queryKey: ['jobs'] }); void cache.invalidateQueries({ queryKey: ['job', job.id] }); } });
   const error = (field: string) => apply.error instanceof ApiError ? apply.error.field(field) : undefined;
   return <section className="card job-detail card-tone-blue"><h2>{job.title}</h2><p className="muted">{job.company_name} · {job.city} · {jobWeaponLabels[job.weapon_requirement]}</p>{job.expires_at && <p>Son başvuru: {dateLabel(job.expires_at)}</p>}<p className="job-description">{job.description}</p>
-    {apply.isSuccess || job.application_id ? <div className="notice"><p role="status">{apply.isSuccess ? 'Başvurun alındı.' : 'Bu ilana başvurdun.'}</p><button className="text-button" onClick={applications}>Başvurularımı gör</button></div> : <form onSubmit={(event) => { event.preventDefault(); apply.mutate(); }}><h3>Başvuru bilgilerin</h3><fieldset disabled={apply.isPending}>
+    {apply.isSuccess || job.application_id ? <div className="notice"><p role="status">{apply.isSuccess ? 'Başvurun alındı.' : 'Bu ilana başvurdun.'}</p><button className="text-button" onClick={applications}>Başvurularımı gör</button></div> : !user.email_verified_at ? <VerifyForApplication /> : <form onSubmit={(event) => { event.preventDefault(); apply.mutate(); }}><h3>Başvuru bilgilerin</h3><fieldset disabled={apply.isPending}>
       <Field label="Ad soyad" error={error('contact_name')}>{(p) => <input {...p} autoComplete="name" required maxLength={100} value={input.contact_name} onChange={(e) => setInput({ ...input, contact_name: e.target.value })} />}</Field>
       <Field label="E-posta adresi" error={error('contact_email')}>{(p) => <input {...p} type="email" autoComplete="email" required maxLength={254} value={input.contact_email} onChange={(e) => setInput({ ...input, contact_email: e.target.value })} />}</Field>
       <Field label="Telefon" error={error('phone')}>{(p) => <input {...p} type="tel" autoComplete="tel" required minLength={7} maxLength={30} value={input.phone} onChange={(e) => setInput({ ...input, phone: e.target.value })} />}</Field>

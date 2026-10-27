@@ -4,7 +4,6 @@ namespace App\Modules\Identity\Actions;
 
 use App\Models\User;
 use App\Modules\Tenancy\Models\StudyContext;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -17,7 +16,6 @@ class RegisterUser
             $user = DB::transaction(function () use ($attributes) {
                 $user = User::create($attributes);
                 StudyContext::create(['user_id' => $user->id]);
-                event(new Registered($user));
 
                 return $user;
             });

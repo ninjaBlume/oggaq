@@ -13,7 +13,7 @@ class StudyContextPolicy
             return false;
         }
 
-        return $context->tenant_id === null || ($context->tenant?->status === 'active'
+        return $context->tenant_id === null || ($user->hasVerifiedEmail() && $context->tenant?->status === 'active'
             && $context->membership?->status === 'active');
     }
 }

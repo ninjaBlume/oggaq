@@ -21,7 +21,7 @@ import type { ExamAttempt, StudyContext, User } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
 import { api, sessionExpiredHandler } from "./api";
 import { session, verifyPreviewStorage } from "./storage";
-import { Login, Verify } from "./auth";
+import { Login } from "./auth";
 import { useResource, useResume, useTask } from "./hooks";
 import {
   Button,
@@ -81,6 +81,7 @@ function MainTabs({
   pending,
   exam,
   account,
+  refresh,
 }: {
   user: User;
   context: StudyContext;
@@ -90,6 +91,7 @@ function MainTabs({
   pending: boolean;
   exam: (id: string, initialExam?: ExamAttempt) => void;
   account: () => void;
+  refresh: () => void;
 }) {
   const { styles } = useTheme();
   const layout = useLayout();
@@ -204,7 +206,7 @@ function MainTabs({
                   ) : page === "calendar" ? (
                     <ExamCalendarScreen initialYear={calendarYear} back={() => selectTab("home")} />
                   ) : page === "jobs" ? (
-                    <Jobs user={user} />
+                    <Jobs user={user} refresh={refresh} />
                   ) : page === "faq" ? (
                     <FaqScreen />
                   ) : page === "stats" ? (
@@ -294,6 +296,14 @@ function Workspace({
     },
     [user.id],
   );
+  const verification = useRef(user.email_verified_at);
+  useEffect(() => {
+    if (verification.current !== user.email_verified_at) {
+      verification.current = user.email_verified_at;
+      // Keep the current screen mounted when verification unlocks institutional contexts.
+      void query.reload(true);
+    }
+  }, [user.email_verified_at, query.reload]);
   const [contextId, setContextId] = useState<string | null>(null);
   useResume(() => {
     void query.reload(true);
@@ -379,6 +389,7 @@ function Workspace({
           {({ navigation }) => (
             <MainTabs
               user={user}
+              refresh={refresh}
               context={context}
               contexts={query.data ?? []}
               choose={setContextId}
@@ -521,7 +532,7 @@ function Application() {
           <BrandWordmark style={styles.heading} />
           <Loading />
         </View>
-      ) : user?.email_verified_at ? (
+      ) : user ? (
         <Workspace
           key={user.id}
           user={user}
@@ -538,22 +549,7 @@ function Application() {
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={body}
           >
-            {user ? (
-              <Verify
-                user={user}
-                verified={(verifiedUser) => {
-                  // A cold start before verification may have preloaded an email_unverified error.
-                  setPrepared(undefined);
-                  setUser(verifiedUser);
-                }}
-                refresh={() => {
-                  void refresh();
-                }}
-                logout={logout}
-              />
-            ) : (
-              <Login signedIn={setUser} />
-            )}
+            <Login signedIn={setUser} />
           </ScrollView>
         </SafeAreaView>
       )}

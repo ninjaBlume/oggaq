@@ -48,8 +48,8 @@ export function AuthFrame({ children, showFreeNotice = false }: { children: Reac
   return <main className="auth-layout">
     <section className="auth-story" aria-label={brand.subtitle}>
       <Link to="/" className="brand"><BrandLogo /><span><BrandWordmark /><small>{brand.subtitle}</small></span></Link>
-      <div className="auth-story-copy"><h1>{brand.tagline}</h1><p>{accountOnly ? 'Hesabını yönet, doğrulama ve güvenlik işlemlerini tamamla. Sınav çalışmaların mobil uygulamada.' : 'Deneme ve ders sınavlarını süreyle çöz; sonuçlarını ve tekrar listelerini hesabından takip et.'}</p></div>
-      <div className="auth-features"><span><Icon name="book" />{accountOnly ? 'Hesap doğrulama' : 'Deneme ve ders sınavları'}</span><span><Icon name="chart" />{accountOnly ? 'Hesap ve güvenlik' : 'Sonuçlar ve gelişim'}</span></div>
+      <div className="auth-story-copy"><h1>{brand.tagline}</h1><p>{accountOnly ? 'Hesap bilgilerini ve güvenlik ayarlarını yönet. Sınav çalışmaların mobil uygulamada.' : 'Deneme ve ders sınavlarını süreyle çöz; sonuçlarını ve tekrar listelerini hesabından takip et.'}</p></div>
+      <div className="auth-features"><span><Icon name="book" />{accountOnly ? 'Hesap bilgileri' : 'Deneme ve ders sınavları'}</span><span><Icon name="chart" />{accountOnly ? 'Hesap ve güvenlik' : 'Sonuçlar ve gelişim'}</span></div>
     </section>
     <section className="auth-content"><div className="auth-card">{children}</div>{showFreeNotice && <p className="auth-free"><Icon name="cap" size={18} />Öğrenciler için ücretsiz.</p>}<LegalLinks /><p className="legal-official">{notOfficialNotice}</p></section>
     <div className="auth-appearance"><ThemeSwitch /></div>
@@ -71,7 +71,7 @@ export function Login() {
   }, onSuccess: async (user) => {
     setPassword(''); setConfirmation('');
     if (user) await replaceSession(cache, user);
-    else if (mode === 'register') { setMode('login'); setMessage('Hesabınız oluşturuldu. Giriş yapıp e-posta adresinizi doğrulayın.'); }
+    else if (mode === 'register') { setMode('login'); setMessage('Hesabın oluşturuldu. Giriş yaparak devam edebilirsin.'); }
     else setMessage('Hesap mevcutsa parola sıfırlama bağlantısı gönderildi.');
   } });
   const fieldError = (field: string) => mutation.error instanceof ApiError ? mutation.error.field(field) : undefined;
@@ -88,14 +88,28 @@ export function Login() {
 }
 export function AuthGate({ children }: { children: ReactNode }) {
   const session = useSession();
-  const logout = useLogout();
-  const [message, setMessage] = useState('');
-  const resend = useMutation({ mutationFn: () => api.request('post', '/api/v1/auth/email-verification-notification', {}), onSuccess: (response) => setMessage(response.data.message) });
   if (session.isPending) return <main className="center"><Loading /></main>;
   if (session.isError) return <main className="center"><ErrorNotice error={session.error} retry={() => { void session.refetch(); }} /></main>;
   if (!session.data) return <Login />;
-  if (!session.data.email_verified_at) return <AuthFrame><span className="eyebrow">SON BİR ADIM</span><h2>E-postanı doğrula</h2><p>{session.data.email} adresine gelen bağlantıyı aç, ardından buradan devam et.</p>{message && <p role="status" className="notice success">{message}</p>}{resend.isError && <ErrorNotice error={resend.error} />}{logout.isError && <ErrorNotice error={logout.error} />}<div className="stack"><button className="button primary" disabled={resend.isPending} onClick={() => resend.mutate()}>Doğrulama e-postası gönder</button><button className="button secondary" onClick={() => { void session.refetch(); }}>Doğrulamayı kontrol et</button><button className="text-button" disabled={logout.isPending} onClick={() => logout.mutate()}>Çıkış yap</button></div></AuthFrame>;
+
   return children;
+}
+export function VerifyForApplication() {
+  const session = useSession();
+  const cache = useQueryClient();
+  const [code, setCode] = useState('');
+  const [message, setMessage] = useState('');
+  const send = useMutation({ mutationFn: () => api.request('post', '/api/v1/auth/email-verification-notification', {}), onSuccess: (response) => setMessage(response.data.message) });
+  const verify = useMutation({ mutationFn: () => api.request('post', '/api/v1/auth/email-verification-code', { body: { code } }), onSuccess: (response) => cache.setQueryData(sessionKey, response.data) });
+  return <section><h3>Başvuru için e-postanı doğrula</h3><p>İş başvurusu için {session.data?.email} adresinin sana ait olduğunu doğrula. Kod isteyip buraya girebilirsin.</p>
+    <form onSubmit={(event) => { event.preventDefault(); verify.mutate(); }}><fieldset disabled={verify.isPending || send.isPending}>
+      <Field label="Doğrulama kodu">{(props) => <input {...props} inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" required maxLength={6} value={code} onChange={(event) => setCode(event.target.value.replace(/[^0-9]/g, '').slice(0, 6))} />}</Field>
+      <button className="button primary" disabled={code.length !== 6} type="submit">Doğrula ve başvuruya dön</button>
+      <button className="button secondary" type="button" onClick={() => send.mutate()}>{message ? 'Yeni kod gönder' : 'Doğrulama kodu gönder'}</button>
+      <button className="text-button" type="button" onClick={() => { void session.refetch(); }}>Bağlantıyla doğruladım, kontrol et</button>
+    </fieldset></form>
+    {message && <p role="status">{message}</p>}{send.isError && <ErrorNotice error={send.error} />}{verify.isError && <ErrorNotice error={verify.error} />}
+  </section>;
 }
 export function ResetPassword() {
   const [search] = useSearchParams();

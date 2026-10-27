@@ -201,12 +201,12 @@ export function Verify({
   user,
   verified,
   refresh,
-  logout,
+  cancel,
 }: {
   user: User;
   verified: (user: User) => void;
   refresh: () => void;
-  logout: () => void;
+  cancel: () => void;
 }) {
   const { styles } = useTheme();
   const task = useTask<User | null>();
@@ -214,14 +214,10 @@ export function Verify({
   const [notice, setNotice] = useState("");
   return (
     <View style={{ width: "100%", maxWidth: 480, alignSelf: "center", gap: 18, paddingTop: 12 }}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-        <BrandLogo size={64} />
-        <BrandWordmark />
-      </View>
-      <Heading>Son bir adım: e-postanı doğrula</Heading>
+      <Heading>Başvuru için e-postanı doğrula</Heading>
       <Card>
         <Text style={styles.text}>
-          {user.email} adresine gönderdiğimiz 6 haneli kodu gir. Doğrulanınca doğrudan uygulamaya geçeceksin.
+          İş başvurusu için {user.email} adresinin sana ait olduğunu doğrula. Kod isteyip buraya girebilirsin.
         </Text>
         <Field label="Doğrulama kodu" oneTimeCode numeric outlined placeholder="6 haneli kod" value={code} editable={!task.pending}
           onChange={(value) => { setCode(value.replace(/\s/g, "").replace(/[^0-9]/g, "").slice(0, 6)); task.reset(); }} />
@@ -229,7 +225,7 @@ export function Verify({
         <Button disabled={task.pending || code.length !== 6} onPress={() => {
           void task.run(async () => (await api.request("post", "/api/v1/auth/email-verification-code", { body: { code } })).data,
             (updated) => { if (updated) verified(updated); });
-        }}>{task.pending ? "İşlem yapılıyor…" : "Doğrula ve başla"}</Button>
+        }}>{task.pending ? "İşlem yapılıyor…" : "Doğrula ve başvuruya dön"}</Button>
         <Button
           secondary
           disabled={task.pending}
@@ -247,13 +243,13 @@ export function Verify({
             );
           }}
         >
-          Yeni kod gönder
+          {notice ? "Yeni kod gönder" : "Doğrulama kodu gönder"}
         </Button>
         <TextLink disabled={task.pending} onPress={refresh}>Bağlantıyla doğruladım, kontrol et</TextLink>
         {notice !== "" && <Text style={styles.text}>{notice}</Text>}
         <ErrorNotice error={task.error} />
-        <Button secondary disabled={task.pending} onPress={logout}>
-          Başka hesap kullan
+        <Button secondary disabled={task.pending} onPress={cancel}>
+          İlanlara dön
         </Button>
       </Card>
     </View>

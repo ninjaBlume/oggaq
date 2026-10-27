@@ -140,10 +140,10 @@ test('bireysel kayıt, giriş ve imzalı e-posta doğrulama öğrenci ekranında
   await page.getByLabel('Parola', { exact: true }).fill('Test-42!');
   await page.getByLabel('Parola tekrar', { exact: true }).fill('Test-42!');
   await page.getByRole('button', { name: 'Hesap oluştur', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText('Hesabınız oluşturuldu.');
+  await expect(page.getByRole('status')).toContainText('Hesabın oluşturuldu.');
   await page.getByLabel('Parola', { exact: true }).fill('Test-42!');
   await page.getByRole('button', { name: 'Giriş yap', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'E-postanı doğrula' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Deneme sınavları' })).toBeVisible();
   await page.goto(fixture('verification-link', 'e2e-new@example.test'));
   await page.getByRole('button', { name: 'E-postamı doğrula', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'E-postan doğrulandı' })).toBeVisible();

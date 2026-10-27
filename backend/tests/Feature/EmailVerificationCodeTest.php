@@ -29,11 +29,15 @@ class EmailVerificationCodeTest extends TestCase
         return [$user, Notification::sent($user, VerifyEmailNotification::class)->last()->code];
     }
 
-    public function test_registration_sends_code_without_exposing_it_and_requires_confirmation_for_content(): void
+    public function test_registration_sends_no_mail_and_code_is_only_created_on_explicit_request(): void
     {
         $response = $this->postJson('/api/v1/auth/register', ['name' => 'Synthetic Student', 'email' => 'new-code@example.test',
             'password' => self::PASSWORD, 'password_confirmation' => self::PASSWORD])->assertCreated()->assertJsonMissingPath('data.code');
         $user = User::findOrFail($response->json('data.id'));
+        Notification::assertNothingSent();
+        $this->assertDatabaseCount('email_verification_codes', 0);
+        $this->asToken($user)->getJson('/api/v1/me/contexts')->assertOk();
+        $this->postJson('/api/v1/auth/email-verification-notification')->assertOk();
         $notification = Notification::sent($user, VerifyEmailNotification::class)->sole();
         $this->assertMatchesRegularExpression('/^[0-9]{6}$/', $notification->code);
         $record = DB::table('email_verification_codes')->where('user_id', $user->id)->first();
@@ -41,7 +45,7 @@ class EmailVerificationCodeTest extends TestCase
         $this->assertNotSame(hash('sha256', $notification->code), $record->code_hash);
         $this->assertStringContainsString($notification->code, implode(' ', $notification->toMail($user)->introLines));
         $this->assertTrue($notification->shouldSend($user, 'mail'));
-        $this->asToken($user)->getJson('/api/v1/me/contexts')->assertForbidden()->assertJsonPath('code', 'email_unverified');
+        $this->assertNull($user->fresh()->email_verified_at);
     }
 
     public function test_valid_code_verifies_current_account_and_unlocks_content_without_a_new_login(): void

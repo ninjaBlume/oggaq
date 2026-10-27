@@ -14,6 +14,25 @@ class TenantIsolationTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_unverified_member_keeps_personal_access_but_cannot_guess_organizational_context(): void
+    {
+        $tenant = Tenant::create(['name' => 'Kurum A', 'slug' => 'kurum-a']);
+        $student = $this->createUser(['email_verified_at' => null]);
+        $this->createMembership($student, $tenant, 'company_admin');
+        $personal = $student->studyContexts()->whereNull('tenant_id')->firstOrFail();
+        $company = $student->studyContexts()->whereNotNull('tenant_id')->firstOrFail();
+        $this->asToken($student)->getJson('/api/v1/me/contexts')->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $personal->id);
+        $this->getJson('/api/v1/contexts/'.$personal->id.'/stats')->assertOk();
+        $this->getJson('/api/v1/contexts/'.$company->id)->assertForbidden();
+        $this->getJson('/api/v1/contexts/'.$company->id.'/stats')->assertForbidden();
+        $this->getJson('/api/v1/tenants/'.$tenant->id.'/profile')->assertForbidden()->assertJsonPath('code', 'email_unverified');
+        $this->getJson('/api/v1/admin/tenants')->assertForbidden()->assertJsonPath('code', 'email_unverified');
+        $student->forceFill(['email_verified_at' => now()])->save();
+        $this->asToken($student)->getJson('/api/v1/me/contexts')->assertOk()->assertJsonCount(2, 'data');
+        $this->getJson('/api/v1/contexts/'.$company->id)->assertOk();
+        $this->getJson('/api/v1/admin/tenants')->assertForbidden();
+    }
+
     public function test_platform_admin_can_create_tenant_and_audit_is_recorded(): void
     {
         $admin = $this->createUser(['platform_role' => 'platform_admin']);

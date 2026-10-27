@@ -199,7 +199,7 @@ export function AccountPage() {
   if (!user) return null;
   return <div className="app-shell"><header className="site-header"><Link to="/" className="brand"><BrandLogo /><span><BrandWordmark /><small>{brand.subtitle}</small></span></Link><nav aria-label="Ana menü"><Link to="/">{accountOnly ? '← Siteye dön' : '← Çalışmaya dön'}</Link></nav><div className="user-menu"><UserIdentity name={user.name} /><ThemeSwitch /><button className="text-button" disabled={logout.isPending} onClick={() => logout.mutate()}>Çıkış yap</button></div></header>
     <main className="content account-page">
-      <div className="page-intro"><span className="eyebrow">HESAP VE GİZLİLİK</span><div className="account-person-heading"><span className="person-avatar profile-avatar" data-testid="profile-initials" aria-hidden="true">{personInitials(user.name) || '?'}</span><div><h1>{vocabulary.account.title}</h1><p data-testid="profile-full-name">{displayPersonName(user.name)}</p><p>{user.email}{user.email_verified_at ? '' : ' (doğrulanmadı)'}</p></div></div></div>
+      <div className="page-intro"><span className="eyebrow">HESAP VE GİZLİLİK</span><div className="account-person-heading"><span className="person-avatar profile-avatar" data-testid="profile-initials" aria-hidden="true">{personInitials(user.name) || '?'}</span><div><h1>{vocabulary.account.title}</h1><p data-testid="profile-full-name">{displayPersonName(user.name)}</p><p>{user.email}</p></div></div></div>
       <div className="account-grid">
         <ChangeName key={user.id} user={user} />
         <ChangeEmail pending={user.pending_email} />

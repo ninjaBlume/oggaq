@@ -14,6 +14,7 @@ class StudyContextController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $contexts = $request->user()->studyContexts()->with(['tenant', 'membership'])
+            ->when(! $request->user()->hasVerifiedEmail(), fn ($query) => $query->whereNull('tenant_id'))
             ->where(fn ($query) => $query->whereNull('tenant_id')->orWhere(fn ($tenantQuery) => $tenantQuery
                 ->whereHas('membership', fn ($membership) => $membership->where('status', 'active'))
                 ->whereHas('tenant', fn ($tenant) => $tenant->where('status', 'active'))))

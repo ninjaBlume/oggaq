@@ -47,28 +47,60 @@ Route::prefix('v1')->group(function () {
         Route::post('me/export', [AccountController::class, 'export'])->middleware('throttle:account');
         Route::delete('me', [AccountController::class, 'destroy'])->middleware('throttle:account');
 
+        Route::get('exam-calendar', ExamCalendarController::class);
+        Route::get('exam-calendar/next', [ExamCalendarController::class, 'next']);
+        Route::get('job-postings', [JobController::class, 'index']);
+        Route::get('job-postings/{job}', [JobController::class, 'show'])->whereUuid('job');
+        Route::get('me/job-applications', [JobController::class, 'applications']);
+
+        foreach (['subjects', 'exam-types'] as $catalog) {
+            Route::get($catalog, [CatalogController::class, 'index'])->defaults('catalog', $catalog);
+        }
+        Route::get('subjects/{subject}/topics', [CatalogController::class, 'index'])->whereUuid('subject')->defaults('catalog', 'topics');
+
+        Route::get('scoring-periods', [ScoringController::class, 'periods']);
+        Route::post('me/score-calculations/preview', [ScoringController::class, 'preview']);
+        Route::get('me/score-calculations', [ScoringController::class, 'history']);
+        Route::post('me/score-calculations', [ScoringController::class, 'store']);
+        Route::post('contexts/{context}/exam-attempts/{exam}/score', [ScoringController::class, 'exam'])->whereUuid(['context', 'exam']);
+        Route::get('official-exams', [OfficialExamController::class, 'index']);
+        Route::get('official-exams/{officialExam}', [OfficialExamController::class, 'show'])->whereUuid('officialExam');
+        Route::get('questions', [QuestionController::class, 'index']);
+        Route::get('questions/{question}', [QuestionController::class, 'show'])->whereUuid('question');
+        Route::get('contexts/{context}/practice-attempts', [PracticeAttemptController::class, 'index'])->whereUuid('context');
+        Route::post('contexts/{context}/practice-attempts', [PracticeAttemptController::class, 'store'])->whereUuid('context');
+        Route::get('contexts/{context}/practice-attempts/{attempt}', [PracticeAttemptController::class, 'show'])->whereUuid(['context', 'attempt']);
+        Route::post('contexts/{context}/practice-attempts/{attempt}/answer', [PracticeAttemptController::class, 'answer'])->whereUuid(['context', 'attempt']);
+        Route::get('contexts/{context}/exam-attempts', [ExamAttemptController::class, 'index'])->whereUuid('context');
+        Route::post('contexts/{context}/exam-attempts', [ExamAttemptController::class, 'store'])->whereUuid('context');
+        Route::get('contexts/{context}/exam-attempts/{exam}', [ExamAttemptController::class, 'show'])->whereUuid(['context', 'exam']);
+        Route::get('contexts/{context}/exam-attempts/{exam}/state', [ExamAttemptController::class, 'state'])->whereUuid(['context', 'exam']);
+        Route::put('contexts/{context}/exam-attempts/{exam}/answers/{answer}', [ExamAttemptController::class, 'answer'])->whereUuid(['context', 'exam', 'answer']);
+        Route::post('contexts/{context}/exam-attempts/{exam}/answers/{answer}/report', [ExamAttemptController::class, 'report'])->whereUuid(['context', 'exam', 'answer'])->middleware('throttle:reports');
+        Route::put('contexts/{context}/exam-attempts/{exam}/position', [ExamAttemptController::class, 'position'])->whereUuid(['context', 'exam']);
+        Route::post('contexts/{context}/exam-attempts/{exam}/timer', [ExamAttemptController::class, 'timer'])->whereUuid(['context', 'exam']);
+        Route::post('contexts/{context}/exam-attempts/{exam}/finish', [ExamAttemptController::class, 'finish'])->whereUuid(['context', 'exam']);
+        Route::get('contexts/{context}/review-questions', [ReviewController::class, 'index'])->whereUuid('context');
+        Route::get('contexts/{context}/review-summary', [ReviewController::class, 'summary'])->whereUuid('context');
+        Route::put('contexts/{context}/favorites/{question}', [ReviewController::class, 'favorite'])->whereUuid(['context', 'question']);
+        Route::delete('contexts/{context}/favorites/{question}', [ReviewController::class, 'unfavorite'])->whereUuid(['context', 'question']);
+        Route::get('contexts/{context}/stats', [StatsController::class, 'show'])->whereUuid('context');
+        Route::get('me/contexts', [StudyContextController::class, 'index']);
+        Route::get('contexts/{context}', [StudyContextController::class, 'show'])->whereUuid('context');
+
+        // Verification is required for applications and organizational/administrative operations only.
         Route::middleware('email.verified')->group(function () {
-            Route::get('exam-calendar', ExamCalendarController::class);
-            Route::get('exam-calendar/next', [ExamCalendarController::class, 'next']);
-            Route::get('job-postings', [JobController::class, 'index']);
-            Route::get('job-postings/{job}', [JobController::class, 'show'])->whereUuid('job');
+            foreach (['subjects', 'topics', 'exam-types', 'question-sources'] as $catalog) {
+                Route::get('admin/'.$catalog, [CatalogController::class, 'index'])->defaults('catalog', $catalog);
+                Route::post('admin/'.$catalog, [CatalogController::class, 'store'])->defaults('catalog', $catalog);
+            }
             Route::post('job-postings/{job}/applications', [JobController::class, 'apply'])->whereUuid('job')->middleware('throttle:job-applications');
-            Route::get('me/job-applications', [JobController::class, 'applications']);
             Route::get('admin/job-postings', [AdminJobController::class, 'index']);
             Route::post('admin/job-postings', [AdminJobController::class, 'store']);
             Route::get('admin/job-postings/{job}', [AdminJobController::class, 'show'])->whereUuid('job');
             Route::patch('admin/job-postings/{job}', [AdminJobController::class, 'update'])->whereUuid('job');
             Route::get('admin/job-postings/{job}/applications', [AdminJobController::class, 'applications'])->whereUuid('job');
             Route::patch('admin/job-applications/{application}', [AdminJobController::class, 'review'])->whereUuid('application');
-
-            foreach (['subjects', 'exam-types'] as $catalog) {
-                Route::get($catalog, [CatalogController::class, 'index'])->defaults('catalog', $catalog);
-            }
-            Route::get('subjects/{subject}/topics', [CatalogController::class, 'index'])->whereUuid('subject')->defaults('catalog', 'topics');
-            foreach (['subjects', 'topics', 'exam-types', 'question-sources'] as $catalog) {
-                Route::get('admin/'.$catalog, [CatalogController::class, 'index'])->defaults('catalog', $catalog);
-                Route::post('admin/'.$catalog, [CatalogController::class, 'store'])->defaults('catalog', $catalog);
-            }
             Route::get('admin/question-stats', [AdminQuestionController::class, 'stats']);
             Route::get('admin/subjects/{subject}/exam-stats', [AdminQuestionController::class, 'subjectExamStats'])->whereUuid('subject');
             Route::get('admin/questions', [AdminQuestionController::class, 'index']);
@@ -87,11 +119,6 @@ Route::prefix('v1')->group(function () {
             Route::put('admin/official-exams/{officialExam}', [AdminOfficialExamController::class, 'update'])->whereUuid('officialExam');
             Route::put('admin/official-exams/{officialExam}/questions/{question}', [AdminOfficialExamController::class, 'updateQuestion'])->whereUuid(['officialExam', 'question']);
             Route::post('admin/official-exams/{officialExam}/publish', [AdminOfficialExamController::class, 'publish'])->whereUuid('officialExam');
-            Route::get('scoring-periods', [ScoringController::class, 'periods']);
-            Route::post('me/score-calculations/preview', [ScoringController::class, 'preview']);
-            Route::get('me/score-calculations', [ScoringController::class, 'history']);
-            Route::post('me/score-calculations', [ScoringController::class, 'store']);
-            Route::post('contexts/{context}/exam-attempts/{exam}/score', [ScoringController::class, 'exam'])->whereUuid(['context', 'exam']);
             Route::get('admin/scoring-rules', [AdminScoringController::class, 'index']);
             Route::post('admin/scoring-rules', [AdminScoringController::class, 'store']);
             Route::put('admin/scoring-rules/{rule}', [AdminScoringController::class, 'update'])->whereUuid('rule');
@@ -100,30 +127,6 @@ Route::prefix('v1')->group(function () {
             Route::put('admin/scoring-periods/{period}', [AdminScoringController::class, 'updatePeriod'])->whereUuid('period');
             Route::post('admin/scoring-periods', [AdminScoringController::class, 'period']);
             Route::put('admin/official-exams/{officialExam}/scoring', [AdminScoringController::class, 'link'])->whereUuid('officialExam');
-            Route::get('official-exams', [OfficialExamController::class, 'index']);
-            Route::get('official-exams/{officialExam}', [OfficialExamController::class, 'show'])->whereUuid('officialExam');
-            Route::get('questions', [QuestionController::class, 'index']);
-            Route::get('questions/{question}', [QuestionController::class, 'show'])->whereUuid('question');
-            Route::get('contexts/{context}/practice-attempts', [PracticeAttemptController::class, 'index'])->whereUuid('context');
-            Route::post('contexts/{context}/practice-attempts', [PracticeAttemptController::class, 'store'])->whereUuid('context');
-            Route::get('contexts/{context}/practice-attempts/{attempt}', [PracticeAttemptController::class, 'show'])->whereUuid(['context', 'attempt']);
-            Route::post('contexts/{context}/practice-attempts/{attempt}/answer', [PracticeAttemptController::class, 'answer'])->whereUuid(['context', 'attempt']);
-            Route::get('contexts/{context}/exam-attempts', [ExamAttemptController::class, 'index'])->whereUuid('context');
-            Route::post('contexts/{context}/exam-attempts', [ExamAttemptController::class, 'store'])->whereUuid('context');
-            Route::get('contexts/{context}/exam-attempts/{exam}', [ExamAttemptController::class, 'show'])->whereUuid(['context', 'exam']);
-            Route::get('contexts/{context}/exam-attempts/{exam}/state', [ExamAttemptController::class, 'state'])->whereUuid(['context', 'exam']);
-            Route::put('contexts/{context}/exam-attempts/{exam}/answers/{answer}', [ExamAttemptController::class, 'answer'])->whereUuid(['context', 'exam', 'answer']);
-            Route::post('contexts/{context}/exam-attempts/{exam}/answers/{answer}/report', [ExamAttemptController::class, 'report'])->whereUuid(['context', 'exam', 'answer'])->middleware('throttle:reports');
-            Route::put('contexts/{context}/exam-attempts/{exam}/position', [ExamAttemptController::class, 'position'])->whereUuid(['context', 'exam']);
-            Route::post('contexts/{context}/exam-attempts/{exam}/timer', [ExamAttemptController::class, 'timer'])->whereUuid(['context', 'exam']);
-            Route::post('contexts/{context}/exam-attempts/{exam}/finish', [ExamAttemptController::class, 'finish'])->whereUuid(['context', 'exam']);
-            Route::get('contexts/{context}/review-questions', [ReviewController::class, 'index'])->whereUuid('context');
-            Route::get('contexts/{context}/review-summary', [ReviewController::class, 'summary'])->whereUuid('context');
-            Route::put('contexts/{context}/favorites/{question}', [ReviewController::class, 'favorite'])->whereUuid(['context', 'question']);
-            Route::delete('contexts/{context}/favorites/{question}', [ReviewController::class, 'unfavorite'])->whereUuid(['context', 'question']);
-            Route::get('contexts/{context}/stats', [StatsController::class, 'show'])->whereUuid('context');
-            Route::get('me/contexts', [StudyContextController::class, 'index']);
-            Route::get('contexts/{context}', [StudyContextController::class, 'show'])->whereUuid('context');
             Route::get('admin/tenants', [TenantController::class, 'index']);
             Route::post('admin/tenants', [TenantController::class, 'store']);
             Route::get('tenants/{tenant}/profile', [TenantController::class, 'show'])->whereUuid('tenant');

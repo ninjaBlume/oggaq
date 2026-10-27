@@ -122,10 +122,10 @@ class ExamTest extends TestCase
         return $this->putJson($this->url($exam, '/answers/'.$row['id']), ['base_version' => $exam['revision'], 'selected_option_id' => $option === null ? null : $row['question']['options'][$option]['id']])->assertOk()->json('data');
     }
 
-    public function test_resume_position_survives_reopening_without_changing_answers_revision_or_deadline(): void
+    public function test_unverified_student_can_answer_resume_and_complete_exam(): void
     {
         $this->pool();
-        $student = $this->createUser();
+        $student = $this->createUser(['email_verified_at' => null]);
         $this->asToken($student);
         $exam = $this->answer($this->start(), 0, 0);
         $this->assertSame(1, $exam['resume_position']);
@@ -139,6 +139,8 @@ class ExamTest extends TestCase
         $this->putJson($this->url($exam, '/position'), ['position' => 4])->assertUnprocessable();
         $this->putJson($this->url($exam, '/position'), ['position' => 1.5])->assertUnprocessable();
         $done = $this->postJson($this->url($exam, '/finish'), ['base_version' => $exam['revision']])->assertOk()->json('data');
+        $this->assertNull($student->fresh()->email_verified_at);
+        $this->assertSame(1, $done['result']['correct']);
         $this->putJson($this->url($exam, '/position'), ['position' => 2])->assertOk()->assertJsonPath('data.resume_position', 3)->assertJsonPath('data.result', $done['result']);
         $this->asToken($this->createUser());
         $this->putJson($this->url($exam, '/position'), ['position' => 1])->assertNotFound();
@@ -388,7 +390,7 @@ class ExamTest extends TestCase
     public function test_unverified_or_suspended_user_cannot_start(): void
     {
         $this->pool();
-        foreach ([['email_verified_at' => null], ['status' => 'suspended']] as $attributes) {
+        foreach ([['status' => 'suspended']] as $attributes) {
             $user = $this->createUser($attributes);
             $this->asToken($user);
             $this->postJson('/api/v1/contexts/'.$user->studyContexts()->firstOrFail()->id.'/exam-attempts', ['id' => (string) Str::uuid(), 'question_count' => 1, 'duration_seconds' => 60])->assertForbidden();

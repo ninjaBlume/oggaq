@@ -26,8 +26,8 @@ class CalculateScore
     {
         return DB::transaction(function () use ($actor, $input) {
             $actor = User::whereKey($actor->id)->lockForUpdate()->firstOrFail();
-            if ($actor->status !== 'active' || ! $actor->hasVerifiedEmail()) {
-                throw new ApiProblem(403, 'forbidden', 'Puan hesabı için doğrulanmış aktif hesap gerekli.');
+            if ($actor->status !== 'active') {
+                throw new ApiProblem(403, 'forbidden', 'Puan hesabı için aktif hesap gerekli.');
             }
             $period = ScoringPeriod::with('rule')->whereKey($input['period_id'])->sharedLock()->firstOrFail();
             $existing = ExamScoreResult::where('id', $input['id'])->orWhere('operation_id', $input['id'])->with('rule')->first();

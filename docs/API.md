@@ -1,5 +1,7 @@
 # API standartları ve planlanan uç noktalar
 
+27 Ekim 2026: Öğrencinin kişisel çalışması (ders/deneme/tekrar/sonuç/puan) e-posta doğrulaması beklemez. Kayıtta otomatik doğrulama postası gönderilmez. İş başvurusu gönderimi, yönetim ve kurumsal bağlamlar için doğrulama korunur; doğrulanmamış kullanıcıya yalnız kişisel bağlam listelenir. Ayrıntılar [SECURITY](SECURITY.md) ve [MOBILE](MOBILE.md) içindedir.
+
 Durum: Identity/Tenancy/QuestionBank/Study/Exams/Scoring/Jobs için [OpenAPI sözleşmesi](openapi.json), [OpenAPI 3.1.2](https://spec.openapis.org/oas/v3.1.2.html) biçiminde oluşturuldu ve lint edildi. Sözleşme–route eşitliği otomatik testtedir. Aşağıdaki resmî sınav şablonu/export/silme/import/offline yolları ileri tasarım olarak korunur; OpenAPI'de yer almayan yollar henüz uygulanmadı. `packages/shared-types` içindeki operasyon/veri tipleri `npm run generate:api` ile üretilir; `packages/api-client` bu tiplerle cookie/CSRF taşımasını uygular. Admin ve öğrenci web bunları gerçek API'de kullanır. Mobil istemci Bearer taşır; credentials omit, cookie/CSRF webde kalır.
 
 ## Bu teslimde uygulanan yollar

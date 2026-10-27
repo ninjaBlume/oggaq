@@ -51,10 +51,10 @@ class PracticeTest extends TestCase
         return '/api/v1/contexts/'.$attempt['context_id'].'/practice-attempts/'.$attempt['id'].$suffix;
     }
 
-    public function test_personal_practice_hides_answers_until_server_grading_and_persists_history(): void
+    public function test_unverified_personal_practice_hides_answers_until_server_grading_and_persists_history(): void
     {
         $question = $this->question();
-        $this->asToken($this->createUser());
+        $this->asToken($this->createUser(['email_verified_at' => null]));
         $attempt = $this->start($question);
         $this->assertNull($attempt['feedback']);
         $this->assertArrayNotHasKey('correct_option_id', $attempt['question']);
@@ -213,10 +213,10 @@ class PracticeTest extends TestCase
         $this->assertDatabaseCount('practice_attempts', 0);
     }
 
-    public function test_unverified_and_inactive_accounts_cannot_start_practice(): void
+    public function test_inactive_accounts_cannot_start_practice(): void
     {
         $question = $this->question();
-        foreach ([['email_verified_at' => null], ['status' => 'suspended']] as $attributes) {
+        foreach ([['status' => 'suspended']] as $attributes) {
             $user = $this->createUser($attributes);
             $this->asToken($user);
             $this->postJson('/api/v1/contexts/'.$user->studyContexts()->firstOrFail()->id.'/practice-attempts', ['id' => (string) Str::uuid(), 'question_id' => $question->id, 'question_version_id' => $question->published_version_id])->assertForbidden();

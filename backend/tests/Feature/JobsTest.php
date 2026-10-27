@@ -28,6 +28,20 @@ class JobsTest extends TestCase
         return $this->postJson('/api/v1/admin/job-postings', $this->posting($extra))->assertCreated()->json('data');
     }
 
+    public function test_unverified_student_can_browse_but_must_verify_before_applying(): void
+    {
+        $job = $this->job();
+        $student = $this->createUser(['email_verified_at' => null]);
+        $this->asToken($student)->getJson('/api/v1/job-postings')->assertOk()->assertJsonCount(1, 'data');
+        $this->getJson('/api/v1/job-postings/'.$job['id'])->assertOk();
+        $this->getJson('/api/v1/me/job-applications')->assertOk()->assertJsonCount(0, 'data');
+        $this->postJson('/api/v1/job-postings/'.$job['id'].'/applications', $this->application())->assertForbidden()->assertJsonPath('code', 'email_unverified');
+        $this->assertDatabaseCount('job_applications', 0);
+        $student->forceFill(['email_verified_at' => now()])->save();
+        $this->asToken($student)->postJson('/api/v1/job-postings/'.$job['id'].'/applications', $this->application())->assertCreated();
+        $this->getJson('/api/v1/admin/job-postings')->assertForbidden();
+    }
+
     public function test_only_platform_admin_can_manage_jobs_and_view_applications(): void
     {
         $job = $this->job();

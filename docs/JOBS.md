@@ -12,7 +12,7 @@
 
 ## Yetki ve veri modeli
 
-Jobs kişisel kullanıcı kimliğine bağlıdır; `study_context_id` veya tenant sahipliği kullanmaz. Çalışma alanı değişimi başvuru sahipliğini değiştirmez. Aktif ve e-postası doğrulanmış kullanıcılar ilan görebilir/başvurabilir. Yalnız platform yöneticisi (`JobPostingPolicy::manage`) ilanları veya başvuru değerlendirmelerini yönetebilir; kurum yöneticiliği bu yetkiyi vermez. Öğrenci API'si başkalarının başvurularını, başvuru sayılarını veya iletişim bilgilerini döndürmez.
+Jobs kişisel kullanıcı kimliğine bağlıdır; `study_context_id` veya tenant sahipliği kullanmaz. Çalışma alanı değişimi başvuru sahipliğini değiştirmez. Aktif kullanıcılar ilanları görebilir ve kendi başvurularını okuyabilir. Başvuru göndermek için e-posta doğrulaması gerekir; kod yalnız başvuru formunda kullanıcının isteğiyle gönderilir. Yalnız platform yöneticisi (`JobPostingPolicy::manage`) ilanları veya başvuru değerlendirmelerini yönetebilir; kurum yöneticiliği bu yetkiyi vermez. Öğrenci API'si başkalarının başvurularını, başvuru sayılarını veya iletişim bilgilerini döndürmez.
 
 `2026_10_24_000004_create_jobs_tables` migration'ı:
 
@@ -29,7 +29,7 @@ Kişisel başvurular mevcut hesap dışa aktarmasına dahil edilir ve hesap sili
 
 ## API
 
-Sözleşme ve ortak tipler [openapi.json](openapi.json) üzerinden üretilir. Tüm uçlar oturum/Bearer kimliği, aktif hesap ve e-posta doğrulaması gerektirir.
+Sözleşme ve ortak tipler [openapi.json](openapi.json) üzerinden üretilir. Tüm uçlar oturum/Bearer kimliği ve aktif hesap gerektirir. Başvuru gönderimi ve yönetim uçları ayrıca e-posta doğrulaması ister.
 
 | Yöntem / yol (`/api/v1`) | Amaç |
 | --- | --- |

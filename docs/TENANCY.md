@@ -1,5 +1,7 @@
 # Multi-tenant erişim modeli
 
+27 Ekim 2026: Öğrencinin kişisel çalışması (ders/deneme/tekrar/sonuç/puan) e-posta doğrulaması beklemez. Kayıtta otomatik doğrulama postası gönderilmez. İş başvurusu gönderimi, yönetim ve kurumsal bağlamlar için doğrulama korunur; doğrulanmamış kullanıcıya yalnız kişisel bağlam listelenir. Ayrıntılar [SECURITY](SECURITY.md) ve [MOBILE](MOBILE.md) içindedir.
+
 Durum: Identity/Tenancy policy, middleware, scoped sorgu, transaction denetimi ve PostgreSQL testleri uygulanmıştır. Mevcut uçlar kurum oluşturma, üyelik oluşturma/iptal, üye listesi/detail ve kullanıcının kendi bağlamlarıdır. Rapor, export, cache'lenmiş tenant veri ve tenant queue işi henüz yoktur; aşağıdaki bu kapsamlara ilişkin kurallar gelecekteki gereksinimlerdir. Ortak PostgreSQL veritabanı ve ortak merkezi soru bankası kullanılır.
 
 ## Çalışma bağlamı

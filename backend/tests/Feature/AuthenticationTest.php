@@ -42,7 +42,7 @@ class AuthenticationTest extends TestCase
         $this->assertStringStartsWith('$argon2id$', $user->password);
         $this->assertNull($user->email_verified_at);
         $this->assertDatabaseHas('study_contexts', ['user_id' => $user->id, 'tenant_id' => null, 'membership_id' => null]);
-        Notification::assertSentTo($user, VerifyEmailNotification::class);
+        Notification::assertNothingSent();
     }
 
     public function test_registration_rejects_role_and_tenant_injection(): void
@@ -187,12 +187,12 @@ class AuthenticationTest extends TestCase
         $this->assertNull($user->fresh()->email_verified_at);
     }
 
-    public function test_unverified_user_can_resend_but_cannot_use_tenant_contexts(): void
+    public function test_unverified_user_can_request_code_and_use_personal_context(): void
     {
         $user = $this->createUser(['email_verified_at' => null]);
         $this->asToken($user)->postJson('/api/v1/auth/email-verification-notification')->assertOk();
         Notification::assertSentTo($user, VerifyEmailNotification::class);
-        $this->getJson('/api/v1/me/contexts')->assertForbidden()->assertJsonPath('code', 'email_unverified');
+        $this->getJson('/api/v1/me/contexts')->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.tenant_id', null);
     }
 
     public function test_password_reset_has_generic_response_for_missing_account(): void

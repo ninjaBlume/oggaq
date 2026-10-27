@@ -254,14 +254,14 @@ class StudyInsightsTest extends TestCase
         $this->review('blank', $context)->assertOk()->assertJsonCount(0, 'data');
     }
 
-    public function test_new_endpoints_require_a_verified_active_user_and_valid_input(): void
+    public function test_personal_insights_allow_unverified_user_and_validate_input(): void
     {
         $this->pool();
         $unverified = $this->createUser(['email_verified_at' => null]);
         $this->asToken($unverified);
         $context = $unverified->studyContexts()->firstOrFail()->id;
-        $this->getJson('/api/v1/contexts/'.$context.'/stats')->assertForbidden();
-        $this->review('incorrect', $context)->assertForbidden();
+        $this->getJson('/api/v1/contexts/'.$context.'/stats')->assertOk();
+        $this->review('incorrect', $context)->assertOk();
         $this->asToken($this->createUser());
         $this->getJson('/api/v1/contexts/'.$this->context().'/review-questions')->assertUnprocessable()->assertJsonValidationErrors('kind');
         $this->review('everything')->assertUnprocessable();

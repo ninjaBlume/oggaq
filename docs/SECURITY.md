@@ -1,11 +1,16 @@
 # Güvenlik, kişisel veri ve mevzuat
 
+## 27 Ekim 2026: kişisel çalışma erişimi
+
+Kullanıcı kararıyla aktif, giriş yapmış öğrencinin kişisel çalışması e-posta doğrulaması beklemez. Kayıt doğrulama e-postası göndermez; doğrulanmış hesap rozeti sunulmaz. Bu, adresin sahibini doğrulamış saymak değildir: `email_verified_at` boş kalır. İş başvurusu gönderimi, tüm yönetim/tenant uçları ve kurumsal çalışma bağlamları doğrulama gerektirir. Bağlam listesi doğrulanmamış kullanıcıya yalnız kişisel bağlamını döndürür; kurumsal kimliği tahmin etmek policy denetimini aşmaz. Askıya alınmış hesap, rol/sahiplik kontrolleri, CSRF ve mevcut hız sınırları korunur. Parola sıfırlama ve e-posta değişimindeki sahiplik kanıtı kaldırılmadı.
+
+
 
 27 Ekim 2026 kullanıcı kararı: yeni parola alt sınırı **8 karakter**, üst sınır 128; büyük/küçük harf, rakam, simge ve doğrulama tekrarı şartları sürer. Ortak kayıt/sıfırlama/değiştirme doğrulaması ve yönetici oluşturma komutu aynı alt sınırı uygular. Mevcut hesapların parolaları değiştirilmedi.
 
 ## 27 Ekim 2026: uygulama içi e-posta onayı
 
-E-posta kodu parola yerine giriş veya token üretimi için kullanılmaz. `POST /api/v1/auth/email-verification-code` aktif, giriş yapmış ve `api:access` yetkili hesabın yalnız kendi mevcut adresini doğrular. Altı hane kriptografik `random_int` ile üretilir; süre 10 dakika, kod başına en çok 5 yanlış tahmin, hesap başına kod kontrolü dakikada 10 istektir. Yeniden gönderim en az 60 saniye aralıklı ve saatte en çok 10'dur; yeni kod eskisini geçersizleştirir. Süresi geçmiş/yenilenmiş veya zaten doğrulanmış hesap için kuyrukta kalan kod postası gönderilmez. Hatalı tahminler transaction dışında fırlatılan hata sayesinde geri alınmaz. Yetkisiz ve doğrulanmamış içerik erişimi önceki middleware'lerle korunur.
+E-posta kodu parola yerine giriş veya token üretimi için kullanılmaz. `POST /api/v1/auth/email-verification-code` aktif, giriş yapmış ve `api:access` yetkili hesabın yalnız kendi mevcut adresini doğrular. Altı hane kriptografik `random_int` ile üretilir; süre 10 dakika, kod başına en çok 5 yanlış tahmin, hesap başına kod kontrolü dakikada 10 istektir. Yeniden gönderim en az 60 saniye aralıklı ve saatte en çok 10'dur; yeni kod eskisini geçersizleştirir. Süresi geçmiş/yenilenmiş veya zaten doğrulanmış hesap için kuyrukta kalan kod postası gönderilmez. Hatalı tahminler transaction dışında fırlatılan hata sayesinde geri alınmaz. İş başvurusu, yönetim ve kurumsal işlemler e-posta doğrulamasıyla korunur.
 
 Kod DB'de kullanıcı+e-posta ile bağlanmış HMAC olarak tutulur; düz kod yalnız mevcut şifreli, commit sonrası bildirim kuyruğundan geçer. Kod/token/parola uygulama loglarına eklenmedi. Eski imzalı doğrulama yolu kimlik ve imza denetimleriyle korunur. Tasarım kaynakları: [Laravel e-posta doğrulama](https://laravel.com/framework/docs/13.x/verification), [Laravel commit sonrası kuyruk bildirimi](https://laravel.com/framework/docs/13.x/notifications#queued-notifications-and-database-transactions). Bu bir kimlik güvencesi veya mevzuat uygunluğu sertifikasyonu değildir.
 

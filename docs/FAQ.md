@@ -4,7 +4,7 @@
 
 ## Uygulanan düzen
 
-Menüde **Sıkça Sorulan Sorular** vardır; ana alt sekmelerin sayısı değişmez. Sayfa, iki grupta 17 özgün soru/yanıt içerir. Aynı anda tek yanıt açılır; klavye ve ekran okuyucu için düğme/açık durum bilgisi kullanılır. Mevcut büyük yazı, açık/koyu tema ve tablet düzeni korunur. İçerik yereldir; ekranı açmak veya yanıtları okumak yeni API isteği, yükleme beklemesi veya yeni veritabanı gerektirmez. Bu, sınavların çevrimdışı çalıştığı anlamına gelmez.
+Menüde **Sıkça Sorulan Sorular** vardır; ana alt sekmelerin sayısı değişmez. Sayfa, iki grupta 18 özgün soru/yanıt içerir. Aynı anda tek yanıt açılır; klavye ve ekran okuyucu için düğme/açık durum bilgisi kullanılır. Mevcut büyük yazı, açık/koyu tema ve tablet düzeni korunur. İçerik yereldir; ekranı açmak veya yanıtları okumak yeni API isteği, yükleme beklemesi veya yeni veritabanı gerektirmez. Bu, sınavların çevrimdışı çalıştığı anlamına gelmez.
 
 Profilde **Yasal ve destek** başlığı ve dört büyük bağlantı kartı kaldırıldı. **Gizlilik Politikası** ve **Kullanım Koşulları** küçük, en az 44 birim dokunma alanlı bağlantılar olarak profilde kalır. Hesap silme işlemi **Profil → Hesabım → Hesabı sil** içinde korunur; SSS sonunda dış hesap silme yardım bağlantısı da vardır. Destek iletişimi SSS sonundaki **Destek ekibine yaz** düğmesi ve merkezi marka e-postası üzerinden sunulur. E-posta uygulaması açılmazsa görünür hata/yeniden deneme ve yazılı adres vardır. Resmî kurum bağlantısı bulunmadığı notu SSS sonunda korunur. Giriş/kayıt bağlantıları ve sunucudaki yasal sayfalar değişmez.
 

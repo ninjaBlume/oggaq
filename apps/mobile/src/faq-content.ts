@@ -19,6 +19,7 @@ export const faqGroups = [
   {
     title: "Uygulama ve hesap",
     items: [
+      { id: "registration", question: "Soru çözmek için e-postamı doğrulamam gerekiyor mu?", answer: "Hayır. Hesabını oluşturduktan sonra doğrudan ders ve deneme sınavlarına başlayabilirsin. E-posta doğrulaması yalnız iş başvurusu ve kurumsal/yönetim işlemlerinde istenir." },
       { id: "connection", question: "İnternet olmadan soru çözebilir miyim?", answer: "Şu an sınav başlatmak, cevapları kaydetmek ve sonuçları almak için internet bağlantısı gerekir. Bağlantı kesildiğinde kaydedildiği doğrulanmamış yanıtları kayıtlı kabul etme; bağlantı gelince ekrandaki yeniden deneme seçeneğini kullan." },
       { id: "devices", question: "Telefon ve tabletimde aynı hesabı kullanabilir miyim?", answer: "Evet. Aynı hesapla giriş yaptığında sunucuya kaydedilmiş sınavlarını ve sonuçlarını görebilirsin. Aynı sınavı iki cihazda aynı anda çözmek yerine bir cihazdan devam et; henüz kaydedilmemiş işlemler diğer cihaza geçmez." },
       { id: "text", question: "Yazıları büyütebilir ve görünümü değiştirebilir miyim?", answer: "Profil bölümünden Küçük, Standart veya Büyük yazı boyutunu seçebilirsin. Aynı yerde açık, koyu veya cihazının görünümüne uygun tema tercihini de değiştirebilirsin." },

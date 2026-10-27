@@ -5,6 +5,7 @@ import type { components, User } from '@oggaq/shared-types';
 import { ApiError, cursorFromLink } from '@oggaq/api-client';
 import { jobApplicationStatusLabels, jobWeaponLabels, jobApplicationNotice } from '@oggaq/study-core';
 import { api } from './api';
+import { Verify } from './auth';
 import { useResource, useTask } from './hooks';
 import { Badge, Button, Card, EmptyState, ErrorNotice, Field, Loading, ScreenTitle, TextLink } from './ui';
 import { Briefcase } from './icons';
@@ -14,13 +15,13 @@ type Application = components['schemas']['JobApplication'];
 type Input = components['schemas']['ApplyForJobInput'];
 const date = (value: string) => new Intl.DateTimeFormat('tr-TR', { dateStyle: 'medium' }).format(new Date(value));
 
-export function Jobs({ user }: { user: User }) {
+export function Jobs({ user, refresh }: { user: User; refresh: () => void }) {
   const [tab, setTab] = useState<'jobs' | 'applications'>('jobs');
   const [selected, setSelected] = useState<string | null>(null);
   function change(next: typeof tab) { setSelected(null); setTab(next); }
   return <><ScreenTitle title="İş İlanları" subtitle="ÖGG ilanlarını incele, başvur ve başvurularını takip et." />
     <View style={{ flexDirection: 'row', gap: 8 }}><View style={{ flex: 1 }}><Button compact secondary={tab !== 'jobs'} onPress={() => change('jobs')}>İlanlar</Button></View><View style={{ flex: 1 }}><Button compact secondary={tab !== 'applications'} onPress={() => change('applications')}>Başvurularım</Button></View></View>
-    {selected ? <JobDetail key={selected} id={selected} user={user} back={() => setSelected(null)} applications={() => change('applications')} /> : tab === 'jobs' ? <JobList open={setSelected} /> : <MyApplications userId={user.id} />}
+    {selected ? <JobDetail key={selected} id={selected} user={user} refresh={refresh} back={() => setSelected(null)} applications={() => change('applications')} /> : tab === 'jobs' ? <JobList open={setSelected} /> : <MyApplications userId={user.id} />}
   </>;
 }
 function JobList({ open }: { open: (id: string) => void }) {
@@ -31,16 +32,17 @@ function JobList({ open }: { open: (id: string) => void }) {
   const page = jobs.data!;
   return <>{page.data.length === 0 ? <EmptyState icon={Briefcase} title="Henüz açık iş ilanı yok" message="Yayımlanan ÖGG ilanları burada görünecek." /> : page.data.map((job) => <Card key={job.id} tone="blue"><Text accessibilityRole="header" style={styles.heading}>{job.title}</Text><Text style={styles.muted}>{job.company_name} · {job.city}</Text><Text style={styles.text}>{jobWeaponLabels[job.weapon_requirement]}</Text>{job.expires_at && <Text style={styles.muted}>Son başvuru: {date(job.expires_at)}</Text>}{job.application_status && <Badge>{jobApplicationStatusLabels[job.application_status]}</Badge>}<Button secondary onPress={() => open(job.id)}>İlanı incele</Button></Card>)}<View style={styles.row}><Button compact secondary disabled={!page.links.prev} onPress={() => setCursor(cursorFromLink(page.links.prev))}>Önceki ilanlar</Button><Button compact secondary disabled={!page.links.next} onPress={() => setCursor(cursorFromLink(page.links.next))}>Sonraki ilanlar</Button></View></>;
 }
-function JobDetail({ id, user, back, applications }: { id: string; user: User; back: () => void; applications: () => void }) {
+function JobDetail({ id, user, refresh, back, applications }: { id: string; user: User; refresh: () => void; back: () => void; applications: () => void }) {
   const { styles } = useTheme();
   const job = useResource((signal) => api.request('get', '/api/v1/job-postings/{job}', { signal, params: { job: id } }), [id]);
-  return <><TextLink onPress={back}>İlanlara dön</TextLink>{job.loading ? <Loading /> : job.error ? <ErrorNotice error={job.error} retry={() => { void job.reload(); }} /> : <><Card tone="blue"><Text accessibilityRole="header" style={styles.heading}>{job.data!.data.title}</Text><Text style={styles.muted}>{job.data!.data.company_name} · {job.data!.data.city}</Text><Text style={styles.text}>{jobWeaponLabels[job.data!.data.weapon_requirement]}</Text>{job.data!.data.expires_at && <Text style={styles.muted}>Son başvuru: {date(job.data!.data.expires_at!)}</Text>}<Text style={styles.text}>{job.data!.data.description}</Text></Card><ApplicationForm job={job.data!.data} user={user} applications={applications} /></>}</>;
+  return <><TextLink onPress={back}>İlanlara dön</TextLink>{job.loading ? <Loading /> : job.error ? <ErrorNotice error={job.error} retry={() => { void job.reload(); }} /> : <><Card tone="blue"><Text accessibilityRole="header" style={styles.heading}>{job.data!.data.title}</Text><Text style={styles.muted}>{job.data!.data.company_name} · {job.data!.data.city}</Text><Text style={styles.text}>{jobWeaponLabels[job.data!.data.weapon_requirement]}</Text>{job.data!.data.expires_at && <Text style={styles.muted}>Son başvuru: {date(job.data!.data.expires_at!)}</Text>}<Text style={styles.text}>{job.data!.data.description}</Text></Card><ApplicationForm job={job.data!.data} user={user} applications={applications} refresh={refresh} back={back} /></>}</>;
 }
-function ApplicationForm({ job, user, applications }: { job: Job; user: User; applications: () => void }) {
+function ApplicationForm({ job, user, applications, refresh, back }: { job: Job; user: User; applications: () => void; refresh: () => void; back: () => void }) {
   const { palette, styles } = useTheme(); const [sent, setSent] = useState(false);
   const [input, setInput] = useState<Input>({ contact_name: user.name, contact_email: user.email, phone: '', cover_letter: '' });
   const task = useTask<{ data: Application }>();
   if (sent || job.application_id) return <Card tone="blue"><Text accessibilityRole="header" style={styles.heading}>{sent ? 'Başvurun alındı.' : 'Bu ilana başvurdun.'}</Text><Text style={styles.muted}>Başvurunun durumunu Başvurularım bölümünden takip edebilirsin.</Text><Button secondary onPress={applications}>Başvurularımı gör</Button></Card>;
+  if (!user.email_verified_at) return <Verify user={user} verified={refresh} refresh={refresh} cancel={back} />;
   const errors = task.error instanceof ApiError ? task.error : null;
   function submit() { void task.run(() => api.request('post', '/api/v1/job-postings/{job}/applications', { params: { job: job.id }, body: input }), () => setSent(true)); }
   const fields = [{ key: 'contact_name', label: 'Ad soyad', max: 100 }, { key: 'contact_email', label: 'E-posta adresi', max: 254 }, { key: 'phone', label: 'Telefon', max: 30 }, { key: 'cover_letter', label: 'Kısa ön yazı (isteğe bağlı)', max: 2000 }] as const;

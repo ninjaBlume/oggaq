@@ -35,7 +35,7 @@ export interface paths {
         put?: never;
         /**
          * Bireysel hesap ve kişisel bağlam oluşturma
-         * @description Rol, tenant ve doğrulama alanları gönderilemez. Otomatik giriş yapılmaz; doğrulama e-postası kuyruğa alınır.
+         * @description Rol, tenant ve doğrulama alanları gönderilemez. Kayıt oturum üretmez; istemci giriş uç noktasını çağırır. Kişisel çalışmalar e-posta doğrulaması beklemez. Kayıtta doğrulama postası gönderilmez; iş başvurusu ve kurumsal/yönetim işlemlerinde gerektiğinde istenir.
          */
         post: operations["register"];
         delete?: never;
@@ -155,7 +155,7 @@ export interface paths {
         put?: never;
         /**
          * Doğrulama e-postasını tekrar gönderme
-         * @description Mevcut e-postaya yeni 6 haneli doğrulama kodu ve tarayıcı bağlantısı gönderir. En az 60 saniye ara gerekir; önceki kod geçersiz olur. Kod 10 dakika geçerlidir.
+         * @description İş başvurusu veya kurumsal/yönetim işlemi için kullanıcının açık isteğiyle mevcut e-postaya 6 haneli doğrulama kodu ve tarayıcı bağlantısı gönderir. En az 60 saniye ara gerekir; önceki kod geçersiz olur. Kod 10 dakika geçerlidir.
          */
         post: operations["resendVerification"];
         delete?: never;

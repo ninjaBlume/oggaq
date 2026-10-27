@@ -13,7 +13,6 @@ import {
 import type { StudyContext, User } from "@oggaq/shared-types";
 import brand from "../../../config/brand.json";
 import {
-  Badge,
   Button,
   Card,
   ErrorNotice,
@@ -75,7 +74,6 @@ export function Profile({
           </Text> : <UserRound size={32} color={palette.primary} />}
         </View>
         <Text testID="profile-full-name" style={[styles.heading, { fontSize: 22, textAlign: "center", alignSelf: "stretch" }]}>{displayPersonName(user.name)}</Text>
-        <Badge tone="success">E-posta doğrulandı</Badge>
       </View>
       <SectionTitle>Hesap bilgilerin</SectionTitle>
       <Card tone="blue">

@@ -5,11 +5,13 @@
 
 Kayıt ve Hesabım açıklamaları sunucuyla birlikte en az **8 karakter** olarak güncellendi. Parola değiştirme/sıfırlama ve webdeki yeni parola alanları da aynı sınırdadır. iOS **01a17d42**, Android **01a17d43** beta OTA yayımlandı; native paket sürümü 0.1.1 korunur. Cihazın paketi alması ayrıca teyit edilmelidir.
 
-## 27 Ekim 2026: uygulama içinde tek kayıt ve doğrulama akışı
+## 27 Ekim 2026: doğrudan öğrenci erişimi
 
-Kayıt formu başarılı olduğunda mevcut mobil token ucu ile otomatik oturum açılır; kullanıcı tekrar giriş formuna gönderilmez. E-postadaki **6 haneli kod**, uygulamadaki **Doğrula ve başla** alanına girilir ve aynı oturumla ana sayfa açılır. iOS/Android tek kullanımlık kod otomatik doldurma ve boşluk içeren kod yapıştırma desteklenir. Kod 10 dakika geçerlidir; yeni kod en erken 60 saniyede, saatte en çok 10 gönderimle istenir. Doğrulama beklerken içerik erişimi sunucuda kapalı kalır.
+Kayıt sonrasında mobil token alınır ve öğrenci doğrudan ana sayfaya girer. Ders, deneme, tekrar, kişisel sonuçlar ve puan hesaplama e-posta doğrulaması beklemez. Kayıtta doğrulama postası/kodu üretilmez. Profilde doğrulanmış hesap rozeti yoktur; gerçek doğrulama durumu veritabanında korunur.
 
-Kayıt başarılı olup token alma/saklama başarısız olursa hesap yeniden oluşturulmaz; mevcut e-posta ile girişten devam edilir. Native oturum SecureStore'da korunur; web test önizlemesindeki token yalnız bellektedir, sayfa yenilenmesi native yeniden açılış doğrulaması sayılmaz. Eski imzalı tarayıcı bağlantısı uyum için korunur. Bu yeni akış Expo/Device Hub kaynaklarında hazırdır; kullanıcı isteğiyle iOS 01a17d36 ve Android 01a17d37 OTA yayımlandı. Cihaz alımı/yeni kayıt teyidi beklenir. Doğrulama sonrasında, doğrulanmadan önceki açılıştan kalan bağlam ön yüklemesi temizlenir. Doğrulamalar ve API yayını [TESTING](TESTING.md) içindedir.
+İlanları incelemek serbesttir; yalnız başvuru formunda e-posta doğrulaması istenir. Öğrenci **Doğrulama kodu gönder** ile istekte bulunur; 6 haneli kodu aynı oturumda girince başvuru formuna döner. Kurumsal bağlamlar ve yönetim işlemleri doğrulanmış e-posta gerektirir. İmzalı bağlantılar ve güvenli e-posta değiştirme akışı korunur. Kod 10 dakika geçerli, yeniden gönderim en erken 60 saniye; tahmin ve gönderim limitleri değişmez.
+
+Kayıt başarılı olup token alma/saklama başarısız olursa hesap yeniden oluşturulmaz; mevcut hesapla girişten devam edilir. Native oturum SecureStore'da korunur; web test önizlemesindeki token yalnız bellektedir. Dağıtım ve cihaz teyidi [TESTING](TESTING.md) içindedir.
 
 
 ## 27 Ekim 2026: Ders sınavlarında Temel/Yenileme ayrımı

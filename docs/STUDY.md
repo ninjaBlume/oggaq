@@ -1,5 +1,7 @@
 # Tek soru alıştırması — uygulanmış akış
 
+27 Ekim 2026: Öğrencinin kişisel çalışması (ders/deneme/tekrar/sonuç/puan) e-posta doğrulaması beklemez. Kayıtta otomatik doğrulama postası gönderilmez. İş başvurusu gönderimi, yönetim ve kurumsal bağlamlar için doğrulama korunur; doğrulanmamış kullanıcıya yalnız kişisel bağlam listelenir. Ayrıntılar [SECURITY](SECURITY.md) ve [MOBILE](MOBILE.md) içindedir.
+
 Study modülü ve [öğrenci web uygulaması](../apps/web/README.md) yayımlanmış merkezi soruyu açma, cevap/boş bırakma, sunucu değerlendirmesi ve kişisel/kurum bağlamında geçmiş sunar. Süreli çok sorulu sınav, resmî kural/puanlama ve istatistik değildir. Gerçek kaynak verisi aktarılmadı.
 
 ## Kalıcı kayıt ve sürüm
