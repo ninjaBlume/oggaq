@@ -108,7 +108,7 @@ function ExamEntry({
   const locked = task.pending || (submission.current !== null && !(task.error instanceof ApiError && ([409, 422].includes(task.error.status) || task.error.problem.code === 'timer_unavailable')));
   const valid = Number(minutes) >= 1 && Number(minutes) <= 180;
   return (
-    <View testID="official-exam-entry" style={{ paddingHorizontal: 12, paddingVertical: 10, gap: 6, borderRadius: shape.control, backgroundColor: tint.surface, borderWidth: 1, borderColor: progress.open && !expired ? palette.primary : tint.line }}>
+    <View testID="official-exam-entry" style={{ paddingHorizontal: 12, paddingVertical: 6, gap: 4, borderRadius: shape.control, backgroundColor: tint.surface, borderWidth: 1, borderColor: progress.open && !expired ? palette.primary : tint.line }}>
       <Text accessibilityRole="header" style={[styles.heading, { fontSize: 16, lineHeight: 22 }]}>{title}</Text>
       <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
         <View style={{ flexGrow: 1, flexBasis: 120, gap: 2 }}>
@@ -287,7 +287,7 @@ export function ExamList({
       ) : (
         <>
           <ErrorNotice title="Önceki sınav bilgilerin yüklenemedi" error={attempts.error} retry={() => void attempts.reload()} />
-          <Columns>
+          <View style={{ gap: 10 }}><Columns>
             {list.map((exam) => (
               <ExamEntry
                 key={exam.id}
@@ -298,7 +298,7 @@ export function ExamList({
                 open={open}
               />
             ))}
-          </Columns>
+          </Columns></View>
         </>
       )}
     </>

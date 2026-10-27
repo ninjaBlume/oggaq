@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## 27 Ekim 2026 — Sınav kartlarında ikinci yoğunluk ayarı
+
+Kullanıcının biraz daha kısa kart isteğiyle yalnız Deneme/Ders ortak kartının dikey iç boşluğu **10 → 6 px**, başlık/bilgi aralığı **6 → 4 px** yapıldı. Tek sütun kartlar ayrı bir grup içinde **20 → 10 px** aralıkla gösterilir; iki sütunlu tablet düzeni korunur. Başlık/metin boyutları, içerik, 44 px eylemler, doğal yükseklik ve açılır süre/çıkış formu değişmez.
+
+**57 mobil birim testi, workspace strict TypeScript, Expo web QA export ve 12 ilgili E2E geçti.** Eğitim seçimi, Deneme/Ders başlatma ve devam, aktif formu koruyan yazı tercihi, küçük telefon/tablet, açık/koyu ve Büyük yazı kontrol edildi. Standart sentetik kartlar 320/390/834 px'de en çok 110 px ve düğmeler en az 44 px olarak doğrulandı. Yeni ekran görüntüsü ve Device Hub iPhone 18 Pro / iOS 27 Expo Go Ders listesi gözle incelendi; bu tur native etkileşim veya gerçek sınav kaydı oluşturulmadı. Android native/fiziksel cihaz teyidi yapılmadı. Backend/API/veritabanı değişmedi; PHPUnit/Composer ve geniş E2E matrisi tekrar çalıştırılmadı. E2E yalnız `oggaq_test` ve 8001/5183/5184/5186 portlarında, başka test süreci yokken çalıştı. Kanıtlar `artifacts/denser-exam-cards/`; native runtime'lar aynı kaldı. Beta dağıtımı ayrıca kaydedilir.
+
 ## 27 Ekim 2026 — Profil kısayolunun kaldırılması ve kompakt sınav kartları
 
 Mobil header profil düğmesi/baş harfleri kaldırıldı; Profil alt sekmede ve tablette gezinme rayında korunur. Marka menü ile aynı genişlikte etkileşimsiz sağ boşluk sayesinde ortada kalır. Deneme/Ders ortak kartı tam başlık, kısa dönem/soru/süre bilgisi ve sağda eylemle düzenlendi; büyük ikon ve “Henüz girmedin” satırı kaldırıldı. Var olan denemede devam/duraklatıldı/süre sonu, tamamlanan denemede önceki başarı bilgisi korunur. Süre/çıkış tercihi formu açılınca genişler. Sayı ve birimi bölünmeyen boşlukla birlikte tutulur; sabit yükseklik/kırpma yoktur.

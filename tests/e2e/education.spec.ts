@@ -24,7 +24,7 @@ for (const mobile of [false, true]) {
    await expect(page.getByRole('heading',{name:'1. Temel Eğitim Sınav Soruları',exact:true})).toBeVisible();
    if (mobile) {
     const card = page.locator('[data-testid="official-exam-entry"]:visible').first();
-    expect((await card.boundingBox())!.height).toBeLessThanOrEqual(140);
+    expect((await card.boundingBox())!.height).toBeLessThanOrEqual(110);
     expect((await card.getByRole('button',{name:'Sınava gir',exact:true}).boundingBox())!.height).toBeGreaterThanOrEqual(44);
     await expect(card.getByText('Henüz girmedin',{exact:true})).toHaveCount(0);
    }
@@ -69,7 +69,7 @@ for (const mobile of [false, true]) {
    if (mobile) {
     const card = page.locator('[data-testid="official-exam-entry"]:visible').first();
     await expect(card.getByRole('heading')).toBeVisible();
-    expect((await card.boundingBox())!.height).toBeLessThanOrEqual(140);
+    expect((await card.boundingBox())!.height).toBeLessThanOrEqual(110);
     expect((await card.getByRole('button',{name:'Sınava gir',exact:true}).boundingBox())!.height).toBeGreaterThanOrEqual(44);
    }
    if (mobile) {
