@@ -1,6 +1,6 @@
 # iPhone ve iPad için kapalı beta
 
-**Son küçük güncelleme — 27 Ekim 2026:** Arka plandan dönüşte zaman aşımı kontrolü ve profil güncelleme denetimi; kaynak `929e8fe`, `testflight` / `01a17afb-12db-7093-9e59-1a88537d62c9` (grup `35b7e7a3-0faa-4eb0-a0b2-d8fa0247248f`). Önceki native runtime korunur. Kullanıcının bildirdiği eski güncelleme kimliği ve native istek başlıklarıyla endpoint doğru yeni paketi verdi; native launch asset isteği 200, launch asset ve tüm ek dosyaların SHA256 değerleri eşleşti. Yeni sürümün telefonda çalıştığı henüz teyit edilmedi; ilk geçiş için tam kapatma/açma testi kullanıcıya iletildi.
+**Son küçük güncelleme — 27 Ekim 2026:** Arka plandan dönüşte zaman aşımı kontrolü ve profil güncelleme denetimi; kaynak `929e8fe`, `testflight` / `01a17afb-12db-7093-9e59-1a88537d62c9` (grup `35b7e7a3-0faa-4eb0-a0b2-d8fa0247248f`). Önceki native runtime korunur. Kullanıcının bildirdiği eski güncelleme kimliği ve native istek başlıklarıyla endpoint doğru yeni paketi verdi; native launch asset isteği 200, launch asset ve tüm ek dosyaların SHA256 değerleri eşleşti. Kullanıcı yeni iOS kodunu ve güncelleme bölümünü gördüğünü teyit etti. Android aynı kontrolde eski kodda kaldı; Android için ayrı native Dahili Test paketi hazırlanıyor.
 
 ## Uygulama içinden güncelleme
 
