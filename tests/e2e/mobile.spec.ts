@@ -695,7 +695,7 @@ test("liste beklerken iskelet gösterir, hata sonrası yeniden deneme gerçek li
   await page.getByRole("tab", { name: "Deneme", exact: true }).click();
   await expect(page.getByRole("progressbar", { name: "Sınavlar yükleniyor", exact: true })).toBeVisible();
   release();
-  await expect(page.getByRole("alert")).toContainText("Sınavlar yüklenemedi");
+  await expect(page.getByRole("alert")).toContainText("Bağlantı yenilenemedi");
   await expect(page.getByRole("alert")).toContainText("Sınav hizmeti geçici olarak kullanılamıyor.");
   fail = false;
   await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();

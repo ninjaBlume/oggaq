@@ -293,6 +293,7 @@ function Workspace({
       return (await api.request("get", "/api/v1/me/contexts", { signal })).data;
     },
     [user.id],
+    true, { manageResume: false },
   );
   const verification = useRef(user.email_verified_at);
   useEffect(() => {
@@ -319,7 +320,7 @@ function Workspace({
             <Loading />
           ) : query.error ? (
             <ErrorNotice
-              error={query.error}
+              error={query.error} read
               retry={() => {
                 void query.reload();
               }}
@@ -348,7 +349,7 @@ function Workspace({
       <SafeAreaView style={styles.shell}>
         <View style={body}>
           <ErrorNotice
-            error={query.error}
+            error={query.error} read
             retry={() => {
               void query.reload();
             }}
@@ -361,7 +362,7 @@ function Workspace({
     );
   return (
     <View style={styles.shell}>
-    {query.error && !connectionWarning ? <ConnectionNotice retry={() => void query.reload(true)} /> : null}
+    {(query.error || query.refreshError) && !connectionWarning ? <ConnectionNotice retry={() => void query.reload(true)} /> : null}
     <NavigationContainer
       key={`${user.id}-${context.id}`}
       theme={navigationTheme}
@@ -509,6 +510,7 @@ function Application() {
         >
           <ErrorNotice
             error={error ?? task.error}
+            read={!task.error}
             retry={() => {
               if (task.error) logout();
               else if (session.token) void refresh();

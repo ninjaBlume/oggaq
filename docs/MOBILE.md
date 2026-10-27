@@ -322,3 +322,14 @@ Cevap yazmaları küçük kanonik seçim yanıtını kullanır; aynı sabit soru
 Yan menüde Sınav takvimi vardır; beş ana sekmenin sırası korunur, İş İlanları en altta kalır. Yıl seçimi, Temel/Yenileme çiftleri, eğitim bitişi, resmî kaynak bağlantısı ve güncel/eski/hazır değil durumları gerçek Calendar API'sine bağlıdır. API veriyi saklanan snapshot'tan okur; mobil cihazda kazıma veya zamanlayıcı yoktur. [Takvim işletimi](EXAM_CALENDAR.md).
 
 Ana sayfada Sınava hazırlık kartının hemen altında Sıradaki sınav kartı vardır. Kalan gün sunucudan gelir; tarih/Temel/Yenileme numaraları ve günlük sayaç tek kartta, geniş yazı boyutunda akışla büyür. Kart takvimin ilgili yılını açar. Ziyaret edilmiş ana sayfa arka planda tutulsa bile bu takvim kartı yalnız aktif/ön planda yenilenir.
+
+
+## Ekran verilerinde bağlantı yenileme (28 Ekim 2026)
+
+Ana sayfa özeti/son sınavlar, sınav listeleri, başarı/tekrar, takvim, iş ilanları/başvurular, puan geçmişi ve cihaz listesi ortak salt okunur kaynak akışını kullanır. İlk okuma ve normal yenileme geçici bağlantı/408/5xx hatasında 800 ms sonra en fazla bir kez tekrar edilir. Başarılı okumaya gecikme eklenmez. 401/403/422/429 ve beklenmeyen uygulama hataları bu yolla tekrar edilmez veya gizlenmez.
+
+Yenileme sürerken yüklenmiş içerik korunur. İki okuma da bağlantı nedeniyle başarısızsa önceden yüklenen veri ekranda kalır; kalıcı kesinti nötr “Bağlantı yenilenemedi” bilgisi ve yeniden deneme eylemiyle belirtilir. İlk yükleme de başarısızsa veri uydurulmaz. Yetki/doğrulama ve yazma hataları normal hata akışında kalır. Kırmızı hata alanını yalnızca zamanlayarak saklayan bir çözüm kullanılmaz.
+
+Arka plana geçiş devam eden okumayı iptal eder; dönüşte yalnız görünür/odaktaki ekran yenilenir. Eski iptal edilmiş isteğin cevabı yeni okumaya hata ekleyemez. Bağlam/hesap/sayfalama değişiminde önceki kaynak verisi temizlenir. Bu yalnız mevcut ekranın bellek durumu olup kalıcı çevrimdışı soru/cevap deposu değildir.
+
+Oturum/bağlam yenilemesi ve sınav ekranının kendi yaşam döngüsü korunur. Sınavın 15 saniyelik durum okuması arka planda başlamaz; periyodik okuma kontrollü tek istek olarak kalır, ön plana dönüşte bir kez okuma kurtarma uygulanır. Cevap, soru konumu, süre ve bitirme yazmaları otomatik yeniden gönderilmez; mevcut idempotent tekrar/uzlaştırma akışları korunur.

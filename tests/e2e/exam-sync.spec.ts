@@ -136,7 +136,7 @@ for (const platform of ['web', 'mobile'] as const) {
       await page.clock.fastForward(15_000);
       expect(calls).toBe(1);
       await page.clock.fastForward(5_000);
-      await expect(page.getByRole('alert')).toContainText('Sunucu yanıtı gecikti');
+      await expect(page.getByTestId('read-connection-notice')).toContainText('Son yüklenen bilgiler gösteriliyor');
       stalled = false;
       await page.getByRole('button', { name: 'Yeniden dene', exact: true }).click();
       await expect(page.getByRole('alert')).toHaveCount(0);

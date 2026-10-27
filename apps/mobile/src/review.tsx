@@ -15,6 +15,7 @@ import {
   Columns,
   EmptyState,
   ErrorNotice,
+  ReadNotice,
   Field,
   Loading,
   ScreenTitle,
@@ -74,15 +75,11 @@ export function Review({
         subtitle="Yanlış yaptığın, boş bıraktığın veya favoriye eklediğin sorulardan süreli bir sınav yap."
         eyebrow="HATALARINDAN ÖĞREN"
       />
-      {summary.loading ? (
+      <ReadNotice resource={summary} refreshOnly />
+      {summary.loading && !summary.data ? (
         <Loading />
       ) : summary.error || !summary.data ? (
-        <ErrorNotice
-          error={summary.error}
-          retry={() => {
-            void summary.reload();
-          }}
-        />
+        <ReadNotice resource={summary} />
       ) : (
         kinds.map((kind) => (
           <ReviewExam
@@ -212,15 +209,11 @@ export function Stats({ context }: { context: StudyContext }) {
         subtitle="Cevapladığın sorulardan hesaplanır. Boş cevaplar doğru sayılmaz."
         eyebrow="İLERLEMEN"
       />
-      {query.loading ? (
+      <ReadNotice resource={query} refreshOnly />
+      {query.loading && !query.data ? (
         <Loading />
       ) : query.error || !stats ? (
-        <ErrorNotice
-          error={query.error}
-          retry={() => {
-            void query.reload();
-          }}
-        />
+        <ReadNotice resource={query} />
       ) : stats.answers.total === 0 && stats.exams.completed === 0 ? (
         <EmptyState
           icon={Trophy}

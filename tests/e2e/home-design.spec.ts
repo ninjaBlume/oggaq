@@ -67,7 +67,7 @@ test("özet isteği yavaş veya hatalıyken ana eylem açık kalır; büyük yaz
   expect(Math.abs((brand!.x+brand!.width/2)-(header!.x+header!.width/2))).toBeLessThanOrEqual(1);
   await expect(page.getByTestId("upcoming-exam")).toContainText("gün kaldı");
  } finally {release();}
- await expect(page.getByRole("alert")).toContainText("Özet bilgilerin yüklenemedi");
+ await expect(page.getByRole("alert")).toContainText("Bağlantı yenilenemedi");
  await expect(page.getByTestId("home-summary").getByText("—",{exact:true})).toHaveCount(3);
  fail=false;
  await page.getByRole("button",{name:"Yeniden dene",exact:true}).click();

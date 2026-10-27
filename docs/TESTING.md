@@ -1,5 +1,16 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Ekran verilerinde anlık kırmızı bağlantı uyarısı
+
+Önceki oturum kurtarması ekran kaynaklarının tamamını kapsamıyordu. Ana sayfa özeti/son sınavlar ve diğer `useResource` okumaları geçici hatayı doğrudan hata alanına aktarabiliyor; bazı ekranlar yenilemede yüklenmiş içeriği de değiştiriyordu. Ortak GET akışı ilk okumada/yenilemede 800 ms sonra en fazla bir kez kurtarma uygular. Arka planda okuma iptal edilir; ön planda yalnız görünür/odaktaki ekran yenilenir. Yüklenmiş veri korunur, kalıcı kesintide nötr bağlantı bilgisi ve yeniden deneme gösterilir. 401/403/422/429 ve yazma hataları korunur; cevap/süre/konum/bitirme yazmaları bu katmanda tekrar edilmez. Sınav periyodik durum okuması arka planda başlamaz. Bu, kalıcı çevrimdışı veri deposu değildir.
+
+**57 mobil birim testi, workspace strict TypeScript, Expo web QA export ve 63 ilgili E2E geçti.** Yeni sekiz senaryo: üç ana sayfa kaynağının tek hata sonrası iyileşmesi, kalıcı kesintide verinin korunması/yeniden deneme, eski iptal edilmiş cevabın etkisizliği, 403/422/429'un gizlenmemesi/tekrarlanmaması, ilk ilan okumasının arka planda iptalinde çökme olmaması ve gizli sekmede gereksiz yenileme olmaması. Geçici kırmızı alanlar MutationObserver ile de izlenir. Var olan sınav cevap kaydı/yanıt kaybı/çakışma/sonuç/son sorudan devam, hesap değişimi, oturum iptali, iş başvurusu, takvim ve küçük/büyük ekran kontrolleri geçti. İlk koşuda eski kırmızı hata başlığını bekleyen bir test beklentisi değişti; son 63 senaryo koşusunda çözülmemiş başarısızlık yok. VS Code kapanmasıyla kesilen ara koşu tamamlanmış test sayılmaz.
+
+E2E yalnız `oggaq_test` ve 8001/5183/5184/5186 üzerinde başka test çalışmıyorken yürütüldü. Kesintide kalan yalnız kendi test servislerinin belirli PID'leri kapatıldı; paylaşılan servisler ve geliştirme hesapları değiştirilmedi. Expo/Device Hub için kendi Metro 8082 yeniden açıldı; manifest SDK 58, API/web `https://oggsor.com`, preview kapalı. Device Hub iPhone 18 Pro / iOS 27'de ana sayfa ve arka plandan Expo Go'ya dönüş gözle incelendi; özet yerinde kaldı. Native ağ kesintisi enjeksiyonu, Android native ve fiziksel TestFlight/Play alımı bu turda henüz teyit edilmedi.
+
+Canlı dış HTTPS readiness 200; DB/Redis/migration/queue/scheduler sağlıklı. Bu kontrol kullanıcının geçmişteki kesintisinin kesin sunucu kaynağını kanıtlamaz. Backend/API/veritabanı değişmedi; sunucu deploy'u gerekmiyor. PHPUnit/Composer, tüm ürün E2E matrisi ve bilinen yasal sayfa testleri tekrar çalıştırılmadı. Her iki native runtime mevcut beta paketleriyle aynı kaldı. Kanıtlar `artifacts/read-revalidation/` içinde; beta teslimi ayrıca kaydedilir.
+
+
 ## 27 Ekim 2026 — Daha ince eylem ve seçim düğmeleri
 
 Mobil `buttonDensity` standart eylemleri **54 → 48 px**, seçimleri **52 → 44 px** olarak ortaklaştırır; kompakt düğmeler 44 px kalır ve dikey boşlukları 8 px olur. Ana sayfa eylemi ve yan menü satırları aynı standart yoğunluğu kullanır. Seçim kapsül köşesi 22 px, onay ikonu 14 px ve iç aralığı 4 px oldu. Fontlar, durum/işlem callback'leri ve dokunma alanı korunur; büyük/uzun metin sabit yüksekliğe sıkıştırılmaz. Alt sekme/gezinme, soru seçenekleri ve içerik kartlarının yüksekliği değiştirilmedi.

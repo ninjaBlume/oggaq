@@ -1,8 +1,8 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
-import { useIsFocused } from "@react-navigation/native";
+import { NavigationContext, useIsFocused } from "@react-navigation/native";
 import { ScreenActive } from "./screenActivity";
-import { recoverRead } from "./readRecovery";
+import { isTransientReadError, recoverRead } from "./readRecovery";
 export function useOnReturn(callback: () => void) {
   const screenFocused = useIsFocused();
   const active = useContext(ScreenActive);
@@ -22,6 +22,7 @@ export function useResource<T>(
   loader: (signal: AbortSignal) => Promise<T>,
   dependencies: readonly unknown[],
   enabled = true,
+  { manageResume = true }: { manageResume?: boolean } = {},
 ) {
   const active = useRef(enabled);
   active.current = enabled;
@@ -30,9 +31,12 @@ export function useResource<T>(
   const controller = useRef<AbortController | null>(null);
   const mounted = useRef(true);
   const [data, setData] = useState<T | null>(null);
+  const retained = useRef<T | null>(null);
+  retained.current = data;
   const [error, setError] = useState<unknown>(null);
+  const [refreshError, setRefreshError] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
-  const reload = useCallback(async (recover = false) => {
+  const reload = useCallback(async (recover = true) => {
     if (!active.current) {
       setLoading(false);
       return;
@@ -41,20 +45,31 @@ export function useResource<T>(
     const next = new AbortController();
     controller.current = next;
     setError(null);
+    setRefreshError(null);
     setLoading(true);
     try {
       const read = () => fn.current(next.signal);
       const value = await (recover ? recoverRead(read, next.signal) : read());
       if (mounted.current && !next.signal.aborted) setData(value);
     } catch (e) {
-      if (mounted.current && !next.signal.aborted) setError(e);
+      if (mounted.current && !next.signal.aborted) {
+        if (retained.current !== null && isTransientReadError(e)) setRefreshError(e);
+        else setError(e);
+      }
     } finally {
       if (mounted.current && !next.signal.aborted) setLoading(false);
     }
   }, []);
+  const cancel = useCallback(() => {
+    controller.current?.abort();
+    if (mounted.current) setLoading(retained.current === null);
+  }, []);
+  // Suspended requests must not publish stale timeout errors after foregrounding.
+  useResume(() => { if (manageResume) void reload(); }, () => { if (manageResume) cancel(); });
   useEffect(() => {
     mounted.current = true;
     setData(null);
+    retained.current = null;
     void reload();
     return () => {
       mounted.current = false;
@@ -65,12 +80,10 @@ export function useResource<T>(
     data,
     setData,
     error,
+    refreshError,
     loading,
     reload,
-    cancel: () => {
-      controller.current?.abort();
-      if (mounted.current) setLoading(false);
-    },
+    cancel,
   };
 }
 export function useTask<T>() {
@@ -102,6 +115,7 @@ export function useTask<T>() {
   return { pending, error, run, reset: () => setError(null) };
 }
 export function useResume(callback: () => void, background?: () => void) {
+  const navigation = useContext(NavigationContext);
   const active = useContext(ScreenActive);
   const ref = useRef(callback);
   ref.current = callback;
@@ -117,9 +131,9 @@ export function useResume(callback: () => void, background?: () => void) {
         pause.current?.();
       } else if (state === "active" && wasBackground) {
         wasBackground = false;
-        if (visible.current) ref.current();
+        if (visible.current && (!navigation || navigation.isFocused())) ref.current();
       }
     });
     return () => s.remove();
-  }, []);
+  }, [navigation]);
 }

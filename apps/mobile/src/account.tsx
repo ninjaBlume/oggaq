@@ -6,7 +6,7 @@ import type { User } from "@oggaq/shared-types";
 import { deleteAccountConfirmation, displayPersonName, vocabulary } from "@oggaq/study-core";
 import { api } from "./api";
 import { useResource, useTask } from "./hooks";
-import { Badge, Button, Card, ErrorNotice, Field, Heading, Loading, ScreenTitle, SectionTitle } from "./ui";
+import { Badge, Button, Card, ErrorNotice, ReadNotice, Field, Heading, Loading, ScreenTitle, SectionTitle } from "./ui";
 import { useBody, useTheme } from "./themeContext";
 
 // Sensitive e-mail/password/session changes ask for the current password again.
@@ -144,10 +144,11 @@ function Sessions() {
       <SectionTitle>Cihazlar ve oturumlar</SectionTitle>
       <Card tone="blue">
         <Text style={styles.muted}>Hesabına giriş yapılmış yerler. Tanımadığın bir oturumu kapat ve gerekirse parolanı değiştir.</Text>
-        {list.loading ? (
+        <ReadNotice resource={list} refreshOnly />
+        {list.loading && !list.data ? (
           <Loading />
         ) : list.error ? (
-          <ErrorNotice error={list.error} retry={() => void list.reload()} />
+          <ReadNotice resource={list} />
         ) : (
           <>
             {(showAll ? items : items.slice(0, visibleSessions)).map((item) => (

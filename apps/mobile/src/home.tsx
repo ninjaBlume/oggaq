@@ -23,7 +23,7 @@ import { api } from "./api";
 import { useResource, useOnReturn } from "./hooks";
 import {
   Badge,
-  ErrorNotice,
+  ReadNotice,
   Loading,
   SectionTitle,
   TextLink,
@@ -147,7 +147,7 @@ export function Home({
           {metrics.map(({ label, accessible, value, icon: Icon, tone }) => {
             const tint = cardTone(palette, tone);
             return (
-            <View key={label} accessible accessibilityLabel={`${accessible}: ${value ?? (summary.loading ? "yükleniyor" : "henüz yok")}`}
+            <View key={label} accessible accessibilityLabel={`${accessible}: ${value ?? (summary.loading && !summary.data ? "yükleniyor" : "henüz yok")}`}
               style={{ flex: 1, minWidth: 0, gap: 5, padding: 10, backgroundColor: tint.surface, borderWidth: 1, borderRadius: shape.control, borderColor: tint.line }}>
               <View style={{ width: 28, height: 28, borderRadius: shape.small, alignItems: "center", justifyContent: "center", backgroundColor: tint.iconSurface }}>
                 <Icon size={17} color={tint.accent} strokeWidth={1.8} />
@@ -157,7 +157,7 @@ export function Home({
             </View>
           );})}
         </View>
-        <ErrorNotice title="Özet bilgilerin yüklenemedi" error={summary.error} retry={() => void summary.reload()} />
+        <ReadNotice title="Özet bilgilerin yüklenemedi" resource={summary} />
       </View>
       </View>
 
@@ -182,11 +182,12 @@ export function Home({
       </View>
       </View>
 
+      <ReadNotice resource={recentExams} refreshOnly />
       <SectionTitle action="Tümünü gör" onPress={history}>Son sınavların</SectionTitle>
       {recentExams.loading && !recentExams.data ? (
         <Loading layout="list" label="Son sınavların yükleniyor" />
       ) : recentExams.error ? (
-        <ErrorNotice title="Son sınavların yüklenemedi" error={recentExams.error} retry={() => void recentExams.reload()} />
+        <ReadNotice title="Son sınavların yüklenemedi" resource={recentExams} />
       ) : recentExams.data?.data.length === 0 ? (
         <HomeGroup>
           <View style={{ padding: 16, gap: 8, backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.line, borderRadius: shape.control }}>

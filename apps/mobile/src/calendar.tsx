@@ -4,7 +4,7 @@ import { calendarDate, calendarDaysRemaining, calendarNotice, calendarRules, cal
 import { api } from './api';
 import { useOnReturn, useResource, useTask } from './hooks';
 import { ArrowLeft, BookOpen, CalendarDays, CheckCircle2, ExternalLink, GraduationCap, ShieldCheck } from './icons';
-import { Badge, Button, Card, Columns, EmptyState, ErrorNotice, IconButton, Loading, Sheet, TextLink } from './ui';
+import { Badge, Button, Card, Columns, EmptyState, ErrorNotice, ReadNotice, IconButton, Loading, Sheet, TextLink } from './ui';
 import { Text } from './text';
 import { useTheme } from './themeContext';
 
@@ -48,7 +48,7 @@ export function ExamCalendarScreen({ initialYear, back }: { initialYear?: number
       <Button secondary compact onPress={() => setPicking(true)}>{`Takvim yılı: ${year}`}</Button>
     </View>
     <Sheet visible={picking} title="Takvim yılı" close={() => setPicking(false)}>{calendarYears(data, current).map(value => <Button key={value} secondary={year !== value} onPress={() => { setYear(value);setPicking(false); }}>{String(value)}</Button>)}</Sheet>
-    {calendar.loading ? <Loading /> : calendar.error || !data ? <ErrorNotice error={calendar.error} retry={() => { void calendar.reload(); }} /> : <>
+    <ReadNotice resource={calendar} refreshOnly />{calendar.loading && !calendar.data ? <Loading /> : calendar.error || !data ? <ReadNotice resource={calendar} /> : <>
       {data.status === 'stale' && <Card tone="sand"><Text accessibilityRole="alert" style={styles.text}>{calendarStaleNotice}</Text></Card>}
       {entries.length === 0 ? <EmptyState title={`${year} takvimi henüz hazır değil`} message="Doğrulanmış resmî takvim alındığında burada görünecek." /> : <Columns>{entries.map((entry, index) => {
         const days = calendarDaysRemaining(entry.exam_date, today);const next = index === 0 && days !== null;

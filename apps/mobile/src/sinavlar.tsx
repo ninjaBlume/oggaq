@@ -15,6 +15,7 @@ import {
   Columns,
   EmptyState,
   ErrorNotice,
+  ReadNotice,
   Field,
   Loading,
   ScreenTitle,
@@ -267,12 +268,14 @@ export function ExamList({
           </Sheet>
         </>
       )}
+      <ReadNotice resource={exams} refreshOnly />
+      {kind === "ders" && <ReadNotice resource={subjects} refreshOnly />}
       {loading ? (
         <Loading layout="list" label="Sınavlar yükleniyor" />
       ) : failure ? (
         <ErrorNotice
           title="Sınavlar yüklenemedi"
-          error={failure}
+          error={failure} read
           retry={() => {
             void exams.reload();
             void subjects.reload();
@@ -286,7 +289,7 @@ export function ExamList({
         />
       ) : (
         <>
-          <ErrorNotice title="Önceki sınav bilgilerin yüklenemedi" error={attempts.error} retry={() => void attempts.reload()} />
+          <ReadNotice title="Önceki sınav bilgilerin yüklenemedi" resource={attempts} />
           <View style={{ gap: 10 }}><Columns>
             {list.map((exam) => (
               <ExamEntry
@@ -373,10 +376,11 @@ export function Results({ context, openExam }: { context: StudyContext; openExam
   return (
     <>
       <ScreenTitle title={vocabulary.results.title} subtitle="Girdiğin deneme ve ders sınavları. Bir sınavı açıp tüm sorularını ve cevaplarını kaydırarak incele." />
+      <ReadNotice resource={exams} refreshOnly />
       {exams.loading && !exams.data ? (
         <Loading layout="list" label="Sonuçların yükleniyor" />
       ) : exams.error ? (
-        <ErrorNotice title="Sonuçların yüklenemedi" error={exams.error} retry={() => void exams.reload()} />
+        <ReadNotice title="Sonuçların yüklenemedi" resource={exams} />
       ) : exams.data?.data.length === 0 ? (
         <EmptyState icon={Clock3} title="Henüz bir sınava girmedin" message="Girdiğin sınavlar ve sonuçların burada görünür." />
       ) : (

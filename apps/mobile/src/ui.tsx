@@ -20,6 +20,7 @@ import {
 } from "./icons";
 import type { LucideIcon } from "lucide-react-native";
 import { errorMessage } from "./feedback";
+import { isTransientReadError } from "./readRecovery";
 import { buttonDensity, shape } from "./theme";
 import { useLayout, useTheme } from "./themeContext";
 import { ExpressivePressable } from "./expressive";
@@ -303,20 +304,33 @@ export function Loading({ layout = "inline", count = 3, label = "Yükleniyor" }:
     </View>
   );
 }
-export function ErrorNotice({ error, retry, title = "İşlem tamamlanamadı" }: {
+export function ReadNotice({ resource, title, refreshOnly = false }: {
+  resource: { error: unknown; refreshError: unknown; reload: () => Promise<void> };
+  refreshOnly?: boolean;
+  title?: string;
+}) {
+  return <ErrorNotice error={refreshOnly ? resource.refreshError : resource.error ?? resource.refreshError} title={title}
+    retry={() => { void resource.reload(); }} read retained={!!resource.refreshError} />;
+}
+export function ErrorNotice({ error, retry, title = "İşlem tamamlanamadı", read = false, retained = false }: {
   error: unknown;
   retry?: () => void;
   title?: string;
+  read?: boolean;
+  retained?: boolean;
 }) {
   const { palette, styles } = useTheme();
   if (!error) return null;
+  const connection = read && isTransientReadError(error);
+  const color = connection ? palette.primary : palette.red;
   return (
-    <View accessibilityRole="alert" style={styles.error}>
+    <View testID={connection ? "read-connection-notice" : "read-error-notice"} accessibilityRole="alert"
+      style={[styles.error, connection && { backgroundColor: palette.softPrimary, borderColor: palette.line }]}>
       <View style={[styles.row, { flexWrap: "nowrap", alignItems: "flex-start" }]}>
-        <CircleHelp size={20} color={palette.red} />
+        <CircleHelp size={20} color={color} />
         <View style={{ flex: 1, gap: 5 }}>
-          <Text style={[styles.buttonText, { color: palette.red }]}>{title}</Text>
-          <Text style={[styles.muted, { color: palette.red }]}>{errorMessage(error)}</Text>
+          <Text style={[styles.buttonText, { color }]}>{connection ? "Bağlantı yenilenemedi" : title}</Text>
+          <Text style={[styles.muted, { color }]}>{connection && retained ? "Son yüklenen bilgiler gösteriliyor. Bağlantını kontrol edip yeniden deneyebilirsin." : errorMessage(error)}</Text>
         </View>
       </View>
       {retry && <TextLink onPress={retry}>Yeniden dene</TextLink>}

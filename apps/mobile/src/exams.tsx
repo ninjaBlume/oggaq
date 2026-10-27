@@ -1,7 +1,7 @@
 import { Text } from "./text";
 import { useEffect, useRef, useState } from "react";
 import type { ScrollViewInstance } from "react-native";
-import { Pressable, ScrollView, View } from "react-native";
+import { AppState, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   ArrowLeft,
@@ -22,6 +22,7 @@ import {
   Card,
   ConfirmDialog,
   ErrorNotice,
+  ReadNotice,
   Loading,
   Option,
   Sheet,
@@ -158,6 +159,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
       return response;
     },
     [context.id, id],
+    true, { manageResume: false },
   );
   const task = useTask<{ data: ExamAttempt }>();
   const [selectedIndex, setIndex] = useState<number | null>(null);
@@ -165,7 +167,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
   const positionSaver = useRef<ExamPositionSaver | null>(null);
   if (!positionSaver.current) positionSaver.current = new ExamPositionSaver(async (position) => {
     const response = await api.request('put', '/api/v1/contexts/{context}/exam-attempts/{exam}/position', { params: { context: context.id, exam: id }, body: { position } });
-    if (response.data.status === 'completed') await query.reload();
+    if (response.data.status === 'completed') await query.reload(false);
   }, setPositionState);
   useEffect(() => {
     positionSaver.current!.listen(setPositionState);
@@ -177,7 +179,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
   const [confirm, setConfirm] = useState(false);
   const exam = query.data?.data;
   const timer = useExamTimer(exam, summary => {
-    if (summary.status === 'completed') { void query.reload(); return; }
+    if (summary.status === 'completed') { void query.reload(false); return; }
     if (latest.current) { const data = mergeExamTimer(latest.current, summary);latest.current = data;query.setData({data}); }
   });
   // Polling and another device may refresh the bookmark; only opening this screen restores it.
@@ -196,13 +198,13 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
     }
   }, [done]);
   useResume(() => {
-    void query.reload();
-  });
+    void query.reload(true);
+  }, query.cancel);
   useEffect(() => {
     if (!exam || done) return;
     const timer = setInterval(() => {
       // A slow request must reach its timeout instead of being aborted/restarted every poll.
-      if (!refreshing.current) void query.reload();
+      if (AppState.currentState === "active" && !refreshing.current) void query.reload(false);
     }, 15000);
     return () => clearInterval(timer);
   }, [done, exam?.id]);
@@ -220,7 +222,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
       setSeconds(left);
       if (left === 0 && !done && !asked) {
         asked = true;
-        void query.reload();
+        if (AppState.currentState === "active") void query.reload(false);
       }
     };
     tick();
@@ -278,7 +280,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
     );
   }
   async function reconcile() {
-    await query.reload();
+    await query.reload(false);
     setSubmission(null);
     setFinishing(null);
     task.reset();
@@ -286,15 +288,15 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
   if (!exam)
     return query.error ? (
       <ErrorNotice
-        error={query.error}
+        error={query.error} read
         retry={() => {
-          void query.reload();
+          void query.reload(false);
         }}
       />
     ) : (
       <Loading />
     );
-  if (done) return <CompletedExam exam={exam} context={context} updateQuestion={updateQuestion} error={query.error} reload={() => { void query.reload(); }} />;
+  if (done) return <CompletedExam exam={exam} context={context} updateQuestion={updateQuestion} error={query.error ?? query.refreshError} reload={() => { void query.reload(false); }} />;
   const blocked = task.pending || submission !== null || finishing !== null;
   const locked = done || blocked || seconds === 0 || exam.timer_paused || timer.pending || timer.error != null;
   const navigationBlocked = finishing !== null;
@@ -310,6 +312,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
   }
   return (
     <View style={styles.shell}>
+      <ReadNotice resource={query} />
       <ConfirmDialog
         visible={confirm && !done}
         title="Denemeyi bitir"
@@ -503,12 +506,6 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
                   Güncel kaydı yükle
                 </Button>
               )}
-              <ErrorNotice
-                error={query.error}
-                retry={() => {
-                  void query.reload();
-                }}
-              />
               {seconds === 0 && !done && (
                 <Text style={styles.text}>
                   Süre doldu. Sunucudan sonuç bekleniyor; bağlantı dönünce kayıt
