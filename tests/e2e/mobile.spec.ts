@@ -204,7 +204,7 @@ test("ders sınavı dersine göre bulunur ve çözülür; çalışma alanı değ
   await expect(page.getByRole("button", { name: "Ders seçimi" })).toContainText(
     "Sentetik çalışma dersi",
   );
-  await expect(page.getByText("1. Ders Sınavı", { exact: true })).toBeVisible();
+  await expect(page.getByText("1. Temel Eğitim Sınav Soruları", { exact: true })).toBeVisible();
   await expect(page.getByText(/3 soru · önerilen süre 5 dk/)).toBeVisible();
   await page.getByRole("button", { name: "Sınava gir", exact: true }).click();
   await page.getByLabel("Süre (dakika)", { exact: true }).filter({ visible: true }).fill("5");
@@ -258,7 +258,7 @@ test("ders sınavlarında çok sayıda uzun ders adı okunur kalır: ders listed
     await screenshot(page, `ders-picker-${width}`);
     await sheet.click();
     await expect(picker).toContainText("Sentetik Yangın güvenliği");
-    await expect(page.getByText("1. Ders Sınavı", { exact: true })).toBeVisible();
+    await expect(page.getByText("1. Temel Eğitim Sınav Soruları", { exact: true })).toBeVisible();
   }
 });
 test("mobil gezinme küçük telefon ve tablette içerikten bağımsız görünür kalır", async ({
@@ -578,15 +578,20 @@ test("sistem hareket azaltma tercihi canlı değişince Expressive hareket kapan
     page.getByRole("tab", { name: "Deneme", exact: true }),
   ).toHaveAttribute("aria-selected", "true");
 });
-test("mobil deneme ve ders sınavları ayrı listelenir", async ({ page }) => {
+test("mobil deneme ve ders sınavları ayrı API kapsamıyla listelenir", async ({ page }) => {
   await login(page);
-  await page.getByRole("tab", { name: "Deneme", exact: true }).click();
-  await expect(page.getByText("1. Temel Eğitim Sınav Soruları", { exact: true })).toBeVisible();
-  await expect(page.getByText("1. Ders Sınavı", { exact: true })).toHaveCount(0);
-  await page.getByRole("tab", { name: "Ders", exact: true }).click();
-  await expect(page.getByText("1. Ders Sınavı", { exact: true })).toBeVisible();
-  await expect(page.getByText("1. Temel Eğitim Sınav Soruları", { exact: true })).not.toBeVisible();
-  await expect(page.getByRole("heading", { name: "1. Temel Eğitim Sınav Soruları", exact: true })).toHaveCount(0);
+  for (const [tab, scope] of [["Deneme", "whole"], ["Ders", "subject"]] as const) {
+    const loaded = page.waitForResponse(r => {
+      const url = new URL(r.url());
+      return url.pathname === "/api/v1/official-exams" && url.searchParams.get("scope") === scope;
+    });
+    await page.getByRole("tab", { name: tab, exact: true }).click();
+    const exams = (await (await loaded).json()).data;
+    expect(exams).toHaveLength(1);
+    expect(Boolean(exams[0].subject)).toBe(scope === "subject");
+    await expect(page.getByRole("heading", { name: "1. Temel Eğitim Sınav Soruları", exact: true })).toBeVisible();
+    await expect(page.getByTestId("official-exam-entry").filter({visible:true})).toHaveCount(1);
+  }
 });
 test("mobil tekrar sınavı hatalardan kurulur; başarı durumu ve sınavlar gerçek API ile çalışır", async ({
   page,

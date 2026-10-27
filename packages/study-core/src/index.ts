@@ -52,7 +52,7 @@ export function examDisplayTitle(title: string): string {
 // List labels use explicit education metadata; renewal numbers are never derived
 // from a basic exam number. Stored titles and historical attempts stay intact.
 export function examQuestionTitle(exam: { exam_number: string | null; education_type?: 'basic' | 'renewal' | 'weapon_difference' }): string {
-  const name = exam.education_type === 'renewal' ? 'Yenileme Sınav Soruları'
+  const name = exam.education_type === 'renewal' ? 'Yenileme Eğitim Sınav Soruları'
     : exam.education_type === 'weapon_difference' ? 'Silah Farkı Sınav Soruları'
     : 'Temel Eğitim Sınav Soruları';
   const number = exam.exam_number?.trim();

@@ -1,5 +1,15 @@
 # Test ve doğrulama stratejisi
 
+## 27 Ekim 2026 — Ders sınavlarında eğitim seçimi ve sınav başlıkları
+
+- Mobil Ders listesine Temel/Yenileme seçimi eklendi; gerçek API eğitim filtresi, eğitim başına ayrı önbellek, ders/sekme seçimini koruma, eğitim bazında boş/hata durumları ve ortak sınav başlıkları birlikte güncellendi. Backend/API şeması ve veritabanı değişikliği yok; öğrenci webdeki eski ders çözme ekranı bu işte değiştirilmedi.
+- `npm run typecheck` ve **57 mobil birim testi** geçti. `npm run test:core`: **52 geçti / 4 başarısız**; başlık testleri geçti. Dört başarısız kontrol değiştirilmeyen `packages/study-core/src/legal.test.ts` dosyasının mevcut yayımlanmış yasal sayfalarda `id="taslak-bandi"` aramasından kaynaklanır; bu iş için yasal sayfalar veya bu beklenti değiştirilmedi.
+- `EXPO_PUBLIC_LOCAL_PREVIEW=1 EXPO_PUBLIC_API_URL=http://127.0.0.1:8001 EXPO_PUBLIC_WEB_URL=http://127.0.0.1:5183 npx expo export --platform all --output-dir ../../artifacts/lesson-education/preview` (`apps/mobile` içinde) ile iOS/Android Hermes ve web export geçti. Bu yalnız izole test önizlemesidir; çalışan Metro'nun `https://oggsor.com` ayarları değiştirilmedi.
+- `E2E_MOBILE_PORT=5186 MOBILE_PREVIEW_DIR=/Users/harunaltay/oggaq/artifacts/lesson-education/preview npm run test:e2e -- tests/e2e/education.spec.ts tests/e2e/mobile.spec.ts --grep 'eğitim seçimi|mobil derslerde|ders sınavı dersine|çok sayıda uzun ders|ayrı API kapsamıyla'`: **10/10 geçti**. Üç web deneme regresyonu, üç mobil telefon/tablet eğitim ayrımı ve yenileme dersinde gerçek sınava giriş/cevap kilidi/devam, ders seçiminde boş liste/503/yeniden deneme, uzun ders seçimi ve ders/deneme kapsam ayrımı kontrol edildi.
+- Testlerden önce diğer PHPUnit/E2E süreçleri ve 8001/5183/5184/5186 portları kontrol edildi. Testler yalnız `oggaq_test` üzerinde sırayla çalıştı; ortak `oggaq` içerikleri/hesapları değiştirilmedi. PostgreSQL/Redis/Mailpit mevcut proje komutuyla başlatıldı. Test sunucuları kapandı, kullanıcının Device Hub için istediği 8082 Metro açık bırakıldı.
+- 390/834 px yenileme ders ekranları görsel incelendi; 320/390/834 px taşma kontrolleri geçti. Kanıtlar `artifacts/education/mobile-lessons-*.png`; export `artifacts/lesson-education/preview`. Simulator otomasyon uygulaması desteklenmediği için native UI ve fiziksel iOS/Android bu değişiklik için doğrulanmadı. Sunucu deploy'u veya EAS Update yayını yapılmadı; genel backend/E2E matrisi tekrar çalıştırılmadı.
+
+
 ## Güncel doğrulama — 27 Ekim 2026, arka plandan dönüş ve güncelleme denetimi
 
 - Kullanıcı Android'de `01a17ac4`, iOS'ta `01a17a9c` gördüğünü; SSS güncellemesinin alınmadığını ve arka plandan dönüşte anlık “İşlem tamamlanamadı / sunucu gecikti” uyarısını bildirdi. Önceki SSS OTA'ları endpoint ve bütün dosya kontrollerinden yeniden geçti; bu, cihazların onları çalıştırdığının kanıtı sayılmadı.

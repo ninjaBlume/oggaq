@@ -1,5 +1,13 @@
 # Expo mobil uygulaması
 
+## 27 Ekim 2026: Ders sınavlarında Temel/Yenileme ayrımı
+
+Ders sınavları da Deneme gibi **Temel eğitim / Yenileme eğitimi** seçimi sunar. Seçili ders eğitim değişiminde korunur; sekmeden çıkıp dönüldüğünde ders ve eğitim tercihi korunur. Ders kataloğu API'ye `scope=subject`, `subject_id` ve `education_type` gönderir; bellek önbelleği bağlam, ekran türü, eğitim ve dersi ayrı anahtarlarda tutar. Eğitimler karışmaz; seçilen eğitimde sınavı bulunmayan ders için açık boş durum, istek hatasında yeniden deneme vardır.
+
+Ders ve Deneme kartları ortak başlığı kullanır: **122. Temel Eğitim Sınav Soruları / 122. Yenileme Eğitim Sınav Soruları**. Sayı gerçek kaydın sınav numarasıdır; yenileme numarası temel numarasından türetilmez. Bu görünüm değişikliği yayımlanmış sınav başlıklarını, soruları veya geçmiş sonuçları değiştirmez. Daha eski bölümlerdeki “Ders ekranına eğitim seçimi eklenmez” kararı bu kullanıcı talimatıyla güncellenmiştir.
+
+TypeScript, 57 mobil birim testi, başlık testleri ve 10 ilgili gerçek API arayüz testi doğrulandı; iOS/Android/web export başarılı. 320/390/834 px ekranlar `artifacts/education/` içindedir. Device Hub için açık 8082 Metro kaynakları kullanır; otomasyon aracı Simulator uygulamasına erişemediği için native ekranda bu değişikliğin kontrolü ve fiziksel cihaz teyidi yapılmadı. TestFlight/Play OTA yayımlanmadı. Ayrıntılar [TESTING](TESTING.md) içinde.
+
 ## Öğrenci süre tercihi — 26 Ekim 2026
 
 Deneme/Ders başlangıç formunda `Çıkınca süre devam etsin` / `Çıkınca süre dursun` seçilir. Tercih sunucuda denemeye kaydolur. Duraklatılabilir ekranda odak/AppState çıkışı durdurur, dönüş devam ettirir; başka cihazda kalan süre aynı kayıttan gelir. Eski oturumun gecikmiş yazısı yeni ekranı durduramaz. Kalan süre saat:dakika:saniye gösterilir; duraklatıldığında ilerlemez. Ani kapanma/ağ kaybında 30 saniyeye kadar işlemeye devam edebilir; formda açıklanır. Süre hatası ve devam eylemi görünür; durakta cevap/bitirme kilitlidir. Sürekli süre seçeneği eski davranışı korur.

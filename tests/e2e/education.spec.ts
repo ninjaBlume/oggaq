@@ -9,7 +9,7 @@ test.afterAll(() => fixture('cleanup'));
 
 for (const mobile of [false, true]) {
  for (const width of [320, 390, 834]) {
-  test(`${mobile ? 'mobil' : 'web'} eğitim seçimi denemeleri ayırır; derslerde seçim yok (${width}px)`, async ({ page }) => {
+  test(`${mobile ? 'mobil eğitim seçimi deneme ve dersleri ayırır' : 'web eğitim seçimi denemeleri ayırır'} (${width}px)`, async ({ page }) => {
    await page.setViewportSize({width, height: 1000});
    await page.goto(mobile ? mobilePreviewUrl : 'http://127.0.0.1:5183');
    await page.getByLabel('E-posta adresi', {exact:true}).fill('e2e-student@example.test');
@@ -34,7 +34,7 @@ for (const mobile of [false, true]) {
    expect(data).toHaveLength(1);
    expect(data[0].education_type).toBe('renewal');
    await expect(renewal).toHaveAttribute(mobile ? 'aria-selected' : 'aria-pressed','true');
-   await expect(page.getByRole('heading',{name:'1. Yenileme Sınav Soruları',exact:true})).toBeVisible();
+   await expect(page.getByRole('heading',{name:'1. Yenileme Eğitim Sınav Soruları',exact:true})).toBeVisible();
    await expect(page.getByText('Ağustos 2026',{exact:false})).toBeVisible();
    const unarmedResponse = page.waitForResponse(r => {
     const u=new URL(r.url());
@@ -44,7 +44,7 @@ for (const mobile of [false, true]) {
    const unarmed = (await (await unarmedResponse).json()).data;
    expect(unarmed).toHaveLength(1);
    expect(unarmed[0].education_type).toBe('renewal');
-   await expect(page.getByRole('heading',{name:'1. Yenileme Sınav Soruları',exact:true})).toBeVisible();
+   await expect(page.getByRole('heading',{name:'1. Yenileme Eğitim Sınav Soruları',exact:true})).toBeVisible();
    await expect(page.getByRole('heading',{name:'1. Temel Eğitim Sınav Soruları',exact:true})).toHaveCount(0);
    await expect(renewal).toHaveAttribute(mobile ? 'aria-selected' : 'aria-pressed','true');
    mkdirSync('artifacts/education',{recursive:true});
@@ -60,9 +60,33 @@ for (const mobile of [false, true]) {
    }
    else await page.getByRole('link',{name:'Ders sınavları',exact:true}).click();
    await expect(page.getByRole('heading',{name:'Ders sınavları',exact:true})).toBeVisible();
-   await expect(renewal).not.toBeVisible();
-   await expect(page.getByRole('heading',{name:'1. Ders Sınavı',exact:true})).toBeVisible();
-   const lessonHeading = page.getByRole('heading',{name:'98. Ders Sınavı',exact:true});
+   if (mobile) {
+    await expect(basic).toHaveAttribute('aria-selected','true');
+    await expect(page.getByRole('heading',{name:'1. Temel Eğitim Sınav Soruları',exact:true})).toBeVisible();
+    await expect(page.getByRole('heading',{name:'98. Yenileme Eğitim Sınav Soruları',exact:true})).toHaveCount(0);
+    // The API and cache must isolate subject exams by education as well as subject.
+    const lessonsLoaded = page.waitForResponse(r => {
+     const u = new URL(r.url());
+     return u.pathname === '/api/v1/official-exams' && u.searchParams.get('scope') === 'subject' && u.searchParams.get('education_type') === 'renewal' && u.searchParams.has('subject_id');
+    });
+    await renewal.click();
+    const lessons = (await (await lessonsLoaded).json()).data;
+    expect(lessons).toHaveLength(1);
+    expect(lessons[0].id).toBe(renewalLessonId);
+    await expect(page.getByRole('heading',{name:'1. Temel Eğitim Sınav Soruları',exact:true})).toHaveCount(0);
+    await basic.click();
+    await expect(page.getByRole('heading',{name:'1. Temel Eğitim Sınav Soruları',exact:true})).toBeVisible();
+    await renewal.click();
+    await page.getByRole('tab',{name:'Profil',exact:true}).click();
+    await page.getByRole('tab',{name:'Ders',exact:true}).click();
+    await expect(renewal).toHaveAttribute('aria-selected','true');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.screenshot({path:`artifacts/education/mobile-lessons-${width}.png`});
+   } else {
+    await expect(renewal).not.toBeVisible();
+    await expect(page.getByRole('heading',{name:'1. Ders Sınavı',exact:true})).toBeVisible();
+   }
+   const lessonHeading = page.getByRole('heading',{name:mobile ? '98. Yenileme Eğitim Sınav Soruları' : '98. Ders Sınavı',exact:true});
    await expect(lessonHeading).toBeVisible();
    const lesson = mobile ? page.getByTestId('official-exam-entry').filter({has:lessonHeading}) : page.locator('.sinav-row').filter({has:lessonHeading});
    await lesson.getByRole('button',{name:'Sınava gir',exact:true}).click();
@@ -70,9 +94,47 @@ for (const mobile of [false, true]) {
    await lesson.getByRole('button',{name:'Sınavı başlat',exact:true}).click();
    expect((await (await lessonStarted).json()).data.official_exam.id).toBe(renewalLessonId);
    await expect(page.getByRole('heading',{name:mobile ? 'Sınav' : 'Denemen devam ediyor',exact:true})).toBeVisible();
+   if (mobile) {
+    await page.getByRole('radio',{name:/Sentetik A/}).click();
+    await expect(page.getByText('Doğru yanıt. Doğru cevap: A. Yanıtın kaydedildi ve kilitlendi.',{exact:true})).toBeVisible();
+    await page.getByRole('button',{name:'Geri dön',exact:true}).click();
+    await expect(renewal).toHaveAttribute('aria-selected','true');
+    await page.getByRole('button',{name:'Devam et',exact:true}).click();
+    await expect(page.getByRole('radio',{name:/Sentetik A/})).toHaveAttribute('aria-checked','true');
+   }
   });
  }
 }
+
+test('mobil derslerde eğitim değişimi ders seçimini korur; boş liste ve bağlantı hatası yeniden denenir', async ({page}) => {
+ fixture('more-subject-exams');
+ await page.goto(mobilePreviewUrl);
+ await page.getByLabel('E-posta adresi',{exact:true}).fill('e2e-student@example.test');
+ await page.getByLabel('Parola',{exact:true}).fill('Synthetic-Browser-42!');
+ await page.getByRole('button',{name:'Giriş yap',exact:true}).click();
+ await page.getByRole('tab',{name:'Ders',exact:true}).click();
+ const picker = page.getByRole('button',{name:'Ders seçimi',exact:true});
+ await picker.click();
+ await page.getByRole('button',{name:'Sentetik Güvenlik tedbirleri',exact:true}).click();
+ await expect(picker).toContainText('Sentetik Güvenlik tedbirleri');
+ await expect(page.getByRole('heading',{name:'1. Temel Eğitim Sınav Soruları',exact:true})).toBeVisible();
+ await page.route('**/api/v1/official-exams?**', async route => {
+  const u = new URL(route.request().url());
+  if (u.searchParams.get('scope') === 'subject' && u.searchParams.get('education_type') === 'renewal') {
+   await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({message:'Synthetic unavailable'})});
+  } else await route.continue();
+ });
+ await page.getByRole('button',{name:'Yenileme eğitimi sınavları',exact:true}).click();
+ await expect(page.getByText('Sınavlar yüklenemedi',{exact:true})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'1. Temel Eğitim Sınav Soruları',exact:true})).toHaveCount(0);
+ await page.unroute('**/api/v1/official-exams?**');
+ await page.getByRole('button',{name:'Yeniden dene',exact:true}).click();
+ await expect(page.getByText('Henüz ders sınavı yok',{exact:true})).toBeVisible();
+ await expect(picker).toContainText('Sentetik Güvenlik tedbirleri');
+ await page.getByRole('button',{name:'Temel eğitim sınavları',exact:true}).click();
+ await expect(page.getByRole('heading',{name:'1. Temel Eğitim Sınav Soruları',exact:true})).toBeVisible();
+ await expect(picker).toContainText('Sentetik Güvenlik tedbirleri');
+});
 
  test('yönetici deneme eğitim türünü kaydeder; ders editörü ortak kalır', async ({page}) => {
   const id=fixture('paired-exam-draft');
