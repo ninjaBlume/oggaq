@@ -1,5 +1,21 @@
 # Sunucuda ayrı geliştirme ortamı
 
+## 27 Ekim 2026 — Doğrudan kişisel öğrenci erişimi
+
+Kaynak `8da8d13`. Yalnız mevcut çalışan app/web image'larının üzerine dar dosya katmanı uygulandı: app/worker/scheduler `oggaq-development-app:student-access-20261027`, web `oggaq-development-web:student-access-20261027`. Kayıt doğrulama postası göndermez; kişisel çalışmalar doğrulama beklemez, başvuru gönderimi ve kurumsal/yönetim işlemleri korunur. Beş backend dosyasının önceki HEAD ve yeni kaynak SHA256 eşleşmeleri, çalışan route middleware sınırları ve dış HTTPS readiness doğrulandı. Web hesap modundadır; genel sitede soru çözme açılmadı.
+
+`manage`, mevcut ana release üzerine `publication/student-access-20261027/services.compose.yaml` katmanını ekler; eski temel release etiketiyle yanlışlıkla güncel kodu geri almaması sağlandı. Önceki wrapper `manage.before-student-access`, eski image sabitlemeleri `rollback.compose.yaml` olarak aynı korumalı dizinde tutulur. Aktifleştirme betiği hata halinde eski katmana geri döner. Veritabanı, kullanıcılar, ortam dosyası, Resend/DNS/Exim, tünel veya diğer siteler değiştirilmedi; gerçek test postası gönderilmedi. Kontroller/dağıtım sınırları [TESTING](../../docs/TESTING.md) içindedir.
+
+Gerekirse bu dar yayını geri almak için:
+
+```sh
+~/oggaq-development/manage -f ~/oggaq-development/publication/student-access-20261027/rollback.compose.yaml up -d --no-deps --force-recreate app worker scheduler web
+cp ~/oggaq-development/publication/student-access-20261027/manage.before-student-access ~/oggaq-development/manage
+```
+
+Bu sunucu geri dönüşü yayımlanan mobil OTA'yı geri almaz; mobil kanalların geri dönüşü [iOS beta](../../docs/IOS_BETA.md) ve [Android beta](../../docs/ANDROID_BETA.md) içinde ayrı ele alınır.
+
+
 25 Ekim marka kararı: **Ogg Sor - Soru Bankası**, güncel adres **https://oggsor.com**. Eski geliştirme adresi geçişte uyumluluk için çalışır; yeni DNS, posta, DNSSEC ve yayın kanıtları [BRAND](../../docs/BRAND.md) içinde izlenir. Yeni TLS/API ve öğrenci oturumu doğrulandı; DNS önbellekleri bazı ağlarda eski adresi gösterebilir. Ortak IP'nin `smtp.codentum.net` PTR'si bu yeniden markalamada değiştirilmez.
 
 Güncel adres `https://oggsor.com` (eski alias: `https://oggsorubankasi.codentum.net`). Öğrenci uygulaması `/`, yönetim paneli `/yonetim/`, API `/api/v1/`, CSRF ucu `/sanctum/` altında sunulur. Mobil API kökü aynı HTTPS adresidir. Admin'in varsayılan yerel kökü `/` olarak korunur; alt yol derlemede `VITE_ADMIN_BASE_PATH=/yonetim/` ile seçilir.
