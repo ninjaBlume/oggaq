@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## 27 Ekim 2026 — Daha ince eylem ve seçim düğmeleri
+
+Mobil `buttonDensity` standart eylemleri **54 → 48 px**, seçimleri **52 → 44 px** olarak ortaklaştırır; kompakt düğmeler 44 px kalır ve dikey boşlukları 8 px olur. Ana sayfa eylemi ve yan menü satırları aynı standart yoğunluğu kullanır. Seçim kapsül köşesi 22 px, onay ikonu 14 px ve iç aralığı 4 px oldu. Fontlar, durum/işlem callback'leri ve dokunma alanı korunur; büyük/uzun metin sabit yüksekliğe sıkıştırılmaz. Alt sekme/gezinme, soru seçenekleri ve içerik kartlarının yüksekliği değiştirilmedi.
+
+**57 mobil birim testi, workspace strict TypeScript, Expo web QA export ve 44 ilgili E2E geçti.** Standart Giriş/Ana sayfa butonunun 44–48 px, varsayılan profil seçimlerinin 44 px olduğu gerçek arayüzde ölçüldü. Giriş/kayıt/kurtarma, butonların istek sırasında kilitlenmesi, basış/azaltılmış hareket, yan menü/kapanma/çıkış hatası, eğitim/ders seçimi, sınav başlatma/devam/yanıt/sonuç ve kaldığı soru, üç yazı boyutu/kalıcılık ve 320–1280 px yerleşim korundu. Device Hub iOS Ana sayfa ve Ders görünümü yalnız görsel olarak incelendi; kullanıcının o sıradaki tercihlerine müdahale edilmedi. Android native/fiziksel beta alımı teyit edilmedi.
+
+E2E yalnız `oggaq_test` ve 8001/5183/5184/5186 portlarında, başka test süreci yokken çalıştı. Backend/API/veritabanı/üretim webi değişmedi; PHPUnit/Composer, tam ürün E2E ve bilinen yasal sayfa testleri tekrar çalıştırılmadı. Kanıtlar `artifacts/slimmer-buttons/`; native runtime'lar korundu. Beta teslimi ayrıca kaydedilir.
+
 ## 27 Ekim 2026 — Kompakt profil kartları
 
 Profilde 56 px avatar/tam ad/e-posta tek kartta toplandı; tekrarlanan hesap bilgi kartı kaldırıldı. Grup boşlukları 12 px, ayar iç aralıkları 8 px; Hesabım/örnek metin/çalışma alanı boşlukları daraltıldı. `Card` isteğe bağlı kompakt görünümünü yalnız profil kimliği/örneği kullanır, diğer kartların varsayılanı aynı kalır. Güncelleme ve çıkış düğmeleri 44 px altına inmez; yetki, veri ve güncelleme motoru değişmedi.

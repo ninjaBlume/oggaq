@@ -27,7 +27,7 @@ import {
 } from "./icons";
 import { displayPersonName, vocabulary } from "@oggaq/study-core";
 import { textSizeFactors } from "./textSize";
-import { motion, shape } from "./theme";
+import { buttonDensity, motion, shape } from "./theme";
 import type { AppPalette } from "./theme";
 import { Briefcase } from "./icons";
 import { railWidth } from "./layout";
@@ -547,12 +547,12 @@ function makeNavStyles(palette: AppPalette) {
     paddingVertical: 10,
   },
   menuRow: {
-    minHeight: 52,
+    minHeight: buttonDensity.standard.minHeight,
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
     paddingHorizontal: 12,
-    paddingVertical: 14,
+    paddingVertical: buttonDensity.standard.paddingVertical,
     borderRadius: shape.medium,
   },
   menuText: {

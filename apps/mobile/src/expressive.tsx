@@ -4,7 +4,7 @@ import { Animated, Pressable, View, type PressableProps, type StyleProp, type Vi
 import Svg, { Path } from "react-native-svg";
 import { Check } from "./icons";
 import { useReducedMotion, useSpringValue } from "./motion";
-import { shape } from "./theme";
+import { buttonDensity, shape } from "./theme";
 import { useTheme } from "./themeContext";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -156,7 +156,7 @@ function ChoiceButton<T extends string>({
   const corner = (outer: boolean) =>
     progress.interpolate({
       inputRange: [0, 1],
-      outputRange: [outer ? 26 : shape.connected, 26],
+      outputRange: [outer ? buttonDensity.choice.minHeight / 2 : shape.connected, buttonDensity.choice.minHeight / 2],
       extrapolate: "clamp",
     });
   return (
@@ -170,13 +170,11 @@ function ChoiceButton<T extends string>({
       onPress={onPress}
       style={{
         flex: 1,
-        minHeight: 52,
-        paddingHorizontal: 10,
-        paddingVertical: 12,
+        ...buttonDensity.choice,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        gap: 6,
+        gap: 4,
         backgroundColor: selected ? palette.primary : palette.primaryContainer,
         borderTopLeftRadius: corner(first),
         borderBottomLeftRadius: corner(first),
@@ -185,7 +183,7 @@ function ChoiceButton<T extends string>({
         opacity: disabled ? 0.45 : 1,
       }}
     >
-      {selected && <Check size={16} color={palette.onPrimary} />}
+      {selected && <Check size={14} color={palette.onPrimary} />}
       <Text
         style={{
           fontSize: 13,

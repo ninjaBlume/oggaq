@@ -20,6 +20,12 @@ export { darkPalette, lightPalette };
 
 export const shape = { ...tokenShape, connected: 6, control: 16, controlPressed: 12 } as const;
 
+export const buttonDensity = {
+  standard: { minHeight: 48, paddingVertical: 10, paddingHorizontal: 18 },
+  compact: { minHeight: 44, paddingVertical: 8, paddingHorizontal: 14 },
+  choice: { minHeight: 44, paddingVertical: 8, paddingHorizontal: 8 },
+} as const;
+
 export const typography = {
   ...typeScale,
   headline: { ...typeScale.headline, fontSize: 26, lineHeight: 33, letterSpacing: -0.5 },

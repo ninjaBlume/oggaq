@@ -20,7 +20,7 @@ import {
 } from "./icons";
 import type { LucideIcon } from "lucide-react-native";
 import { errorMessage } from "./feedback";
-import { shape } from "./theme";
+import { buttonDensity, shape } from "./theme";
 import { useLayout, useTheme } from "./themeContext";
 import { ExpressivePressable } from "./expressive";
 import { useSpringValue } from "./motion";
@@ -65,7 +65,7 @@ export function Button({
       onPress={onPress}
       style={[
         styles.button,
-        compact && { minHeight: 44, paddingVertical: 10, paddingHorizontal: 14 },
+        compact && buttonDensity.compact,
         secondary && styles.secondary,
         danger && { backgroundColor: palette.softRed },
         alignStart && { justifyContent: "flex-start" },

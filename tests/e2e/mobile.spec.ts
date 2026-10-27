@@ -509,6 +509,8 @@ test("Expressive düğme ve seçim grupları eylemleri korur ve küçük ekrana 
   }
   await page.setViewportSize({ width: 390, height: 844 });
   const start = page.getByRole("button", { name: "Sınava gir", exact: true });
+  expect((await start.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  expect((await start.boundingBox())!.height).toBeLessThanOrEqual(48);
   const radius = await start.evaluate((el) =>
     parseFloat(getComputedStyle(el).borderRadius),
   );

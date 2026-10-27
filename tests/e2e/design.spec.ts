@@ -148,6 +148,10 @@ test("mobil: ilk kurulum koyu cihazda Açık ve Standart; seçilen tercihler son
   const page = await context.newPage();
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${mobile}/`);
+  const loginButton = page.getByRole("button", { name: "Giriş yap", exact: true });
+  await expect(loginButton).toBeVisible();
+  expect((await loginButton.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  expect((await loginButton.boundingBox())!.height).toBeLessThanOrEqual(48);
   await page.getByLabel("E-posta adresi", { exact: true }).fill("e2e-student@example.test");
   await page.getByLabel("Parola", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
@@ -156,6 +160,11 @@ test("mobil: ilk kurulum koyu cihazda Açık ve Standart; seçilen tercihler son
   await page.getByRole("tab", { name: "Profil", exact: true }).click();
   await expect(page.getByRole("button", { name: "Görünüm: Açık", exact: true })).toHaveAttribute("aria-selected", "true");
   await expect(page.getByRole("button", { name: "Yazı boyutu: Standart", exact: true })).toHaveAttribute("aria-selected", "true");
+  for (const label of ["Görünüm: Açık", "Yazı boyutu: Standart"]) {
+    const choice = page.getByRole("button", { name: label, exact: true });
+    expect((await choice.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    expect((await choice.boundingBox())!.height).toBeLessThanOrEqual(44);
+  }
   expect(await page.evaluate(() => localStorage.getItem('oggaq.theme'))).toBeNull();
   expect(await page.evaluate(() => localStorage.getItem('oggaq.textSize'))).toBeNull();
   await page.getByRole("button", { name: "Görünüm: Koyu", exact: true }).click();

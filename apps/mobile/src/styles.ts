@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 import type { ColorScheme } from "@oggaq/design-tokens";
-import { palettes, shape, typography } from "./theme";
+import { buttonDensity, palettes, shape, typography } from "./theme";
 import type { AppPalette } from "./theme";
 
 // Shared styles for one palette. They are rebuilt only when the colour scheme changes (see stylesFor).
@@ -44,13 +44,11 @@ export function makeStyles(palette: AppPalette) {
       letterSpacing: 1.5,
     },
     button: {
-      minHeight: 54,
+      ...buttonDensity.standard,
       borderRadius: shape.control,
-      paddingVertical: 15,
-      paddingHorizontal: 20,
       backgroundColor: palette.primary,
       flexDirection: "row",
-      gap: 10,
+      gap: 8,
       alignItems: "center",
       justifyContent: "center",
     },

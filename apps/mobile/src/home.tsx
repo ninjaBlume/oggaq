@@ -18,7 +18,7 @@ import type { StudyContext, User } from "@oggaq/shared-types";
 import { ExpressivePressable } from "./expressive";
 import { examDisplayTitle, vocabulary } from "@oggaq/study-core";
 import { cardDensity, cardTone, type CardTone } from "@oggaq/design-tokens";
-import { scoreTone, shape } from "./theme";
+import { buttonDensity, scoreTone, shape } from "./theme";
 import { api } from "./api";
 import { useResource, useOnReturn } from "./hooks";
 import {
@@ -123,7 +123,7 @@ export function Home({
         <ExpressivePressable radius={shape.control} pressedRadius={shape.controlPressed}
           accessibilityRole="button" accessibilityLabel={activeExam ? "Denemene devam et" : "Sınava gir"}
           onPress={activeExam ? () => exam(activeExam.id) : deneme}
-          style={{ minHeight: 54, borderRadius: shape.control, paddingVertical: 14, paddingHorizontal: 16, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9, backgroundColor: palette.onNavy }}>
+          style={{ ...buttonDensity.standard, borderRadius: shape.control, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, backgroundColor: palette.onNavy }}>
           {activeExam ? <Play size={18} color={palette.navy} /> : <ArrowRight size={18} color={palette.navy} />}
           <Text style={{ color: palette.navy, fontSize: 15, lineHeight: 22, fontWeight: "700" }}>{activeExam ? "Denemene devam et" : "Sınava gir"}</Text>
         </ExpressivePressable>
