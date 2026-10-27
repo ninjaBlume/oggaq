@@ -25,8 +25,6 @@ test('the site renders without scripts, session requests or study forms and pres
     assert.match(html, /href="\/legal\/hesap-silme.html"/);
     assert.match(html, /class="app-screen" src="\/screens\/mobile-home.jpg\?v=[a-f0-9]{12}"/);
     assert.ok((await readFile(path.join(temp, 'screens/mobile-home.jpg'))).length > 0);
-    assert.match(html, /src="\/screens\/mobile-result.jpg\?v=[a-f0-9]{12}"/);
-    assert.ok((await readFile(path.join(temp, 'screens/mobile-result.jpg'))).length > 0);
     assert.match(html, /Örnek veriler/);
     assert.ok((await readFile(path.join(temp, 'fonts/LeagueSpartan-Bold.woff2'))).length > 0);
     assert.match(await readFile(path.join(temp, 'legal/gizlilik.html'), 'utf8'), /Gizlilik/);

@@ -10,9 +10,6 @@ for (const colorScheme of ['light', 'dark'] as const) test(`tanıtım sitesi: ${
     const screen = page.getByRole('img', { name: /^ÖGG SOR ana ekranı:/ });
     await expect(screen).toBeVisible();
     await expect.poll(() => screen.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth === 780 && img.naturalHeight === 1688)).toBe(true);
-    const result = page.getByRole('img', { name: /^ÖGG SOR sonuç özeti:/ });
-    await expect(result).toBeVisible();
-    await expect.poll(() => result.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth === 724 && img.naturalHeight === 268)).toBe(true);
     await expect(page.getByText('Örnek veriler', { exact: true })).toBeVisible();
     await expect(page.getByRole('group', { name: 'App Store: yakında', exact: true })).toBeVisible();
     await expect(page.getByRole('group', { name: 'Google Play: yakında', exact: true })).toBeVisible();
@@ -24,6 +21,20 @@ for (const colorScheme of ['light', 'dark'] as const) test(`tanıtım sitesi: ${
     for (const width of [320, 390, 834, 1280]) {
       await page.setViewportSize({ width, height: 1000 });
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await screen.scrollIntoViewIfNeeded();
+      const phone = await page.locator('.phone').boundingBox();
+      const image = await screen.boundingBox();
+      expect(phone).not.toBeNull();expect(image).not.toBeNull();
+      expect(image!.x).toBeGreaterThanOrEqual(phone!.x);
+      expect(image!.y).toBeGreaterThanOrEqual(phone!.y);
+      expect(image!.x + image!.width).toBeLessThanOrEqual(phone!.x + phone!.width);
+      expect(image!.y + image!.height).toBeLessThanOrEqual(phone!.y + phone!.height);
+      // The whole screenshot must be visible, including its central working area.
+      expect(await screen.evaluate(img => {
+        const r = img.getBoundingClientRect();
+        return document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2) === img;
+      })).toBe(true);
+      await page.evaluate(() => window.scrollTo(0, 0));
       await page.screenshot({ path: `artifacts/public-site/screens/${colorScheme}-${width}.png`, fullPage: true, animations: 'disabled' });
     }
     expect(apiRequests).toEqual([]);

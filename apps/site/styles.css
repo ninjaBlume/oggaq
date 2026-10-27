@@ -16,7 +16,7 @@ h1, h2, p, figure, dl, dd { margin: 0; }
 .site-header nav { display: flex; gap: 28px; align-items: center; font-size: 13px; }
 .site-header nav a { display: inline-flex; align-items: center; min-height: 44px; }
 .nav-download { gap: 16px; color: var(--c-primary); font-weight: 600; }
-.hero { display: grid; grid-template-columns: 1fr 1.04fr; grid-template-areas: "copy preview" "download preview"; align-items: center; column-gap: 48px; row-gap: 0; padding-block: 24px 48px; }
+.hero { display: grid; grid-template-columns: 1.15fr 1fr; grid-template-areas: "copy preview" "download preview"; align-items: center; column-gap: 64px; row-gap: 0; padding-block: 36px 52px; }
 .hero-copy { grid-area: copy; align-self: end; }
 .kicker { color: var(--c-primary); font-size: 13px; font-weight: 600; }
 h1 { font-size: clamp(36px, 4.4vw, 52px); font-weight: 700; line-height: 1.12; letter-spacing: -1.2px; margin-block: 16px 20px; }
@@ -39,24 +39,16 @@ h1 em { font-style: normal; color: var(--c-primary); }
 .store-card.available .store-state { color: var(--c-primary); }
 .store-card.available:hover { background: var(--c-soft-primary); }
 .store-notice { margin-top: 12px; color: var(--c-muted); font-size: 12px; }
-/* The artwork is composed from current app screenshots, with no generated UI. */
-.app-preview { grid-area: preview; min-width: 0; }
-.showcase { position: relative; height: 648px; overflow: hidden; isolation: isolate; background: var(--c-navy); border: 1px solid var(--c-navy); border-radius: 28px; }
-.showcase::before { content: ""; position: absolute; width: 430px; height: 690px; top: 55px; right: -195px; transform: rotate(25deg); background: var(--c-primary); z-index: -1; }
-.showcase-heading { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 24px; color: var(--c-on-navy); font-size: 12px; line-height: 18px; }
-.showcase-heading span:last-child { color: var(--c-on-navy-muted); font-size: 11px; }
-.showcase-line { position: absolute; left: 24px; top: 65px; width: 45px; height: 2px; background: var(--c-on-navy-muted); }
-.phone { position: absolute; right: 34px; top: 64px; width: 248px; padding: 0 6px; border: 1px solid var(--c-line); border-radius: 34px; background: var(--c-ink); overflow: hidden; transform: rotate(4deg); box-shadow: 0 22px 40px var(--c-scrim); }
-.phone-top { height: 22px; display: grid; place-items: center; }
-.phone-top span { display: block; width: 40px; height: 4px; background: var(--c-muted); border-radius: 3px; }
-.app-screen { width: 100%; border-radius: 4px; }
-.phone-bottom { height: 15px; display: grid; place-items: center; }
-.phone-bottom span { display: block; width: 66px; height: 3px; border-radius: 3px; background: var(--c-muted); }
-.result-preview { position: absolute; left: 22px; width: min(320px, calc(100% - 44px)); bottom: 44px; padding: 14px; border: 1px solid var(--c-line); border-radius: 18px; background: var(--c-surface); box-shadow: 0 12px 36px var(--c-scrim); }
-.result-preview p { margin-bottom: 9px; font-size: 13px; line-height: 18px; font-weight: 650; }
-.result-preview img { width: 100%; border-radius: 12px; }
-.app-preview figcaption { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 4px 12px; color: var(--c-muted); font-size: 11px; line-height: 18px; }
-.app-preview figcaption span { padding-left: 12px; border-left: 1px solid var(--c-line); }
+/* A single current app screenshot, upright and unobscured. */
+.app-preview { grid-area: preview; min-width: 0; display: grid; justify-items: center; gap: 16px; }
+.phone { width: 278px; max-width: 100%; padding: 0 7px; border: 1px solid var(--c-line); border-radius: 38px; background: var(--c-navy); overflow: hidden; box-shadow: 0 16px 36px color-mix(in srgb, var(--c-scrim) 30%, transparent); }
+.phone-top { height: 24px; display: grid; place-items: center; }
+.phone-top span { display: block; width: 38px; height: 4px; background: var(--c-on-navy-muted); opacity: .5; border-radius: 3px; }
+.app-screen { width: 100%; border-radius: 22px; }
+.phone-bottom { height: 13px; display: grid; place-items: center; }
+.phone-bottom span { display: block; width: 64px; height: 3px; border-radius: 3px; background: var(--c-on-navy-muted); opacity: .5; }
+.app-preview figcaption { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; color: var(--c-muted); font-size: 11px; line-height: 16px; }
+.app-preview figcaption span { padding-left: 10px; border-left: 1px solid var(--c-line); }
 .app-details { display: grid; grid-template-columns: 1fr 1.15fr; gap: 70px; padding-block: 42px 48px; border-top: 1px solid var(--c-line); }
 .details-intro h2 { margin-block: 12px; font-size: 29px; line-height: 1.3; letter-spacing: -.3px; font-weight: 600; }
 .details-intro > p:last-child { max-width: 320px; color: var(--c-muted); font-size: 15px; }
@@ -79,10 +71,7 @@ h1 em { font-style: normal; color: var(--c-primary); }
 .footer-bottom p { max-width: 760px; }
 @media (max-width: 1000px) {
   .hero { column-gap: 28px; }
-  .showcase { height: 616px; }
-  .showcase-heading { padding: 20px; flex-wrap: wrap; gap: 2px 12px; }
-  .phone { width: 230px; right: 26px; top: 74px; }
-  .result-preview { left: 16px; width: min(300px, calc(100% - 48px)); bottom: 38px; padding: 12px; }
+  .phone { width: 260px; }
   .store-list { flex-direction: column; }
   .store-card { max-width: 320px; }
   .app-details { gap: 36px; }
@@ -94,7 +83,7 @@ h1 em { font-style: normal; color: var(--c-primary); }
   .brand img { width: 38px; }
   .site-header nav { gap: 12px; }
   .site-header nav a:not(.nav-download) { display: none; }
-  .hero { grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "preview" "download"; gap: 28px; padding-block: 24px 36px; }
+  .hero { grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "download" "preview"; gap: 28px; padding-block: 24px 36px; }
   .hero-copy { padding-bottom: 0; }
   h1 { font-size: 36px; letter-spacing: -.4px; margin-block: 14px 18px; }
   .hero-description { font-size: 16px; }
@@ -103,10 +92,8 @@ h1 em { font-style: normal; color: var(--c-primary); }
   .store-list { flex-direction: row; flex-wrap: wrap; }
   .store-card { flex: 1 1 210px; max-width: none; }
   .app-preview { width: 100%; max-width: 430px; justify-self: center; }
-  .showcase { height: 600px; }
-  .phone { width: 230px; top: 72px; right: 30px; }
-  .result-preview { bottom: 32px; width: min(300px, calc(100% - 48px)); }
-  .app-preview figcaption { margin-top: 12px; }
+  .phone { width: 244px; }
+  .app-preview { margin-top: 8px; }
   .app-details { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-block: 28px 32px; }
   .details-intro h2 { font-size: 27px; }
   .details-intro h2 br { display: none; }
@@ -120,11 +107,7 @@ h1 em { font-style: normal; color: var(--c-primary); }
   .site-header .brand-wordmark { font-size: 20px; }
   .site-header nav { font-size: 12px; }
   .nav-download { gap: 8px; }
-  .showcase { height: 540px; border-radius: 22px; }
-  .phone { width: 204px; top: 66px; right: 24px; }
-  .result-preview { left: 12px; width: calc(100% - 42px); bottom: 24px; padding: 10px; }
-  .showcase-heading { padding: 16px; font-size: 11px; }
-  .showcase-line { left: 16px; }
+  .phone { width: 232px; }
   .app-preview figcaption { font-size: 11px; }
 }
 @media (prefers-reduced-motion: reduce) {

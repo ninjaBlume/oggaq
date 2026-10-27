@@ -1,5 +1,14 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Reddedilen site görselinin geri alınması ve tek telefon önizlemesi
+
+Kullanıcı `8937c44` kompozisyonunu reddetti. Canlı ortak compose override'ında yalnız web imajı `site-visual-20261028` yerine `documents-20261028` yapılıp `manage up -d --no-deps --no-build web` ile önceki sade siteye dönüldü. Hesap/yönetim/bilgi/marka dosyalarının 10 hash'i ve diğer 7 servisin container kimliği aynı kaldı. Origin ve genel HTTPS üzerinde beş readiness kontrolü geçti; genel HTML'de reddedilen `showcase` yok. Geri alım kaydı `artifacts/site-clean-preview/rollback.log` içinde.
+
+Yerel yeni taslakta güncel ana ekranı gösteren tek, düz telefon bulunur. Lacivert panel/çapraz dekor/eğim/öne bindirilmiş sonuç kartı ve kullanılmayan sonuç JPEG'i kaldırıldı. Ana ekran 780×1688 / 143.081 byte, içerik hash'li URL ve örnek veri açıklaması korunur. Masaüstünde metnin sağında; mobilde indirme alanının altında gösterilir. Bilgi sayfalarının üretilmiş ortak CSS sürümü güncellendi; içerikleri değişmedi.
+
+**4 site Node testi, 6 site Chromium E2E, site build, marka tutarlılığı ve git diff boşluk kontrolü geçti.** 320/390/834/1280 px açık/koyu tema, gerçek görsel yüklenmesi, çerçeve içinde kalması, ekran ortasının örtülmemesi, taşmama, mağaza Yakında durumu, sıfır API isteği ve hesap/bilgi yolları kontrol edildi. Açık/koyu masaüstü ve mobil PNG'ler görsel olarak incelendi. Önizlemeler `artifacts/site-clean-preview/` altında; geçici 5189 sunucusu kapatıldı. Yerel taslak **yayımlanmadı**, kullanıcı incelemesi bekleniyor. Mobil/API/DB değişmedi; backend/ürün testleri veya OTA tekrarı ve Git push yok.
+
+
 
 
 
