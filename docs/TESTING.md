@@ -8,6 +8,10 @@ Mobil ilk açılış tercihi `light` oldu; yazı boyutunun mevcut `standard` var
 
 Backend/API/veritabanı değişmedi; PHPUnit, Composer, tüm E2E matrisi ve daha önce belgelenen yasal sayfa testleri bu dar mobil değişiklik için tekrar çalıştırılmadı. iOS ve Android runtime'ları mevcut native beta ile aynı kaldı. Fiziksel cihaz veya Device Hub native ilk kurulum senaryosu henüz teyit edilmedi; tarayıcı önizlemesi native kalıcı saklama kanıtı sayılmaz. Beta dağıtım sonucu aşağıda ayrıca kaydedilir.
 
+Bu değişiklik uyumlu JavaScript OTA güncellemesidir; mevcut TestFlight/Play beta paketinin gömülü kodu yeniden derlenmedi. Eski native paket ilk kez kurulursa yeni varsayılan OTA indirildikten sonraki açılışta uygulanır. Sonraki native derleme yeni varsayılanı gömülü içerir. Bu turda yeni mağaza paketi veya genel yayın oluşturulmadı.
+
+Kaynak `3236b05`: iOS `testflight / 01a17e99-a3ce-7fbd-b47a-cd51fa883676`, grup `92d5aa21-9abb-48e8-918c-4491145d015c`; Android `android-beta / 01a17e9a-9d38-772f-a5f6-8a01e13fa33d`, grup `a236d361-9085-481f-88a1-5a33424707da`. Her platformun gerçek native başlıklarıyla manifest/launch asset ve bütün ek dosyalarının SHA256 kontrolleri (iOS 18, Android 19) geçti; yeni profil açıklaması Hermes paketinde bulundu. Kanal/runtime/platform/API ayrımı korundu; yanlış runtime/platform 204, üretim kanalı 404. Android yayınında yalnız iOS dağıtım notu commit dışındaydı; uygulama kodu kaynak commit ile aynıydı. Kanıtlar `artifacts/default-appearance/ota/`; fiziksel cihaz alımı teyit edilmedi. Git push yapılmadı.
+
 ## 27 Ekim 2026 — Kullanıcı isteğiyle yeniden öğrenci temizliği
 
 Expo/Device Hub giriş denemesinden sonra kullanıcı yeniden kayıt olabilmek için normal hesabın tekrar silinmesini istedi. İkinci işlemde de **1 öğrenci silindi, 0 öğrenci / 1 platform yöneticisi kaldı**; sınav/alıştırma/başvuru yoktu. Aynı transaction, erasure ledger, yönetici ve 11 içerik tablosu karşılaştırmaları ile kişisel kayıt/token/oturum temizliği doğrulandı. Posta gönderilmedi; dış HTTPS readiness sağlıklı. Anonim sonuç: `artifacts/student-reset/second-result.json`. Kod veya mobil beta değişmedi; ürün testleri tekrar çalıştırılmadı.

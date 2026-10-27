@@ -1,5 +1,7 @@
 # iPhone ve iPad için kapalı beta
 
+**Son görünüm güncellemesi — 27 Ekim 2026:** Kaynak `3236b05`, **testflight / 01a17e99-a3ce-7fbd-b47a-cd51fa883676**, grup `92d5aa21-9abb-48e8-918c-4491145d015c`. İlk kurulum varsayılanları **Açık görünüm / Standart yazı**; cihaz koyu modda olsa da tercih yoksa açık başlar. Önceden kaydedilmiş kullanıcı tercihleri korunur. Mevcut 0.1.1 native paket ve runtime değişmez. Fiziksel cihazın **01a17e99** alımı ve native ilk kurulum henüz teyit edilmedi. Profil → Uygulama güncellemesi → Güncellemeleri denetle → Güncellemeyi uygula; sınav sırasında zorunlu yeniden başlatma yok. [Doğrulama ve dağıtım kontrolleri](TESTING.md).
+
 **Son öğrenci akışı — 27 Ekim 2026:** Kaynak `8da8d13`, **testflight / 01a17df3-6923-75b2-8257-caa928de4e21**, grup `d7d1502a-0621-431c-9fc8-bd24a73c4327`. Kayıt sonrası doğrudan kişisel çalışma açılır; genel doğrulama ekranı ve profil rozeti kaldırıldı. Kayıt doğrulama postası göndermez. Doğrulama yalnız iş başvurusu ve kurumsal/yönetim işlemlerinde istenir. Mevcut 0.1.1 paket/runtime korunur. Manifest, launch asset ve 18 ek dosyanın hash kontrolleri geçti. Native pakette eski ekran/rozet bulunmadı, başvuruya özel doğrulama metni bulundu. Fiziksel cihazın **01a17df3** alımı ve yeni kayıt akışı henüz teyit edilmedi. Profil → Uygulama güncellemesi → Güncellemeleri denetle → Güncellemeyi uygula; giriş ekranındaysa internet bağlıyken bir süre açık tutup tamamen kapatarak yeniden aç. Sınav sırasında zorunlu yeniden başlatma ve genel mağaza yayını yok. [Kontroller](TESTING.md).
 
 
