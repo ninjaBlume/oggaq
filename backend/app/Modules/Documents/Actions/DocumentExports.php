@@ -23,6 +23,8 @@ class DocumentExports
                 'recipient' => $template['kind'] === 'petition' ? '................................................................................' : null,
                 'body' => $this->templates->draft($template, [], true),
                 'signers' => array_map(fn ($role) => ['role' => $role, 'name' => null], $template['signer_roles']),
+                'address' => $template['kind'] === 'petition' ? "................................................................................\n................................................................................" : null,
+                'contact' => $template['kind'] === 'petition' ? '................................................................................' : null,
             ];
         }
         $token = bin2hex(random_bytes(32));

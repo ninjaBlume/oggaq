@@ -3317,6 +3317,12 @@ export interface components {
             key: string;
             label: string;
             multiline: boolean;
+            /**
+             * @description Tarih gg/aa/yyyy, saat ss:dd biçiminde girilir.
+             * @enum {string}
+             */
+            format: "text" | "date" | "time";
+            optional: boolean;
         };
         DocumentTemplate: {
             id: string;
@@ -3327,11 +3333,17 @@ export interface components {
             version: string;
             fields: components["schemas"]["DocumentField"][];
             signer_roles: string[];
+            /**
+             * @deprecated
+             * @description Eski istemciler için boş dizi; örnekler ÖGG SOR için özgün olarak yazılmıştır.
+             */
             sources: {
                 title: string;
                 /** Format: uri */
                 url: string;
             }[];
+            /** @description ÖGG SOR için yazılmış özgün metin; {alan} yerleri kullanıcı bilgisi veya boş doldurma alanıyla değiştirilir. */
+            body: string;
         };
         DocumentDraft: {
             title: string;
@@ -3347,7 +3359,11 @@ export interface components {
             mode: "blank" | "guided" | "free";
             title?: string | null;
             recipient?: string | null;
-            /** Format: date */
+            /**
+             * @description Kullanıcı tarihi gg/aa/yyyy (ör. 28/10/2026). ISO yyyy-aa-gg yalnız eski istemci uyumluluğu için kabul edilir. PDF daima gg/aa/yyyy gösterir.
+             * @example 28/10/2026
+             * @example null
+             */
             document_date?: string | null;
             body?: string | null;
             address?: string | null;

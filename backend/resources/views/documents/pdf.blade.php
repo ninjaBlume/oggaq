@@ -11,7 +11,7 @@ p { margin: 0 0 10pt; overflow-wrap: break-word; }
 .details { margin-top: 18pt; font-size: 10pt; }
 </style></head><body>
 <h1>{{ $document['title'] }}</h1>
-<div class="date">{{ empty($document['document_date']) ? 'Tarih: .... / .... / ........' : \Carbon\CarbonImmutable::parse($document['document_date'])->format('d.m.Y') }}</div>
+<div class="date">{{ empty($document['document_date']) ? 'Tarih: ../../....' : \App\Modules\Documents\Actions\DocumentDates::display($document['document_date']) }}</div>
 @if(!empty($document['recipient']))<div class="recipient">{!! nl2br(e($document['recipient'])) !!}</div>@endif
 @foreach(explode("\n\n", $document['body']) as $paragraph)<p>{!! nl2br(e($paragraph)) !!}</p>@endforeach
 @if(!empty($document['attachments']))<div class="details"><b>Ekler</b><br>{!! nl2br(e($document['attachments'])) !!}</div>@endif

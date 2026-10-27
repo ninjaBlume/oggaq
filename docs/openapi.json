@@ -12729,7 +12729,9 @@
         "required": [
           "key",
           "label",
-          "multiline"
+          "multiline",
+          "format",
+          "optional"
         ],
         "properties": {
           "key": {
@@ -12739,6 +12741,18 @@
             "type": "string"
           },
           "multiline": {
+            "type": "boolean"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "text",
+              "date",
+              "time"
+            ],
+            "description": "Tarih gg/aa/yyyy, saat ss:dd biçiminde girilir."
+          },
+          "optional": {
             "type": "boolean"
           }
         }
@@ -12753,7 +12767,8 @@
           "version",
           "fields",
           "signer_roles",
-          "sources"
+          "sources",
+          "body"
         ],
         "properties": {
           "id": {
@@ -12804,7 +12819,14 @@
                   "format": "uri"
                 }
               }
-            }
+            },
+            "deprecated": true,
+            "maxItems": 0,
+            "description": "Eski istemciler için boş dizi; örnekler ÖGG SOR için özgün olarak yazılmıştır."
+          },
+          "body": {
+            "type": "string",
+            "description": "ÖGG SOR için yazılmış özgün metin; {alan} yerleri kullanıcı bilgisi veya boş doldurma alanıyla değiştirilir."
           }
         }
       },
@@ -12881,7 +12903,12 @@
               "string",
               "null"
             ],
-            "format": "date"
+            "pattern": "^(?:[0-9]{2}/[0-9]{2}/[0-9]{4}|[0-9]{4}-[0-9]{2}-[0-9]{2})$",
+            "description": "Kullanıcı tarihi gg/aa/yyyy (ör. 28/10/2026). ISO yyyy-aa-gg yalnız eski istemci uyumluluğu için kabul edilir. PDF daima gg/aa/yyyy gösterir.",
+            "examples": [
+              "28/10/2026",
+              null
+            ]
           },
           "body": {
             "type": [

@@ -2,12 +2,26 @@
 
 namespace App\Modules\Documents\Http\Requests;
 
+use App\Modules\Documents\Actions\DocumentDates;
 use App\Modules\Documents\Actions\DocumentTemplates;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class ExportDocumentRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        $date = $this->input('document_date');
+        if (is_string($date) && ($normalized = DocumentDates::normalize($date)) !== null) {
+            $this->merge(['document_date' => $normalized]);
+        }
+    }
+
+    public function messages(): array
+    {
+        return ['document_date.date_format' => 'Tarihi gg/aa/yyyy biçiminde, geçerli bir gün olarak girin.'];
+    }
+
     public function rules(DocumentTemplates $templates): array
     {
         $templates->find(is_string($this->input('template_id')) ? $this->input('template_id') : '');

@@ -29,16 +29,19 @@ test('dilekçe: gerçek API ile taslak, düzenleme, önizleme ve tek kullanıml�
   await page.getByRole('button', { name: 'Dilekçe hazırla', exact: true }).click();
   const create = page.getByRole('button', { name: 'Taslağı oluştur', exact: true });
   await expect(create).toBeDisabled();
+  await expect(page.getByText('ÖGG SOR için hazırlanmış özgün ve düzenlenebilir örnektir.', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Üniversitesi|Emniyet Müdürlüğü/ })).toHaveCount(0);
   await page.getByLabel('Talep veya bildirim', { exact: true }).fill('Görev çizelgemin bir örneğini talep ediyorum.');
   await page.getByLabel('Açıklama / gerekçe', { exact: true }).fill('Sentetik kayıt kontrolü.');
   await create.click();
   await expect(page.getByLabel('Belge metni', { exact: true })).toContainText('Görev çizelgemin');
   await page.getByLabel('Belge başlığı', { exact: true }).fill('Sentetik çizelge talebi');
   await page.getByLabel('Muhatap / birim (isteğe bağlı)', { exact: true }).fill('Örnek Güvenlik Müdürlüğüne');
-  await page.getByLabel('Belge tarihi (YYYY-AA-GG, isteğe bağlı)', { exact: true }).fill('2026-10-28');
+  await page.getByLabel('Belge tarihi (gg/aa/yyyy, isteğe bağlı)', { exact: true }).fill('28/10/2026');
   await page.getByLabel('İmza 1 · adı soyadı (isteğe bağlı)', { exact: true }).fill('Örnek Öğrenci');
   await page.getByRole('button', { name: 'Metni önizle', exact: true }).click();
   await expect(page.getByText('Sentetik çizelge talebi', { exact: true })).toBeVisible();
+  await expect(page.getByText('Tarih: 28/10/2026', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Kapat', exact: true }).click();
   const exported = page.waitForResponse(r => r.url().endsWith('/api/v1/document-exports') && r.request().method() === 'POST');
   const popup = context.waitForEvent('page');
@@ -67,6 +70,7 @@ test('tutanak: matbu PDF ve serbest metin, rol düzenleme; telefon/tablet taşma
   await page.getByRole('button', { name: 'Tutanak hazırla', exact: true }).click();
   await page.getByRole('button', { name: 'Olay / tespit tutanağı', exact: true }).click();
   await page.getByRole('button', { name: 'Teslim-tesellüm tutanağı', exact: true }).click();
+  await expect(page.getByLabel('Teslim tarihi (gg/aa/yyyy)', { exact: true })).toHaveAttribute('placeholder', 'gg/aa/yyyy');
   await page.getByRole('button', { name: 'Matbu örnek', exact: true }).click();
   await expect(page.getByLabel('Belge metni', { exact: true })).toHaveCount(0);
   const popup = context.waitForEvent('page');
@@ -102,4 +106,25 @@ test('taslak isteği başarısız olunca girilen metin korunur ve tekrar oluştu
   await page.unroute('**/api/v1/documents/prepare');
   await page.getByRole('button', { name: 'Taslağı oluştur', exact: true }).click();
   await expect(page.getByLabel('Belge metni', { exact: true })).toContainText('Sentetik talep');
+});
+
+
+test('izin tarihleri gg/aa/yyyy girilir; ters tarih aralığı açıklanır ve düzeltilince özgün metin oluşur', async ({ page }) => {
+  await page.getByRole('button', { name: 'Menüyü aç', exact: true }).click();
+  await page.getByRole('button', { name: 'Dilekçe hazırla', exact: true }).click();
+  await page.getByRole('button', { name: 'Genel talep / bildirim', exact: true }).click();
+  await page.getByRole('button', { name: 'İzin talebi', exact: true }).click();
+  // Wait for the closing sheet's focus restoration before typing into the form.
+  await expect(page.getByRole('button', { name: 'Kapat', exact: true, includeHidden: true })).toHaveCount(0);
+  await page.getByLabel('İzin başlangıç tarihi (gg/aa/yyyy)', { exact: true }).fill('28/10/2026');
+  await page.getByLabel('İzin bitiş tarihi (gg/aa/yyyy)', { exact: true }).fill('27/10/2026');
+  await page.getByLabel('İzin talebi ve açıklama', { exact: true }).fill('Sentetik açıklama');
+  await page.getByRole('button', { name: 'Taslağı oluştur', exact: true }).click();
+  await expect(page.getByText('İzin bitiş tarihi başlangıç tarihinden önce olamaz.', { exact: true })).toBeVisible();
+  const end = page.getByLabel('İzin bitiş tarihi (gg/aa/yyyy)', { exact: true });
+  await end.fill('29/10/2026');
+  await expect(end).toHaveValue('29/10/2026');
+  await page.getByRole('button', { name: 'Taslağı oluştur', exact: true }).click();
+  await expect(page.getByLabel('Belge metni', { exact: true })).toContainText('28/10/2026 - 29/10/2026 tarihleri arasında izin kullanmak istiyorum.');
+  await expect(page.getByLabel('Belge tarihi (gg/aa/yyyy, isteğe bağlı)', { exact: true })).toHaveAttribute('placeholder', 'gg/aa/yyyy');
 });

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Linking, View } from "react-native";
 import type { components, User } from "@oggaq/shared-types";
+import brand from "../../../config/brand.json";
 import { api, apiUrl } from "./api";
 import { ChoiceGroup } from "./expressive";
 import { useResource, useTask } from "./hooks";
@@ -49,9 +50,8 @@ function DocumentForm({ template, user }: { template: Template; user: User }) {
   const [preview, setPreview] = useState(false);
   const prepare = useTask<Draft>();
   const output = useTask<void>();
-  const source = useTask<unknown>();
   const pending = prepare.pending || output.pending;
-  const missing = template.fields.some(field => !fields[field.key]?.trim());
+  const missing = template.fields.some(field => !field.optional && !fields[field.key]?.trim());
   const blank = mode === "blank";
   const createDraft = () => void prepare.run(async () => (await api.request("post", "/api/v1/documents/prepare", { body: { template_id: template.id, fields } })).data, setDraft);
   const exportPdf = () => void output.run(async () => {
@@ -66,7 +66,7 @@ function DocumentForm({ template, user }: { template: Template; user: User }) {
     <ChoiceGroup choices={modes} value={mode} disabled={pending} onChange={value => { setMode(value); setDraft(value === "free" ? { title: template.title, body: "" } : null); }} />
     <Text style={styles.muted}>{blank ? "Boş alanlı örneği yazdırıp elle doldurabilirsin." : "Bu bir düzenlenebilir örnektir. Kurumunun istediği biçimi ve başvuru yolunu kontrol et."}</Text>
     {mode === "guided" && !draft && <Card compact>
-      {template.fields.map(field => <Field key={field.key} label={field.label} value={fields[field.key] ?? ""} maxLength={6000} multiline={field.multiline} editable={!pending} onChange={value => setFields(previous => ({ ...previous, [field.key]: value }))} />)}
+      {template.fields.map(field => <Field key={field.key} label={field.label} placeholder={field.format === "date" ? "gg/aa/yyyy" : field.format === "time" ? "ss:dd" : undefined} value={fields[field.key] ?? ""} maxLength={field.format === "date" ? 10 : field.format === "time" ? 5 : 6000} multiline={field.multiline} editable={!pending} onChange={value => setFields(previous => ({ ...previous, [field.key]: value }))} />)}
       <Button disabled={missing || pending} onPress={createDraft}>{prepare.pending ? "Hazırlanıyor…" : "Taslağı oluştur"}</Button>
     </Card>}
     <ErrorNotice error={prepare.error} />
@@ -75,7 +75,7 @@ function DocumentForm({ template, user }: { template: Template; user: User }) {
         <SectionTitle>Metnini düzenle</SectionTitle>
         <Field label="Belge başlığı" value={draft.title} maxLength={150} editable={!pending} onChange={title => setDraft({ ...draft, title })} />
         <Field label="Muhatap / birim (isteğe bağlı)" value={recipient} maxLength={300} editable={!pending} onChange={setRecipient} />
-        <Field label="Belge tarihi (YYYY-AA-GG, isteğe bağlı)" value={date} placeholder="2026-10-28" maxLength={10} editable={!pending} onChange={setDate} />
+        <Field label="Belge tarihi (gg/aa/yyyy, isteğe bağlı)" value={date} placeholder="gg/aa/yyyy" maxLength={10} editable={!pending} onChange={setDate} />
         <Field label="Belge metni" value={draft.body} maxLength={16000} multiline editable={!pending} onChange={body => setDraft({ ...draft, body })} />
         <Field label="Ekler (isteğe bağlı)" value={attachments} maxLength={1500} multiline editable={!pending} onChange={setAttachments} />
         {template.kind === "petition" && <><Field label="Adres (isteğe bağlı)" value={address} maxLength={600} multiline editable={!pending} onChange={setAddress} /><Field label="İletişim (isteğe bağlı)" value={contact} maxLength={200} editable={!pending} onChange={setContact} /></>}
@@ -90,11 +90,11 @@ function DocumentForm({ template, user }: { template: Template; user: User }) {
         {signers.length < 6 && <Button secondary disabled={pending} onPress={() => setSigners(previous => [...previous, { role: "İlgili", name: "" }])}>İmza alanı ekle</Button>}
       </Card>
       <Button secondary onPress={() => setPreview(true)}>Metni önizle</Button>
-      <Sheet visible={preview} title="Belge önizlemesi" close={() => setPreview(false)}><Text style={styles.heading}>{draft.title}</Text>{!!recipient && <Text style={styles.text}>{recipient}</Text>}<Text style={styles.text}>{draft.body}</Text>{!!attachments && <Text style={styles.text}>{`Ekler\n${attachments}`}</Text>}{signers.map((signer, i) => <Text key={i} style={styles.text}>{`${signer.role}\n${signer.name || "Adı soyadı"}\nİmza: ……………………`}</Text>)}</Sheet>
+      <Sheet visible={preview} title="Belge önizlemesi" close={() => setPreview(false)}><Text style={styles.heading}>{draft.title}</Text>{!!recipient && <Text style={styles.text}>{recipient}</Text>}{!!date && <Text style={styles.text}>{`Tarih: ${date}`}</Text>}<Text style={styles.text}>{draft.body}</Text>{!!attachments && <Text style={styles.text}>{`Ekler\n${attachments}`}</Text>}{signers.map((signer, i) => <Text key={i} style={styles.text}>{`${signer.role}\n${signer.name || "Adı soyadı"}\nİmza: ……………………`}</Text>)}</Sheet>
     </>}
     {(blank || draft) && <Card compact tone="blue"><Button disabled={pending || (!blank && (!draft?.body.trim() || !draft.title.trim() || signers.some(s => !s.role.trim())))} onPress={exportPdf}>{output.pending ? "PDF hazırlanıyor…" : "PDF aç / indir"}</Button><Text style={styles.muted}>PDF’yi tarayıcıda açarak kaydedebilir, paylaşabilir veya yazdırabilirsin.</Text></Card>}
     <ErrorNotice title="PDF açılamadı" error={output.error} retry={exportPdf} />
     <Text style={[styles.muted, { fontSize: 12 }]}>Belge bilgileri PDF hazırlamak için sunucuya iletilir; geçici erişim 5 dakika sonra sona erer. Uygulamada belge arşivi tutulmaz. Bu ekrandan çıkınca metnini yeniden girmen gerekir. Belge kurumlara gönderilmez ve elektronik olarak imzalanmaz.</Text>
-    <Card compact><SectionTitle>Örnek hakkında</SectionTitle><Text style={styles.muted}>Genel kullanım için uyarlanmıştır; resmî veya kurumca onaylanmış form değildir. Şablon sürümü: {template.version}</Text>{template.sources.map(item => <Button key={item.url} secondary disabled={source.pending} onPress={() => void source.run(() => Linking.openURL(item.url), () => {})}>{item.title}</Button>)}<ErrorNotice error={source.error} /></Card>
+    <Text style={[styles.muted, { fontSize: 12 }]}>{`${brand.name} için hazırlanmış özgün ve düzenlenebilir örnektir.`}</Text>
   </>;
 }

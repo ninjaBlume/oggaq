@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Modules\Documents\Actions\DocumentDates;
 use App\Modules\Documents\Actions\DocumentExports;
 use App\Modules\Documents\Actions\DocumentTemplates;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -45,9 +46,9 @@ class DocumentGenerationTest extends TestCase
         $this->postJson('/api/v1/documents/prepare', ['template_id' => 'report-incident', 'fields' => ['place' => 'Sentetik kapı']])->assertUnprocessable();
         $this->postJson('/api/v1/documents/prepare', ['template_id' => 'petition-general', 'fields' => ['request' => 'Talep', 'reason' => 'Gerekçe', 'unexpected' => 'veri']])->assertUnprocessable();
         $this->postJson('/api/v1/documents/prepare', ['template_id' => ['invalid'], 'fields' => []])->assertUnprocessable();
-        $this->postJson('/api/v1/documents/prepare', ['template_id' => 'report-incident', 'fields' => array_fill_keys(['occurred', 'place', 'description', 'actions'], str_repeat('a', 6000))])->assertUnprocessable();
+        $this->postJson('/api/v1/documents/prepare', ['template_id' => 'petition-shift', 'fields' => array_fill_keys(['current', 'requested', 'reason'], str_repeat('a', 6000))])->assertUnprocessable();
         $this->postJson('/api/v1/documents/prepare', ['template_id' => 'petition-general', 'fields' => ['request' => 'Vardiya kaydımı talep ediyorum.', 'reason' => 'Kayıt kontrolü']])
-            ->assertOk()->assertJsonPath('data.title', 'Genel talep / bildirim')->assertJsonFragment(['body' => "Talep veya bildirim:\nVardiya kaydımı talep ediyorum.\n\nAçıklama / gerekçe:\nKayıt kontrolü"]);
+            ->assertOk()->assertJsonPath('data.title', 'Genel talep / bildirim')->assertJsonFragment(['body' => "Başvuru konusu: Vardiya kaydımı talep ediyorum.\n\nBaşvuruma ilişkin açıklama ve gerekçem:\nKayıt kontrolü\n\nBelirttiğim talebin değerlendirilmesini ve sonucuyla ilgili tarafıma bilgi verilmesini arz ederim."]);
     }
 
     public function test_export_is_encrypted_short_lived_and_one_use(): void
@@ -129,6 +130,65 @@ class DocumentGenerationTest extends TestCase
         $this->assertStringContainsString("default-src 'none'", $response->headers->get('Content-Security-Policy'));
         $response->assertSee('src="/api/v1/document-exports/viewer.js"', false)->assertSee('method="post"', false);
         $this->get('/api/v1/document-exports/viewer.js')->assertOk()->assertHeader('Content-Type', 'application/javascript; charset=UTF-8')->assertSee('history.replaceState', false);
+    }
+
+    public function test_templates_use_our_own_fillable_text_without_institution_sources(): void
+    {
+        foreach (app(DocumentTemplates::class)->all() as $template) {
+            $this->assertSame([], $template['sources']);
+            $this->assertSame('2026-10-28.2', $template['version']);
+            $this->assertDoesNotMatchRegularExpression('/https?:|Üniversitesi|Emniyet Müdürlüğü/', $template['body']);
+            $blank = app(DocumentTemplates::class)->draft($template, [], true);
+            $this->assertDoesNotMatchRegularExpression('/\{[a-z_]+\}/', $blank);
+            $this->assertNotEmpty($blank);
+        }
+        $template = app(DocumentTemplates::class)->find('petition-leave');
+        $blank = app(DocumentTemplates::class)->draft($template, [], true);
+        $this->assertStringContainsString('../../.... - ../../.... tarihleri arasında izin kullanmak istiyorum.', $blank);
+    }
+
+    public function test_document_dates_display_day_month_year_and_keep_old_clients_compatible(): void
+    {
+        $this->asToken($this->createUser());
+        foreach (['28/10/2026', '2026-10-28'] as $date) {
+            $ticket = $this->ticket(['document_date' => $date]);
+            $document = app(DocumentExports::class)->redeem($ticket);
+            $this->assertSame('2026-10-28', $document['document_date']);
+            $html = view('documents.pdf', ['document' => $document])->render();
+            $this->assertStringContainsString('28/10/2026', $html);
+            $this->assertStringNotContainsString('28.10.2026', $html);
+        }
+        $this->assertSame('2024-02-29', DocumentDates::normalize('29/02/2024'));
+        foreach (['31/04/2026', '29/02/2025', '1/2/2026', '28.10.2026', '00/01/2026', '01/01/0000', "bad\x00date"] as $invalid) {
+            $this->assertNull(DocumentDates::normalize($invalid));
+        }
+        $this->postJson('/api/v1/document-exports', $this->input(['document_date' => '31/04/2026']))->assertUnprocessable();
+    }
+
+    public function test_guided_dates_and_optional_time_are_rendered_without_inventing_information(): void
+    {
+        $this->asToken($this->createUser());
+        $body = $this->postJson('/api/v1/documents/prepare', ['template_id' => 'report-incident', 'fields' => [
+            'occurred' => '28/10/2026', 'place' => 'Sentetik kapı', 'description' => 'Sentetik olay açıklaması', 'actions' => 'Sentetik işlem',
+        ]])->assertOk()->json('data.body');
+        $this->assertStringContainsString('Olay / tespit tarihi: 28/10/2026', $body);
+        $this->assertStringContainsString('Saat (biliniyorsa): ..:..', $body);
+        $this->assertStringNotContainsString('2026-10-28', $body);
+        $this->postJson('/api/v1/documents/prepare', ['template_id' => 'petition-leave', 'fields' => [
+            'start_date' => '28/10/2026', 'end_date' => '29/10/2026', 'reason' => 'Sentetik açıklama',
+        ]])->assertOk()->assertJsonFragment(['body' => "28/10/2026 - 29/10/2026 tarihleri arasında izin kullanmak istiyorum.\n\nİzin talebime ilişkin açıklamam:\nSentetik açıklama\n\nTalebimin değerlendirilmesini arz ederim."]);
+    }
+
+    public function test_invalid_guided_dates_times_and_reverse_leave_ranges_are_rejected(): void
+    {
+        $this->asToken($this->createUser());
+        $fields = ['occurred' => '28/10/2026', 'time' => '12:30', 'place' => 'Sentetik yer', 'description' => 'Sentetik açıklama', 'actions' => 'Sentetik işlem'];
+        foreach ([['occurred' => '31/04/2026'], ['time' => '24:01'], ['time' => '10:60']] as $override) {
+            $this->postJson('/api/v1/documents/prepare', ['template_id' => 'report-incident', 'fields' => array_replace($fields, $override)])->assertUnprocessable();
+        }
+        $this->postJson('/api/v1/documents/prepare', ['template_id' => 'petition-leave', 'fields' => [
+            'start_date' => '29/10/2026', 'end_date' => '28/10/2026', 'reason' => 'Sentetik açıklama',
+        ]])->assertUnprocessable();
     }
 
     public function test_all_blank_templates_and_long_turkish_document_render_as_pdf(): void

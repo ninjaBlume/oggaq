@@ -1,5 +1,17 @@
 # Test ve doğrulama stratejisi
 
+
+## 28 Ekim 2026 — Özgün matbu metinler ve gg/aa/yyyy
+
+Kullanıcı kararıyla kurum/firma kataloglarına ait bağlantılar kaldırıldı. 14 belge için ÖGG SOR'a özgü doldurulabilir metinler yazıldı (sürüm 2026-10-28.2). Matbu PDF yalnız etiket/boş çizgi değildir; türe özel açıklama ve sonuç cümleleri içerir. API `sources` alanı eski istemciler için yalnız boş dizi olarak kalır; yeni mobil ekranda kurumsal atıf veya dış belge bağlantısı yoktur. Dilekçelerde boş adres/iletişim alanları bulunur. Eski kurum PDF'leri ürün şablonu olarak kullanılmaz.
+
+Belge tarihi, izin başlangıç/bitiş ve olay/kayıp tarihleri gg/aa/yyyy (28/10/2026); PDF de aynı biçimde gösterir. Tarih ve isteğe bağlı saat ayrıldı. Sunucu geçersiz takvim gününü/artık günü, saat sınırlarını ve ters izin aralığını reddeder. Eski mobil istemcilerden gelen ISO tarih yalnız API uyumluluğu için kabul edilip PDF'de gg/aa/yyyy gösterilir. Serbest metin ve sınav kartlarının daha önce belirlenen Türkçe ay gösterimi değiştirilmez.
+
+**303 backend testi / 3224 assertion** geçti; 14 belge testi / 211 assertion dahildir. 57 mobil birim testi, workspace strict TypeScript, OpenAPI lint/tip üretimi ve Expo web QA export geçti. Bağımlılık/DB değişikliği yok; Composer audit/validate ve ilgisiz admin/web build tekrar koşulmadı. PHPUnit ve E2E yalnız oggaq_test üzerinde, ayrı zamanlarda çalıştırılır. Kanıtlar artifacts/original-documents/.
+
+Dört ilgili E2E gerçek API ile özgün metin ve kurum bağlantılarının yokluğu, slash tarih girişi/önizleme, ters izin tarihini düzeltme, çift CSP altında PDF açma/aynı sekmeyi kullanma, matbu/serbest belge, imza rolleri ve hata sonrası metnin korunmasını kapsar. Bütün 14 matbu PDF birer sayfa; uzun Türkçe PDF altı sayfa. İzin, kayıp kimlik ve olay tutanağı görüntüleri ile PDF tarih metni kontrol edildi. Tam ürün E2E/bilinen eski yasal sayfa beklentileri tekrar koşulmadı. Gerçek telefonların beta alımı ayrıca teyit edilmelidir.
+
+
 ## 28 Ekim 2026 — Dilekçe ve tutanak / PDF
 
 Yan menüde Dilekçe hazırla ve Tutanak hazırla; 14 sürümlü örnek, matbu/yönlendirmeli/serbest metin, düzenlenebilir rol/ad ve PDF tarayıcı handoff’u eklendi. Yeni native modül yoktur. AI sağlayıcısına aktarım veya kalıcı belge arşivi yoktur. API, kişisel belgeyi en çok 5 dakika şifreli cache’te tutar; tek kullanım, aktif hesap/oturum ve boyut/alan doğrulamaları sunucudadır. Ayrıntılar [DOCUMENT_GENERATION](DOCUMENT_GENERATION.md).
