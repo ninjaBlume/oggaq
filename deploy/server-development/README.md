@@ -56,6 +56,21 @@ Tünel konteyneri token dosyasının sahibi olan dağıtım kullanıcısının U
 
 ## E-posta: gerçek gönderim
 
+### 27 Ekim 2026: Outlook spam incelemesi
+
+Kullanıcının açtığı güncel Outlook iletisinde SPF/DKIM/DMARC ve compauth **PASS**, `SCL:5`, `BCL:0`, teslim hedefi `dest:J` görüldü. Kimlik doğrulaması geçiyor; ileti yine de spam klasörüne ayrılmış. Bu değerler Microsoft'un özel filtre kararının tek nedenini açıklamaz ([Outlook gönderici sorun giderme](https://substrate.office.com/ip-domain-management-snds/Postmaster/Troubleshooting)). Ham başlıklar, alıcı adresi ve doğrulama kodu depoya alınmadı.
+
+Genel DNS'de `212.68.34.90` PTR → `smtp.codentum.net`, aynı adın A kaydı → `212.68.34.90`. Buna karşılık sunucunun yerel çözümleyicisi eski başka site adını döndürüyor; Outlook'un `Received-SPF` başlığı da bu eski HELO adını doğruluyor. `mail/fix-smtp-helo.py` yalnız **Header From alanı tam `oggsor.com` olan** normal `remote_smtp` iletilerinde HELO'yu `smtp.codentum.net` olarak sabitler. Diğer gönderenlerin eski ifadesi ve `remote_forwarded_smtp` korunur. Genel PTR, hosts/resolver, SPF/MX/DKIM/DMARC veya başka sitelerin posta ayarları değiştirilmez.
+
+```sh
+# Sunucuya kopyalanan betik: ön kontrol salt okunurdur.
+python3 /home/harun/oggaq-development/mail-setup/fix-smtp-helo.py --domain oggsor.com --hostname smtp.codentum.net --public-ip 212.68.34.90
+# Root operatör uygular; özel yedek, Exim doğrulaması, reload ve hata halinde geri alma.
+sudo python3 /home/harun/oggaq-development/mail-setup/fix-smtp-helo.py --domain oggsor.com --hostname smtp.codentum.net --public-ip 212.68.34.90 --apply
+```
+
+**Şu anki durum:** 17 Python testi ve gerçek sunucuda salt okunur Exim/DNS aday kontrolü geçti. SSH oturumu sudo parolası gerektirdiğinden **HELO değişikliği henüz uygulanmadı**; kullanıcıya yukarıdaki komut verildi. Uygulama Reply-To adresi marka kaynağındaki `destek@oggsor.com` olarak ayrıca yayına alındı (`oggaq-development-app:mail-replyto-20261027`); gerçek config ve HTTPS readiness doğrulandı. Bu, gelen kutusu yerleşimi garantisi değildir. Root adımından sonra onaylı tek yeni gönderimin Outlook başlıkları/klasörüyle karşılaştırılması beklenir; bu turda gerçek test postası henüz gönderilmedi.
+
 ### Ogg Sor alanına geçiş
 
 Gerçek gönderen `no-reply@oggsor.com`, görünen ad `Ogg Sor - Soru Bankası`; destek alıcısı `destek@oggsor.com` Cloudflare ile doğrulanmış Gmail hedefine yönlenir. Yeni alanın anahtarı `/etc/exim4/oggaq-dkim/oggsor.com.pem`; önceki Codentum anahtarı geçişte korunur. Güncel idempotent kontrol:

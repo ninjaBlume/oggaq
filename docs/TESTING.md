@@ -1,5 +1,12 @@
 # Test ve doğrulama stratejisi
 
+## 27 Ekim 2026 — Outlook teslimi incelemesi ve yanıt adresi
+
+- Kullanıcının Safari'de açtığı yeni Outlook spam iletisinin teknik başlıklarında **SPF/DKIM/DMARC/compauth PASS**, **SCL 5 / BCL 0 / dest:J** görüldü. Başlıklarda SMTP HELO, genel DNS PTR adından farklıydı. Genel DNS iki yönde `smtp.codentum.net` ↔ `212.68.34.90` eşleşirken sunucunun yerel DNS/hosts çözümü eski başka site adını veriyordu. Bu somut yapılandırma tutarsızlığıdır; Microsoft'un spam kararının tek nedeni olduğu kanıtlanmadı. Ham ileti, doğrulama kodu ve alıcı bilgileri kaydedilmedi; ileti taşınmadı, güvenli gönderen eklenmedi.
+- **0085f48:** marka kaynağından `destek@oggsor.com` Reply-To varsayılanı eklendi; From korunur. **34 ilgili backend testi / 165 assertion** ve PHP Pint geçti; MIME testinde gerçek yanıt/gönderen başlıkları kontrol edilir. `oggaq-development-app:mail-replyto-20261027` dar dosya overlay'iyle app/worker/scheduler yayına alındı, proje nginx'i reload edildi. Canlı config yeni yanıt adresini verdi; dosya SHA256'sı kaynakla aynı, Horizon çalışıyor, HTTPS readiness bütün kontrollerde `true`. DB migration/veri değişikliği, mobil OTA veya Git push yok. Geri dönüş override'ı `publication/mail-replyto-20261027/rollback.compose.yaml` içinde.
+- **17 Python testi** ve çevrimdışı `mail/test-configure.sh` geçti. Yeni HELO betiği tam alan adı kapsamını, diğer taşıyıcı/gönderenleri korumayı, idempotansı, beklenmeyen config/injection reddini, parser hatasında yazmama ve son kontrolde başarısızlıkta eski dosyayı/izinlerini geri getirmeyi kapsar. Ek geri alma testi hazırlık betiğinin yedek açma hatasını yakaladı; sunucuda uygulanmadan düzeltildi, son testler geçti. CI tüm `test_*.py` posta testlerini kapsayacak şekilde güncellendi.
+- HELO betiğinin sunucu kopyası SHA256 ile eşleşti; gerçek Exim 4.95'in salt okunur aday doğrulaması, genel DNS ön kontrolü ve **5 gerçek ifade kontrolü** geçti (tam alan adı, büyük harf normalizasyonu, önceki alan/başka alan/alt alan için eski davranış). **Sistem HELO ayarı henüz değiştirilmedi:** mevcut SSH hesabı için sudo parola istiyor, kullanıcıya hazırlanmış `--apply` komutu verildi. Bu turda yeni gerçek e-posta gönderilmedi. Root uygulaması ve ardından izinli gerçek Outlook gelen kutusu/başlık kontrolü bekleniyor. Genel backend/E2E matrisi ve fiziksel mobil testler bu operasyon için yeniden çalıştırılmadı.
+
 
 ## 27 Ekim 2026 — sekiz karakterli parola sınırı ve yayın
 
