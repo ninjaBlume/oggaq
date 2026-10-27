@@ -22,6 +22,8 @@ Kullanıcı iPhone ve iPad'e Apple TestFlight uygulamasını kurup hesap sahibin
 
 ## Sürüm ve güncelleme düzeni
 
+**Kalıcı çalışma kararı — 27 Ekim 2026:** Geliştirme ve hızlı denemeler Expo + Device Hub üzerinden; dağıtılan gerçek cihaz paketinin son kontrolü TestFlight üzerinden yapılır. Test edilmiş uyumlu küçük düzeltmeler EAS Update ile, native/SDK/izin veya runtime değişiklikleri yeni TestFlight paketiyle dağıtılır. Her commit otomatik yayın değildir; doğrulanmış değişiklikler kontrollü yayımlanır. Bu düzen [AGENTS.md](../AGENTS.md) içinde de sonraki çalışmalar için kayıtlıdır.
+
 Görünen uygulama sürümü `apps/mobile/app.config.ts` içindeki `version` değeridir; güncel sürüm **0.1.1**, iOS build numarası **4**. `appVersionSource: remote` ve kalıtılan `autoIncrement: true` ile EAS her yeni pakette build numarasını artırır; başarısız derlemeler nedeniyle numaralar atlayabilir. Aynı sürüm için birden fazla build çıkarılabilir. Hata düzeltme sürümleri için `0.1.x`, yeni özellik grubu için `0.2.0`, ilk genel yayın için hazır olduğunda `1.0.0` düzeni kullanılır; son iki örnek henüz yayımlanmış değildir. OTA kimliği native build numarasından ayrı kaydedilir.
 
 İlk beta **0.1.0 (3)** içinde `expo-updates`, güncelleme kanalı veya `runtimeVersion` yapılandırması **yoktur**. Dolayısıyla bu eski pakete mobil kod/tasarım değişikliği kendiliğinden ulaşmaz; önce aşağıdaki OTA destekli yeni native paket kurulmalıdır. Her Git commit'i ayrı beta yayını değildir; doğrulanmış değişiklikler paketlenir. Kullanıcı TestFlight'tan Güncelle seçer veya uygulama için otomatik güncellemeleri açar. Her build 90 gün test edilebilir.

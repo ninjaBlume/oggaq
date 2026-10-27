@@ -43,6 +43,10 @@ Admin için kökte `npm run generate:api`, `npm run typecheck`, `npm run test:ad
 
 Öğrenci web `apps/web` içinde Study API'ye bağlıdır. Tek soru alıştırmasını süreli sınav olarak sunma; sonuçlar sabit yayımlanmış sürümden sunucuda değerlendirilir. Aynı çalışma/cevap tekrarını ikinci sonuca dönüştürme; kurum/kişisel geçmiş ayrıdır. Web için `npm run test:web` ve `npm run build:web`; ortak `npm run typecheck` iki uygulamayı kapsar. Gerçek kullanıcı kimlik/parolalarını fixture veya belgeye yazma.
 
+## Mobil geliştirme ve güncelleme düzeni
+
+27 Ekim 2026 kullanıcı kararı: günlük geliştirme ve hızlı görsel/işlev kontrolü Expo ve Device Hub üzerinden yapılır; dağıtılan gerçek iOS paketinin son kontrolü TestFlight'tadır. Uyumlu JavaScript/görsel düzeltmeleri ilgili testlerden sonra EAS Update'in `testflight` kanalına kontrollü yayımlanır. SDK, native bağımlılık, izin veya runtime uyumluluğunu değiştiren işler yeni imzalı TestFlight paketi gerektirir. Her yerel değişiklik veya Git commit'i otomatik beta yayını değildir; genel mağaza yayını ayrı kullanıcı kararıdır. Güncelleme açılışı bekletmemeli ve sınav sırasında zorunlu reload yapmamalıdır. Sürüm/build/OTA kimlikleri ve cihaz teyidi [IOS_BETA](docs/IOS_BETA.md) ile [TESTING](docs/TESTING.md) içinde kaydedilir; güncel komutlar ve geri dönüş yolu oradadır. Expo/Device Hub kontrolünü fiziksel cihazda TestFlight/OTA teyidi yerine sayma.
+
 ## Git çalışma düzeni
 
 Tek ana hat `main`'dir. Bir iş için dal açılacaksa kısa ömürlü olur (tek özellik, en çok birkaç gün); doğrulandıktan sonra `main`'e birleştirilir ve dal yerelde ve uzakta silinir. Ayrı `git worktree` klasörü ve uzun ömürlü ajan dalları (`codex/…`, `claude/…`) açılmaz; ikinci bir `node_modules` kopyası yüzlerce MB tutar. Kullanıcı aynı anda iki ajanla çalışıyorsa her ajan farklı dosya alanında çalışır ve işi bitince `main`'e ilerletir. Push yalnız kullanıcı istediğinde yapılır; zorla push (`--force`) yapılmaz. Geçici dosyalar (deneme veritabanları, anahtarlar, dökümler) iş bitince silinir; gizli değerler depoya girmez.
