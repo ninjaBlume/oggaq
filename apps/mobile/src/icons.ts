@@ -33,3 +33,15 @@ export { default as Briefcase } from "lucide-react-native/icons/briefcase-busine
 export { default as ExternalLink } from "lucide-react-native/icons/external-link";
 
 export { default as CalendarDays } from "lucide-react-native/icons/calendar-days";
+
+export { default as ClipboardList } from "lucide-react-native/icons/clipboard-list";
+export { default as FileChartColumn } from "lucide-react-native/icons/file-chart-column";
+export { default as Calculator } from "lucide-react-native/icons/calculator";
+export { default as ListRestart } from "lucide-react-native/icons/list-restart";
+export { default as FilePenLine } from "lucide-react-native/icons/file-pen-line";
+export { default as ClipboardPenLine } from "lucide-react-native/icons/clipboard-pen-line";
+export { default as CirclePercent } from "lucide-react-native/icons/circle-percent";
+export { default as ClipboardCheck } from "lucide-react-native/icons/clipboard-check";
+export { default as Target } from "lucide-react-native/icons/target";
+export { default as Scale } from "lucide-react-native/icons/scale";
+export { default as Send } from "lucide-react-native/icons/send";

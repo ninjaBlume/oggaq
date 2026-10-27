@@ -1,3 +1,4 @@
+import { featureIcons } from "./featureIcons";
 import { UpcomingExamCard } from "./upcomingExam";
 import { Text } from "./text";
 import { Pressable, View } from "react-native";
@@ -5,14 +6,12 @@ import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react-native";
 import {
   ArrowRight,
-  BookOpen,
-  ChartColumn,
   ChevronRight,
-  Clock3,
-  History,
   ListChecks,
   Play,
-  ShieldCheck,
+  ClipboardList,
+  ClipboardCheck,
+  CirclePercent,
 } from "./icons";
 import type { StudyContext, User } from "@oggaq/shared-types";
 import { ExpressivePressable } from "./expressive";
@@ -80,9 +79,9 @@ export function Home({
   const activeExam = recentExams.data?.data.find((e) => e.status === "active" && Date.parse(e.deadline_at) > Date.parse(e.server_time));
   const totals = summary.data?.data;
   const metrics = [
-    { label: "Soru", accessible: "Değerlendirilen soru", tone: "blue" as const, value: totals?.answers.total.toLocaleString("tr-TR"), icon: BookOpen },
-    { label: "Doğruluk", accessible: "Doğruluk", tone: "indigo" as const, value: typeof accuracy === "number" ? `%${accuracy.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}` : undefined, icon: ChartColumn },
-    { label: "Biten sınav", accessible: "Tamamlanan sınav", tone: "sand" as const, value: totals?.exams.completed.toLocaleString("tr-TR"), icon: ListChecks },
+    { label: "Soru", accessible: "Değerlendirilen soru", tone: "blue" as const, value: totals?.answers.total.toLocaleString("tr-TR"), icon: ListChecks },
+    { label: "Doğruluk", accessible: "Doğruluk", tone: "indigo" as const, value: typeof accuracy === "number" ? `%${accuracy.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}` : undefined, icon: CirclePercent },
+    { label: "Biten sınav", accessible: "Tamamlanan sınav", tone: "sand" as const, value: totals?.exams.completed.toLocaleString("tr-TR"), icon: ClipboardCheck },
   ];
   return (
     <>
@@ -102,7 +101,7 @@ export function Home({
           style={{ position: "absolute", width: 170, height: 170, right: -38, bottom: -115, borderRadius: 85, borderWidth: 1, borderColor: palette.decorativeLine }} />
         <View style={[styles.between, { flexWrap: "wrap" }]}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 7 }}>
-            <ShieldCheck size={17} color={palette.onNavyMuted} />
+            <ClipboardList size={17} color={palette.onNavyMuted} />
             <Text style={{ color: palette.onNavyMuted, fontSize: 12, lineHeight: 18, fontWeight: "700" }}>SINAVA HAZIRLIK</Text>
           </View>
           <View style={{ borderWidth: 1, borderColor: palette.decorativeLine, paddingHorizontal: 9, paddingVertical: 4, borderRadius: shape.small }}>
@@ -165,17 +164,17 @@ export function Home({
       <View testID="home-quick-start" style={{ flex: layout.columns === 2 ? 1 : undefined, gap: 12 }}>
       <SectionTitle>Hızlı başla</SectionTitle>
       <HomeGroup>
-        <HomeRow icon={BookOpen} tone="indigo" title={vocabulary.ders.title} description="Dersini seç, ilgili sınavlara ulaş" onPress={() => ders()} />
-        <HomeRow icon={Clock3} tone="blue" title={vocabulary.deneme.title} description="Silahlı veya silahsız sınavını seç" onPress={deneme} />
-        <HomeRow icon={ListChecks} tone="sand" title={vocabulary.review.title} description="Yanlış, boş ve favori sorularından sınav yap"
+        <HomeRow icon={featureIcons.ders} tone="indigo" title={vocabulary.ders.title} description="Dersini seç, ilgili sınavlara ulaş" onPress={() => ders()} />
+        <HomeRow icon={featureIcons.deneme} tone="blue" title={vocabulary.deneme.title} description="Silahlı veya silahsız sınavını seç" onPress={deneme} />
+        <HomeRow icon={featureIcons.review} tone="sand" title={vocabulary.review.title} description="Yanlış, boş ve favori sorularından sınav yap"
           accessibilityLabel={`${vocabulary.review.title} ekranını aç`} onPress={review} />
       </HomeGroup>
       </View>
       <View style={{ flex: layout.columns === 2 ? 1 : undefined, gap: 12 }}>
       <SectionTitle>Çalışmaların</SectionTitle>
       <HomeGroup>
-        <HomeRow icon={History} tone="blue" title={vocabulary.results.title} description="Girdiğin sınavları ve cevaplarını incele" onPress={history} />
-        <HomeRow icon={ChartColumn} tone="indigo" title={vocabulary.stats.title}
+        <HomeRow icon={featureIcons.history} tone="blue" title={vocabulary.results.title} description="Girdiğin sınavları ve cevaplarını incele" onPress={history} />
+        <HomeRow icon={featureIcons.stats} tone="indigo" title={vocabulary.stats.title}
           description={typeof accuracy === "number" ? `Doğruluk %${accuracy.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}` : "İlerlemeni ve derslere göre durumunu gör"}
           accessibilityLabel={`${vocabulary.stats.title} ekranını aç`} onPress={stats} />
       </HomeGroup>
@@ -203,7 +202,7 @@ export function Home({
             const status = attempt.status === "active"
               ? Date.parse(attempt.deadline_at) > Date.parse(attempt.server_time) ? "Devam ediyor" : "Süresi doldu"
               : attempt.result ? `%${attempt.result.score_percent} doğru` : "Sonuç bekleniyor";
-            return <HomeRow key={attempt.id} icon={Clock3} title={title}
+            return <HomeRow key={attempt.id} icon={attempt.status === "completed" ? featureIcons.history : featureIcons.deneme} title={title}
               description={new Date(attempt.started_at).toLocaleDateString("tr-TR")}
               accessibilityLabel={`${title}, ${status}`} onPress={() => exam(attempt.id)}
               badge={<Badge tone={attempt.status === "completed" && attempt.result ? scoreTone(attempt.result.score_percent, palette).badge : "primary"}>{status}</Badge>} />;

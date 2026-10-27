@@ -43,6 +43,26 @@ Sınav başlıklarının parantez içindeki tarihleri gösterilmez: `ÖGG 104. D
 
 Sonucun altındaki ÖGG puan hesabı aynı ekranda kompakt kart/32 px sayı/6 px bölüm boşluklarını kullanır; bağımsız Puan hesapla ekranının normal yoğunluğu korunur. Çalışma oranının geçme/kalma kararı olmadığı bilgisi, atış güncellemesi, koşullar ve kaynaklara erişim korunur. Sonuç soruları tek sanallaştırılmış listede kaydırılır.
 
+## İkonların anlamı
+
+Mobilde bölüm ikonları `apps/mobile/src/featureIcons.ts` kaynağından okunur. Bir bölüm menüde, alt sekmede, ana sayfa kısayolunda ve boş durumda aynı simgeyi kullanır. Farklı işlevlere rastgele aynı simge verilmez; aynı işlev için tekrar kullanımı bilinçlidir. Mevcut Lucide çizgi ailesi, rol renkleri ve bileşen ölçüleri korunur; yeni ikon paketi eklenmez. Tek tek modül importları tüm ikon kataloğunun pakete alınmasını önler.
+
+| Bölüm | Simge |
+|---|---|
+| Deneme sınavları | Soru listeli sınav panosu |
+| Ders sınavları | Açık kitap |
+| Sonuçlarım | Grafikli sonuç belgesi |
+| Puan hesapla | Hesap makinesi |
+| Tekrar sınavı | Geri dönüş oklu liste |
+| Başarı durumum | Sütun grafiği |
+| Sınav takvimi | Takvim |
+| Dilekçe hazırla | Kalemli belge |
+| Tutanak hazırla | Kalemli kayıt panosu |
+| Sıkça Sorulan Sorular | Soru işareti |
+| İş İlanları | İş çantası |
+
+Saat süreyi anlatır; deneme bölümünün genel simgesi değildir. Doğruluk özetinde yüzde, değerlendirilen sorularda cevap listesi, biten sınavda onaylı pano kullanılır. Geçmiş sonuçta belge, devam eden son sınavda sınav panosu gösterilir. Kurallarda terazi, uygulamalı atışta hedef; iş başvurusu boş durumunda gönderim simgesi bulunur. İstatistik yokken ödül/kupa gösterilmez. Marka yerine genel güvenlik kalkanı kullanılmaz; profil altındaki marka gerçek logoyu kullanır. Simgeler metin etiketlerinin yerine geçmez; erişilebilir adlar ve dokunma alanları korunur.
+
 ## 3. Renk
 
 - **Rol temelli:** bileşen renk adını değil rolü kullanır (`surface`, `ink`, `primary`, `onPrimary`, `softRed` …). Koddaki sabit renk kodu hatadır; yeni renk önce rol olarak eklenir.

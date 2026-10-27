@@ -8,7 +8,7 @@ import { api } from './api';
 import { Verify } from './auth';
 import { useResource, useTask } from './hooks';
 import { Badge, Button, Card, EmptyState, ErrorNotice, ReadNotice, Field, Loading, ScreenTitle, TextLink } from './ui';
-import { Briefcase } from './icons';
+import { Briefcase, Send } from './icons';
 import { useTheme } from './themeContext';
 type Job = components['schemas']['JobPosting'];
 type Application = components['schemas']['JobApplication'];
@@ -54,5 +54,5 @@ function MyApplications({ userId }: { userId: string }) {
   if (applications.loading && !applications.data) return <Loading layout="list" label="Başvuruların yükleniyor" />;
   if (applications.error) return <ReadNotice resource={applications} />;
   const page = applications.data!;
-  return <><ReadNotice resource={applications} refreshOnly /><TextLink onPress={() => { void applications.reload(); }}>Başvuruları yenile</TextLink>{page.data.length === 0 ? <EmptyState icon={Briefcase} title="Henüz iş başvurun yok" message="Bir ilanı inceleyip başvurduğunda burada takip edebilirsin." /> : page.data.map((item) => <Card key={item.id} tone="blue"><Badge>{jobApplicationStatusLabels[item.status]}</Badge><Text accessibilityRole="header" style={styles.heading}>{item.job.title}</Text><Text style={styles.muted}>{item.job.company_name} · {item.job.city}</Text><Text style={styles.muted}>Başvuru: {date(item.created_at)}</Text><Text style={styles.text}>{item.contact_name}</Text><Text style={styles.muted}>{item.contact_email} · {item.phone}</Text>{item.cover_letter && <Text style={styles.text}>{item.cover_letter}</Text>}</Card>)}<View style={styles.row}><Button compact secondary disabled={!page.links.prev} onPress={() => setCursor(cursorFromLink(page.links.prev))}>Önceki başvurular</Button><Button compact secondary disabled={!page.links.next} onPress={() => setCursor(cursorFromLink(page.links.next))}>Sonraki başvurular</Button></View></>;
+  return <><ReadNotice resource={applications} refreshOnly /><TextLink onPress={() => { void applications.reload(); }}>Başvuruları yenile</TextLink>{page.data.length === 0 ? <EmptyState icon={Send} title="Henüz iş başvurun yok" message="Bir ilanı inceleyip başvurduğunda burada takip edebilirsin." /> : page.data.map((item) => <Card key={item.id} tone="blue"><Badge>{jobApplicationStatusLabels[item.status]}</Badge><Text accessibilityRole="header" style={styles.heading}>{item.job.title}</Text><Text style={styles.muted}>{item.job.company_name} · {item.job.city}</Text><Text style={styles.muted}>Başvuru: {date(item.created_at)}</Text><Text style={styles.text}>{item.contact_name}</Text><Text style={styles.muted}>{item.contact_email} · {item.phone}</Text>{item.cover_letter && <Text style={styles.text}>{item.cover_letter}</Text>}</Card>)}<View style={styles.row}><Button compact secondary disabled={!page.links.prev} onPress={() => setCursor(cursorFromLink(page.links.prev))}>Önceki başvurular</Button><Button compact secondary disabled={!page.links.next} onPress={() => setCursor(cursorFromLink(page.links.next))}>Sonraki başvurular</Button></View></>;
 }

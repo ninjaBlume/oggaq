@@ -25,6 +25,7 @@ import {
   SplitLegend,
 } from "./ui";
 import { ChoiceGroup } from "./expressive";
+import { featureIcons } from "./featureIcons";
 import { BookOpen, ChevronDown, ChevronRight, Clock3 } from "./icons";
 import { scoreTone, shape } from "./theme";
 import { useTheme } from "./themeContext";
@@ -283,7 +284,7 @@ export function ExamList({
         />
       ) : list.length === 0 ? (
         <EmptyState
-          icon={Clock3}
+          icon={featureIcons[kind]}
           title={kind === "deneme" ? "Henüz deneme sınavı yok" : "Henüz ders sınavı yok"}
           message={`Seçtiğin ${education === "basic" ? "temel" : "yenileme"} eğitimi için${kind === "ders" ? " bu derste" : ""} yayımlanmış sınav olduğunda burada görünür.`}
         />
@@ -381,7 +382,7 @@ export function Results({ context, openExam }: { context: StudyContext; openExam
       ) : exams.error ? (
         <ReadNotice title="Sonuçların yüklenemedi" resource={exams} />
       ) : exams.data?.data.length === 0 ? (
-        <EmptyState icon={Clock3} title="Henüz bir sınava girmedin" message="Girdiğin sınavlar ve sonuçların burada görünür." />
+        <EmptyState icon={featureIcons.history} title="Henüz bir sınava girmedin" message="Girdiğin sınavlar ve sonuçların burada görünür." />
       ) : (
         <View style={{ gap: 10 }}><Columns>
           {exams.data?.data.map((e) => <ResultCard key={e.id} attempt={e} open={() => openExam(e.id)} />)}

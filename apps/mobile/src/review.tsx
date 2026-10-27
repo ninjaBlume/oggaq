@@ -5,7 +5,7 @@ import { vocabulary } from "@oggaq/study-core";
 import { typography } from "./theme";
 import { newId } from "./ids";
 import { ApiError } from "@oggaq/api-client";
-import { Trophy } from "./icons";
+import { featureIcons } from "./featureIcons";
 import type { ExamAttempt, StudyContext, components } from "@oggaq/shared-types";
 import { api } from "./api";
 import { useOnReturn, useResource, useTask } from "./hooks";
@@ -216,7 +216,7 @@ export function Stats({ context }: { context: StudyContext }) {
         <ReadNotice resource={query} />
       ) : stats.answers.total === 0 && stats.exams.completed === 0 ? (
         <EmptyState
-          icon={Trophy}
+          icon={featureIcons.stats}
           title="Henüz istatistik yok"
           message="Sınavlara girdikçe sonuçların burada görünür."
         />

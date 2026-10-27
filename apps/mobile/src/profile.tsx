@@ -1,4 +1,5 @@
 import { Text } from "./text";
+import { BrandLogo } from "./brandLogo";
 import { BrandWordmark } from "./wordmark";
 import { Pressable, View } from "react-native";
 import {
@@ -205,7 +206,7 @@ export function Profile({
         onPress={home}
         style={[styles.row, { justifyContent: "center", minHeight: 44 }]}
       >
-        <ShieldCheck size={15} color={palette.muted} />
+        <BrandLogo size={22} />
         <Text style={[styles.muted, { fontSize: 11 }]}>
           <BrandWordmark />{` - ${brand.subtitle}`}
         </Text>

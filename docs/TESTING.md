@@ -1,5 +1,16 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Mobil ikonların anlamlarına göre düzenlenmesi
+
+13 gezinme hedefinin simgeleri `apps/mobile/src/featureIcons.ts` içinde merkezileştirildi; menü, alt sekme, ana sayfa kısayolları ve ilgili boş durumlar aynı anlamı kullanır. Deneme: sınav panosu; sonuç: grafikli belge; tekrar: geri dönüş oklu liste; puan: hesap makinesi; dilekçe: kalemli belge; tutanak: kalemli pano. Soru/doğruluk/biten sınav özeti ayrıldı; sürede saat korundu. Takvim kurallarına terazi, atışa hedef, başvuru boş durumuna gönderim simgesi verildi. İstatistik boş durumunda kupa yerine grafik, profil marka bağlantısında genel kalkan yerine gerçek logo kullanıldı. Yeni bağımlılık/native modül eklenmedi; mevcut Lucide ikonları tek tek import edilir. Tasarım eşleştirmesi [DESIGN](DESIGN.md#ikonların-anlamı) içinde.
+
+**Mobil strict TypeScript, 65 birim testi, iOS/Android/web Expo export ve 10 ilgili gerçek API Chromium E2E geçti.** Koşu: `E2E_MOBILE_PORT=5186 npm run test:e2e -- tests/e2e/mobile.spec.ts tests/e2e/home-design.spec.ts tests/e2e/calendar.spec.ts --grep 'logo ve marka|yan menü gerçek|mobil gezinme|mobil sekmeler|ana sayfa:|özet isteği|mobil.*kurallar|mobil takvim standart'`. Önce test süreçleri ve 8001/5183/5184/5186 portlarının boş olduğu kontrol edildi; yalnız `oggaq_test` kullanıldı, koşu sonrasında test servisleri kapandı. Testler logo dönüşü, sekmeler/gerçek sınav-sonuç/çıkış, yan menü odağı/erişimi, telefon/tablet yerleşimi, hata davranışı ve takvim kurallarını kapsar. Görsel düzenleme için eşleştirmeyi tekrar eden yeni birim testi eklenmedi.
+
+Açık görünüm menü/ana sayfa, ayrıca yerel saklanan `oggaq.theme=dark` ile gerçek koyu görünümde 320/390/834 px ikonlar görsel olarak incelendi. Koyu QA yalnız izole sentetik tarayıcı yanıtlarıyla, dış ağ/API/veritabanı kullanmadan çalıştı; sıfır beklenmeyen istek ve sıfır sayfa hatası. Kanıtlar `artifacts/icon-review/` altında. Başlangıçta iOS Simulator Expo Go ekranı `ExpoAsset` hatası gösteriyordu. Expo Go yeniden başlatılıp çalışan kendi 8082 Metro'suna `exp://localhost:8082` ile bağlanınca ana sayfa ve yeni ikonlar native olarak görüntülendi; yeni paket/SDK kurulmadı. Mevcut oturumla yalnız ana ekran okundu; sınav açılmadı veya yanıt verilmedi. Bu kontrol fiziksel TestFlight/Android cihaz doğrulaması yerine geçmez.
+
+API/DB/marka/app launcher ikonu/website değişmedi. Sunucu/OTA/genel mağaza yayını ve Git push yapılmadı; geliştirme Metro'su 8082 üzerinde açık kaldı. Fiziksel iOS/Android son kontrolü ve beta dağıtımı bu işte yapılmadı.
+
+
 ## 28 Ekim 2026 — Onaylanan düz telefon tasarımının yayını
 
 Kullanıcının “yayınlasana” talimatıyla kaynak `7f9d88f`, `oggaq-development-web:site-clean-7f9d88f` imajı üzerinden oggsor.com'a alındı. Önce site build ve **4 Node testi** yeniden geçti; aynı kaynağın **6 Chromium E2E** sonucu bir önceki bölümde kayıtlıdır. Native/OTA/DB veya uygulama servislerinde değişiklik yok; Git push yapılmadı.

@@ -8,20 +8,11 @@ import { StatusBar } from "expo-status-bar";
 import type { StudyContext, User } from "@oggaq/shared-types";
 import brand from "../../../config/brand.json";
 import {
-  BookOpen,
   Building2,
   Check,
   ChevronRight,
-  Clock3,
-  CircleHelp,
-  CalendarDays,
-  ChartColumn,
-  History,
-  House,
-  ListChecks,
   LogOut,
   Menu,
-  SlidersHorizontal,
   UserRound,
   X,
 } from "./icons";
@@ -29,7 +20,7 @@ import { displayPersonName, vocabulary } from "@oggaq/study-core";
 import { textSizeFactors } from "./textSize";
 import { buttonDensity, motion, shape } from "./theme";
 import type { AppPalette } from "./theme";
-import { Briefcase } from "./icons";
+import { featureIcons } from "./featureIcons";
 import { railWidth } from "./layout";
 import { TabIndicator } from "./expressive";
 import { useReducedMotion } from "./motion";
@@ -37,22 +28,22 @@ import { useLayout, useTheme } from "./themeContext";
 
 // Names come from the shared vocabulary (study-core): `short` on tabs and the rail, `title` in the menu.
 export const destinations = [
-  { id: "home", label: vocabulary.home.short, menuLabel: vocabulary.home.title, icon: House },
-  { id: "deneme", label: vocabulary.deneme.short, menuLabel: vocabulary.deneme.title, icon: Clock3 },
-  { id: "ders", label: vocabulary.ders.short, menuLabel: vocabulary.ders.title, icon: BookOpen },
-  { id: "history", label: vocabulary.results.short, menuLabel: vocabulary.results.title, icon: History },
-  { id: "profile", label: vocabulary.profile.short, menuLabel: vocabulary.profile.title, icon: UserRound },
+  { id: "home", label: vocabulary.home.short, menuLabel: vocabulary.home.title, icon: featureIcons.home },
+  { id: "deneme", label: vocabulary.deneme.short, menuLabel: vocabulary.deneme.title, icon: featureIcons.deneme },
+  { id: "ders", label: vocabulary.ders.short, menuLabel: vocabulary.ders.title, icon: featureIcons.ders },
+  { id: "history", label: vocabulary.results.short, menuLabel: vocabulary.results.title, icon: featureIcons.history },
+  { id: "profile", label: vocabulary.profile.short, menuLabel: vocabulary.profile.title, icon: featureIcons.profile },
 ] as const;
 // Reachable from the side menu and home only; the tab bar / rail keeps its five primary tabs.
 export const extraDestinations = [
-  { id: "score", label: "Puan hesapla", menuLabel: "Puan hesapla", icon: SlidersHorizontal },
-  { id: "review", label: vocabulary.review.short, menuLabel: vocabulary.review.title, icon: ListChecks },
-  { id: "stats", label: vocabulary.stats.short, menuLabel: vocabulary.stats.title, icon: ChartColumn },
-  { id: "calendar", label: vocabulary.calendar.short, menuLabel: vocabulary.calendar.title, icon: CalendarDays },
-  { id: "petition", label: "Dilekçe hazırla", menuLabel: "Dilekçe hazırla", icon: BookOpen },
-  { id: "report", label: "Tutanak hazırla", menuLabel: "Tutanak hazırla", icon: ListChecks },
-  { id: "faq", label: "SSS", menuLabel: "Sıkça Sorulan Sorular", icon: CircleHelp },
-  { id: "jobs", label: vocabulary.jobs.short, menuLabel: vocabulary.jobs.title, icon: Briefcase },
+  { id: "score", label: "Puan hesapla", menuLabel: "Puan hesapla", icon: featureIcons.score },
+  { id: "review", label: vocabulary.review.short, menuLabel: vocabulary.review.title, icon: featureIcons.review },
+  { id: "stats", label: vocabulary.stats.short, menuLabel: vocabulary.stats.title, icon: featureIcons.stats },
+  { id: "calendar", label: vocabulary.calendar.short, menuLabel: vocabulary.calendar.title, icon: featureIcons.calendar },
+  { id: "petition", label: "Dilekçe hazırla", menuLabel: "Dilekçe hazırla", icon: featureIcons.petition },
+  { id: "report", label: "Tutanak hazırla", menuLabel: "Tutanak hazırla", icon: featureIcons.report },
+  { id: "faq", label: "SSS", menuLabel: "Sıkça Sorulan Sorular", icon: featureIcons.faq },
+  { id: "jobs", label: vocabulary.jobs.short, menuLabel: vocabulary.jobs.title, icon: featureIcons.jobs },
 ] as const;
 export type MainTab =
   | (typeof destinations)[number]["id"]
