@@ -42,7 +42,7 @@ const isPreference = (value: unknown): value is ThemePreference =>
 // no remount, no lost form, exam or navigation state.
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const system = useColorScheme();
-  const [preference, setPreferenceState] = useState<ThemePreference>("system");
+  const [preference, setPreferenceState] = useState<ThemePreference>("light");
   const changed = useRef(false);
   const [textSize, setTextSizeState] = useState<TextSize>("standard");
   const [textSizeError, setTextSizeError] = useState<unknown>(null);
@@ -75,7 +75,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           setPreferenceState(saved);
       },
       () => {
-        /* Unreadable storage: stay on the device setting. */
+        /* Unreadable storage: keep the default light appearance. */
       },
     );
     return () => {

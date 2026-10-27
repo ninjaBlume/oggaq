@@ -16,6 +16,7 @@ async function login(page: Page) {
 const fontSize = (element: Locator) => element.evaluate(node => parseFloat(getComputedStyle(node).fontSize));
 for (const colorScheme of ["light", "dark"] as const) {
  test(`yazı boyutu: üç kademe, ${colorScheme} tema, telefon/tablet ve kalıcılık`, async ({page}) => {
+  await page.addInitScript(value => localStorage.setItem('oggaq.theme', value), colorScheme);
   await page.emulateMedia({colorScheme}); await login(page);
   const sample = page.getByText("Örnek metin: Soruları ve seçenekleri rahatça oku.",{exact:true});
   for (const [label, value, font] of [["Küçük","small",15.3],["Standart","standard",17],["Büyük","large",20.4]] as const) {

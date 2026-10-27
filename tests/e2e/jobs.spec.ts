@@ -86,6 +86,7 @@ for (const scheme of ['light', 'dark'] as const) test(`iş ilanı ekranları ${s
   fixture('jobs'); mkdirSync('artifacts/jobs-preview', { recursive: true });
   for (const surface of ['web', 'mobile', 'admin'] as const) {
     const context = await browser.newContext({ baseURL: web, colorScheme: scheme, viewport: { width: 390, height: 844 } }); const page = await context.newPage();
+    if (surface === 'mobile') await context.addInitScript(value => localStorage.setItem('oggaq.theme', value), scheme);
     try {
       if (surface === 'admin') await adminLogin(page); else if (surface === 'mobile') await mobileLogin(page); else { await login(page); await page.getByRole('link', { name: 'İş İlanları', exact: true }).click(); }
       await expect(page.getByText('Sentetik ÖGG ilanı published', { exact: true })).toBeVisible();

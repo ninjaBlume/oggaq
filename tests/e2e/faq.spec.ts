@@ -23,6 +23,7 @@ async function openFaq(page: Page) {
 
 for (const colorScheme of ["light", "dark"] as const) {
   test(`SSS: menü, klavye, tek açık yanıt ve büyük yazıda telefon/tablet — ${colorScheme}`, async ({ page }) => {
+    await page.addInitScript(value => localStorage.setItem('oggaq.theme', value), colorScheme);
     await page.emulateMedia({ colorScheme });
     await login(page);
     await page.getByRole("tab", { name: "Profil", exact: true }).click();

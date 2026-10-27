@@ -9,6 +9,7 @@ for (const platform of ['web', 'mobile'] as const) for (const scheme of ['light'
   test(`${platform} ${scheme}: tam ad düzenleme, iki/üç baş harf ve kalıcılık`, async ({ browser }) => {
     const context = await browser.newContext({ baseURL: platform === 'web' ? 'http://127.0.0.1:5183' : mobilePreviewUrl, viewport: { width: 320, height: 1000 }, colorScheme: scheme });
     if (platform === 'mobile' && scheme === 'dark') await context.addInitScript(() => localStorage.setItem('oggaq.textSize', 'large'));
+    if (platform === 'mobile') await context.addInitScript(value => localStorage.setItem('oggaq.theme', value), scheme);
     const page = await context.newPage();
     let fail = true;
     await page.route('**/api/v1/me', async route => {

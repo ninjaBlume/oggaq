@@ -47,7 +47,7 @@ export async function verifyPreviewStorage(): Promise<void> {
 }
 
 // The colour scheme choice is a small, non-secret preference. It is written only when the user changes it (never at
-// startup); a store that cannot be read or written leaves the app on "Cihaz ayarı" instead of breaking it.
+// startup); unreadable storage keeps the default light appearance instead of breaking the app.
 const themeKey = "oggaq.theme";
 export const themeStore = {
   async read(): Promise<string | null> {

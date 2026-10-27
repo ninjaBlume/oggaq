@@ -72,6 +72,7 @@ for (const colorScheme of ['light', 'dark'] as const) test(`sonuçlar ${colorSch
   fixture('long-result'); mkdirSync('artifacts/exam-results', { recursive: true });
   for (const surface of ['web', 'mobile'] as const) {
     const context = await browser.newContext({ baseURL: 'http://127.0.0.1:5183', colorScheme }); const page = await context.newPage();
+    if (surface === 'mobile') await context.addInitScript(value => localStorage.setItem('oggaq.theme', value), colorScheme);
     try {
       if (surface === 'web') { await login(page); await page.getByRole('link', { name: 'Sonuçlarım', exact: true }).click(); await page.getByRole('region', { name: 'Sınav sonuçları' }).getByRole('link').click(); } else await mobileLogin(page);
       await expect(page.getByTestId('result-question-1')).toBeAttached();

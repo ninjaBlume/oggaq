@@ -115,6 +115,7 @@ for (const scheme of schemes) {
 
   test(`mobil (${scheme}): sekmeler 320–1280 px taşmaz, genişte gezinme rayı vardır`, async ({ browser }) => {
     const context = await browser.newContext({ colorScheme: scheme });
+    await context.addInitScript(value => localStorage.setItem('oggaq.theme', value), scheme);
     const page = await context.newPage();
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`${mobile}/`);
@@ -142,8 +143,8 @@ for (const scheme of schemes) {
   });
 }
 
-test("mobil: Profil'den koyu görünüm seçilir ve açık cihazda uygulanır", async ({ browser }) => {
-  const context = await browser.newContext({ colorScheme: "light" });
+test("mobil: ilk kurulum koyu cihazda Açık ve Standart; seçilen tercihler sonraki açılışta korunur", async ({ browser }) => {
+  const context = await browser.newContext({ colorScheme: "dark" });
   const page = await context.newPage();
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${mobile}/`);
@@ -153,13 +154,31 @@ test("mobil: Profil'den koyu görünüm seçilir ve açık cihazda uygulanır", 
   await expect(page.getByText("Merhaba, E2E.", { exact: true })).toBeVisible();
   expect(luminance(hex(await backgroundAt(page, 4, 400)))).toBeGreaterThan(0.8);
   await page.getByRole("tab", { name: "Profil", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Görünüm: Açık", exact: true })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("button", { name: "Yazı boyutu: Standart", exact: true })).toHaveAttribute("aria-selected", "true");
+  expect(await page.evaluate(() => localStorage.getItem('oggaq.theme'))).toBeNull();
+  expect(await page.evaluate(() => localStorage.getItem('oggaq.textSize'))).toBeNull();
   await page.getByRole("button", { name: "Görünüm: Koyu", exact: true }).click();
+  await page.getByRole("button", { name: "Yazı boyutu: Büyük", exact: true }).click();
   await expect.poll(async () => luminance(hex(await backgroundAt(page, 4, 400)))).toBeLessThan(0.05);
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('oggaq.theme'))).toBe('dark');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('oggaq.textSize'))).toBe('large');
+  // The preview's token is intentionally in memory; preferences survive the reload independently.
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Hoş geldin", exact: true })).toBeVisible();
+  await expect.poll(async () => luminance(hex(await backgroundAt(page, 4, 400)))).toBeLessThan(0.05);
+  await page.getByLabel("E-posta adresi", { exact: true }).fill("e2e-student@example.test");
+  await page.getByLabel("Parola", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await page.getByRole("tab", { name: "Profil", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Görünüm: Koyu", exact: true })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("button", { name: "Yazı boyutu: Büyük", exact: true })).toHaveAttribute("aria-selected", "true");
   await page.getByRole("tab", { name: "Ana sayfa", exact: true }).click();
   await expect(page.getByText("Merhaba, E2E.", { exact: true })).toBeVisible();
   expect(luminance(hex(await backgroundAt(page, 4, 400)))).toBeLessThan(0.05);
   await page.getByRole("tab", { name: "Profil", exact: true }).click();
   await page.getByRole("button", { name: "Görünüm: Cihaz ayarı", exact: true }).click();
+  await page.emulateMedia({ colorScheme: "light" });
   await expect.poll(async () => luminance(hex(await backgroundAt(page, 4, 400)))).toBeGreaterThan(0.8);
   await context.close();
 });

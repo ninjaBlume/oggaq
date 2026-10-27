@@ -7,6 +7,7 @@ test.beforeEach(()=>{fixture('setup-study');fixture('upcoming-calendar');});
 test.afterAll(()=>fixture('cleanup'));
 for(const platform of ['web','mobile']as const)for(const scheme of ['light','dark']as const)test(`${platform} ${scheme}: ana sayfada gün sayacı, hazır ekran, takvim bağlantısı ve boş/eski durum`,async({browser})=>{
  const context=await browser.newContext({baseURL:platform==='web'?'http://127.0.0.1:5183':mobilePreviewUrl,colorScheme:scheme,viewport:{width:390,height:900}});const page=await context.newPage();
+ if (platform === 'mobile') await context.addInitScript(value => localStorage.setItem('oggaq.theme', value), scheme);
  let release!:()=>void;const held=new Promise<void>(r=>release=r);let first=true;
  await page.route('**/exam-calendar/next',async route=>{if(first){first=false;await held;}await route.continue();});
  async function refresh(){if(platform==='web')await page.reload();else{await page.getByRole('tab',{name:'Profil',exact:true}).click();await page.getByRole('tab',{name:'Ana sayfa',exact:true}).click();}}

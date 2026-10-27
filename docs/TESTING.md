@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## 27 Ekim 2026 — İlk kurulumda Açık görünüm / Standart yazı
+
+Mobil ilk açılış tercihi `light` oldu; yazı boyutunun mevcut `standard` varsayılanı korundu. Cihaz koyu modda olsa da kaydedilmiş tercih yoksa Açık görünüm seçilir. Önceden saklanan Açık/Koyu/Cihaz ayarı ve Küçük/Standart/Büyük değerleri korunur; güncelleme bunları sıfırlamaz. Varsayılanlar açılışta depoya yazılmaz. Profil açıklaması ve tasarım/mobil belgeleri güncellendi.
+
+**57 mobil birim testi, tüm workspace strict TypeScript, Expo web QA export ve 39 ilgili Chromium E2E geçti.** Koyu cihazda temiz tercihle Açık/Standart seçili olduğu, açılışta tercih yazılmadığı, Koyu/Büyük seçimi ve sayfa yeniden açılışında kalıcılığı, açık ekranın korunması, kullanıcı seçerse Cihaz ayarının canlı izlenmesi kontrol edildi. Koyu tema görsel senaryoları artık açıkça saklanmış koyu tercih kullanır; ilk kurulum varsayılanını koyu tema testi sanmaz. Kanıtlar `artifacts/default-appearance/` içinde. E2E yalnız `oggaq_test` ve 8001/5183/5184/5186 portlarını kullandı; başka test süreci olmadığı doğrulandı.
+
+Backend/API/veritabanı değişmedi; PHPUnit, Composer, tüm E2E matrisi ve daha önce belgelenen yasal sayfa testleri bu dar mobil değişiklik için tekrar çalıştırılmadı. iOS ve Android runtime'ları mevcut native beta ile aynı kaldı. Fiziksel cihaz veya Device Hub native ilk kurulum senaryosu henüz teyit edilmedi; tarayıcı önizlemesi native kalıcı saklama kanıtı sayılmaz. Beta dağıtım sonucu aşağıda ayrıca kaydedilir.
+
 ## 27 Ekim 2026 — Kullanıcı isteğiyle yeniden öğrenci temizliği
 
 Expo/Device Hub giriş denemesinden sonra kullanıcı yeniden kayıt olabilmek için normal hesabın tekrar silinmesini istedi. İkinci işlemde de **1 öğrenci silindi, 0 öğrenci / 1 platform yöneticisi kaldı**; sınav/alıştırma/başvuru yoktu. Aynı transaction, erasure ledger, yönetici ve 11 içerik tablosu karşılaştırmaları ile kişisel kayıt/token/oturum temizliği doğrulandı. Posta gönderilmedi; dış HTTPS readiness sağlıklı. Anonim sonuç: `artifacts/student-reset/second-result.json`. Kod veya mobil beta değişmedi; ürün testleri tekrar çalıştırılmadı.

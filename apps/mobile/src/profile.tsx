@@ -121,7 +121,7 @@ export function Profile({
       </Pressable>
       <SectionTitle>Görünüm</SectionTitle>
       <Text style={styles.muted}>
-        Uygulama cihazının açık veya koyu ayarını izler; istersen sabitle.
+        İlk kurulumda Açık görünüm kullanılır. Koyu veya Cihaz ayarı seçebilirsin.
       </Text>
       <ChoiceGroup
         choices={themePreferences.map((value) => ({

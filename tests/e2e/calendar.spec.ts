@@ -7,6 +7,7 @@ test.beforeEach(() => { fixture('setup-study');fixture('calendar'); });
 test.afterAll(() => fixture('cleanup'));
 for (const platform of ['web','mobile'] as const) for (const scheme of ['light','dark'] as const) test(`${platform} ${scheme}: menüden takvim, temel/yenileme, eski veri ve boş yıl`, async ({browser}) => {
   const context = await browser.newContext({baseURL:platform === 'web'?'http://127.0.0.1:5183':mobilePreviewUrl,colorScheme:scheme,viewport:{width:390,height:900}});const page = await context.newPage();
+  if (platform === 'mobile') await context.addInitScript(value => localStorage.setItem('oggaq.theme', value), scheme);
   await page.clock.install({ time: new Date(`${new Date().getFullYear()}-10-26T12:00:00+03:00`) });
   try {
     if(platform === 'web') { await login(page);await page.getByRole('link',{name:'Sınav takvimi',exact:true}).click(); }

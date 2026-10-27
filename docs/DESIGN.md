@@ -48,10 +48,10 @@ Sınav başlıklarının parantez içindeki tarihleri gösterilmez: `ÖGG 104. D
 
 ## 4. Koyu mod
 
-- **Üç seçenek:** Cihaz ayarı (varsayılan), Açık, Koyu. Seçim her uygulamada profil/kullanıcı menüsünden yapılır ve o cihazda saklanır (hassas veri değildir; sunucuya gönderilmez).
+- **Üç seçenek:** Cihaz ayarı, Açık, Koyu. Mobil uygulamanın ilk kurulum varsayılanı **Açık**, yazı boyutu **Standart** olur; cihaz koyu modda olsa da ilk görünüm açıktır. Web/yönetim paneli cihaz ayarını izleyerek başlar. Seçim profil/kullanıcı menüsünden yapılır ve o cihazda saklanır (hassas veri değildir; sunucuya gönderilmez). Daha önce saklanan tercihler güncellemeyle sıfırlanmaz.
 - **Tersine çevirme değil, ayrı palet:** saf siyah yerine lacivert-gri; yükseklik arttıkça yüzey açılır (`paper` < `surface` < `surfaceContainer`); vurgu renkleri koyu zeminde AA geçecek biçimde açılır ve doygunluğu azaltılır; açık mavi üzerindeki yazı koyudur (`onPrimary`).
 - **Web ve yönetim paneli:** `tokens.css` CSS değişkenlerini üretir; cihazın koyu tercihi `prefers-color-scheme` ile, kullanıcının zorlaması `data-theme` ile uygulanır. Sayfa açılışında tema, ilk boyamadan önce uygulanır (parlama olmaz).
-- **Mobil:** sistem teması dinlenir; tema değişince açık ekranların durumu (sınav, form) kaybolmaz.
+- **Mobil:** sistem teması yalnız Cihaz ayarı seçildiğinde görünümü belirler; tema değişince açık ekranların durumu (sınav, form) kaybolmaz. Tercih yoksa, geçersizse veya okunamıyorsa Açık görünüm kullanılır; açılışta varsayılan değerler depoya yazılmaz.
 - **Mobil okunabilirlik:** standart boyutta sayfa başlığı 26/33px, yardımcı metin 14/21px, normal gövde 17/27px, sınav sorusu 21/32px. Profil → Yazı boyutu üç kademelidir: Küçük (×0,9), Standart (×1, varsayılan), Büyük (×1,2). Yazı ve satır yüksekliği özgün metrikten birlikte ölçeklenir; iç içe metin iki kez büyütülmez. Girdi alanları ve native gezinme başlıkları da tercihi izler. Sistem yazı büyütmesi kapatılmaz; dokunma hedefleri küçültülmez. Tercih cihazda saklanır, açık ekran/sınav/form yeniden kurulmaz; hata halinde boyut o oturumda uygulanır ve kaydetme yeniden denenebilir.
 - Resimler ve ikonlar rolden renk alır; koyu modda ayrı görsel gerekmez.
 
