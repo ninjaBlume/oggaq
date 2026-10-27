@@ -1,10 +1,12 @@
 # iPhone ve iPad için kapalı beta
 
+**Son küçük güncelleme — 27 Ekim 2026:** Arka plandan dönüşte zaman aşımı kontrolü ve profil güncelleme denetimi; kaynak `929e8fe`, `testflight` / `01a17afb-12db-7093-9e59-1a88537d62c9` (grup `35b7e7a3-0faa-4eb0-a0b2-d8fa0247248f`). Önceki native runtime korunur. Kullanıcının bildirdiği eski güncelleme kimliği ve native istek başlıklarıyla endpoint doğru yeni paketi verdi; native launch asset isteği 200, launch asset ve tüm ek dosyaların SHA256 değerleri eşleşti. Yeni sürümün telefonda çalıştığı henüz teyit edilmedi; ilk geçiş için tam kapatma/açma testi kullanıcıya iletildi.
+
 ## Uygulama içinden güncelleme
 
 Arka plandan dönüşte uyumlu güncelleme denetlenir ve bulunursa indirilir; açılış bekletilmez. **Profil → Uygulama güncellemesi → Güncellemeleri denetle** ile elle de kontrol edilir. İndirilmiş paket için **Güncellemeyi uygula** görünür; kullanıcı bu düğmeye bastığında uygulama yeniden başlatılır. Açık işlemler önce tamamlanır. Sınav ekranından veya otomatik olarak yeniden başlatılmaz; indirilen paket sonraki tam açılışta da uygulanabilir. Ağ/indirme hatası aynı bölümde yeniden denenebilir. Bu kontrolleri içermeyen eski beta için ilk geçiş hâlâ native açılış indirmesi üzerinden yapılır; yeni kodun sunucuda olması cihaz teyidi yerine geçmez.
 
-**Son küçük güncelleme — 27 Ekim 2026:** SSS menüsü ve sade profil, kaynak `739fcad`; `testflight` kanalı / `01a17ae4-cd0c-7ad4-be75-61f74f793df1`. Native runtime değişmedi; gerçek endpoint ve tüm dosya SHA256 kontrolleri geçti. Yeni ekranın fiziksel iOS teyidi henüz alınmadı. Aşağıdaki eski OTA koduna ait cihaz teyidi tarihsel kayıttır. Ayrıntılar [SSS teslimi](FAQ.md) ve [TESTING](TESTING.md) içinde.
+**Önceki küçük güncelleme — 27 Ekim 2026:** SSS menüsü ve sade profil, kaynak `739fcad`; `testflight` kanalı / `01a17ae4-cd0c-7ad4-be75-61f74f793df1`. Native runtime değişmedi; gerçek endpoint ve tüm dosya SHA256 kontrolleri geçti. Yeni ekranın fiziksel iOS teyidi henüz alınmadı. Aşağıdaki eski OTA koduna ait cihaz teyidi tarihsel kayıttır. Ayrıntılar [SSS teslimi](FAQ.md) ve [TESTING](TESTING.md) içinde.
 
 27 Ekim 2026: Kişisel TestFlight betası hazır; güncel paket **0.1.1 (4)** ve OTA altyapısını içerir. Apple'da **Testing** ve hesap sahibinde **Installed 0.1.1 (4)** doğrulandı. Önceki **0.1.0 (3)** de korunur; kullanıcı bu ilk betayı indirdiğini ve teste başladığını bildirmişti. Hangi cihazda kurduğu veya tüm akışların geçtiği ayrıca belirtilmedi; iPhone ve iPad'in ikisinde de tam doğrulama yapıldığı anlamına gelmez. Kullanıcı cihazında **Sürüm 0.1.1 · Güncelleme 01a17a9c** gördüğünü doğruladı; OTA indirme ve çalıştırma zinciri cihazda teyit edildi.
 
