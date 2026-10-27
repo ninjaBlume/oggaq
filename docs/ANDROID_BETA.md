@@ -1,5 +1,7 @@
 # Android kişisel beta ve güncelleme düzeni
 
+**Son buton güncellemesi — 27 Ekim 2026:** Kaynak `3ed1703`, **android-beta / 01a17f0d-b5e3-76b5-afda-1606891dab7a**, grup `f5e52b6b-43ae-4872-9cfd-77b9685f4457`. Standart eylemler 48 px; seçim ve kompakt eylemler 44 px ile başlar. Yeni köşe/ikon aralıkları, büyük metinde doğal büyüme, seçili/disabled durumları ve işlem davranışları korunur. Ana sayfa eylemi ve yan menü satırları da ortak yoğunluktadır. 0.1.1 native paket/runtime aynı; Android native ve fiziksel cihazın **01a17f0d** alımı henüz teyit edilmedi. [Kontroller](TESTING.md).
+
 **Son profil güncellemesi — 27 Ekim 2026:** Kaynak `35b02f6`, **android-beta / 01a17ef2-a0f9-7c6c-ac82-13308fde0461**, grup `8f40622e-80e3-4959-91aa-8b2be1b396a6`. Avatar/ad/e-posta tek kompakt kartta; Hesabım, örnek metin, ayar grupları ve varsa çalışma alanları sıkıştırıldı. Hesap/yasal bağlantılar, cihaz tercihleri ve 44 px güncelleme/çıkış eylemleri korunur. 0.1.1 native paket/runtime aynı; Android native görünümü ve fiziksel cihazın **01a17ef2** alımı henüz teyit edilmedi. [Kontroller](TESTING.md).
 
 **Son kart yoğunluğu ayarı — 27 Ekim 2026:** Kaynak `e1377dc`, **android-beta / 01a17ee3-c4f1-7819-aed7-a920713a5665**, grup `528c4fe5-53a3-4612-8a19-af423bfbf996`. Deneme/Ders kartlarında dikey iç boşluk 6 px, başlık/bilgi aralığı 4 px, tek sütun kart aralığı 10 px oldu. Yazı, 44 px eylem ve büyüyebilen yükseklik korunur. Native runtime ve 0.1.1 paketi aynı; fiziksel cihazın yeni güncellemeyi aldığı henüz teyit edilmedi. [Kontroller](TESTING.md).

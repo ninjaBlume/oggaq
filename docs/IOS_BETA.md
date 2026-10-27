@@ -1,5 +1,7 @@
 # iPhone ve iPad için kapalı beta
 
+**Son buton güncellemesi — 27 Ekim 2026:** Kaynak `3ed1703`, **testflight / 01a17f0c-4f7d-7dd9-a87b-94b3f5fbc4da**, grup `6bbfbf5b-5378-406e-b775-168fa03f5be6`. Standart eylemler 48 px; seçim ve kompakt eylemler 44 px ile başlar. Yeni köşe/ikon aralıkları, büyük metinde doğal büyüme, seçili/disabled durumları ve işlem davranışları korunur. Ana sayfa eylemi ve yan menü satırları da ortak yoğunluktadır. 0.1.1 native paket/runtime aynı; fiziksel cihazın **01a17f0c** alımı henüz teyit edilmedi. [Kontroller](TESTING.md).
+
 **Son profil güncellemesi — 27 Ekim 2026:** Kaynak `35b02f6`, **testflight / 01a17ef1-b762-7e6e-ba29-06d1178d5df4**, grup `f886b37a-481b-44b7-a02d-dcd35ce093b5`. Avatar/ad/e-posta tek kompakt kartta; Hesabım, örnek metin, ayar grupları ve varsa çalışma alanları sıkıştırıldı. Hesap/yasal bağlantılar, cihaz tercihleri ve 44 px güncelleme/çıkış eylemleri korunur. Device Hub iOS profil görünümü Koyu/Büyük tercihle incelendi. 0.1.1 native paket/runtime aynı; fiziksel cihazın **01a17ef1** alımı henüz teyit edilmedi. [Kontroller](TESTING.md).
 
 **Son kart yoğunluğu ayarı — 27 Ekim 2026:** Kaynak `e1377dc`, **testflight / 01a17ee3-1a99-7121-b5d6-b6c47e7dd77c**, grup `62df6186-c236-4202-a2a2-85266f3e97ab`. Deneme/Ders kartlarında dikey iç boşluk 6 px, başlık/bilgi aralığı 4 px, tek sütun kart aralığı 10 px oldu. Yazı, 44 px eylem ve büyüyebilen yükseklik korunur. Native runtime ve 0.1.1 paketi aynı; fiziksel cihazın yeni güncellemeyi aldığı henüz teyit edilmedi. [Kontroller](TESTING.md).

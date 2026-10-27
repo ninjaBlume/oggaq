@@ -8,6 +8,8 @@ Mobil `buttonDensity` standart eylemleri **54 → 48 px**, seçimleri **52 → 4
 
 E2E yalnız `oggaq_test` ve 8001/5183/5184/5186 portlarında, başka test süreci yokken çalıştı. Backend/API/veritabanı/üretim webi değişmedi; PHPUnit/Composer, tam ürün E2E ve bilinen yasal sayfa testleri tekrar çalıştırılmadı. Kanıtlar `artifacts/slimmer-buttons/`; native runtime'lar korundu. Beta teslimi ayrıca kaydedilir.
 
+OTA kaynak `3ed1703`: iOS `testflight / 01a17f0c-4f7d-7dd9-a87b-94b3f5fbc4da` (grup `6bbfbf5b-5378-406e-b775-168fa03f5be6`), Android `android-beta / 01a17f0d-b5e3-76b5-afda-1606891dab7a` (grup `f5e52b6b-43ae-4872-9cfd-77b9685f4457`). Doğru kanal/runtime/API, native başlıklarla launch asset ve tüm ek dosyaların hash kontrolleri (iOS 18, Android 19) geçti. Yanlış runtime/platform 204, üretim kanalı 404. 0.1.1 native paketler değişmedi; fiziksel cihazın yeni kodu aldığı teyit edilmedi. Genel mağaza yayını ve Git push yok. Kanıtlar `artifacts/slimmer-buttons/ota/` içinde.
+
 ## 27 Ekim 2026 — Kompakt profil kartları
 
 Profilde 56 px avatar/tam ad/e-posta tek kartta toplandı; tekrarlanan hesap bilgi kartı kaldırıldı. Grup boşlukları 12 px, ayar iç aralıkları 8 px; Hesabım/örnek metin/çalışma alanı boşlukları daraltıldı. `Card` isteğe bağlı kompakt görünümünü yalnız profil kimliği/örneği kullanır, diğer kartların varsayılanı aynı kalır. Güncelleme ve çıkış düğmeleri 44 px altına inmez; yetki, veri ve güncelleme motoru değişmedi.
