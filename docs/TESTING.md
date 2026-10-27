@@ -2,6 +2,8 @@
 
 ## 27 Ekim 2026 — Kullanıcı isteğiyle yeniden öğrenci temizliği
 
+Expo/Device Hub giriş denemesinden sonra kullanıcı yeniden kayıt olabilmek için normal hesabın tekrar silinmesini istedi. İkinci işlemde de **1 öğrenci silindi, 0 öğrenci / 1 platform yöneticisi kaldı**; sınav/alıştırma/başvuru yoktu. Aynı transaction, erasure ledger, yönetici ve 11 içerik tablosu karşılaştırmaları ile kişisel kayıt/token/oturum temizliği doğrulandı. Posta gönderilmedi; dış HTTPS readiness sağlıklı. Anonim sonuç: `artifacts/student-reset/second-result.json`. Kod veya mobil beta değişmedi; ürün testleri tekrar çalıştırılmadı.
+
 oggsor.com üretim ortamında mevcut **1 normal öğrenci** tek transaction ile silindi; **1 platform yöneticisi korundu, 0 öğrenci kaldı**. Mevcut `DeleteAccount::erasePersonalData` ve `AccountErasureLedger` kullanıldı. Öğrencinin sınav/alıştırma/iş başvurusu kaydı yoktu; kişisel bağlam, token/oturum ve doğrulama kodu kalmadığı kontrol edildi. Yönetici satırı ve 11 merkezi içerik tablosunun özetleri önce/sonra eşleşti. Silme postası gönderilmedi; yerel geliştirme kullanıcılarına dokunulmadı. Dış HTTPS readiness bütün kontrollerde sağlıklı. Kimlik, parola veya adres içermeyen sonuç `artifacts/student-reset/result.json` içinde; tek kullanımlık işlem betiği kaldırıldı. Yeni üyelik açılabilir. Uygulama kodu veya mobil beta değiştirilmedi; bu operasyon için yeniden ürün testi çalıştırılmadı.
 
 ## 27 Ekim 2026 — Doğrudan öğrenci erişimi, iş başvurusuna özel doğrulama
