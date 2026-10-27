@@ -9,7 +9,7 @@ return [
     'domain' => 'oggsor.com',
     'websiteUrl' => 'https://oggsor.com',
     'supportEmail' => 'destek@oggsor.com',
-    'mailFromAddress' => 'no-reply@oggsor.com',
+    'mailFromAddress' => 'destek@oggsor.com',
     'exportPrefix' => 'oggsor-verilerim',
     'bundleIdentifier' => 'net.codentum.oggsor',
     'logoAsset' => 'config/assets/oggsor-logo.png',

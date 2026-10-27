@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Deploy-user side (no root): configures the private relay or authenticated SMTP and sends one test mail.
-#   bash configure-app-mail.sh --to <deneme-adresi> [--host H] [--port 587] [--from no-reply@oggsor.com] [--username U] [--prompt-password]
+#   bash configure-app-mail.sh --to <deneme-adresi> [--host H] [--port 587] [--from destek@oggsor.com] [--username U] [--prompt-password]
 # --relay: yalnız 172.30.88.1:25 özel Compose köprüsü; önce setup-exim-relay.sh uygulanmalıdır.
 # Hestia mailbox: defaults (host panel.harunaltay.net, username = the from address). SMTP provider (e.g. Brevo): pass
 # --host smtp-relay.brevo.com --username <SMTP girişi> --prompt-password (asks for the SMTP key without echo, stores it only in
@@ -10,7 +10,7 @@
 set -Eeuo pipefail
 umask 077
 base="${OGGAQ_BASE:-$HOME/oggaq-development}"
-host="panel.harunaltay.net"; port="587"; from="no-reply@oggsor.com"; to=""; send_only=0; username=""; prompt_password=0; relay=0
+host="panel.harunaltay.net"; port="587"; from="destek@oggsor.com"; to=""; send_only=0; username=""; prompt_password=0; relay=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --to) to="${2:?}"; shift ;; --host) host="${2:?}"; shift ;; --port) port="${2:?}"; shift ;; --from) from="${2:?}"; shift ;;
@@ -51,7 +51,7 @@ if [ "$send_only" = 0 ]; then
       echo "MAIL_USERNAME=$username"; printf 'MAIL_PASSWORD=%s\n' "$(head -n 1 "$password_file")"
     fi
     echo "MAIL_FROM_ADDRESS=$from"
-    echo 'MAIL_FROM_NAME="Ogg Sor - Soru Bankası"'
+    echo 'MAIL_FROM_NAME="ÖGG SOR - Soru Bankası"'
   } >>"$tmp"
   chmod 600 "$tmp"; mv "$tmp" "$env_file"
   rollback() {

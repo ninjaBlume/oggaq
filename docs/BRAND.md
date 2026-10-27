@@ -9,8 +9,10 @@
 | Ana web/API kökü | https://oggsor.com |
 | Yönetim paneli | https://oggsor.com/yonetim/ |
 | Destek | destek@oggsor.com |
-| Sistem bildirimi göndereni | no-reply@oggsor.com |
+| Sistem bildirimi göndereni | destek@oggsor.com |
 | Yayıncı ve veri sorumlusu | Codentum L.L.C. |
+
+27 Ekim 2026 e-posta kararı: Resend'in teslim önerisi ve kullanıcı onayıyla hesap/güvenlik bildirimlerinin From adresi `destek@oggsor.com` oldu; Reply-To da aynı adrestir. Görünen ad **ÖGG SOR - Soru Bankası**. `mailFromAddress` merkezi kaynağı, üretilen backend/ortam örnekleri ve posta kurulum betiğinin varsayılanları eşitlendi. Sunucu güncellendi; mobil paket/OTA gerekmez. Önceki no-reply adresi aşağıdaki tarihsel kayıtlarda korunur. Güncel gerçek teslim sonucu [TESTING](TESTING.md) içindedir; gönderen değişikliği tek başına Outlook spam yerleşimini düzeltmedi.
 
 ## Kod ve yapılandırma
 

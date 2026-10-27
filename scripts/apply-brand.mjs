@@ -7,6 +7,7 @@ import { legalShell } from '../apps/site/shell.mjs';
 
 const html = (value) => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('"', '&quot;');
 const php = (value) => `'${value.replaceAll('\\', '\\\\').replaceAll("'", "\\'")}'`;
+const shell = (value) => `'${value.replaceAll("'", "'\\''")}'`;
 
 export function brandFiles(root) {
   const read = (path) => readFileSync(join(root, path), 'utf8');
@@ -91,6 +92,11 @@ export function brandFiles(root) {
       .replace(/^MAIL_FROM_NAME=.*$/m, `MAIL_FROM_NAME="${brand.displayName}"`)
       .replace(/^MAIL_FROM_ADDRESS=.*$/m, `MAIL_FROM_ADDRESS=${brand.mailFromAddress}`));
   }
+  const mailSetup = 'deploy/server-development/mail/configure-app-mail.sh';
+  files.set(mailSetup, read(mailSetup)
+    .replace(/\[--from [^\]]+\]/, `[--from ${brand.mailFromAddress}]`)
+    .replace(/(\bfrom=")[^"]*("; to=)/, `$1${brand.mailFromAddress}$2`)
+    .replace(/^    echo 'MAIL_FROM_NAME=.*'$/m, `    echo ${shell(`MAIL_FROM_NAME="${brand.displayName}"`)}`));
   return files;
 }
 
