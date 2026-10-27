@@ -1,5 +1,7 @@
 # App Store ve Play Store yayın hazırlığı
 
+> Güncel kapalı beta durumu ve sürüm/güncelleme akışı: [iOS TestFlight](IOS_BETA.md), [Android Dahili Test](ANDROID_BETA.md). Aşağıdaki ilk hazırlık kontrol listesi genel mağaza yayını içindir; tarihli eski paket/hesap bilgileri güncel beta durumunu temsil etmez.
+
 Durum (25 Ekim 2026): **yayına hazır değil.** Kod tarafında hesap silme, sorun bildirme, takip SDK'sı olmaması ve HTTPS-yalnızca iletişim gibi mağaza kurallarının teknik şartları karşılanıyor. Eksik olanlar: hukuki metinlerin son hâli, yayıncı ve veri sorumlusu kararı, soru içeriğinin hak teyidi, puanlama uzman onayı, nihai marka ikonu, derleme ve mağaza hesapları. Bu belge neyin hazır, neyin kimde olduğunu ve adım adım ne yapılacağını anlatır. Otomatik ön kontrol: `npm run check:store` (engel varsa çıkış kodu 1).
 
 **Hesap işlemleri ile paket gönderimi ayrıdır.** Kullanıcı Google Play kayıt ödemesini ve iletişim doğrulamasını tamamladığını bildirdi; Apple için Codentum Organization/DSA süreci ayrıca yürütüldü. Bu oturumda panellerin son onay durumu yeniden doğrulanmadı; EAS derlemesi veya mağazaya paket gönderimi yapılmadı. Anahtar ve inceleme hesabı parolası depoda tutulmaz.
