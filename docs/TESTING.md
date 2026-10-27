@@ -1,5 +1,9 @@
 # Test ve doğrulama stratejisi
 
+## 27 Ekim 2026 — Kullanıcı isteğiyle yeniden öğrenci temizliği
+
+oggsor.com üretim ortamında mevcut **1 normal öğrenci** tek transaction ile silindi; **1 platform yöneticisi korundu, 0 öğrenci kaldı**. Mevcut `DeleteAccount::erasePersonalData` ve `AccountErasureLedger` kullanıldı. Öğrencinin sınav/alıştırma/iş başvurusu kaydı yoktu; kişisel bağlam, token/oturum ve doğrulama kodu kalmadığı kontrol edildi. Yönetici satırı ve 11 merkezi içerik tablosunun özetleri önce/sonra eşleşti. Silme postası gönderilmedi; yerel geliştirme kullanıcılarına dokunulmadı. Dış HTTPS readiness bütün kontrollerde sağlıklı. Kimlik, parola veya adres içermeyen sonuç `artifacts/student-reset/result.json` içinde; tek kullanımlık işlem betiği kaldırıldı. Yeni üyelik açılabilir. Uygulama kodu veya mobil beta değiştirilmedi; bu operasyon için yeniden ürün testi çalıştırılmadı.
+
 ## 27 Ekim 2026 — Doğrudan öğrenci erişimi, iş başvurusuna özel doğrulama
 
 Kullanıcı kararı: aktif öğrenci kayıt sonrasında doğrudan kişisel ders/deneme/tekrar/sonuç/puan ekranlarına girer. Kayıtta kod/e-posta üretilmez; genel doğrulama kapısı ve profil rozeti kaldırıldı. Gerçek `email_verified_at` korunur. İlan okuma serbest, yalnız başvuru gönderimi ve yönetim/kurum işlemleri doğrulama ister. Kurumsal bağlamları tahmin ederek erişme policy ile engellenir. Başvuru için kod doğrulanınca aynı form açık kalır; bağlam listesi arka planda güncellenir.
