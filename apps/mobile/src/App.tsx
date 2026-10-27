@@ -541,7 +541,11 @@ function Application() {
             {user ? (
               <Verify
                 user={user}
-                verified={setUser}
+                verified={(verifiedUser) => {
+                  // A cold start before verification may have preloaded an email_unverified error.
+                  setPrepared(undefined);
+                  setUser(verifiedUser);
+                }}
                 refresh={() => {
                   void refresh();
                 }}
