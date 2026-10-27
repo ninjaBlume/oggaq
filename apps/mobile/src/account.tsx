@@ -103,7 +103,7 @@ function ChangePassword() {
         <ErrorNotice error={task.error} />
         <Field label="Mevcut parola" password value={current} onChange={setCurrent} maxLength={128} />
         <Field label="Yeni parola" password value={password} onChange={setPassword} maxLength={128} />
-        <Text style={styles.muted}>En az 12 karakter; büyük/küçük harf, rakam ve sembol.</Text>
+        <Text style={styles.muted}>En az 8 karakter; büyük/küçük harf, rakam ve sembol.</Text>
         <Field label="Yeni parola tekrar" password value={confirmation} onChange={setConfirmation} maxLength={128} />
         <Button
           disabled={task.pending || current === "" || password === "" || confirmation === ""}

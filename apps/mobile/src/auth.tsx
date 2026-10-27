@@ -160,7 +160,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
         {mode === "register" && (
           <View style={{ gap: 10 }}>
             <Field label="Parola tekrar" password newPassword value={confirmation} onChange={setConfirmation} editable={!task.pending} outlined />
-            <Text style={styles.muted}>En az 12 karakter; büyük / küçük harf, sayı ve simge.</Text>
+            <Text style={styles.muted}>En az 8 karakter; büyük / küçük harf, sayı ve simge.</Text>
           </View>
         )}
         {notice !== "" && (

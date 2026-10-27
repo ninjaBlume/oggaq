@@ -137,11 +137,11 @@ test('bireysel kayıt, giriş ve imzalı e-posta doğrulama öğrenci ekranında
   await page.getByRole('button', { name: 'Hesap oluştur', exact: true }).click();
   await page.getByLabel('Ad soyad').fill('Sentetik yeni öğrenci');
   await page.getByLabel('E-posta adresi', { exact: true }).fill('e2e-new@example.test');
-  await page.getByLabel('Parola', { exact: true }).fill('Synthetic-Browser-42!');
-  await page.getByLabel('Parola tekrar', { exact: true }).fill('Synthetic-Browser-42!');
+  await page.getByLabel('Parola', { exact: true }).fill('Test-42!');
+  await page.getByLabel('Parola tekrar', { exact: true }).fill('Test-42!');
   await page.getByRole('button', { name: 'Hesap oluştur', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('Hesabınız oluşturuldu.');
-  await page.getByLabel('Parola', { exact: true }).fill('Synthetic-Browser-42!');
+  await page.getByLabel('Parola', { exact: true }).fill('Test-42!');
   await page.getByRole('button', { name: 'Giriş yap', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'E-postanı doğrula' })).toBeVisible();
   await page.goto(fixture('verification-link', 'e2e-new@example.test'));
@@ -159,13 +159,13 @@ test('parola sıfırlama formu gerçek token ile yeni giriş sağlar', async ({ 
   await expect(page.getByRole('status')).toContainText('Hesap mevcutsa');
   // The local fixture issues a real Laravel broker token and uses the mail notification's URL.
   await page.goto(fixture('reset-link', 'e2e-student@example.test'));
-  await page.getByLabel('Yeni parola', { exact: true }).fill('Synthetic-New-Password-42!');
-  await page.getByLabel('Parola tekrar', { exact: true }).fill('Synthetic-New-Password-42!');
+  await page.getByLabel('Yeni parola', { exact: true }).fill('Reset-8!');
+  await page.getByLabel('Parola tekrar', { exact: true }).fill('Reset-8!');
   await page.getByRole('button', { name: 'Parolayı yenile' }).click();
   await expect(page.getByRole('heading', { name: 'Parolan yenilendi' })).toBeVisible();
   await page.getByRole('link', { name: 'Girişe dön' }).click();
   await page.getByLabel('E-posta adresi', { exact: true }).fill('e2e-student@example.test');
-  await page.getByLabel('Parola', { exact: true }).fill('Synthetic-New-Password-42!');
+  await page.getByLabel('Parola', { exact: true }).fill('Reset-8!');
   await page.getByRole('button', { name: 'Giriş yap' }).click();
   await expect(page.getByRole('heading', { name: 'Deneme sınavları' })).toBeVisible();
 });

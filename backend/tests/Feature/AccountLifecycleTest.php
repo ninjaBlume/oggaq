@@ -16,6 +16,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -90,6 +91,16 @@ class AccountLifecycleTest extends TestCase
         $this->postJson('/api/v1/me/email', [])->assertUnauthorized();
         $this->postJson('/api/v1/me/export', ['current_password' => self::PASSWORD])->assertUnauthorized();
         $this->deleteJson('/api/v1/me', ['current_password' => self::PASSWORD, 'confirmation' => 'HESABIMI SİL'])->assertUnauthorized();
+    }
+
+    public function test_password_change_accepts_eight_characters_and_rejects_seven(): void
+    {
+        $user = $this->createUser();
+        $this->asToken($user);
+        $this->postJson('/api/v1/me/password', ['current_password' => self::PASSWORD, 'password' => 'Test-7!', 'password_confirmation' => 'Test-7!'])
+            ->assertUnprocessable()->assertJsonValidationErrors('password');
+        $this->postJson('/api/v1/me/password', ['current_password' => self::PASSWORD, 'password' => 'Test-42!', 'password_confirmation' => 'Test-42!'])->assertOk();
+        $this->assertTrue(Hash::check('Test-42!', $user->fresh()->password));
     }
 
     public function test_changes_need_the_current_password_and_change_nothing_without_it(): void

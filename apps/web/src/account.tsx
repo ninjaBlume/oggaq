@@ -88,7 +88,7 @@ function ChangePassword() {
         {change.isSuccess && <p className="notice success" role="status">Parolan değiştirildi; diğer cihazlardaki oturumlar kapatıldı.</p>}
         {change.isError && !['current_password', 'password'].some((name) => fieldError(change.error, name)) && <ErrorNotice error={change.error} />}
         <PasswordField value={current} onChange={setCurrent} error={fieldError(change.error, 'current_password')} />
-        <Field label="Yeni parola" error={fieldError(change.error, 'password')} hint="En az 12 karakter; büyük/küçük harf, rakam ve sembol.">{(props) => <input {...props} required type="password" minLength={12} maxLength={128} autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} />}</Field>
+        <Field label="Yeni parola" error={fieldError(change.error, 'password')} hint="En az 8 karakter; büyük/küçük harf, rakam ve sembol.">{(props) => <input {...props} required type="password" minLength={8} maxLength={128} autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} />}</Field>
         <Field label="Yeni parola tekrar">{(props) => <input {...props} required type="password" maxLength={128} autoComplete="new-password" value={confirmation} onChange={(event) => setConfirmation(event.target.value)} />}</Field>
         <button className="button primary" type="submit">{change.isPending ? 'Kaydediliyor…' : 'Parolayı değiştir'}</button>
       </fieldset>

@@ -24,7 +24,7 @@ class CreatePlatformAdmin extends Command
         $validator = Validator::make($data, [
             'email' => ['required', 'email:rfc', 'max:254', 'unique:users,email'],
             'name' => ['required', 'string', 'max:100'],
-            'password' => ['required', 'string', 'max:128', 'confirmed', Password::min(12)->mixedCase()->numbers()->symbols()],
+            'password' => ['required', 'string', 'max:128', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
         ]);
         if ($validator->fails()) {
             foreach ($validator->errors()->all() as $error) {

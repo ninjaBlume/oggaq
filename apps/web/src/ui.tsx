@@ -17,7 +17,7 @@ export function PasswordField({ label = 'Parola', value, onChange, error, hint, 
   const [visible, setVisible] = useState(false);
   return <Field label={label} error={error} hint={hint} labelAction={labelAction}>{(props) => <div className="input-shell">
     <Icon name="lock" />
-    <input {...props} required type={visible ? 'text' : 'password'} minLength={newPassword ? 12 : undefined} maxLength={128} autoComplete={newPassword ? 'new-password' : 'current-password'} value={value} onChange={(event) => onChange(event.target.value)} />
+    <input {...props} required type={visible ? 'text' : 'password'} minLength={newPassword ? 8 : undefined} maxLength={128} autoComplete={newPassword ? 'new-password' : 'current-password'} value={value} onChange={(event) => onChange(event.target.value)} />
     <button className="password-toggle" type="button" aria-label={visible ? `${label}: parolayı gizle` : `${label}: parolayı göster`} aria-pressed={visible} onClick={() => setVisible(!visible)}><Icon name={visible ? 'eyeOff' : 'eye'} /></button>
   </div>}</Field>;
 }

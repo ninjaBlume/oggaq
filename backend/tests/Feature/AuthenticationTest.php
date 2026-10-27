@@ -76,6 +76,26 @@ class AuthenticationTest extends TestCase
         $this->withToken($token)->getJson('/api/v1/me')->assertOk()->assertJsonPath('data.id', $user->id);
     }
 
+    public function test_registration_accepts_eight_characters_and_rejects_seven(): void
+    {
+        $this->postJson('/api/v1/auth/register', $this->registration(['password' => 'Test-7!', 'password_confirmation' => 'Test-7!']))
+            ->assertUnprocessable()->assertJsonValidationErrors('password');
+        $response = $this->postJson('/api/v1/auth/register', $this->registration(['password' => 'Test-42!', 'password_confirmation' => 'Test-42!']))
+            ->assertCreated();
+        $user = User::findOrFail($response->json('data.id'));
+        $this->assertTrue(Hash::check('Test-42!', $user->password));
+    }
+
+    public function test_password_reset_accepts_eight_characters_and_rejects_seven(): void
+    {
+        $user = $this->createUser();
+        $token = Password::createToken($user);
+        $payload = ['email' => $user->email, 'token' => $token, 'password' => 'Test-7!', 'password_confirmation' => 'Test-7!'];
+        $this->postJson('/api/v1/auth/reset-password', $payload)->assertUnprocessable()->assertJsonValidationErrors('password');
+        $this->postJson('/api/v1/auth/reset-password', array_merge($payload, ['password' => 'Reset-8!', 'password_confirmation' => 'Reset-8!']))->assertOk();
+        $this->assertTrue(Hash::check('Reset-8!', $user->fresh()->password));
+    }
+
     public function test_mobile_login_rotates_only_the_same_device_token(): void
     {
         $user = $this->createUser();
@@ -249,7 +269,7 @@ class AuthenticationTest extends TestCase
     public function test_admin_command_creates_a_separate_personal_context_without_default_credentials(): void
     {
         $this->artisan('app:create-admin', ['email' => 'operator@example.test', '--name' => 'Test Operator'])
-            ->expectsQuestion('Parola', self::PASSWORD)->expectsQuestion('Parola tekrar', self::PASSWORD)->assertExitCode(0);
+            ->expectsQuestion('Parola', 'Test-42!')->expectsQuestion('Parola tekrar', 'Test-42!')->assertExitCode(0);
         $user = User::where('email', 'operator@example.test')->firstOrFail();
         $this->assertTrue($user->isPlatformAdmin());
         $this->assertTrue($user->hasVerifiedEmail());

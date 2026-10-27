@@ -15,7 +15,7 @@ test.afterAll(() => fixture("cleanup"));
 const web = "http://127.0.0.1:5183";
 const mobile = mobilePreviewUrl;
 const password = "Synthetic-Browser-42!";
-const newPassword = "Another-Browser-77!";
+const newPassword = "New-42!x";
 
 async function webLogin(page: Page, email: string, secret = password) {
   await page.goto(`${web}/`);
