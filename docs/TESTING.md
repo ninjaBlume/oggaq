@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## 27 Ekim 2026 — Profil kısayolunun kaldırılması ve kompakt sınav kartları
+
+Mobil header profil düğmesi/baş harfleri kaldırıldı; Profil alt sekmede ve tablette gezinme rayında korunur. Marka menü ile aynı genişlikte etkileşimsiz sağ boşluk sayesinde ortada kalır. Deneme/Ders ortak kartı tam başlık, kısa dönem/soru/süre bilgisi ve sağda eylemle düzenlendi; büyük ikon ve “Henüz girmedin” satırı kaldırıldı. Var olan denemede devam/duraklatıldı/süre sonu, tamamlanan denemede önceki başarı bilgisi korunur. Süre/çıkış tercihi formu açılınca genişler. Sayı ve birimi bölünmeyen boşlukla birlikte tutulur; sabit yükseklik/kırpma yoktur.
+
+**57 mobil birim testi, workspace strict TypeScript, Expo web QA export ve toplam 52 ilgili E2E başarılı:** son geniş koşuda 50 senaryo geçti; iki metadata beklentisi bölünmeyen boşluğu da kabul edecek şekilde düzeltildikten sonra iki uçtan uca sınav akışı ayrıca geçti. Önceki koşuda gizli, korunmuş sekmenin kartını seçen ölçüm locator'ı aktif/görünür kartı ölçecek şekilde düzeltildi. Açık/koyu tema, 320/390/834 px Standart kart yüksekliği (sentetik örneklerde en çok 140 px), en az 44 px eylem, 320–1280 px yerleşim, Büyük yazı, eğitim ayrımı, başlatma/yanıt/geri bildirim/devam/sonuç, logo bağlantısı ve alt sekmeden profil/ad düzenleme doğrulandı. Son üretim kaynakları değişmeden yalnız bu iki test beklentisi güncellendi; çözülmemiş yeni başarısız test yok. Tüm ürün test paketi/önceden belgelenmiş yasal sayfa testleri tekrar çalıştırılmadı.
+
+Device Hub iPhone 18 Pro / iOS 27 / Expo Go üzerinde header, gerçek API'ye bağlı Deneme ve Ders kartları gözle incelendi; son metadata yerleşimi Ders ekranında ayrıca görüldü. Sınav başlatılmadı veya kullanıcı verisi yazılmadı. iPad/Android native ve fiziksel TestFlight/Play alımı bu kontrolde doğrulanmadı. E2E yalnız `oggaq_test` ve 8001/5183/5184/5186 portlarında, başka test süreci yokken çalıştı. Backend/API/veritabanı/üretim webi değişmedi; PHPUnit/Composer veya sunucu deploy'u gerektiren değişiklik yok. Kanıtlar `artifacts/compact-exam-cards/`, ekranlar `artifacts/education/`, `artifacts/mobile-preview/redesign/`, `artifacts/person-names/screens/` içinde. Native runtime'lar korundu; beta dağıtım sonucu ayrıca kaydedilir.
+
 ## 27 Ekim 2026 — İlk kurulumda Açık görünüm / Standart yazı
 
 Mobil ilk açılış tercihi `light` oldu; yazı boyutunun mevcut `standard` varsayılanı korundu. Cihaz koyu modda olsa da kaydedilmiş tercih yoksa Açık görünüm seçilir. Önceden saklanan Açık/Koyu/Cihaz ayarı ve Küçük/Standart/Büyük değerleri korunur; güncelleme bunları sıfırlamaz. Varsayılanlar açılışta depoya yazılmaz. Profil açıklaması ve tasarım/mobil belgeleri güncellendi.

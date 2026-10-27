@@ -135,7 +135,7 @@ test("mobil sekmeler gerçek Bearer API ile deneme sınavı, sonuçlar ve çık�
     page.getByRole("heading", { name: "Deneme sınavları", exact: true }),
   ).toBeVisible();
   await expect(page.getByText("1. Temel Eğitim Sınav Soruları", { exact: true })).toBeVisible();
-  await expect(page.getByText(/önerilen süre 150 dk/)).toBeVisible();
+  await expect(page.getByText(/3\s+soru · 150\s+dk/)).toBeVisible();
   await screenshot(page, "deneme");
   await page.getByRole("button", { name: "Sınava gir", exact: true }).click();
   await expect(page.getByLabel("Süre (dakika)", { exact: true })).toHaveValue(
@@ -205,7 +205,7 @@ test("ders sınavı dersine göre bulunur ve çözülür; çalışma alanı değ
     "Sentetik çalışma dersi",
   );
   await expect(page.getByText("1. Temel Eğitim Sınav Soruları", { exact: true })).toBeVisible();
-  await expect(page.getByText(/3 soru · önerilen süre 5 dk/)).toBeVisible();
+  await expect(page.getByText(/3\s+soru · 5\s+dk/)).toBeVisible();
   await page.getByRole("button", { name: "Sınava gir", exact: true }).click();
   await page.getByLabel("Süre (dakika)", { exact: true }).filter({ visible: true }).fill("5");
   await page.getByRole("button", { name: "Sınavı başlat" }).click();

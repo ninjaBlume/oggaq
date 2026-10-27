@@ -156,11 +156,9 @@ function MainTabs({
           {layout.railed && <PrimaryNavigation tab={tab} select={selectTab} placement="rail" />}
           <View style={{ flex: 1 }}>
             <MainHeader
-              user={user}
               context={context}
               expanded={menuOpen}
               menu={() => setMenuOpen(true)}
-              profile={() => selectTab("profile")}
               home={() => selectTab("home")}
             />
             {(primaryTabs.includes(tab) ? visited : [...visited, tab]).map(page => (

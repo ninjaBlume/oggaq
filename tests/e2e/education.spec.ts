@@ -22,6 +22,12 @@ for (const mobile of [false, true]) {
    const renewal = page.getByRole('button',{name:mobile ? 'Yenileme eğitimi sınavları' : 'Yenileme eğitimi',exact:true});
    await expect(basic).toHaveAttribute(mobile ? 'aria-selected' : 'aria-pressed','true');
    await expect(page.getByRole('heading',{name:'1. Temel Eğitim Sınav Soruları',exact:true})).toBeVisible();
+   if (mobile) {
+    const card = page.locator('[data-testid="official-exam-entry"]:visible').first();
+    expect((await card.boundingBox())!.height).toBeLessThanOrEqual(140);
+    expect((await card.getByRole('button',{name:'Sınava gir',exact:true}).boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    await expect(card.getByText('Henüz girmedin',{exact:true})).toHaveCount(0);
+   }
    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
    mkdirSync('artifacts/education',{recursive:true});
    await page.screenshot({path:`artifacts/education/${mobile ? 'mobile' : 'web'}-${width}-basic.png`});
@@ -60,6 +66,12 @@ for (const mobile of [false, true]) {
    }
    else await page.getByRole('link',{name:'Ders sınavları',exact:true}).click();
    await expect(page.getByRole('heading',{name:'Ders sınavları',exact:true})).toBeVisible();
+   if (mobile) {
+    const card = page.locator('[data-testid="official-exam-entry"]:visible').first();
+    await expect(card.getByRole('heading')).toBeVisible();
+    expect((await card.boundingBox())!.height).toBeLessThanOrEqual(140);
+    expect((await card.getByRole('button',{name:'Sınava gir',exact:true}).boundingBox())!.height).toBeGreaterThanOrEqual(44);
+   }
    if (mobile) {
     await expect(basic).toHaveAttribute('aria-selected','true');
     await expect(page.getByRole('heading',{name:'1. Temel Eğitim Sınav Soruları',exact:true})).toBeVisible();

@@ -108,21 +108,17 @@ function ExamEntry({
   const locked = task.pending || (submission.current !== null && !(task.error instanceof ApiError && ([409, 422].includes(task.error.status) || task.error.problem.code === 'timer_unavailable')));
   const valid = Number(minutes) >= 1 && Number(minutes) <= 180;
   return (
-    <View testID="official-exam-entry" style={{ paddingHorizontal: 14, paddingVertical: cardDensity.paddingY, gap: cardDensity.rowGap, borderRadius: shape.large, backgroundColor: tint.surface, borderWidth: 1, borderColor: progress.open && !expired ? palette.primary : tint.line }}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-        <View style={{ width: cardDensity.iconSize, height: cardDensity.iconSize, borderRadius: shape.control, alignItems: "center", justifyContent: "center", backgroundColor: tint.iconSurface }}>
-          <BookOpen size={21} color={tint.accent} />
-        </View>
-        <Text accessibilityRole="header" style={[styles.heading, { flex: 1, fontSize: 17, lineHeight: 24 }]}>{title}</Text>
-      </View>
-      <Text style={styles.muted}>
-        {[examPeriodLabel(exam), `${exam.question_count} soru`, `önerilen süre ${suggestedMinutes(exam)} dk`].join(" · ")}
-      </Text>
+    <View testID="official-exam-entry" style={{ paddingHorizontal: 12, paddingVertical: 10, gap: 6, borderRadius: shape.control, backgroundColor: tint.surface, borderWidth: 1, borderColor: progress.open && !expired ? palette.primary : tint.line }}>
+      <Text accessibilityRole="header" style={[styles.heading, { fontSize: 16, lineHeight: 22 }]}>{title}</Text>
       <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
-        <View style={{ flexGrow: 1, flexBasis: 100 }}>
-          <Text style={[styles.muted, progress.open && !expired && { color: palette.primary, fontWeight: "700" }]}>
-            {progress.open ? (progress.open.timer_paused ? "Süre duraklatıldı" : expired ? "Süresi doldu" : "Devam ediyor") : progress.runs > 0 ? `${progress.runs} kez · en iyi %${progress.best}` : "Henüz girmedin"}
+        <View style={{ flexGrow: 1, flexBasis: 120, gap: 2 }}>
+          <Text style={{ color: palette.muted, fontSize: 13, lineHeight: 19 }}>{examPeriodLabel(exam)}</Text>
+          <Text accessibilityLabel={`${exam.question_count} soru, önerilen süre ${suggestedMinutes(exam)} dakika`} style={{ color: palette.muted, fontSize: 13, lineHeight: 19 }}>
+            {`${exam.question_count}\u00a0soru · ${suggestedMinutes(exam)}\u00a0dk`}
           </Text>
+          {(progress.open || progress.runs > 0) && <Text style={{ color: progress.open && !expired ? palette.primary : palette.muted, fontSize: 12, lineHeight: 18, fontWeight: progress.open && !expired ? "700" : "400" }}>
+            {progress.open ? (progress.open.timer_paused ? "Süre duraklatıldı" : expired ? "Süresi doldu" : "Devam ediyor") : `${progress.runs} kez · en iyi %${progress.best}`}
+          </Text>}
         </View>
         {progress.open ? (
           <Button compact secondary={!!expired} onPress={() => open(progress.open!.id)}>{expired ? "Sonucu gör" : "Devam et"}</Button>
@@ -131,7 +127,7 @@ function ExamEntry({
         ) : null}
       </View>
       {expanded && !progress.open && (
-        <View style={{ gap: 12 }}>
+        <View style={{ gap: 12, borderTopWidth: 1, borderTopColor: tint.line, paddingTop: 10 }}>
           <Field label="Süre (dakika)" numeric value={minutes} onChange={setMinutes} editable={!locked} />
           <Text style={styles.muted}>Süre tercihini seç. Süre dolunca sınav kendiliğinden biter.</Text>
           <ChoiceGroup choices={examTimerChoices.map(choice => ({...choice, accessibilityLabel: choice.label}))} value={timerPolicy} disabled={locked} onChange={value => setTimerPolicy(value as ExamTimerPolicy)} />

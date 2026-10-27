@@ -1,5 +1,11 @@
 # Expo mobil uygulaması
 
+## 27 Ekim 2026: sade header ve kompakt sınav kartları
+
+Header profil düğmesi kaldırıldı; Profil alt sekmeden veya tablet gezinme rayından açılır. Menü ve marka ana sayfa bağlantısı korunur; marka etkileşimsiz sağ boşlukla ortada kalır. Profil içindeki tam ad ve baş harfler değişmez.
+
+Deneme ve Ders listelerinin ortak kartı kompaktlaştırıldı: büyük kitap ikonu ve yeni sınavdaki “Henüz girmedin” satırı kaldırıldı. Tam başlık üstte, dönem ile soru/süre bilgileri solda, Başla/Devam/Sonuç düğmesi sağda yer alır. Sayı ve birimi aynı grupta kalır. Önceki sonuç/aktif sınav durumu yalnız varsa gösterilir. Süre ve çıkış tercihi formu kart açılınca görünür; API, başlangıç/tekrar/konum/sonuç kuralları değişmez. Dokunma hedefi en az 44 px, yazı ölçekleme ve başlık sarılması korunur; sabit kart yüksekliği yoktur. Kontroller ve beta dağıtımı [TESTING](TESTING.md) içinde kaydedilir.
+
 
 ## 27 Ekim 2026: sekiz karakterli parola alt sınırı
 

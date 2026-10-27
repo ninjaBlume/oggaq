@@ -18,7 +18,7 @@ for (const platform of ['web', 'mobile'] as const) for (const scheme of ['light'
     });
     const openProfile = async () => {
       if (platform === 'web') await page.getByRole('link', { name: 'Hesabım', exact: true }).click();
-      else await page.getByRole('button', { name: 'Profilimi aç', exact: true }).click();
+      else await page.getByRole('tab', { name: 'Profil', exact: true }).click();
     };
     const edit = async () => {
       if (platform === 'mobile') await page.getByRole('button', { name: /^Hesabım:/ }).click();
@@ -28,7 +28,11 @@ for (const platform of ['web', 'mobile'] as const) for (const scheme of ['light'
       await page.getByLabel('E-posta adresi', { exact: true }).fill('e2e-student@example.test');
       await page.getByLabel('Parola', { exact: true }).fill('Synthetic-Browser-42!');
       await page.getByRole('button', { name: 'Giriş yap', exact: true }).click();
-      await expect(page.getByTestId('header-initials')).toHaveText('EÖ');
+      if (platform === 'web') await expect(page.getByTestId('header-initials')).toHaveText('EÖ');
+      else {
+        await expect(page.getByRole('button', { name: 'Profilimi aç', exact: true })).toHaveCount(0);
+        await expect(page.getByTestId('header-person')).toHaveCount(0);
+      }
       await openProfile();
       for (const [name, initials] of [['Ayşe Yılmaz', 'AY'], ['Ayşe Deniz Yılmaz', 'ADY'], ['Ayşe Deniz Nur Yılmaz', 'ADY']] as const) {
         await edit();
@@ -45,7 +49,7 @@ for (const platform of ['web', 'mobile'] as const) for (const scheme of ['light'
         expect((await (await saved).json()).data.name).toBe(name);
         await expect(page.getByText('Ad soyadın güncellendi.', { exact: true })).toBeVisible();
         if (platform === 'mobile') await page.getByRole('button', { name: 'Geri dön', exact: true }).click();
-        await expect(page.getByTestId('header-initials')).toHaveText(initials);
+        if (platform === 'web') await expect(page.getByTestId('header-initials')).toHaveText(initials);
         await expect(page.getByTestId('profile-initials')).toHaveText(initials);
         await expect(page.getByTestId('profile-full-name')).toHaveText(name);
       }
@@ -67,7 +71,7 @@ for (const platform of ['web', 'mobile'] as const) for (const scheme of ['light'
         await page.getByLabel('Parola', { exact: true }).fill('Synthetic-Browser-42!');
         await page.getByRole('button', { name: 'Giriş yap', exact: true }).click();
       }
-      await expect(page.getByTestId('header-initials')).toHaveText('ADY');
+      if (platform === 'web') await expect(page.getByTestId('header-initials')).toHaveText('ADY');
       if (platform === 'mobile') await openProfile();
       await expect(page.getByTestId('profile-full-name')).toHaveText('Ayşe Deniz Nur Yılmaz');
       if (platform === 'web') {

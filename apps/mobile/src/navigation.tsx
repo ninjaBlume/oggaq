@@ -25,7 +25,7 @@ import {
   UserRound,
   X,
 } from "./icons";
-import { displayPersonName, personInitials, vocabulary } from "@oggaq/study-core";
+import { displayPersonName, vocabulary } from "@oggaq/study-core";
 import { textSizeFactors } from "./textSize";
 import { motion, shape } from "./theme";
 import type { AppPalette } from "./theme";
@@ -57,24 +57,19 @@ export type MainTab =
   | (typeof extraDestinations)[number]["id"];
 
 export function MainHeader({
-  user,
   context,
   menu,
-  profile,
   home,
   expanded,
 }: {
-  user: User;
   context: StudyContext;
   menu: () => void;
-  profile: () => void;
   home: () => void;
   expanded: boolean;
 }) {
   const { palette, textSize } = useTheme();
   const navStyles = useNavStyles();
   const layout = useLayout();
-  const initials = personInitials(user.name);
   return (
     <View
       testID="main-header"
@@ -121,21 +116,7 @@ export function MainHeader({
           </View>
         </View>
       </Pressable>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Profilimi aç"
-        accessibilityHint={displayPersonName(user.name)}
-        testID="header-person"
-        onPress={profile}
-        style={({ pressed }) => [
-          navStyles.avatarButton,
-          pressed && navStyles.pressed,
-        ]}
-      >
-        {initials ? <Text testID="header-initials" numberOfLines={1} adjustsFontSizeToFit style={[navStyles.avatarLetter, { fontSize: initials.length > 2 ? 13 : 16 }]}>
-          {initials}
-        </Text> : <UserRound size={22} color={palette.primary} />}
-      </Pressable>
+      <View accessible={false} pointerEvents="none" style={navStyles.headerButton} />
     </View>
   );
 }
@@ -528,15 +509,6 @@ function makeNavStyles(palette: AppPalette) {
     letterSpacing: 1.8,
     color: palette.ink,
   },
-  avatarButton: {
-    width: 44,
-    height: 44,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 16,
-    backgroundColor: palette.softPrimary,
-  },
-  avatarLetter: { fontSize: 16, fontWeight: "700", color: palette.primary },
   contextLabel: { fontSize: 12, lineHeight: 18, color: palette.muted },
   panel: {
     height: "100%",
