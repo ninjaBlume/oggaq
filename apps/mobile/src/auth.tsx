@@ -2,12 +2,12 @@ import { Text } from "./text";
 import { BrandWordmark } from "./wordmark";
 import { BrandLogo } from "./brandLogo";
 import { useState } from "react";
-import { Linking, Platform, View } from "react-native";
+import { Platform, View } from "react-native";
 import { CheckCircle2, GraduationCap } from "./icons";
 import brand from "../../../config/brand.json";
 import { shape, typography } from "./theme";
 import type { User } from "@oggaq/shared-types";
-import { api, frontendUrl } from "./api";
+import { api } from "./api";
 import { deviceId, session } from "./storage";
 import { useTask } from "./hooks";
 import {
@@ -43,11 +43,6 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
               password_confirmation: confirmation,
             },
           });
-          setMode("login");
-          setPassword("");
-          setConfirmation("");
-          setNotice("Hesabın oluşturuldu. Giriş yapıp e-postanı doğrula.");
-          return null;
         }
         if (mode === "forgot") {
           await api.request("post", "/api/v1/auth/forgot-password", {
@@ -58,11 +53,23 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
           );
           return null;
         }
-        const response = await api.request(
-          "post",
-          "/api/v1/auth/mobile-tokens",
-          { body: { email, password, device_id: await deviceId(), device_platform: devicePlatform } },
-        );
+        let response;
+        try {
+          response = await api.request(
+            "post",
+            "/api/v1/auth/mobile-tokens",
+            { body: { email, password, device_id: await deviceId(), device_platform: devicePlatform } },
+          );
+        } catch (error) {
+          // If registration succeeded but sign-in failed, retry sign-in, never create another account.
+          if (mode === "register") {
+            setMode("login");
+            setNotice("Hesabın oluşturuldu. Giriş yaparak kaldığın yerden devam edebilirsin.");
+            setPassword("");
+            setConfirmation("");
+          }
+          throw error;
+        }
         try {
           await session.save({
             token: response.data.token,
@@ -70,6 +77,12 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
           });
         } catch (error) {
           // Do not orphan a newly issued token if native secure storage is locked.
+          if (mode === "register") {
+            setMode("login");
+            setNotice("Hesabın oluşturuldu. Giriş yaparak kaldığın yerden devam edebilirsin.");
+            setPassword("");
+            setConfirmation("");
+          }
           const { ApiClient } = await import("@oggaq/api-client");
           const revoke = new ApiClient((await import("./api")).apiUrl, {
             auth: "bearer",
@@ -81,6 +94,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
           throw error;
         }
         setPassword("");
+        setConfirmation("");
         return response.data.user;
       },
       (user) => {
@@ -184,58 +198,64 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
 }
 
 export function Verify({
+  user,
+  verified,
   refresh,
   logout,
 }: {
+  user: User;
+  verified: (user: User) => void;
   refresh: () => void;
   logout: () => void;
 }) {
   const { styles } = useTheme();
-  const task = useTask<unknown>();
+  const task = useTask<User | null>();
+  const [code, setCode] = useState("");
   const [notice, setNotice] = useState("");
   return (
-    <>
-      <Heading>E-postanı doğrula</Heading>
+    <View style={{ width: "100%", maxWidth: 480, alignSelf: "center", gap: 18, paddingTop: 12 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+        <BrandLogo size={64} />
+        <BrandWordmark />
+      </View>
+      <Heading>Son bir adım: e-postanı doğrula</Heading>
       <Card>
         <Text style={styles.text}>
-          E-postandaki doğrulama bağlantısını tarayıcıda aç ve aynı hesabına
-          giriş yap. Sonra uygulamaya dönüp doğrulamayı kontrol et.
+          {user.email} adresine gönderdiğimiz 6 haneli kodu gir. Doğrulanınca doğrudan uygulamaya geçeceksin.
         </Text>
-        <Button onPress={refresh}>Doğrulamayı kontrol et</Button>
+        <Field label="Doğrulama kodu" oneTimeCode numeric outlined placeholder="6 haneli kod" value={code} editable={!task.pending}
+          onChange={(value) => { setCode(value.replace(/\s/g, "").replace(/[^0-9]/g, "").slice(0, 6)); task.reset(); }} />
+        <Text style={styles.muted}>Kod 10 dakika geçerlidir. E-postayı göremiyorsan spam klasörünü de kontrol et. Yeni kod istemek için bir dakika bekle.</Text>
+        <Button disabled={task.pending || code.length !== 6} onPress={() => {
+          void task.run(async () => (await api.request("post", "/api/v1/auth/email-verification-code", { body: { code } })).data,
+            (updated) => { if (updated) verified(updated); });
+        }}>{task.pending ? "İşlem yapılıyor…" : "Doğrula ve başla"}</Button>
         <Button
           secondary
           disabled={task.pending}
           onPress={() => {
             void task.run(
-              () =>
-                api.request(
+              async () => {
+                await api.request(
                   "post",
                   "/api/v1/auth/email-verification-notification",
                   {},
-                ),
-              () => setNotice("Doğrulama e-postası gönderildi."),
+                );
+                return null;
+              },
+              () => { setCode(""); setNotice("Yeni kod gönderildi. E-postandaki en son kodu kullan."); },
             );
           }}
         >
-          E-postayı yeniden gönder
+          Yeni kod gönder
         </Button>
-        <Button
-          secondary
-          onPress={() => {
-            void task.run(
-              () => Linking.openURL(frontendUrl),
-              () => {},
-            );
-          }}
-        >
-          Web girişini aç
-        </Button>
+        <TextLink disabled={task.pending} onPress={refresh}>Bağlantıyla doğruladım, kontrol et</TextLink>
         {notice !== "" && <Text style={styles.text}>{notice}</Text>}
         <ErrorNotice error={task.error} />
-        <Button secondary onPress={logout}>
-          Çıkış yap
+        <Button secondary disabled={task.pending} onPress={logout}>
+          Başka hesap kullan
         </Button>
       </Card>
-    </>
+    </View>
   );
 }

@@ -55,6 +55,8 @@ Komut parolayı gizli istemle iki kez alır; mevcut kullanıcıyı yöneticiye y
 
 ## Web ve mobil API kullanımı
 
+27 Ekim 2026: Mobil kayıt sonrasında aynı kullanıcı için otomatik token alınır; yeniden giriş ve tarayıcı zorunluluğu kaldırıldı. Mevcut e-postaya gelen 6 haneli kod `POST /api/v1/auth/email-verification-code` üzerinden mevcut Bearer oturumuyla doğrulanır. Eski imzalı tarayıcı yolu da çalışır. Kod tablosu/migration ve limitler [DATABASE](DATABASE.md) ile [SECURITY](SECURITY.md) içinde; kullanıcı akışı [MOBILE](MOBILE.md) içindedir.
+
 Web girişinden önce `/sanctum/csrf-cookie` çağrılır; cookies saklanır. `XSRF-TOKEN` cookie'sinin URL decode edilmiş değeri `X-XSRF-TOKEN` başlığında, cookie'ler `credentials: include` ile gönderilir. Giriş session ID'sini yeniler. `FRONTEND_URL`, `ADMIN_URL` ve `SANCTUM_STATEFUL_DOMAINS` gerçek istemci origin'leriyle eşleşmelidir.
 
 Mobil `/api/v1/auth/mobile-tokens` için e-posta/parola ve UUID `device_id` gönderir; sonlu `expires_at` ve token alır. Aynı cihazla tekrar giriş o cihazın eski token'ını iptal eder. Diğer cihazlar korunur. Token `api:access` ability taşır; Policy denetimleri ayrıca uygulanır. Expo istemcisi native token'ı SecureStore'a yazar; [mobil kurulum](MOBILE.md) aynı Wi-Fi üzerinden iPhone/Expo Go erişimini de açıklar.

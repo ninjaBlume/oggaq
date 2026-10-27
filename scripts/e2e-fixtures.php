@@ -35,8 +35,21 @@ if (config('database.default') !== 'pgsql' || config('database.connections.pgsql
     throw new RuntimeException('Browser fixtures require the isolated oggaq_test PostgreSQL database.');
 }
 $operation = $argv[1] ?? '';
-if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'renewal-exams', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'long-result', 'paired-exam-draft', 'scoring', 'scored-exam-draft', 'calendar', 'calendar-stale', 'upcoming-calendar', 'upcoming-empty', 'cleanup'], true)) {
+if (! in_array($operation, ['setup', 'setup-study', 'verification-link', 'verification-code', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'renewal-exams', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'long-result', 'paired-exam-draft', 'scoring', 'scored-exam-draft', 'calendar', 'calendar-stale', 'upcoming-calendar', 'upcoming-empty', 'cleanup'], true)) {
     throw new InvalidArgumentException('Expected setup or cleanup.');
+}
+if ($operation === 'verification-code') {
+    $email = $argv[2] ?? '';
+    if (! str_ends_with($email, '@example.test')) {
+        throw new RuntimeException('Code fixtures require synthetic accounts.');
+    }
+    $user = User::where('email', $email)->whereNull('email_verified_at')->firstOrFail();
+    // Synthetic mail transport is an in-memory array. Capture a fresh test-only delivery instead.
+    Illuminate\Support\Facades\Notification::fake();
+    DB::table('email_verification_codes')->where('user_id', $user->id)->update(['sent_at' => now()->subMinutes(2)]);
+    $user->sendEmailVerificationNotification();
+    echo Illuminate\Support\Facades\Notification::sent($user, App\Modules\Identity\Notifications\VerifyEmailNotification::class)->sole()->code;
+    exit;
 }
 if ($operation === 'upcoming-empty') {
     DB::table('exam_calendar_sources')->update(['active_snapshot_id' => null, 'verified_at' => null, 'status' => 'unavailable']);

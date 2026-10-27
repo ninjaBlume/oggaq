@@ -2,6 +2,7 @@
 
 namespace App\Modules\Identity\Notifications;
 
+use App\Modules\Identity\Actions\EmailVerificationCodes;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
@@ -14,9 +15,17 @@ class VerifyEmailNotification extends VerifyEmail implements ShouldBeEncrypted, 
 
     public $tries = 3;
 
-    public function __construct()
+    public ?string $code = null;
+
+    public function __construct(?string $code = null)
     {
+        $this->code = $code;
         $this->afterCommit();
+    }
+
+    public function shouldSend(object $notifiable, string $channel): bool
+    {
+        return $this->code === null || app(EmailVerificationCodes::class)->isCurrent($notifiable, $this->code);
     }
 
     public function toMail($notifiable): MailMessage
@@ -28,8 +37,16 @@ class VerifyEmailNotification extends VerifyEmail implements ShouldBeEncrypted, 
             'expires' => $query['expires'], 'signature' => $query['signature'],
         ]);
 
-        return (new MailMessage)->subject('E-posta adresinizi doğrulayın')
-            ->greeting('Merhaba!')->line('Hesabınızı kullanmak için e-posta adresinizi doğrulayın.')
+        $mail = (new MailMessage)->subject(config('brand.name').' e-posta doğrulama')
+            ->greeting('Merhaba!');
+        if ($this->code !== null) {
+            $mail->line('Uygulamadaki doğrulama alanına aşağıdaki 6 haneli kodu gir:')
+                ->line('**'.$this->code.'**')
+                ->line('Kod 10 dakika geçerlidir. Uygulamaya dönüp kodu girmen yeterli; yeniden giriş yapman gerekmez.')
+                ->line('Tarayıcı kullanıyorsan aşağıdaki bağlantıyla da doğrulayabilirsin.');
+        }
+
+        return $mail
             ->action('E-postamı doğrula', $url)
             ->line('Bu hesabı siz oluşturmadıysanız bu e-postayı dikkate almayın.');
     }

@@ -518,6 +518,7 @@ SQL);
         $found = collect($references)->map(fn ($row) => "{$row->tbl}({$row->cols}) -> {$row->ref}")->sort()->values()->all();
         $handled = [
             // deleted with the person
+            'email_verification_codes(user_id) -> users', // cascade; a secret, excluded from account export
             'exam_score_results(exam_attempt_id) -> exam_attempts', 'exam_score_results(user_id) -> users',
             'memberships(user_id) -> users', 'study_contexts(user_id) -> users', 'sessions(user_id) -> users',
             'exam_attempts(study_context_id) -> study_contexts', 'practice_attempts(study_context_id) -> study_contexts', 'favorite_questions(study_context_id) -> study_contexts',
@@ -533,7 +534,7 @@ SQL);
 
         // Personal data held without a foreign key.
         $columns = collect(DB::select("SELECT table_name || '.' || column_name AS name FROM information_schema.columns WHERE table_schema = 'public' AND (column_name IN ('email', 'user_id', 'actor_id', 'ip_address', 'user_agent') OR column_name LIKE '%\\_by' ESCAPE '\\') ORDER BY 1"))->pluck('name')->all();
-        $known = ['audit_events.actor_id', 'import_batches.approved_by', 'import_batches.created_by', 'job_applications.user_id', 'job_postings.created_by', 'memberships.user_id', 'official_exam_question_changes.actor_id', 'official_exams.created_by',
+        $known = ['audit_events.actor_id', 'email_verification_codes.user_id', 'import_batches.approved_by', 'import_batches.created_by', 'job_applications.user_id', 'job_postings.created_by', 'memberships.user_id', 'official_exam_question_changes.actor_id', 'official_exams.created_by',
             'password_reset_tokens.email', 'question_reports.resolved_by', 'question_reports.user_id', 'questions.created_by', 'sessions.ip_address', 'sessions.user_agent', 'sessions.user_id',
             'study_contexts.user_id', 'users.email'];
         $known[] = 'exam_score_results.user_id';

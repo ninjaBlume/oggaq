@@ -1,5 +1,12 @@
 # Veritabanı tasarımı
 
+## 27 Ekim 2026: e-posta doğrulama kodları
+
+`2026_10_27_000001_create_email_verification_codes` migration'ı `email_verification_codes` tablosunu ekler. Her kullanıcı için tek satır: `user_id` UUID primary key ve `users` FK (ON DELETE CASCADE), `code_hash` (64 karakter HMAC-SHA256), `failed_attempts` (CHECK 0–5), `sent_at`, indeksli `expires_at` (`timestamptz`). Düz kod DB'de tutulmaz; özet kullanıcı kimliği + mevcut e-posta + kod ve uygulama anahtarına bağlıdır. Bildirim kuyruğu şifrelidir.
+
+Kullanıcı satırı üzerinde kilit ile gönderim, hatalı tahmin sayımı ve tüketim sıralanır. Başarılı doğrulamada veya imzalı bağlantı doğrulandığında kod satırı silinir; yeniden gönderimde önceki kod geçersiz olur. Kullanıcı silindiğinde FK ile kod da silinir. Kodlar ve özetler hesap dışa aktarımına dahil edilmez. Ortak yerel `oggaq` veritabanına migration uygulanmadı; testler yalnız `oggaq_test` üzerinde çalıştı. Sunucu uygulaması [TESTING](TESTING.md) içinde kaydedilir.
+
+
 Öğrenci süre tercihi migration'ı `2026_10_26_000003_add_student_exam_timer_choice`: `exam_attempts` tablosuna `timer_policy` (varsayılan `continuous`), `paused_at`, `paused_seconds` (varsayılan 0), `clock_seen_at`, `timer_session_id` ekler. Eski sütun değerleri/sonuçlar yeniden yazılmaz. `exam_timer_valid` ve genişletilmiş `exam_settings_valid`, sabit temel süre + kayıtlı ara toplamını doğrular; mevcut özgün soru, sonuç ve hesap silme korumaları aynı kalır. Süre tercihi değişmez. SQL'de keyfî deadline uzatma ve duraklayan kayda cevap reddedilir; sonuçtaki süre araları dışlar. Ayrıntılar [EXAMS](EXAMS.md) içinde. Ortak yerel DB'ye otomatik uygulanmaz.
 
 26 Ekim 2026 cevap kilidi: `2026_10_26_000002_lock_submitted_exam_answers` yeni tablo/alan eklemeden `submitted_exam_answer_lock` trigger'ını kurar. Önceden null olmayan `exam_answers.selected_option_id` farklı bir seçenek veya null olamaz; aynı değer ve sonuç değerlendirmesinin `is_correct` yazması geçerlidir. Migration mevcut soru, cevap, sonuç ve kullanıcı satırlarını değiştirmez. Doğru yanıt aktif denemede kaynak anahtardan hesaplanarak yalnız cevaplanmış soruda gösterilir; toplam sonuç yine bitirmede kaydedilir. Migration yalnız test DB ve canlı API sunucusunda uygulandı; 19 iş tablosunun satırları değişmedi. Ortak yerel `oggaq` veritabanına uygulanmadı; bu hedef için kullanıcı onayı gerekir.

@@ -540,6 +540,8 @@ function Application() {
           >
             {user ? (
               <Verify
+                user={user}
+                verified={setUser}
                 refresh={() => {
                   void refresh();
                 }}

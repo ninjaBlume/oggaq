@@ -35,6 +35,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum', 'account.active', 'abilities:api:access', 'throttle:api'])->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
         Route::post('auth/email-verification-notification', [AuthController::class, 'resendVerification'])->middleware('throttle:verification');
+        Route::post('auth/email-verification-code', [AuthController::class, 'verifyCode'])->middleware('throttle:verification-code');
         Route::get('me', [ProfileController::class, 'show']);
         Route::patch('me', [ProfileController::class, 'update']);
         // Account lifecycle: reachable without a verified e-mail (a mistyped address must be fixable).

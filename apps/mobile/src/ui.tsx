@@ -339,6 +339,7 @@ export function Field({
   labelAction,
   newPassword = false,
   personName = false,
+  oneTimeCode = false,
 }: {
   label: string;
   value: string;
@@ -355,6 +356,7 @@ export function Field({
   labelAction?: ReactNode;
   newPassword?: boolean;
   personName?: boolean;
+  oneTimeCode?: boolean;
 }) {
   const { palette, styles, scheme } = useTheme();
   const [focused, setFocused] = useState(false);
@@ -388,7 +390,7 @@ export function Field({
           secureTextEntry={password && !reveal}
           keyboardType={phone ? "phone-pad" : numeric ? "number-pad" : email ? "email-address" : "default"}
           autoCapitalize={email || password ? "none" : personName ? "words" : "sentences"}
-          autoCorrect={!email && !password && !personName}
+          autoCorrect={!email && !password && !personName && !oneTimeCode}
           editable={editable}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
@@ -407,9 +409,9 @@ export function Field({
                 ]
               : styles.input
           }
-          autoComplete={personName ? "name" : phone ? "tel" : email ? "email" : password ? newPassword ? "new-password" : "current-password" : undefined}
+          autoComplete={oneTimeCode ? "one-time-code" : personName ? "name" : phone ? "tel" : email ? "email" : password ? newPassword ? "new-password" : "current-password" : undefined}
           textContentType={
-            personName ? "name" : phone ? "telephoneNumber" : email ? "emailAddress" : password ? newPassword ? "newPassword" : "password" : undefined
+            oneTimeCode ? "oneTimeCode" : personName ? "name" : phone ? "telephoneNumber" : email ? "emailAddress" : password ? newPassword ? "newPassword" : "password" : undefined
           }
         />
         {password && (

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use App\Modules\Identity\Actions\EmailVerificationCodes;
 use App\Modules\Identity\Notifications\ResetPasswordNotification;
-use App\Modules\Identity\Notifications\VerifyEmailNotification;
 use App\Modules\Tenancy\Models\Membership;
 use App\Modules\Tenancy\Models\StudyContext;
 use Database\Factories\UserFactory;
@@ -43,7 +43,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new VerifyEmailNotification);
+        app(EmailVerificationCodes::class)->send($this);
     }
 
     public function sendPasswordResetNotification($token): void

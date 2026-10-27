@@ -4,6 +4,7 @@ namespace App\Modules\Identity\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Identity\Actions\AuthenticateUser;
+use App\Modules\Identity\Actions\EmailVerificationCodes;
 use App\Modules\Identity\Actions\RegisterUser;
 use App\Modules\Identity\Actions\ResetUserPassword;
 use App\Modules\Identity\Http\Requests\ForgotPasswordRequest;
@@ -11,6 +12,7 @@ use App\Modules\Identity\Http\Requests\LoginRequest;
 use App\Modules\Identity\Http\Requests\MobileTokenRequest;
 use App\Modules\Identity\Http\Requests\RegisterRequest;
 use App\Modules\Identity\Http\Requests\ResetPasswordRequest;
+use App\Modules\Identity\Http\Requests\VerifyEmailCodeRequest;
 use App\Modules\Identity\Http\Resources\UserResource;
 use App\Support\ApiProblem;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -113,7 +115,13 @@ class AuthController extends Controller
     public function verifyEmail(EmailVerificationRequest $request): JsonResponse
     {
         $request->fulfill();
+        DB::table('email_verification_codes')->where('user_id', $request->user()->id)->delete();
 
         return response()->json(['data' => ['message' => 'E-posta adresiniz doğrulandı.']]);
+    }
+
+    public function verifyCode(VerifyEmailCodeRequest $request, EmailVerificationCodes $action): UserResource
+    {
+        return new UserResource($action->verify($request->user(), $request->validated('code')));
     }
 }

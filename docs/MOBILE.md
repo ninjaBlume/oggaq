@@ -1,5 +1,12 @@
 # Expo mobil uygulaması
 
+## 27 Ekim 2026: uygulama içinde tek kayıt ve doğrulama akışı
+
+Kayıt formu başarılı olduğunda mevcut mobil token ucu ile otomatik oturum açılır; kullanıcı tekrar giriş formuna gönderilmez. E-postadaki **6 haneli kod**, uygulamadaki **Doğrula ve başla** alanına girilir ve aynı oturumla ana sayfa açılır. iOS/Android tek kullanımlık kod otomatik doldurma ve boşluk içeren kod yapıştırma desteklenir. Kod 10 dakika geçerlidir; yeni kod en erken 60 saniyede, saatte en çok 10 gönderimle istenir. Doğrulama beklerken içerik erişimi sunucuda kapalı kalır.
+
+Kayıt başarılı olup token alma/saklama başarısız olursa hesap yeniden oluşturulmaz; mevcut e-posta ile girişten devam edilir. Native oturum SecureStore'da korunur; web test önizlemesindeki token yalnız bellektedir, sayfa yenilenmesi native yeniden açılış doğrulaması sayılmaz. Eski imzalı tarayıcı bağlantısı uyum için korunur. Bu yeni akış Expo/Device Hub kaynaklarında hazırdır; ayrıca TestFlight/Play OTA yayımlanmadı. Doğrulamalar ve API yayını [TESTING](TESTING.md) içindedir.
+
+
 ## 27 Ekim 2026: Ders sınavlarında Temel/Yenileme ayrımı
 
 Ders sınavları da Deneme gibi **Temel eğitim / Yenileme eğitimi** seçimi sunar. Seçili ders eğitim değişiminde korunur; sekmeden çıkıp dönüldüğünde ders ve eğitim tercihi korunur. Ders kataloğu API'ye `scope=subject`, `subject_id` ve `education_type` gönderir; bellek önbelleği bağlam, ekran türü, eğitim ve dersi ayrı anahtarlarda tutar. Eğitimler karışmaz; seçilen eğitimde sınavı bulunmayan ders için açık boş durum, istek hatasında yeniden deneme vardır.

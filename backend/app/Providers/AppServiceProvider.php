@@ -59,7 +59,11 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinute(5)->by('password:'.$identityKey($request)),
             Limit::perMinute(15)->by('password-ip:'.$request->ip()),
         ]);
-        RateLimiter::for('verification', fn (Request $request) => Limit::perMinute(6)->by('verify:'.$request->user()?->id));
+        RateLimiter::for('verification', fn (Request $request) => [
+            Limit::perMinute(6)->by('verify:'.$request->user()?->id),
+            Limit::perHour(10)->by('verify-hour:'.$request->user()?->id),
+        ]);
+        RateLimiter::for('verification-code', fn (Request $request) => Limit::perMinute(10)->by('verify-code:'.$request->user()?->id));
         RateLimiter::for('job-applications', fn (Request $request) => Limit::perHour(20)->by('job-applications:'.$request->user()?->id));
         RateLimiter::for('reports', fn (Request $request) => Limit::perHour(20)->by('reports:'.$request->user()?->id));
         // Password-confirmed account actions: a stolen session must not be able to guess the password.

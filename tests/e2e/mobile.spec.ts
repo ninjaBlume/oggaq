@@ -757,7 +757,7 @@ test("giriş formu iki temada dar/yatay ekrana sığar; parola görünürlüğü
   await expect(password).toHaveAttribute("type", "password");
 });
 
-test("yeni kayıt ekranı sunucu doğrulamasını gösterir ve gerçek kayıt oluşturur", async ({ page }) => {
+test("yeni kayıt ekranı sunucu doğrulamasını gösterir; kodla tek akışta uygulamaya girilir", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Hesap oluştur", exact: true }).click();
   await page.getByLabel("Ad soyad", { exact: true }).fill("Sentetik Mobil Öğrenci");
@@ -773,9 +773,44 @@ test("yeni kayıt ekranı sunucu doğrulamasını gösterir ve gerçek kayıt ol
   const created = page.waitForResponse((r) => r.url().endsWith("/api/v1/auth/register") && r.request().method() === "POST");
   await page.getByRole("button", { name: "Hesap oluştur", exact: true }).click();
   expect((await created).status()).toBe(201);
-  await expect(page.getByRole("heading", { name: "Hoş geldin", exact: true })).toBeVisible();
-  await expect(page.getByRole("alert")).toContainText("Hesabın oluşturuldu");
-  await expect(page.getByLabel("Parola", { exact: true })).toHaveValue("");
+  await expect(page.getByRole("heading", { name: "Son bir adım: e-postanı doğrula", exact: true })).toBeVisible();
+  await expect(page.getByLabel("Parola", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", {name:"Web girişini aç",exact:true})).toHaveCount(0);
+  const code = execFileSync(phpBinary, ["scripts/e2e-fixtures.php", "verification-code", "mobile-auth@example.test"], {env: browserTestEnv,encoding:"utf8"}).trim();
+  const field = page.getByLabel("Doğrulama kodu",{exact:true});
+  await expect(field).toHaveAttribute("autocomplete","one-time-code");
+  mkdirSync("artifacts/registration-code",{recursive:true});
+  await page.screenshot({path:"artifacts/registration-code/verification-390.png"});
+  const wrong = code === "000000" ? "111111" : "000000";
+  await field.fill(wrong);
+  await page.getByRole("button",{name:"Doğrula ve başla",exact:true}).click();
+  await expect(page.getByRole("alert")).toContainText("Kod hatalı");
+  // Expo web preview intentionally keeps tokens in memory; native persistence is covered by SessionStore tests.
+  await page.getByLabel("Doğrulama kodu",{exact:true}).fill(code.slice(0,3)+" "+code.slice(3));
+  await page.getByRole("button",{name:"Doğrula ve başla",exact:true}).click();
+  await expect(page.getByText("Merhaba, Sentetik.",{exact:true})).toBeVisible();
+  await expect(page.getByRole("tab",{name:"Ders",exact:true})).toBeVisible();
+  expect(page.context().pages()).toHaveLength(1);
+});
+
+test("kayıt sonrası giriş bağlantısı kesilirse hesap yeniden oluşturulmadan giriş denenir", async ({page}) => {
+  let registrations = 0;
+  page.on("request",r=>{if(r.method()==="POST" && r.url().endsWith("/api/v1/auth/register")) registrations++;});
+  await page.route("**/api/v1/auth/mobile-tokens",route=>route.fulfill({status:503,contentType:"application/json",body:JSON.stringify({message:"Synthetic unavailable"})}));
+  await page.goto("/");
+  await page.getByRole("button",{name:"Hesap oluştur",exact:true}).click();
+  await page.getByLabel("Ad soyad",{exact:true}).fill("Sentetik Devam");
+  await page.getByLabel("E-posta adresi",{exact:true}).fill("mobile-auth@example.test");
+  await page.getByLabel("Parola",{exact:true}).fill("Design-Synthetic-42!");
+  await page.getByLabel("Parola tekrar",{exact:true}).fill("Design-Synthetic-42!");
+  await page.getByRole("button",{name:"Hesap oluştur",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Hoş geldin",exact:true})).toBeVisible();
+  await expect(page.getByText("Hesabın oluşturuldu. Giriş yaparak kaldığın yerden devam edebilirsin.",{exact:true})).toBeVisible();
+  await page.unroute("**/api/v1/auth/mobile-tokens");
+  await page.getByLabel("Parola",{exact:true}).fill("Design-Synthetic-42!");
+  await page.getByRole("button",{name:"Giriş yap",exact:true}).click();
+  await expect(page.getByLabel("Doğrulama kodu",{exact:true})).toBeVisible();
+  expect(registrations).toBe(1);
 });
 
 test("giriş isteği sürerken form ve yön değiştiren bağlantılar kilitlenir", async ({ page }) => {

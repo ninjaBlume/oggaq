@@ -155,7 +155,7 @@ export interface paths {
         put?: never;
         /**
          * Doğrulama e-postasını tekrar gönderme
-         * @description Doğrulama e-postasını tekrar gönderme
+         * @description Mevcut e-postaya yeni 6 haneli doğrulama kodu ve tarayıcı bağlantısı gönderir. En az 60 saniye ara gerekir; önceki kod geçersiz olur. Kod 10 dakika geçerlidir.
          */
         post: operations["resendVerification"];
         delete?: never;
@@ -1735,6 +1735,26 @@ export interface paths {
         get: operations["getUpcomingExam"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/email-verification-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Uygulama içinden e-posta kodunu doğrulama
+         * @description Giriş yapmış aktif hesabın mevcut e-postasını 6 haneli tek kullanımlık kodla doğrular. Kod 10 dakika geçerlidir; 5 hatalı tahminden sonra yeni kod gerekir. Yeni gönderim en erken 60 saniye sonra mümkündür. Oturum veya token oluşturmaz.
+         */
+        post: operations["verifyEmailCode"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6370,6 +6390,37 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["UpcomingExam"];
                     };
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    verifyEmailCode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description E-postadaki en son 6 haneli kod. */
+                    code: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserResponse"];
                 };
             };
             401: components["responses"]["Problem"];

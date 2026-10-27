@@ -357,7 +357,7 @@
       "post": {
         "operationId": "resendVerification",
         "summary": "Doğrulama e-postasını tekrar gönderme",
-        "description": "Doğrulama e-postasını tekrar gönderme",
+        "description": "Mevcut e-postaya yeni 6 haneli doğrulama kodu ve tarayıcı bağlantısı gönderir. En az 60 saniye ara gerekir; önceki kod geçersiz olur. Kod 10 dakika geçerlidir.",
         "tags": [
           "Identity"
         ],
@@ -6745,6 +6745,69 @@
           },
           "429": {
             "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/email-verification-code": {
+      "post": {
+        "operationId": "verifyEmailCode",
+        "summary": "Uygulama içinden e-posta kodunu doğrulama",
+        "description": "Giriş yapmış aktif hesabın mevcut e-postasını 6 haneli tek kullanımlık kodla doğrular. Kod 10 dakika geçerlidir; 5 hatalı tahminden sonra yeni kod gerekir. Yeni gönderim en erken 60 saniye sonra mümkündür. Oturum veya token oluşturmaz.",
+        "tags": [
+          "Identity"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "code"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "pattern": "^[0-9]{6}$",
+                    "description": "E-postadaki en son 6 haneli kod."
+                  }
+                }
+              }
+            }
           }
         }
       }
