@@ -69,7 +69,9 @@ python3 /home/harun/oggaq-development/mail-setup/fix-smtp-helo.py --domain oggso
 sudo python3 /home/harun/oggaq-development/mail-setup/fix-smtp-helo.py --domain oggsor.com --hostname smtp.codentum.net --public-ip 212.68.34.90 --apply
 ```
 
-**Şu anki durum:** 17 Python testi ve gerçek sunucuda salt okunur Exim/DNS aday kontrolü geçti. SSH oturumu sudo parolası gerektirdiğinden **HELO değişikliği henüz uygulanmadı**; kullanıcıya yukarıdaki komut verildi. Uygulama Reply-To adresi marka kaynağındaki `destek@oggsor.com` olarak ayrıca yayına alındı (`oggaq-development-app:mail-replyto-20261027`); gerçek config ve HTTPS readiness doğrulandı. Bu, gelen kutusu yerleşimi garantisi değildir. Root adımından sonra onaylı tek yeni gönderimin Outlook başlıkları/klasörüyle karşılaştırılması beklenir; bu turda gerçek test postası henüz gönderilmedi.
+**Şu anki durum:** 17 Python testi ve gerçek sunucuda salt okunur Exim/DNS aday kontrolü geçti. Kullanıcının sağladığı sudo yetkisiyle **27 Ekim 2026'da HELO değişikliği uygulandı**; korumalı yedek `/etc/exim4/exim4.conf.template.oggsor-helo-1793107475989310530.bak` içinde. Üretilen Exim ayarı yeni ifadeyi taşıyor, servis aktif ve HTTPS readiness sağlıklı. Uygulama Reply-To adresi marka kaynağındaki `destek@oggsor.com` olarak ayrıca yayına alındı (`oggaq-development-app:mail-replyto-20261027`); gerçek config ve kaynak dosyanın SHA256'sı doğrulandı.
+
+Kullanıcının açık onayıyla **tek** `mail:test` postası gönderildi. Outlook'ta **27 Ekim 16:25 (İstanbul)** tarihli yeni iletinin başlıkları HELO=`smtp.codentum.net`, SPF/DKIM/DMARC/compauth=`PASS` ve Reply-To=`destek@oggsor.com` olduğunu doğruladı. Buna rağmen ileti **Gereksiz E-posta**, SCL=5/BCL=0 durumunda. HELO düzeltmesi gerçek teslimde çalışıyor; **spam sorunu çözülmedi**. Bu test düz metin teslimidir; kayıt kodu/parola sıfırlama uçtan uca testi sayılmaz. Kullanıcıya mevcut işlem e-postası sağlayıcısı hesabı soruldu; harici sağlayıcıya geçilmedi, Microsoft'a destek iletisi gönderilmedi. SPF/DKIM/DMARC'ı gevşetmek veya alıcıyı güvenli gönderen listesine eklemek çözüm olarak uygulanmadı.
 
 ### Ogg Sor alanına geçiş
 
