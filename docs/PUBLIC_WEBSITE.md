@@ -37,4 +37,4 @@ Bilgi sayfaları (26 Ekim 2026): `/legal/*` header/footer'ı `apps/site/index.ht
 
 Bilgi sayfalarının ortak tasarımı `site-legal-5af3e01` web imajıyla yayımlandı. Dört genel HTTPS sayfasında yeni CSS/marka çerçevesi ve hesap silme bağlantıları doğrulandı; yalnız web yenilendi. İç inceleme/eksik karar kayıtları mağaza kontrolünde beklemeye devam eder.
 
-28 Ekim 2026: `site-visual-20261028` hero tasarımı kullanıcı tarafından reddedildi; canlı web `documents-20261028` imajına geri alındı. Güncel gerçek uygulama ekranını tek düz telefonda gösteren yeni taslak yalnız yerel önizlemede, kullanıcı incelemesini bekliyor. Detaylar [görsel kaynağı ve yayın durumu](../apps/site/SCREENSHOTS.md) ile [TESTING](TESTING.md) içinde.
+28 Ekim 2026: `site-visual-20261028` hero tasarımı kullanıcı tarafından reddedildi; canlı web `documents-20261028` imajına geri alındı. Güncel gerçek uygulama ekranını tek düz telefonda gösteren yeni önizleme, kullanıcının “yayınlasana” onayıyla `site-clean-7f9d88f` web imajı üzerinden yayımlandı. Detaylar [görsel kaynağı ve yayın durumu](../apps/site/SCREENSHOTS.md) ile [TESTING](TESTING.md) içinde.

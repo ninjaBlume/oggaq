@@ -1,5 +1,14 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Onaylanan düz telefon tasarımının yayını
+
+Kullanıcının “yayınlasana” talimatıyla kaynak `7f9d88f`, `oggaq-development-web:site-clean-7f9d88f` imajı üzerinden oggsor.com'a alındı. Önce site build ve **4 Node testi** yeniden geçti; aynı kaynağın **6 Chromium E2E** sonucu bir önceki bölümde kayıtlıdır. Native/OTA/DB veya uygulama servislerinde değişiklik yok; Git push yapılmadı.
+
+Yayın öncesi altı bilgi dosyasının eski canlı hash'i beklenen önceki kaynakla karşılaştırıldı. Nginx yapılandırması, aday ve origin üzerinde **9 dosya hash'i**, **6 korunan dosya/yol** ve **5 readiness kontrolü** geçti. Yedi ilgisiz servisin container kimliği aynı kaldı. Geri dönüş dosyası sunucuda `publication/site-clean-7f9d88f/services.before-site-clean.yaml`; yalnız web imajı önceki `documents-20261028` değerine döndürülür.
+
+Genel HTTPS üzerinde ana HTML (yalnız tanınmış Cloudflare e-posta koruması normalleştirilerek), ana CSS/JPEG ve iki bilgi CSS'i hash ile doğrulandı. Dört bilgi HTML'i tarayıcıda 200/başlık kontrolünden geçti; içerik hash'leri origin'de doğrulandı. Canlı koyu temada 320/390/834/1280 px taşmama, tam ekran görseli, mobilde mağazalardan sonra telefon sırası, Yakında mağazaları, **sıfır site API isteği / sıfır sayfa hatası** ve genel API readiness doğrulandı. Canlı masaüstü ekran görüntüsü görsel olarak incelendi. Kanıtlar `artifacts/site-clean-preview/live-report.json` ve `live-*.png`; build/yayın manifesti `publication/` altında.
+
+
 ## 28 Ekim 2026 — Reddedilen site görselinin geri alınması ve tek telefon önizlemesi
 
 Kullanıcı `8937c44` kompozisyonunu reddetti. Canlı ortak compose override'ında yalnız web imajı `site-visual-20261028` yerine `documents-20261028` yapılıp `manage up -d --no-deps --no-build web` ile önceki sade siteye dönüldü. Hesap/yönetim/bilgi/marka dosyalarının 10 hash'i ve diğer 7 servisin container kimliği aynı kaldı. Origin ve genel HTTPS üzerinde beş readiness kontrolü geçti; genel HTML'de reddedilen `showcase` yok. Geri alım kaydı `artifacts/site-clean-preview/rollback.log` içinde.
