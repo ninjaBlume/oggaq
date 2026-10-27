@@ -1,5 +1,7 @@
 # iPhone ve iPad için kapalı beta
 
+**Son küçük güncelleme — 27 Ekim 2026:** SSS menüsü ve sade profil, kaynak `739fcad`; `testflight` kanalı / `01a17ae4-cd0c-7ad4-be75-61f74f793df1`. Native runtime değişmedi; gerçek endpoint ve tüm dosya SHA256 kontrolleri geçti. Yeni ekranın fiziksel iOS teyidi henüz alınmadı. Aşağıdaki eski OTA koduna ait cihaz teyidi tarihsel kayıttır. Ayrıntılar [SSS teslimi](FAQ.md) ve [TESTING](TESTING.md) içinde.
+
 27 Ekim 2026: Kişisel TestFlight betası hazır; güncel paket **0.1.1 (4)** ve OTA altyapısını içerir. Apple'da **Testing** ve hesap sahibinde **Installed 0.1.1 (4)** doğrulandı. Önceki **0.1.0 (3)** de korunur; kullanıcı bu ilk betayı indirdiğini ve teste başladığını bildirmişti. Hangi cihazda kurduğu veya tüm akışların geçtiği ayrıca belirtilmedi; iPhone ve iPad'in ikisinde de tam doğrulama yapıldığı anlamına gelmez. Kullanıcı cihazında **Sürüm 0.1.1 · Güncelleme 01a17a9c** gördüğünü doğruladı; OTA indirme ve çalıştırma zinciri cihazda teyit edildi.
 
 ## Hazır yapılandırma

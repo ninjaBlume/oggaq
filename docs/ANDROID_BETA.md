@@ -1,5 +1,7 @@
 # Android kişisel beta ve güncelleme düzeni
 
+**Son küçük güncelleme — 27 Ekim 2026:** SSS menüsü ve sade profil, kaynak `739fcad`; `android-beta` kanalı / `01a17ae5-76da-7f5f-b483-43deef3659df`. Native runtime değişmedi; gerçek endpoint ve tüm dosya SHA256 kontrolleri geçti. Yeni ekranın fiziksel Android teyidi henüz alınmadı. Aşağıdaki eski OTA koduna ait cihaz teyidi tarihsel kayıttır. Ayrıntılar [SSS teslimi](FAQ.md) ve [TESTING](TESTING.md) içinde.
+
 27 Ekim 2026, 03:38 İstanbul: **0.1.1 (2)** yalnız Google Play **Dahili Test** kanalında yayımlandı. Kanal **Etkin**, sürüm **Dahili test kullanıcıları tarafından kullanılabilir**. Yalnız hesap sahibinin 1 kişilik listesi seçilidir; genel mağaza yayını yapılmadı. Test daveti kabul edildi; gerçek Google Play indirme sayfası ve cihaz için kullanılabilirlik doğrulandı. Kullanıcı fiziksel Android telefonda ilk hatanın ardından Google Play indirmesinin tamamlandığını teyit etti. Kullanıcı fiziksel Android cihazda tam yeniden başlatma sonrası **Sürüm 0.1.1 · Güncelleme 01a17ac4** gördüğünü teyit etti; mağazadan indirme, açılış ve OTA indirme/çalıştırma zinciri doğrulandı.
 
 ## Hazır yapılandırma ve kontroller

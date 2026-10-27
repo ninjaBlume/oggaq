@@ -25,4 +25,4 @@ Konu seçimi için incelenen benzer hizmetlerin herkese açık sayfaları:
 
 Bu sayfalardan metin kopyalanmadı. Yanıtlar `apps/mobile/src/faq-content.ts` içinde ÖGG SOR'un mevcut davranışlarına göre yazıldı; kurum/sertifika uygunluğu veya değişebilen başvuru koşulları hakkında yeni vaat eklenmedi.
 
-Doğrulama ve dağıtım durumu [TESTING](TESTING.md) içinde tutulur. Yerel kaynak değişikliği, TestFlight/Google Play betasına otomatik yayın anlamına gelmez.
+**Doğrulama:** 42 mobil birim testi, workspace strict TypeScript, iOS/Android/web export ve 5 ilgili E2E geçti; telefon/tablet, açık/koyu ve büyük yazı görselleri incelendi. Kaynak `739fcad`, mevcut native runtime'ları koruyarak iOS/Android beta kanallarına kontrollü OTA olarak dağıtıldı. iOS kodu **01a17ae4**, Android kodu **01a17ae5**. Endpoint, kanal/platform/runtime ayrımı ve tüm içerik dosyalarının bütünlüğü doğrulandı. Yeni SSS ekranının fiziksel cihaz teyidi henüz alınmadı; genel mağaza yayını ve Git push yapılmadı. Ayrıntılı kayıt [TESTING](TESTING.md) içinde.
