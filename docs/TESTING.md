@@ -8,6 +8,8 @@ Profilde 56 px avatar/tam ad/e-posta tek kartta toplandı; tekrarlanan hesap bil
 
 E2E yalnız `oggaq_test` ve 8001/5183/5184/5186 portlarında, başka test süreci yokken çalıştı. Backend/API/DB/üretim webi değişmedi; PHPUnit/Composer ve tam ürün E2E paketi yeniden çalıştırılmadı. Bilinen yasal sayfa testleri bu turda yeniden koşulmadı. Kanıtlar `artifacts/compact-profile/`; native runtime'lar aynı kaldı. Beta dağıtım sonucu ayrıca kaydedilir.
 
+OTA kaynak `35b02f6`: iOS `testflight / 01a17ef1-b762-7e6e-ba29-06d1178d5df4` (grup `f886b37a-481b-44b7-a02d-dcd35ce093b5`), Android `android-beta / 01a17ef2-a0f9-7c6c-ac82-13308fde0461` (grup `8f40622e-80e3-4959-91aa-8b2be1b396a6`). Her platformda doğru API/kanal/runtime, native başlıklarla launch asset ve tüm ek dosyaların hash kontrolleri (iOS 18, Android 19) geçti; yeni profil kimlik/e-posta işaretleri Hermes paketinde bulundu. Yanlış runtime/platform 204, üretim kanalı 404. 0.1.1 native paketler aynı; fiziksel cihazın güncellemeyi aldığı teyit edilmedi. Genel mağaza yayını ve Git push yok. Kanıtlar `artifacts/compact-profile/ota/` içinde.
+
 ## 27 Ekim 2026 — Sınav kartlarında ikinci yoğunluk ayarı
 
 Kullanıcının biraz daha kısa kart isteğiyle yalnız Deneme/Ders ortak kartının dikey iç boşluğu **10 → 6 px**, başlık/bilgi aralığı **6 → 4 px** yapıldı. Tek sütun kartlar ayrı bir grup içinde **20 → 10 px** aralıkla gösterilir; iki sütunlu tablet düzeni korunur. Başlık/metin boyutları, içerik, 44 px eylemler, doğal yükseklik ve açılır süre/çıkış formu değişmez.
