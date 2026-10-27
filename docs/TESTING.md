@@ -2,6 +2,18 @@
 
 
 
+
+## 28 Ekim 2026 — Tanıtım sayfasının güncel uygulama görselleri
+
+oggsor.com hero alanındaki eski profil düğmeli ana ekran yenilendi; mevcut Expo bileşenlerinden yeni ana ekran ve kompakt sonuç kartı JPEG'leri alındı. Kişisel veri/gerçek hesap kullanılmadı, sunucu oturumu açılmadı, DB'ye yazılmadı; yalnız çekime özel tarayıcı yanıtlarıyla “Öğrenci” tanıtım hesabı ve açıkça örnek veri gösterildi. Sorular yayımlanmaz. Ana ekran 780×1688, sonuç özeti 724×268; iki görsel toplam 162.926 byte. Ekran takvimi/sayaç statiktir; kaynak ve sınırlar [SCREENSHOTS](../apps/site/SCREENSHOTS.md) içinde.
+
+Lacivert-mavi zemin, daha temiz cihaz çerçevesi ve önde kompakt sonuç kartı; daha güçlü başlık hiyerarşisi uygulandı. Mobilde görsel, mağaza bölümünün önüne taşındı; masaüstünde metnin sağındadır. İki görsel içerik hash'li URL kullanır. JavaScript, form, ana sayfa API isteği veya takip kodu eklenmedi; mağazalar halen Yakında, web soru çözümü kapalıdır.
+
+**4 site Node testi, 6 site Chromium E2E, site build ve yerel hesap modu web build geçti.** 320/390/834/1280 px açık/koyu düzen, iki görselin yüklenmesi/boyutları, örnek veri açıklaması, sıfır API isteği, mağaza bekleme durumu, parola reset/hesap modu ve dört bilgi sayfasının ortak görünümü doğrulandı. İlk Node beklentisi “yakında” kelimesini “yakından” içinde de bulduğu için mağaza durum sınıflarını kontrol edecek şekilde daraltıldı. İlk hesap E2E'sinde eski yerel dist çalışma modundaydı; VITE_WEB_MODE=account ile doğru QA build alınarak altı test tekrar geçti. Üretim hesap uygulaması yeniden yayımlanmaz.
+
+Backend/mobil kaynakları/DB değişmedi; PHPUnit/tam ürün E2E/OTA/native mağaza paketi yayını yok. Yakalama için açılan yalnız kendi 5189 sunucusu PID 38852 ile durduruldu; paylaşılan geliştirme portları korunur. Site QA 5187/5188 üzerinde çalıştı. Kanıtlar artifacts/site-visual-refresh/ içinde.
+
+
 ## 28 Ekim 2026 — Expo Go güncelleme uyarısının kaldırılması
 
 `Updates.isEnabled` tek başına OTA desteği sayılmıyor. Mevcut Expo `isRunningInExpoGo()` API'si, platform, debug/yerel önizleme ve native enabled değeri birlikte denetlenir. Expo Go/web/debug/önizlemede native update provider/hook/foreground denetimi monte edilmez; Profil'deki OTA kontrolü/hata alanı ve yanlış OTA kimliği gösterilmez. Dağıtım iOS/Android paketleri desteklenir; gerçek indirme hatası, tekrar deneme ve yalnız görünür profilde manuel reload davranışı korunur. Yeni native modül veya bağımlılık yoktur.

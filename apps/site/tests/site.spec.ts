@@ -10,6 +10,10 @@ for (const colorScheme of ['light', 'dark'] as const) test(`tanıtım sitesi: ${
     const screen = page.getByRole('img', { name: /^ÖGG SOR ana ekranı:/ });
     await expect(screen).toBeVisible();
     await expect.poll(() => screen.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth === 780 && img.naturalHeight === 1688)).toBe(true);
+    const result = page.getByRole('img', { name: /^ÖGG SOR sonuç özeti:/ });
+    await expect(result).toBeVisible();
+    await expect.poll(() => result.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth === 724 && img.naturalHeight === 268)).toBe(true);
+    await expect(page.getByText('Örnek veriler', { exact: true })).toBeVisible();
     await expect(page.getByRole('group', { name: 'App Store: yakında', exact: true })).toBeVisible();
     await expect(page.getByRole('group', { name: 'Google Play: yakında', exact: true })).toBeVisible();
     await expect(page.getByRole('textbox')).toHaveCount(0);

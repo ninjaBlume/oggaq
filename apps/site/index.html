@@ -22,22 +22,29 @@
       <h1 id="hero-title">Çıkmış sorularla<br><em>sınavına hazırlan.</em></h1>
       <p class="hero-description">Temel ve yenileme eğitimi için ders sınavları, denemeler ve tekrar çalışmaları. Hepsi {{name}} uygulamasında.</p>
       <p class="exam-types">Temel ve yenileme <span aria-hidden="true">/</span> Silahlı ve silahsız</p>
-      <div class="download-section" id="indir">
-        <h2>Telefonuna indir</h2>
-        <p class="download-caption">iPhone, iPad ve Android için. Ücretsiz.</p>
-        <div class="store-list">{{stores}}</div>
-        {{storeNotice}}
-      </div>
     </div>
     <figure class="app-preview">
-      <div class="preview-backdrop" aria-hidden="true"></div>
-      <div class="phone">
-        <div class="phone-top" aria-hidden="true"><span></span></div>
-        <img class="app-screen" src="{{homeScreen}}" width="780" height="1688" fetchpriority="high" alt="ÖGG SOR ana ekranı: deneme sınavına başla, sıradaki sınav, çalışma özeti ve hızlı başla bölümleri.">
-        <div class="phone-bottom" aria-hidden="true"><span></span></div>
+      <div class="showcase">
+        <div class="showcase-heading"><span>Uygulamaya yakından bak</span><span>iOS &amp; Android</span></div>
+        <div class="showcase-line" aria-hidden="true"></div>
+        <div class="phone">
+          <div class="phone-top" aria-hidden="true"><span></span></div>
+          <img class="app-screen" src="{{homeScreen}}" width="780" height="1688" fetchpriority="high" alt="ÖGG SOR ana ekranı: deneme sınavına başla, sıradaki sınav, çalışma özeti ve hızlı başla bölümleri.">
+          <div class="phone-bottom" aria-hidden="true"><span></span></div>
+        </div>
+        <div class="result-preview">
+          <p>Deneme sonucun</p>
+          <img src="{{resultScreen}}" width="724" height="268" alt="ÖGG SOR sonuç özeti: doğru oranı, cevap dağılımı ve doğru, yanlış, boş sayıları. Örnek veriler." decoding="async">
+        </div>
       </div>
-      <figcaption>Uygulamanın ana ekranı <span>Tanıtım hesabı</span></figcaption>
+      <figcaption>Gerçek uygulama ekranları <span>Örnek veriler</span></figcaption>
     </figure>
+    <div class="download-section" id="indir">
+      <h2>Telefonuna indir</h2>
+      <p class="download-caption">iPhone, iPad ve Android için. Ücretsiz.</p>
+      <div class="store-list">{{stores}}</div>
+      {{storeNotice}}
+    </div>
   </section>
   <section class="app-details wrap" id="uygulama" aria-labelledby="details-title">
     <div class="details-intro"><p class="kicker">Çalışma biçimini sen seç</p><h2 id="details-title">Bir ders, bir deneme<br>ya da kaldığın yer.</h2><p>İster konu konu ilerle, ister bir sınavı baştan sona çöz.</p></div>

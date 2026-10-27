@@ -38,6 +38,7 @@ export async function buildSite({ output = path.join(root, 'apps/site/dist'), li
     website: brand.websiteUrl, support: brand.supportEmail,
     css: `/site-assets/${cssName}`, notice: notOfficialNotice,
     homeScreen: `/screens/mobile-home.jpg?v=${createHash('sha256').update(await readFile(path.join(root, 'apps/site/public/screens/mobile-home.jpg'))).digest('hex').slice(0, 12)}`,
+    resultScreen: `/screens/mobile-result.jpg?v=${createHash('sha256').update(await readFile(path.join(root, 'apps/site/public/screens/mobile-result.jpg'))).digest('hex').slice(0, 12)}`,
     stores: storeCard('appStore', links.appStore)+storeCard('googlePlay', links.googlePlay),
     storeNotice: links.appStore || links.googlePlay ? '' : '<p class="store-notice">Mağaza yayını hazırlanıyor. Bağlantılar burada yer alacak.</p>',
     legal: legalPages.map(page => `<a href="${page.file}">${escapeHtml(page.title)}</a>`).join(''),
