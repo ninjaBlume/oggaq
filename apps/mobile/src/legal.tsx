@@ -1,11 +1,9 @@
 import { Text } from "./text";
 import { Linking, Pressable, View } from "react-native";
-import { legalPages, legalUrl, notOfficialNotice } from "@oggaq/study-core";
+import { legalPages, legalUrl } from "@oggaq/study-core";
 import type { LegalPageId } from "@oggaq/study-core";
-import brand from "../../../config/brand.json";
 import { frontendUrl } from "./api";
 import { useTask } from "./hooks";
-import { ExternalLink } from "./icons";
 import { useTheme } from "./themeContext";
 import { ErrorNotice } from "./ui";
 
@@ -19,49 +17,28 @@ function useLegalLink() {
   return { open, error: task.error };
 }
 
-// Profil → "Yasal ve destek": one row per page, the "not an official app" line and, when configured, the support address.
-export function LegalSection() {
-  const { palette, styles } = useTheme();
+// Keep privacy readily accessible without a separate legal card stack.
+// Support lives in FAQ; account deletion also remains in Profile → Hesabım.
+export function LegalSection({ includeAccountDeletion = false }: { includeAccountDeletion?: boolean }) {
+  const { styles } = useTheme();
   const { open, error } = useLegalLink();
+  const pages = legalPages.filter(page => page.id === "gizlilik" || page.id === "kosullar" || (includeAccountDeletion && page.id === "hesap-silme"));
   return (
-    <View style={{ gap: 10 }}>
-      {legalPages.map((page) => (
-        <Pressable
-          key={page.id}
-          accessibilityRole="link"
-          accessibilityLabel={`${page.title} sayfasını aç`}
-          onPress={() => open(page.id)}
-          style={({ pressed }) => [
-            {
-              minHeight: 52,
-              borderRadius: 16,
-              borderWidth: 1,
-              borderColor: palette.primaryContainer,
-              backgroundColor: palette.softPrimary,
-              paddingHorizontal: 14,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 12,
-            },
-            pressed && { opacity: 0.8 },
-          ]}
-        >
-          <Text style={{ flex: 1, color: palette.ink, fontSize: 14, fontWeight: "600" }}>{page.title}</Text>
-          <ExternalLink size={18} color={palette.muted} />
-        </Pressable>
-      ))}
-      {brand.supportEmail !== "" && (
-        <Pressable
-          accessibilityRole="link"
-          accessibilityLabel={`Destek e-postası: ${brand.supportEmail}`}
-          onPress={() => void Linking.openURL(`mailto:${brand.supportEmail}`)}
-          style={{ minHeight: 44, justifyContent: "center" }}
-        >
-          <Text style={styles.link}>{brand.supportEmail}</Text>
-        </Pressable>
-      )}
+    <View style={{ gap: 4 }}>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", columnGap: 16, justifyContent: "center" }}>
+        {pages.map((page) => (
+          <Pressable
+            key={page.id}
+            accessibilityRole="link"
+            accessibilityLabel={`${page.title} sayfasını aç`}
+            onPress={() => open(page.id)}
+            style={({ pressed }) => [{ minHeight: 44, justifyContent: "center" }, pressed && { opacity: 0.8 }]}
+          >
+            <Text style={[styles.link, { fontSize: 12 }]}>{page.title}</Text>
+          </Pressable>
+        ))}
+      </View>
       <ErrorNotice error={error} />
-      <Text style={styles.muted}>{notOfficialNotice}</Text>
     </View>
   );
 }

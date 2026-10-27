@@ -1,0 +1,30 @@
+// Original answers reflect this app's behavior; research sources live in docs/FAQ.md.
+export const faqGroups = [
+  {
+    title: "Sınavlar ve sorular",
+    items: [
+      { id: "sources", question: "Sorular çıkmış sınav soruları mı?", answer: "Çıkmış soru olarak belirtilen içerikler, EGM’nin yayımladığı soru kitapçıkları ve cevap anahtarlarından hazırlanır. Sınavın adı, eğitim türü ve dönemi üzerinden kaynağını ayırt edebilirsin. Uygulamadaki sonuçlar resmî sınav sonucu değildir." },
+      { id: "education", question: "Temel ve Yenileme sınavlarını nasıl seçerim?", answer: "Deneme Sınavları bölümünde Temel Eğitim veya Yenileme Eğitimi seç. Ardından Silahlı ya da Silahsız seçeneğiyle ilgili dönemin sorularını aç. Silahlı seçenek ortak sorularla birlikte silah bölümünü; Silahsız seçenek ortak bölümü içerir." },
+      { id: "weapon", question: "Yalnızca silah sorularını çözebilir miyim?", answer: "Evet. Ders Sınavları bölümünde silah bilgisi dersini seçerek bu alandaki sorulara çalışabilirsin." },
+      { id: "feedback", question: "Doğru cevabı ne zaman görürüm? Yanıtımı değiştirebilir miyim?", answer: "Deneme ve ders sınavlarında seçimin sunucuya kaydedilince doğru cevap gösterilir ve yanıtın kilitlenir. Kaydedilmiş yanıtı değiştiremezsin. Bu, öğrenmeye yönelik bir çalışma düzenidir; resmî sınavda doğru cevaplar soru çözerken gösterilmez." },
+      { id: "resume", question: "Yarım bıraktığım sınava nasıl devam ederim?", answer: "Sınavın bulunduğu bölümde Devam et seçeneğine dokun. Sunucuya kaydedilmiş yanıtların ve son soru konumun geri yüklenir. Çıkmadan önce kayıt durumunu kontrol et; kaydetme hatası varsa internet bağlantını kontrol edip yeniden dene." },
+      { id: "timer", question: "Uygulamadan çıkınca süre durur mu?", answer: "Buna sınava başlarken sen karar verirsin. Süre devam etsin seçiliyse dışarıda geçirdiğin zaman da sayılır. Seçili değilse sınavdan ayrıldığında süre duraklatılır. Ekranı arka plana almak ile sınavı bitirmek aynı şey değildir." },
+      { id: "results", question: "Tamamladığım sınavı ve tüm yanıtları nerede görürüm?", answer: "Sonuçlarım bölümünden tamamladığın sınavı aç. Doğru, yanlış, boş sayıları ve puanının yanında sorularını da aynı sayfada inceleyebilirsin. Uzun sınavlarda sorular aşağı kaydırdıkça yüklenebilir." },
+      { id: "shooting", question: "Atış sonucunu puanıma nasıl eklerim?", answer: "Silahlı denemenin sonucunda isabetli atış sayını girerek hesaplamayı tamamlayabilirsin. Ayrıca menüdeki Puan hesapla bölümünde eğitim türünü ve doğru, yanlış, boş, atış bilgilerini kullanarak tahmini puanını hesaplayabilirsin. Gerçek atış uygulaması bu uygulamada yapılmaz." },
+      { id: "repeat", question: "Yanlışlarımı ve favorilerimi tekrar çözebilir miyim?", answer: "Menüdeki Tekrar Sınavı bölümünde yanlışların, boş bıraktıkların veya favorilerin üzerinden yeni bir çalışma başlatabilirsin. Listenin oluşması için önce soru çözmen veya soruları favorilerine eklemen gerekir." },
+      { id: "report", question: "Bir soruda veya cevapta hata görürsem ne yapmalıyım?", answer: "Sorunun yanındaki bildirim seçeneğini kullanarak hatayı ilet. Sorunun metni, şıkları veya doğru cevabıyla ilgili sorunu kısaca açıkla. Destek e-postasıyla yazıyorsan sınav adını ve soru numarasını belirt; parolanı gönderme." },
+      { id: "calendar", question: "Sıradaki sınav tarihini ve başvuru bilgilerini nereden takip ederim?", answer: "Ana sayfadaki Sıradaki sınav kartına veya menüdeki Sınav takvimi seçeneğine dokun. Tarihler EGM’nin yayımladığı takvimden alınır. Başvuru işlemleri için eğitim kurumunu ve resmî duyuruları takip et; uygulama üzerinden resmî sınav başvurusu yapılmaz." },
+    ],
+  },
+  {
+    title: "Uygulama ve hesap",
+    items: [
+      { id: "connection", question: "İnternet olmadan soru çözebilir miyim?", answer: "Şu an sınav başlatmak, cevapları kaydetmek ve sonuçları almak için internet bağlantısı gerekir. Bağlantı kesildiğinde kaydedildiği doğrulanmamış yanıtları kayıtlı kabul etme; bağlantı gelince ekrandaki yeniden deneme seçeneğini kullan." },
+      { id: "devices", question: "Telefon ve tabletimde aynı hesabı kullanabilir miyim?", answer: "Evet. Aynı hesapla giriş yaptığında sunucuya kaydedilmiş sınavlarını ve sonuçlarını görebilirsin. Aynı sınavı iki cihazda aynı anda çözmek yerine bir cihazdan devam et; henüz kaydedilmemiş işlemler diğer cihaza geçmez." },
+      { id: "text", question: "Yazıları büyütebilir ve görünümü değiştirebilir miyim?", answer: "Profil bölümünden Küçük, Standart veya Büyük yazı boyutunu seçebilirsin. Aynı yerde açık, koyu veya cihazının görünümüne uygun tema tercihini de değiştirebilirsin." },
+      { id: "password", question: "Parolamı unuttum, ne yapmalıyım?", answer: "Giriş ekranında Parolamı unuttum seçeneğine dokun ve hesabının e-posta adresini yaz. Gelen parola yenileme bağlantısını aç. E-posta görünmüyorsa spam klasörünü de kontrol et. Sorun sürerse destek adresine yazabilirsin." },
+      { id: "deletion", question: "Hesabımı ve verilerimi nasıl silebilirim?", answer: "Profil → Hesabım → Hesabı sil yolunu izle. Silme öncesinde gösterilen açıklamaları ve onay adımlarını oku. Hesabına erişemiyorsan aşağıdaki Hesap silme bağlantısından dışarıdan talep yoluna ulaşabilirsin." },
+      { id: "updates", question: "Uygulama güncellemelerini nasıl alırım?", answer: "Küçük güncellemeler internet bağlıyken arka planda indirilebilir ve uygulamanın sonraki tam açılışında uygulanır. Sınavın ortasında zorunlu yeniden başlatma yapılmaz. Yeni mağaza sürümlerini iOS’ta TestFlight/App Store, Android’de Google Play üzerinden alırsın." },
+    ],
+  },
+] as const;

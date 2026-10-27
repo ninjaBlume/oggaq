@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 27 Ekim 2026, SSS ve sade profil
+
+- Menüye iki grupta 17 özgün yanıt içeren **Sıkça Sorulan Sorular** eklendi. Profilde “Yasal ve destek” başlığı/büyük kartlar kaldırıldı; doğrudan gizlilik/koşul bağlantıları ve Hesabım içindeki hesap silme korundu. Destek ve dış hesap silme bağlantısı SSS sonunda sunulur. [Araştırma ve kapsam](FAQ.md).
+- Tüm workspace strict TypeScript, **42 mobil birim testi**, iOS/Android/web Expo export geçti. **5 ilgili E2E 9,1 saniyede geçti** (3 yeni SSS, 2 güncel bağlantı testi): gerçek API ile giriş, menü, klavye/açık durum, tek açık yanıt, açık/koyu tema, büyük yazı, 320/390/834 px taşma, bağlantısız statik yardım, e-posta açma hatası/yeniden deneme, doğru bağlantı adresleri ve gerçek hesap silme ekranına erişim. İlk koşumdaki test seçicisi erişilebilir Hesabım etiketiyle eşleştirilerek düzeltildi; son koşumun tamamı başarılıdır. Görüntüler gözle incelendi.
+- API/backend/DB değişmedi; PHPUnit ve tüm eski E2E paketi yeniden çalıştırılmadı. Ortak test süreçleri/portlar önceden kontrol edildi; yalnız `oggaq_test`, 8001/5183/5184 ve ayrı mobil 5186 kullanıldı. Korunan geliştirme servislerine/hesaplarına dokunulmadı. Kanıt `artifacts/faq/`. Bu yeni ekranın fiziksel iOS/Android kontrolü ve beta OTA dağıtımı henüz doğrulanmadı; Git push yapılmadı.
+
 ## Güncel doğrulama — 27 Ekim 2026, Android dahili test hazırlığı
 
 - `play-internal` AAB/store profili, ayrı `android-beta` kanalı, preview ortamı ve otomatik versionCode hazırlandı. iOS ayarları korunur. **42 mobil + 29 araç/güvenlik testi**, workspace strict TypeScript ve Android Hermes export geçti. Yeni test Android mağaza paketi ve Android/iOS/production kanal ayrımını doğrular.

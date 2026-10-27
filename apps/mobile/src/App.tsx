@@ -39,6 +39,7 @@ import { MotionProvider } from "./motion";
 import { ScoreCalculator } from "./scoring";
 import { ExamCalendarScreen } from "./calendar";
 import { Jobs } from "./jobs";
+import { FaqScreen } from "./faq";
 import { vocabulary } from "@oggaq/study-core";
 import { AccountScreen } from "./account";
 import { Profile } from "./profile";
@@ -194,6 +195,8 @@ function MainTabs({
                     <ExamCalendarScreen initialYear={calendarYear} back={() => selectTab("home")} />
                   ) : page === "jobs" ? (
                     <Jobs user={user} />
+                  ) : page === "faq" ? (
+                    <FaqScreen />
                   ) : page === "stats" ? (
                     <Stats context={context} />
                   ) : (

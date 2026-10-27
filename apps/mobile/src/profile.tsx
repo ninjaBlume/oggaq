@@ -194,7 +194,6 @@ export function Profile({
           ))}
         </>
       )}
-      <SectionTitle>Yasal ve destek</SectionTitle>
       <LegalSection />
       <View style={{ paddingTop: 12 }}>
         <Button danger icon={LogOut} disabled={pending} onPress={logout}>

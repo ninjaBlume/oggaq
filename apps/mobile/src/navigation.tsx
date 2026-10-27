@@ -13,6 +13,7 @@ import {
   Check,
   ChevronRight,
   Clock3,
+  CircleHelp,
   CalendarDays,
   ChartColumn,
   History,
@@ -48,6 +49,7 @@ export const extraDestinations = [
   { id: "review", label: vocabulary.review.short, menuLabel: vocabulary.review.title, icon: ListChecks },
   { id: "stats", label: vocabulary.stats.short, menuLabel: vocabulary.stats.title, icon: ChartColumn },
   { id: "calendar", label: vocabulary.calendar.short, menuLabel: vocabulary.calendar.title, icon: CalendarDays },
+  { id: "faq", label: "SSS", menuLabel: "Sıkça Sorulan Sorular", icon: CircleHelp },
   { id: "jobs", label: vocabulary.jobs.short, menuLabel: vocabulary.jobs.title, icon: Briefcase },
 ] as const;
 export type MainTab =
