@@ -35,6 +35,16 @@
         "EXPO_PUBLIC_WEB_URL": "https://oggsor.com"
       }
     },
+    "play-internal": {
+      "extends": "production",
+      "channel": "android-beta",
+      "environment": "preview",
+      "distribution": "store",
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "node": "24.22.0"
+    },
     "testflight": {
       "extends": "production",
       "channel": "testflight",

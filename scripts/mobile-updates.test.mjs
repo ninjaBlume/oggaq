@@ -39,3 +39,14 @@ test('TestFlight and public store packages use different update channels', () =>
   assert.equal(eas.build.production.env.EXPO_PUBLIC_LOCAL_PREVIEW, '0');
   assert.equal(eas.build.testflight.extends, 'production');
 });
+test('Play internal testing uses a store AAB and cannot receive iOS or production updates', () => {
+  const android = eas.build['play-internal'];
+  assert.equal(android.extends, 'production');
+  assert.equal(android.android.buildType, 'app-bundle');
+  assert.equal(android.distribution, 'store');
+  assert.equal(android.environment, 'preview');
+  assert.equal(android.channel, 'android-beta');
+  assert.notEqual(android.channel, eas.build.testflight.channel);
+  assert.notEqual(android.channel, eas.build.production.channel);
+  assert.equal(eas.build.production.autoIncrement, true);
+});

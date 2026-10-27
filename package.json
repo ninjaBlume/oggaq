@@ -41,7 +41,9 @@
     "test:site": "node --test apps/site/site.test.mjs",
     "test:site:e2e": "playwright test --config apps/site/playwright.config.ts",
     "build:ios:beta": "npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs build --platform ios --profile testflight --freeze-credentials",
-    "update:ios:beta": "npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs update --channel testflight --platform ios --environment preview"
+    "update:ios:beta": "npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs update --channel testflight --platform ios --environment preview",
+    "build:android:beta": "npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs build --platform android --profile play-internal --freeze-credentials",
+    "update:android:beta": "npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs update --channel android-beta --platform android --environment preview"
   },
   "devDependencies": {
     "@redocly/cli": "2.60.0",

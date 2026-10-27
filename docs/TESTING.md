@@ -1,5 +1,10 @@
 # Test ve doğrulama stratejisi
 
+## Güncel doğrulama — 27 Ekim 2026, Android dahili test hazırlığı
+
+- `play-internal` AAB/store profili, ayrı `android-beta` kanalı, preview ortamı ve otomatik versionCode hazırlandı. iOS ayarları korunur. **42 mobil + 29 araç/güvenlik testi**, workspace strict TypeScript ve Android Hermes export geçti. Yeni test Android mağaza paketi ve Android/iOS/production kanal ayrımını doğrular.
+- Google Play Codentum kurumsal hesabı ve başarılı kimlik doğrulama bildirimi görüldü; henüz uygulama kaydı yoktu. EAS'te Android credentials yokken yeni korumalı upload JKS oluşturulup EAS varsayılan kaydına bağlandı; sertifika SHA256 eşleşti, geçici credentials.json silindi. Paket/Play yayını/cihaz doğrulaması henüz yapılmadı. Backend/API/DB değişmedi, ortak DB testleri çalıştırılmadı. Kanıt `artifacts/android-beta/`; [Android durumu](ANDROID_BETA.md).
+
 ## Güncel doğrulama — 27 Ekim 2026, EAS Update hazırlığı
 
 - `expo-updates@58.0.18`, fingerprint uyumluluğu, ayrı testflight/production kanalları, açık preview ortam değişkenleri, 0 ms açılış beklemesi ve gömülü paket kurtarması hazırlandı. Yerel önizleme OTA alamaz; sınav sırasında zorunlu reload yoktur. Profil sürümü ve OTA kimliğini gösterir.
