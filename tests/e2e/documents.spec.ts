@@ -13,6 +13,17 @@ test.beforeEach(async ({ page }) => {
 });
 test.afterAll(() => fixture('cleanup'));
 
+// Production nginx adds this policy in addition to the controller's nonce policy.
+// Both policies must permit the handoff; inline script would be blocked by nginx.
+test.beforeEach(async ({ context }) => {
+  await context.route('**/api/v1/document-exports/viewer', async route => {
+    const response = await route.fetch();
+    const headers = response.headers();
+    headers['content-security-policy'] += ", default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; object-src 'none'";
+    await route.fulfill({ response, headers });
+  });
+});
+
 test('dilekçe: gerçek API ile taslak, düzenleme, önizleme ve tek kullanımlık PDF', async ({ page, context }) => {
   await page.getByRole('button', { name: 'Menüyü aç', exact: true }).click();
   await page.getByRole('button', { name: 'Dilekçe hazırla', exact: true }).click();
@@ -29,11 +40,20 @@ test('dilekçe: gerçek API ile taslak, düzenleme, önizleme ve tek kullanıml�
   await page.getByRole('button', { name: 'Metni önizle', exact: true }).click();
   await expect(page.getByText('Sentetik çizelge talebi', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Kapat', exact: true }).click();
+  const exported = page.waitForResponse(r => r.url().endsWith('/api/v1/document-exports') && r.request().method() === 'POST');
   const popup = context.waitForEvent('page');
   await page.getByRole('button', { name: 'PDF aç / indir', exact: true }).click();
   const viewer = await popup;
   await expect(viewer.getByRole('heading', { name: 'Belgen hazır' })).toBeVisible();
-  expect(viewer.url()).not.toContain('#');
+  await expect(viewer).not.toHaveURL(/#/);
+  const originalUrl = (await (await exported).json()).data.viewer_url as string;
+  const changed = new URL(originalUrl); changed.hash = 'a'.repeat(64);
+  await viewer.goto(changed.toString());
+  await expect(viewer).not.toHaveURL(/#/);
+  await expect(viewer.locator('#ticket')).toHaveValue('a'.repeat(64));
+  await viewer.goto(originalUrl);
+  await expect(viewer).not.toHaveURL(/#/);
+  expect(await viewer.locator('#ticket').inputValue() === new URL(originalUrl).hash.slice(1)).toBe(true);
   const response = viewer.waitForResponse(r => r.url().endsWith('/document-exports/open'));
   await viewer.getByRole('button', { name: 'PDF’yi aç', exact: true }).click();
   const pdf = await response;

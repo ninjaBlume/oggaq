@@ -40,6 +40,13 @@ class DocumentController
         ]);
     }
 
+    public function viewerScript(): Response
+    {
+        return response(file_get_contents(resource_path('documents/viewer.js')))->withHeaders([
+            'Content-Type' => 'application/javascript; charset=UTF-8', 'X-Robots-Tag' => 'noindex, nofollow',
+        ]);
+    }
+
     public function open(Request $request, DocumentExports $exports): Response
     {
         $token = $request->input('ticket');

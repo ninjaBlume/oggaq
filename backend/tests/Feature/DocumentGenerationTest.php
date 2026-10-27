@@ -127,7 +127,8 @@ class DocumentGenerationTest extends TestCase
     {
         $response = $this->get('/api/v1/document-exports/viewer')->assertOk()->assertHeader('Referrer-Policy', 'no-referrer')->assertHeader('Cache-Control', 'no-store, private');
         $this->assertStringContainsString("default-src 'none'", $response->headers->get('Content-Security-Policy'));
-        $response->assertSee('history.replaceState', false)->assertSee('method="post"', false);
+        $response->assertSee('src="/api/v1/document-exports/viewer.js"', false)->assertSee('method="post"', false);
+        $this->get('/api/v1/document-exports/viewer.js')->assertOk()->assertHeader('Content-Type', 'application/javascript; charset=UTF-8')->assertSee('history.replaceState', false);
     }
 
     public function test_all_blank_templates_and_long_turkish_document_render_as_pdf(): void

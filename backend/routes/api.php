@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::get('document-exports/viewer', [DocumentController::class, 'viewer'])->middleware('throttle:document-open');
+    Route::get('document-exports/viewer.js', [DocumentController::class, 'viewerScript'])->middleware('throttle:document-open');
     Route::post('document-exports/open', [DocumentController::class, 'open'])->middleware('throttle:document-open');
     // Instance readiness for monitors and the deploy script; booleans only (docs/DEPLOYMENT.md).
     Route::get('health/ready', ReadinessController::class)->middleware('throttle:health');

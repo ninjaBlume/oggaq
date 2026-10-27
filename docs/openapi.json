@@ -7074,6 +7074,31 @@
           }
         }
       }
+    },
+    "/api/v1/document-exports/viewer.js": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "operationId": "documentViewerScript",
+        "summary": "Aynı origin ve nonce CSP ile PDF açma betiği",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Kişisel veri içermeyen statik betik",
+            "content": {
+              "application/javascript": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Çok sık istek"
+          }
+        }
+      }
     }
   },
   "components": {

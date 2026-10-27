@@ -57,6 +57,18 @@ Bu nedenle gerçek tutanak/dilekçe içeriğini ücretsiz Gemini'ye doğrudan g�
 
 ## Doğrulama
 
-299 backend testi / 3120 assertion geçti (10 yeni belge testi / 107 assertion dahil). Testler yalnız `oggaq_test` üzerinde ve E2E’den ayrı yürütüldü. 57 mobil, 16 admin, 10 web birim testi; strict TypeScript, OpenAPI lint/tip üretimi, admin/web/site build, Composer lint/validate/audit geçti. Mevcut paketler değişmeden 5 PDF bağımlılığı eklendi; güvenlik duyurusu bulunmadı.
+299 backend testi / 3124 assertion geçti (10 yeni belge testi / 111 assertion dahil). Testler yalnız `oggaq_test` üzerinde ve E2E’den ayrı yürütüldü. 57 mobil, 16 admin, 10 web birim testi; strict TypeScript, OpenAPI lint/tip üretimi, admin/web/site build, Composer lint/validate/audit geçti. Mevcut paketler değişmeden 5 PDF bağımlılığı eklendi; güvenlik duyurusu bulunmadı.
 
 Üç yeni mobil web QA E2E gerçek API ile yönlendirmeli dilekçe düzenleme/önizleme/PDF açma, matbu tutanak/PDF, serbest metin ve rol düzenleme, 320/390/834 px taşmama ve hata sonrası metnin korunmasını doğruladı. Bütün 14 boş PDF ile uzun Türkçe metin PDF’si üretildi; Türkçe metin çıkarımı ve render görüntüleri incelendi. Kanıtlar `artifacts/documents/` içinde. Fiziksel iOS/Android kaydet/paylaş/yazdır ve beta alımı ayrıca kullanıcı teyidi gerektirir; web QA bunların yerine sayılmaz.
+
+## Sunucu ve beta teslimi — 28 Ekim 2026
+
+Sunucu yalnız dar kapsamlı image overlay ile güncellendi. Son app/worker/scheduler image’i `oggaq-development-app:documents-final-20261028`, web image’i `oggaq-development-web:documents-20261028`. Önceki Composer paketleri birebir aynı kaldı; yalnız PDF bağımlılıkları eklendi. Canlı AppServiceProvider’ın önceki console-command farkı korunup yalnız iki rate limiter eklendi. Veritabanı migration’ı, soru/hesap değişikliği, posta/DNS işlemi yapılmadı. Ortak yerel geliştirme servislerine dokunulmadı.
+
+Canlı nginx’in `script-src 'self'` politikası ek CSP olarak uygulandığından inline açma betiği iOS’ta engellendi. Betik aynı origin’de ayrı API kaynağına taşındı; nonce politikası ve mevcut nginx CSP korunur. E2E, iki CSP’yi birlikte uygulayarak PDF açma akışını tekrar doğruladı. Safari’nin aynı sekmede yeni fragmentle açması da dinlenir; önceki anahtarın yeniden kullanılmasına dayanılmaz. Native modül değişikliği veya güvenlik başlığı gevşetme yoktur.
+
+Device Hub iPhone 18 Pro / iOS 27’de gerçek API kataloğu ve kişisel alan içermeyen matbu dilekçe kontrol edildi. Safari’de tek sayfa PDF açıldı; paylaşım paneli `PDF Belgesi` olarak tanıdı ve Dosyalar’a Kaydet / Yazdır seçenekleri görüldü. Dosya bir alıcıya gönderilmedi veya fiziksel yazıcıya iş yollanmadı. Android native ve fiziksel TestFlight/Play cihaz alımı ayrıca teyit edilmeli.
+
+Mobil kaynak `4204b4b`: iOS `testflight / 01a17f7b-c2aa-74f3-a1c9-8ff6681a3644`, grup `44e15b43-8cf9-48dc-b9e0-aaa61b9dac29`; Android `android-beta / 01a17f7c-7648-7448-84da-bcdde5ce896c`, grup `61a8b59d-2272-4415-a836-8c256a0fcec9`. Runtime’lar değişmedi. İki kanalın API/runtime/platform ayrımı, native başlıklarla launch asset ve iOS 18 / Android 19 ek dosyanın SHA-256 kontrolleri geçti. Yanlış runtime/platform 204, üretim kanalı 404. Genel mağaza yayını ve Git push yapılmadı. Sunucudaki CSP/fragment düzeltmesi yalnız backend açma sayfasını değiştirir; yeni OTA gerektirmez.
+
+Geri dönüş: `~/oggaq-development/publication/documents-20261028/services.before-documents.yaml` önceki dört image’i tutar. Uygulama geri alınacaksa `publication/student-access-20261027/services.compose.yaml` bu dosyadan geri yüklenip `~/oggaq-development/manage up -d --no-deps app worker scheduler web` uygulanır. Son küçük adım öncesi `documents-final-20261028/services.before-final.yaml` ara sürümün geri dönüşüdür. Mobil OTA geri dönüş komutları IOS_BETA / ANDROID_BETA içinde; önceki OTA kodları iOS `01a17f61`, Android `01a17f62`.
