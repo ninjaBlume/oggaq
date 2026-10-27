@@ -2,6 +2,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { ScreenActive } from "./screenActivity";
+import { recoverRead } from "./readRecovery";
 export function useOnReturn(callback: () => void) {
   const screenFocused = useIsFocused();
   const active = useContext(ScreenActive);
@@ -31,7 +32,7 @@ export function useResource<T>(
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
-  const reload = useCallback(async () => {
+  const reload = useCallback(async (recover = false) => {
     if (!active.current) {
       setLoading(false);
       return;
@@ -42,7 +43,8 @@ export function useResource<T>(
     setError(null);
     setLoading(true);
     try {
-      const value = await fn.current(next.signal);
+      const read = () => fn.current(next.signal);
+      const value = await (recover ? recoverRead(read, next.signal) : read());
       if (mounted.current && !next.signal.aborted) setData(value);
     } catch (e) {
       if (mounted.current && !next.signal.aborted) setError(e);
@@ -99,15 +101,24 @@ export function useTask<T>() {
   }
   return { pending, error, run, reset: () => setError(null) };
 }
-export function useResume(callback: () => void) {
+export function useResume(callback: () => void, background?: () => void) {
   const active = useContext(ScreenActive);
   const ref = useRef(callback);
   ref.current = callback;
   const visible = useRef(active);
   visible.current = active;
+  const pause = useRef(background);
+  pause.current = background;
   useEffect(() => {
+    let wasBackground = AppState.currentState === "background";
     const s = AppState.addEventListener("change", (state) => {
-      if (state === "active" && visible.current) ref.current();
+      if (state === "background") {
+        wasBackground = true;
+        pause.current?.();
+      } else if (state === "active" && wasBackground) {
+        wasBackground = false;
+        if (visible.current) ref.current();
+      }
     });
     return () => s.remove();
   }, []);

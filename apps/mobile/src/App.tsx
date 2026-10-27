@@ -30,6 +30,7 @@ import {
   Heading,
   IconButton,
   Loading,
+  TextLink,
 } from "./ui";
 import { Review, Stats } from "./review";
 import { Exam } from "./exams";
@@ -53,6 +54,8 @@ import { ThemeProvider, useBody, useLayout, useTheme } from "./themeContext";
 import { ScreenActive } from "./screenActivity";
 import { restoreApplication, type Prepared } from "./startup";
 import { textSizeFactors } from "./textSize";
+import { isTransientReadError, recoverRead } from "./readRecovery";
+import { AppUpdatesProvider } from "./appUpdates";
 
 type Routes = {
   Main: undefined;
@@ -61,6 +64,13 @@ type Routes = {
 };
 const Stack = createNativeStackNavigator<Routes>();
 const primaryTabs: readonly MainTab[] = ["home", "deneme", "ders", "history", "profile"];
+function ConnectionNotice({ retry }: { retry: () => void }) {
+  const { styles, palette } = useTheme();
+  return <View testID="connection-notice" accessibilityRole="alert" style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: palette.softPrimary }}>
+    <Text style={styles.muted}>Bağlantı yenilenemedi. Kayıtlı bilgilerin korunuyor; yeni işlemler için bağlantını kontrol et.</Text>
+    <TextLink onPress={retry}>Bağlantıyı yeniden dene</TextLink>
+  </View>;
+}
 type PreparedContexts = Prepared<StudyContext[]>;
 function MainTabs({
   user,
@@ -244,6 +254,7 @@ function Workspace({
   refresh,
   signedOut,
   prepared,
+  connectionWarning,
 }: {
   user: User;
   logout: () => void;
@@ -251,6 +262,7 @@ function Workspace({
   refresh: () => void;
   signedOut: () => void;
   prepared?: PreparedContexts;
+  connectionWarning: boolean;
 }) {
   const { palette, styles, scheme, textSize } = useTheme();
   const body = useBody();
@@ -284,8 +296,8 @@ function Workspace({
   );
   const [contextId, setContextId] = useState<string | null>(null);
   useResume(() => {
-    void query.reload();
-  });
+    void query.reload(true);
+  }, query.cancel);
   const context =
     query.data?.find((c) => c.id === contextId) ??
     (contextId
@@ -323,7 +335,7 @@ function Workspace({
         </ScrollView>
       </SafeAreaView>
     );
-  if (query.error)
+  if (query.error && !isTransientReadError(query.error))
     return (
       <SafeAreaView style={styles.shell}>
         <View style={body}>
@@ -340,6 +352,8 @@ function Workspace({
       </SafeAreaView>
     );
   return (
+    <View style={styles.shell}>
+    {query.error && !connectionWarning ? <ConnectionNotice retry={() => void query.reload(true)} /> : null}
     <NavigationContainer
       key={`${user.id}-${context.id}`}
       theme={navigationTheme}
@@ -383,6 +397,7 @@ function Workspace({
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
+    </View>
   );
 }
 function ExamDetail({ context, id, initialExam }: { context: StudyContext; id: string; initialExam?: ExamAttempt }) {
@@ -395,9 +410,13 @@ function Application() {
   const [restoring, setRestoring] = useState(true);
   const [prepared, setPrepared] = useState<{ token: string; contexts: PreparedContexts }>();
   const [error, setError] = useState<unknown>(null);
+  const [refreshWarning, setRefreshWarning] = useState(false);
+  const refreshing = useRef<AbortController | null>(null);
   const task = useTask<unknown>();
   const insets = useSafeAreaInsets();
   async function clear() {
+    refreshing.current?.abort();
+    setRefreshWarning(false);
     setUser(null);
     setPrepared(undefined);
     try {
@@ -406,18 +425,25 @@ function Application() {
       setError(e);
     }
   }
-  async function refresh() {
+  async function refresh(recover = false) {
     const token = session.token;
     if (!token) return;
+    refreshing.current?.abort();
+    const request = new AbortController();
+    refreshing.current = request;
+    const current = () => !request.signal.aborted && refreshing.current === request && session.token === token;
     try {
       setError(null);
-      const result = await api.request("get", "/api/v1/me", {});
+      setRefreshWarning(false);
+      const read = () => api.request("get", "/api/v1/me", { signal: request.signal });
+      const result = await (recover ? recoverRead(read, request.signal) : read());
       // A response from a signed-out account must never replace a newer session.
-      if (session.token !== token) return;
+      if (!current()) return;
       setUser(result.data);
     } catch (e) {
-      if (session.token !== token) return;
+      if (!current()) return;
       if (e instanceof ApiError && [401, 403].includes(e.status)) await clear();
+      else if (recover && isTransientReadError(e)) setRefreshWarning(true);
       else setError(e);
     }
   }
@@ -432,7 +458,7 @@ function Application() {
         prepared: contexts => {
           if (session.token) setPrepared({ token: session.token, contexts });
         },
-        identity: refresh,
+        identity: () => refresh(),
       });
     } catch (e) {
       setError(e);
@@ -442,24 +468,26 @@ function Application() {
   }
   useEffect(() => {
     void restore();
-    return sessionExpiredHandler(() => {
+    const unsubscribe = sessionExpiredHandler(() => {
       void clear();
     });
+    return () => { refreshing.current?.abort(); unsubscribe(); };
   }, []);
   useResume(() => {
-    if (session.token) void refresh();
-  });
+    if (session.token) void refresh(true);
+  }, () => refreshing.current?.abort());
   function logout() {
     void task.run(
       async () => {
         await api.request("post", "/api/v1/auth/logout", {});
         await session.clear();
       },
-      () => { setUser(null); setPrepared(undefined); },
+      () => { refreshing.current?.abort(); setRefreshWarning(false); setUser(null); setPrepared(undefined); },
     );
   }
   return (
     <View style={styles.shell}>
+      {refreshWarning && user ? <ConnectionNotice retry={() => void refresh(true)} /> : null}
       {error || task.error ? (
         <View
           style={{
@@ -502,6 +530,7 @@ function Application() {
           refresh={() => void refresh()}
           signedOut={() => void clear()}
           prepared={prepared?.token === session.token ? prepared.contexts : undefined}
+          connectionWarning={refreshWarning}
         />
       ) : (
         <SafeAreaView style={styles.shell} edges={["top", "bottom"]}>
@@ -537,7 +566,7 @@ function Root() {
         style={styles.shell}
       >
         {fontTask.error ? <View style={{ padding: 12 }}><ErrorNotice title="Marka yazısı yüklenemedi" error={fontTask.error} retry={loadFont} /></View> : null}
-        <Application />
+        <AppUpdatesProvider><Application /></AppUpdatesProvider>
       </KeyboardAvoidingView>
     </MotionProvider>
   );

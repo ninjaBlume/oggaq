@@ -28,6 +28,7 @@ import { cardTone, themePreferenceLabels, themePreferences } from "@oggaq/design
 import { textSizes, textSizeLabels } from "./textSize";
 import Constants from "expo-constants";
 import * as Updates from "expo-updates";
+import { AppUpdateControls } from "./appUpdates";
 export function Profile({
   user,
   context,
@@ -195,6 +196,7 @@ export function Profile({
         </>
       )}
       <LegalSection />
+      <AppUpdateControls />
       <View style={{ paddingTop: 12 }}>
         <Button danger icon={LogOut} disabled={pending} onPress={logout}>
           {pending ? "Oturum kapatılıyor…" : "Çıkış yap"}

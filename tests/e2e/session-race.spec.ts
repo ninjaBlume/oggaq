@@ -17,13 +17,15 @@ async function login(page: Page, email: string) {
 }
 
 for (const status of [200, 401, 403]) {
-  test(`eski mobil oturumun geciken /me ${status} yanıtı yeni hesabı değiştirmez`, async ({ page }) => {
+  test(`eski mobil oturumun geciken /me ${status} isteği iptal edilir ve yeni hesabı değiştirmez`, async ({ page }) => {
     await page.goto("/");
     await login(page, "e2e-student@example.test");
     let release!: () => void;
     let received!: () => void;
     const gate = new Promise<void>((resolve) => { release = resolve; });
     const started = new Promise<void>((resolve) => { received = resolve; });
+    let handled!: () => void;
+    const completed = new Promise<void>(resolve => { handled = resolve; });
     let held = false;
     await page.route("**/api/v1/me", async (route) => {
       if (held || route.request().method() !== "GET") return route.continue();
@@ -31,8 +33,10 @@ for (const status of [200, 401, 403]) {
       const original = await route.fetch();
       received();
       await gate;
-      if (status === 200) await route.fulfill({ response: original });
-      else await route.fulfill({ status, json: { message: "Eski oturum artık geçerli değil." } });
+      try {
+        if (status === 200) await route.fulfill({ response: original });
+        else await route.fulfill({ status, json: { message: "Eski oturum artık geçerli değil." } });
+      } finally { handled(); }
     });
     // React Native Web implements the same AppState callback through visibilitychange.
     await page.evaluate(() => {
@@ -42,15 +46,16 @@ for (const status of [200, 401, 403]) {
       }
     });
     await started;
+    const cancelled = page.waitForEvent("requestfailed", request => new URL(request.url()).pathname === "/api/v1/me");
     await page.getByRole("tab", { name: "Profil", exact: true }).click();
     await page.getByRole("button", { name: "Çıkış yap", exact: true }).click();
+    await cancelled;
     await expect(page.getByText("Hoş geldin", { exact: true })).toBeVisible();
     await login(page, "e2e-new-session@example.test");
     await page.getByRole("tab", { name: "Profil", exact: true }).click();
     await expect(page.getByText("e2e-new-session@example.test", { exact: true })).toBeVisible();
-    const finished = page.waitForResponse((response) => response.url().endsWith("/api/v1/me") && response.status() === status);
     release();
-    await (await finished).finished();
+    await completed;
     // A turn through the UI ensures the response's state updates have been rendered.
     await page.getByRole("tab", { name: "Ana sayfa", exact: true }).click();
     await page.getByRole("tab", { name: "Profil", exact: true }).click();
