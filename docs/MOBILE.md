@@ -1,5 +1,9 @@
 # Expo mobil uygulaması
 
+## Parola yer tutucusu ve takvim metni — 28 Ekim 2026
+
+Ortak mobil `Field` bileşeni parola alanı boşken, açıkça başka yer tutucu verilmediyse `••••••••` gösterir. Giriş, kayıt ve parola tekrar alanları aynı görünümü kullanır; gerçek değer boş kalır, güvenli giriş/göster-gizle/otomatik doldurma davranışı değişmez. Takvimde kullanıcıya gösterilen “Son doğrulama” tarih-saat satırı mobil ve web arayüzünden kaldırıldı; resmî kaynak bağlantıları ve eski veri uyarıları korunur. API'nin kontrol zamanı ve takvim botu değiştirilmez.
+
 ## Kompakt takvim ve sonuç listesi — 28 Ekim 2026
 
 Sınavın altında sürekli görünen “Cevaplar sunucuda kayıtlı” metni kaldırıldı. İşlem sürerken “Kaydediliyor…”, uzlaştırma gerektiğinde “Kayıt doğrulanmalı” ve hata/yeniden deneme korunur. Doğru/yanlış geri bildirimi, cevap kilidi ve kayıt işlemleri değişmez.

@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Parola yer tutucusu ve takvim kontrol tarihi
+
+Ortak mobil parola alanlarında varsayılan `••••••••` yer tutucusu eklendi; açıkça verilmiş yer tutucu varsa önceliği korunur. Gerçek değer veya kayıtlı parola üretilmez. Mobil ve web takvim arayüzünden “Son doğrulama” tarih-saat satırı kaldırıldı; veri doğrulama zamanı, takvim botu, eski veri uyarısı ve resmî kaynak bağlantıları değiştirilmedi.
+
+**57 mobil + 10 web birim testi, workspace strict TypeScript, web build, Expo QA export ve 30 ilgili E2E geçti.** Giriş/parola tekrarı alanlarının boş değerle noktalı yer tutucusu, güvenli giriş/göster-gizle, current/new-password otomatik doldurma, kayıt/yanlış parola tekrarı, hata/yenileme ve mobil ekran/sınav akışları korundu. Takvimde kontrol tarihinin yokluğu iki platform/iki tema, büyük yazı, boş/eski takvim ve kaynak bağlantılarıyla birlikte doğrulandı. Yeni test dosyası eklenmedi; mevcut UI senaryoları güncellendi. Kanıtlar `artifacts/password-calendar-copy/` içinde.
+
+E2E yalnız `oggaq_test` ve 8001/5183/5184/5186 üzerinde başka test yokken çalıştı. Backend/API/DB değişmedi; PHPUnit/Composer ve tüm ürün E2E paketi yeniden çalıştırılmadı. Native runtime'lar mevcut beta ile aynı kaldı. Bu tur native giriş/kayıt ekranında veya fiziksel iOS/Android cihazda kontrol yapılmadı. Üretim web paketi yeniden yayımlanmadı; takvim orada genel öğrenci ekranı olarak sunulmuyor. Beta teslimi ayrıca kaydedilir.
+
 ## 28 Ekim 2026 — Kompakt takvim/Sonuçlarım ve kayıt metninin kaldırılması
 
 Mobil sınavdaki sürekli “Cevaplar sunucuda kayıtlı” metni kaldırıldı; yazma sürüyor/uzlaştırma/hata ve doğru-yanlış geri bildirimi korunur. Takvim kuralları 14/20 px birleşik madde satırlarıyla 8 px aralıkta, kural/tarih kartları mevcut kompakt iç boşluklarla gösterilir. Tarih etiketi/tarih aynı satırda, eğitim bitişi ayrı satırda kalır. Sayfa bölümleri 12 px aralıkta; kaynak ve yönetmelik eylemleri korunur. Sonuçlarım satırında küçük skor alanı, tam sarılan başlık, kısa meta ve 4 px dağılım çubuğu/kompakt açıklama vardır. Sabit kart yüksekliği veya başlık kırpma eklenmedi. Hesaplama/kayıt/yanıt kilidi/API değişmez.

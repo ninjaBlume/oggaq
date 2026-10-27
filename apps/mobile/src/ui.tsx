@@ -409,7 +409,7 @@ export function Field({
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           keyboardAppearance={scheme}
-          placeholder={placeholder}
+          placeholder={placeholder ?? (password ? "••••••••" : undefined)}
           placeholderTextColor={palette.muted}
           selectionColor={palette.primary}
           multiline={multiline}

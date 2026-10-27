@@ -740,6 +740,8 @@ test("giriş formu iki temada dar/yatay ekrana sığar; parola görünürlüğü
   }
   await page.setViewportSize({ width: 390, height: 844 });
   const password = page.getByLabel("Parola", { exact: true });
+  await expect(password).toHaveAttribute("placeholder", "••••••••");
+  await expect(password).toHaveValue("");
   await expect(password).toHaveAttribute("autocomplete", "current-password");
   await password.fill("Synthetic-Browser-42!");
   await expect(password).toHaveAttribute("type", "password");
@@ -764,6 +766,12 @@ test("giriş formu iki temada dar/yatay ekrana sığar; parola görünürlüğü
 test("yeni öğrenci kayıt sonrası doğrulama olmadan doğrudan kişisel çalışmaya girer", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Hesap oluştur", exact: true }).click();
+  for (const label of ["Parola", "Parola tekrar"]) {
+    const field = page.getByLabel(label, { exact: true });
+    await expect(field).toHaveAttribute("placeholder", "••••••••");
+    await expect(field).toHaveValue("");
+    await expect(field).toHaveAttribute("type", "password");
+  }
   await page.getByLabel("Ad soyad", { exact: true }).fill("Sentetik Mobil Öğrenci");
   await page.getByLabel("E-posta adresi", { exact: true }).fill("mobile-auth@example.test");
   await expect(page.getByLabel("Parola", { exact: true })).toHaveAttribute("autocomplete", "new-password");

@@ -37,7 +37,7 @@ export function ExamCalendarPage() {
           <p className="muted">Eğitim bitişi: <time dateTime={entry.training_deadline}>{calendarDate(entry.training_deadline, false)}</time></p>
         </article>;
       })}</section>}
-      <footer className="calendar-source"><p>{calendarNotice}</p>{data.verified_at && <p>Son doğrulama: {new Date(data.verified_at).toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' })}</p>}<a href={data.source_url} target="_blank" rel="noreferrer">EGM takvimini aç ↗</a></footer>
+      <footer className="calendar-source"><p>{calendarNotice}</p><a href={data.source_url} target="_blank" rel="noreferrer">EGM takvimini aç ↗</a></footer>
     </>}
   </div>;
 }

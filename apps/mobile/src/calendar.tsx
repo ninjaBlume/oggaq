@@ -68,7 +68,7 @@ export function ExamCalendarScreen({ initialYear, back }: { initialYear?: number
           </View>
         </Card>;
       })}</Columns></View>}
-      <View style={{ gap: 4 }}><Text style={[styles.muted, { fontSize: 13, lineHeight: 19 }]}>{calendarNotice}</Text>{data.verified_at && <Text style={[styles.muted, { fontSize: 12, lineHeight: 18 }]}>Son doğrulama: {new Date(data.verified_at).toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' })}</Text>}<TextLink onPress={() => { void sourceLink.run(async () => { await Linking.openURL(data.source_url); }, () => {}); }}>EGM takvimini aç ↗</TextLink><ErrorNotice error={sourceLink.error} retry={() => { void sourceLink.run(async () => { await Linking.openURL(data.source_url); }, () => {}); }} /></View>
+      <View style={{ gap: 4 }}><Text style={[styles.muted, { fontSize: 13, lineHeight: 19 }]}>{calendarNotice}</Text><TextLink onPress={() => { void sourceLink.run(async () => { await Linking.openURL(data.source_url); }, () => {}); }}>EGM takvimini aç ↗</TextLink><ErrorNotice error={sourceLink.error} retry={() => { void sourceLink.run(async () => { await Linking.openURL(data.source_url); }, () => {}); }} /></View>
     </>}
   </View>;
 }

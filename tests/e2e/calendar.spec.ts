@@ -20,6 +20,7 @@ for (const platform of ['web','mobile'] as const) for (const scheme of ['light',
       await expect(rules.getByRole('link',{name:'Resmî EGM sayfası',exact:true})).toHaveAttribute('href','https://www.egm.gov.tr/ozelguvenlik');
       await expect(rules.getByRole('link',{name:/Güncel yönetmeliği/})).toHaveAttribute('href','https://www.mevzuat.gov.tr/mevzuatmetin/yonetmelik/7.5.7190.pdf');
     } else await expect(rules.getByRole('button',{name:'Resmî EGM sayfası',exact:true})).toBeEnabled();
+    await expect(page.getByText(/Son doğrulama:/)).toHaveCount(0);
     const cards = page.getByTestId('calendar-entry');
     await expect(cards.first()).toContainText('902. Temel');
     await expect(cards.first()).toContainText(/gün kaldı|Bugün/);
