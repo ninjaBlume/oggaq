@@ -56,6 +56,32 @@ Tünel konteyneri token dosyasının sahibi olan dağıtım kullanıcısının U
 
 ## E-posta: gerçek gönderim
 
+### 27 Ekim 2026: Resend geçişi — güncel gönderim
+
+Kullanıcı ücretsiz Resend geçişini, DNS gönderim yetkisini, sınırlı anahtarın panodan doğrudan sunucuya aktarılmasını ve tek Hotmail testini açıkça onayladı. Mevcut `hcbilisimtr` hesabında Free plan **100/gün, 3.000/ay**, ücretli aşım kapalı olarak görüldü. `oggsor.com` **Ireland / eu-west-1** bölgesinde **Verified**, Forge **Enabled**. Alım kapalıdır; mevcut destek posta yönlendirmesi sürer. Alan adında alıcıya **Enforced TLS** etkinleştirildi.
+
+Cloudflare'de yalnız aşağıdaki üç yeni kayıt DNS-only olarak içe aktarıldı; 9 mevcut kayıt korundu. Genel DNS doğrulaması geçti. Ana SPF/DMARC/MX ve eski Exim/DKIM/PTR aynı kaldı.
+
+| Tür | Ad | Değer |
+| --- | --- | --- |
+| TXT | `resend._domainkey.oggsor.com` | Resend panelinin ürettiği DKIM açık anahtarı |
+| CNAME | `rsend.oggsor.com` | `rsend-euw1.forge.rmta.net` |
+| CNAME | `send.oggsor.com` | `send.forge.rmta.net` |
+
+Bu hesabın güncel formu eski SPF/MX yönergesi yerine CNAME kayıtları verdi; kök alanın MX/SPF kayıtlarına yeni değer eklenmedi. Resend'e DNS hesabı için OAuth/otomatik düzenleme yetkisi verilmedi. API anahtarı **Sending access / oggsor.com** kapsamlıdır; hesap yönetim yetkisi yoktur. Gizli değer sohbet/komut argümanı/depo/yerel dosyaya yazılmadan aktarıldı; panodaki kopyası aktarım sonrasında temizlendi. Sunucuda `shared/.resend-smtp-key` ve `shared/.env` izinleri **0600**.
+
+Uygulama SMTP ayarı `smtp.resend.com:465`, `MAIL_SCHEME=smtps`, kullanıcı `resend`; From `no-reply@oggsor.com`, Reply-To `destek@oggsor.com`, görünen ad marka kaynağıyla **ÖGG SOR - Soru Bankası**. Eski özel relay `MAIL_URL` değeri kaldırıldı. Gerçek Laravel/Symfony transport'u TLS bağlantısı ve kimlik doğrulamayı geçti. Laravel kuyruğu/Horizon korunur; yeni paket veya native/OTA güncellemesi gerekmez. Sunucu Exim'i diğer siteler için çalışmaya devam eder.
+
+Aktivasyon: `publication/resend-20261027/activate.py`, imaj/ortam ön kontrolü, gerçek Dotenv parser, korumalı ortam yedeği, mevcut app imajıyla app/worker/scheduler yenilemesi ve yalnız gizlilik dosyası değişen `oggaq-development-web:resend-privacy-20261027` üzerinden yapıldı. App imajı **mail-replyto-20261027** olarak kalır. `manage` sarmalayıcısı aktif imajları koruyan yeni override'a alındı; eski `site-legal-5af3e01` override'ına dönüp sonraki komutta uygulama sürümünü geriletmez. `nginx -t`, readiness ve Horizon başarılı. Gizlilik dosyasının iki web kökündeki SHA256'sı kaynakla eşleşti ve canlı HTTPS sayfasında Resend/saklama açıklaması görüldü.
+
+Geri alma yalnız bu projenin ortamı ve dört uygulama servisi üzerindedir: `publication/resend-20261027/env-backup-path.txt` içindeki korumalı dosyadan `.env` geri yüklenir, `manage.before-resend` geri kopyalanır; `rollback.compose.yaml` ile app/worker/scheduler/web yeniden oluşturulur ve proje nginx'i reload edilir. DB/Redis/tünel ve host posta servisleri yeniden oluşturulmaz. DNS kayıtlarının silinmesi normal geri alma için gerekli değildir; anahtar iptal edilirse tekrar Resend'e geçişte yenisi gerekir.
+
+**Gerçek teslim sonucu:** 27 Ekim **17:05:18 İstanbul** tarihli tek düz metin test SMTP tarafından kabul edildi. Resend listesi önce Queued gösterdi; yenilendiğinde **Sent ve Delivered 17:05** görüldü. Outlook başlıkları **17:05:26** varışı, yaklaşık **8 saniye** teslimi, yeni gönderici IP **54.240.3.12**, SPF/DKIM/DMARC/compauth **PASS**, SCL **5** ve BCL **0** sonuçlarını doğruladı. Buna rağmen ileti **Gereksiz E-posta** klasöründedir. Dolayısıyla Resend geçişi çalışıyor; **spam sorunu çözülmedi**. Kuyruk ekranındaki geçici görünüm gerçek teslim gecikmesi olarak yorumlanmadı. İkinci test gönderilmedi.
+
+Outlook'un filtresi **Standart** ve engellenen gönderen/alan listesinde `oggsor.com` araması **Sonuç yok** verdi; ayarlar değiştirilmedi. Resend Insights tek uyarı olarak genel “Don't use no-reply” önerisini verdi; bu Microsoft'un sınıflandırma nedeninin kanıtı değildir. Destek adresi zaten Reply-To'dur. Gönderici adı/adresi veya alan adı bu öneriye dayanarak tekrar değiştirilmedi. Gizli değer/kod/reset bağlantısı içermeyen Resend teslim desteği taslağı `artifacts/resend-20261027/support-draft.txt` içinde hazırlandı; **destek ekibine henüz gönderilmedi**.
+
+Resend'in [bölge/saklama açıklaması](https://resend.com/docs/dashboard/domains/regions) ve [gizlilik politikası](https://resend.com/legal/privacy-policy) doğrulanarak gizlilik değerleri güncellendi; hukuki inceleme durumu değiştirilmedi.
+
 ### 27 Ekim 2026: Outlook spam incelemesi
 
 Kullanıcının açtığı güncel Outlook iletisinde SPF/DKIM/DMARC ve compauth **PASS**, `SCL:5`, `BCL:0`, teslim hedefi `dest:J` görüldü. Kimlik doğrulaması geçiyor; ileti yine de spam klasörüne ayrılmış. Bu değerler Microsoft'un özel filtre kararının tek nedenini açıklamaz ([Outlook gönderici sorun giderme](https://substrate.office.com/ip-domain-management-snds/Postmaster/Troubleshooting)). Ham başlıklar, alıcı adresi ve doğrulama kodu depoya alınmadı.
