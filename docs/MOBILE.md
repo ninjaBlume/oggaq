@@ -4,7 +4,7 @@
 
 Kayıt formu başarılı olduğunda mevcut mobil token ucu ile otomatik oturum açılır; kullanıcı tekrar giriş formuna gönderilmez. E-postadaki **6 haneli kod**, uygulamadaki **Doğrula ve başla** alanına girilir ve aynı oturumla ana sayfa açılır. iOS/Android tek kullanımlık kod otomatik doldurma ve boşluk içeren kod yapıştırma desteklenir. Kod 10 dakika geçerlidir; yeni kod en erken 60 saniyede, saatte en çok 10 gönderimle istenir. Doğrulama beklerken içerik erişimi sunucuda kapalı kalır.
 
-Kayıt başarılı olup token alma/saklama başarısız olursa hesap yeniden oluşturulmaz; mevcut e-posta ile girişten devam edilir. Native oturum SecureStore'da korunur; web test önizlemesindeki token yalnız bellektedir, sayfa yenilenmesi native yeniden açılış doğrulaması sayılmaz. Eski imzalı tarayıcı bağlantısı uyum için korunur. Bu yeni akış Expo/Device Hub kaynaklarında hazırdır; ayrıca TestFlight/Play OTA yayımlanmadı. Doğrulamalar ve API yayını [TESTING](TESTING.md) içindedir.
+Kayıt başarılı olup token alma/saklama başarısız olursa hesap yeniden oluşturulmaz; mevcut e-posta ile girişten devam edilir. Native oturum SecureStore'da korunur; web test önizlemesindeki token yalnız bellektedir, sayfa yenilenmesi native yeniden açılış doğrulaması sayılmaz. Eski imzalı tarayıcı bağlantısı uyum için korunur. Bu yeni akış Expo/Device Hub kaynaklarında hazırdır; kullanıcı isteğiyle iOS 01a17d36 ve Android 01a17d37 OTA yayımlandı. Cihaz alımı/yeni kayıt teyidi beklenir. Doğrulama sonrasında, doğrulanmadan önceki açılıştan kalan bağlam ön yüklemesi temizlenir. Doğrulamalar ve API yayını [TESTING](TESTING.md) içindedir.
 
 
 ## 27 Ekim 2026: Ders sınavlarında Temel/Yenileme ayrımı
@@ -13,7 +13,7 @@ Ders sınavları da Deneme gibi **Temel eğitim / Yenileme eğitimi** seçimi su
 
 Ders ve Deneme kartları ortak başlığı kullanır: **122. Temel Eğitim Sınav Soruları / 122. Yenileme Eğitim Sınav Soruları**. Sayı gerçek kaydın sınav numarasıdır; yenileme numarası temel numarasından türetilmez. Bu görünüm değişikliği yayımlanmış sınav başlıklarını, soruları veya geçmiş sonuçları değiştirmez. Daha eski bölümlerdeki “Ders ekranına eğitim seçimi eklenmez” kararı bu kullanıcı talimatıyla güncellenmiştir.
 
-TypeScript, 57 mobil birim testi, başlık testleri ve 10 ilgili gerçek API arayüz testi doğrulandı; iOS/Android/web export başarılı. 320/390/834 px ekranlar `artifacts/education/` içindedir. Device Hub için açık 8082 Metro kaynakları kullanır; otomasyon aracı Simulator uygulamasına erişemediği için native ekranda bu değişikliğin kontrolü ve fiziksel cihaz teyidi yapılmadı. TestFlight/Play OTA yayımlanmadı. Ayrıntılar [TESTING](TESTING.md) içinde.
+TypeScript, 57 mobil birim testi, başlık testleri ve 10 ilgili gerçek API arayüz testi doğrulandı; iOS/Android/web export başarılı. 320/390/834 px ekranlar `artifacts/education/` içindedir. Device Hub için açık 8082 Metro kaynakları kullanır; otomasyon aracı Simulator uygulamasına erişemediği için native ekranda bu değişikliğin kontrolü ve fiziksel cihaz teyidi yapılmadı. Ders ayrımı da 27 Ekim kayıt güncellemesiyle iOS/Android beta OTA kanallarına yayımlandı; fiziksel cihaz teyidi beklenir. Ayrıntılar [TESTING](TESTING.md) içinde.
 
 ## Öğrenci süre tercihi — 26 Ekim 2026
 

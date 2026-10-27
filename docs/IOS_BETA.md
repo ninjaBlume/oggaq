@@ -1,6 +1,11 @@
 # iPhone ve iPad için kapalı beta
 
-**Son küçük güncelleme — 27 Ekim 2026:** Arka plandan dönüşte zaman aşımı kontrolü ve profil güncelleme denetimi; kaynak `929e8fe`, `testflight` / `01a17afb-12db-7093-9e59-1a88537d62c9` (grup `35b7e7a3-0faa-4eb0-a0b2-d8fa0247248f`). Önceki native runtime korunur. Kullanıcının bildirdiği eski güncelleme kimliği ve native istek başlıklarıyla endpoint doğru yeni paketi verdi; native launch asset isteği 200, launch asset ve tüm ek dosyaların SHA256 değerleri eşleşti. Kullanıcı yeni iOS kodunu ve güncelleme bölümünü gördüğünü teyit etti. Android aynı kontrolde eski kodda kaldı; Android için ayrı native Dahili Test paketi hazırlanıyor.
+
+**Son güncelleme — 27 Ekim 2026:** Uygulama içinde e-posta koduyla tek kayıt akışı ve Ders sınavlarında Temel/Yenileme ayrımı, kaynak 3e4bfe9 + doğrulama sonrası eski ön yüklemeyi temizleyen 1ee505d. **testflight / 01a17d36-aea0-766e-a626-142a70b06b5f**, grup c3be968d-b837-47fd-9029-2ff9d84cb2c7. Kurulu native runtime **1223b533f37e49802bffbaeeaf657bde54e48337** ile aynıdır; yeni mağaza paketi gerektirmeyen EAS Update olarak yayımlandı. Sürüm **0.1.1** ve mevcut native build numarası korunur. Güncel API https://oggsor.com yayındadır. Fiziksel cihazın bu yeni kodu aldığı ve yeni kayıt akışını tamamladığı henüz teyit edilmedi.
+
+Oturum açıksa **Profil → Uygulama güncellemesi → Güncellemeleri denetle → Güncellemeyi uygula** kullanılır. Önceki öğrenci hesapları kullanıcı kararıyla silindiği için giriş ekranındaysa: uygulamayı açıp internet bağlıyken bir süre bekle, tamamen kapatıp tekrar aç; indirilen paket sonraki açılışta uygulanır. Kod **01a17d36** profil altında görünür. Sınav sırasında otomatik yeniden başlatma yoktur; genel mağaza yayını ve Git push yapılmadı. Yayın/cihaz sınırları ve dosya kontrolleri [TESTING](TESTING.md) içinde.
+
+**Önceki küçük güncelleme — 27 Ekim 2026:** Arka plandan dönüşte zaman aşımı kontrolü ve profil güncelleme denetimi; kaynak `929e8fe`, `testflight` / `01a17afb-12db-7093-9e59-1a88537d62c9` (grup `35b7e7a3-0faa-4eb0-a0b2-d8fa0247248f`). Önceki native runtime korunur. Kullanıcının bildirdiği eski güncelleme kimliği ve native istek başlıklarıyla endpoint doğru yeni paketi verdi; native launch asset isteği 200, launch asset ve tüm ek dosyaların SHA256 değerleri eşleşti. Kullanıcı yeni iOS kodunu ve güncelleme bölümünü gördüğünü teyit etti. Android aynı kontrolde eski kodda kaldı; Android için ayrı native Dahili Test paketi hazırlanıyor.
 
 ## Uygulama içinden güncelleme
 
