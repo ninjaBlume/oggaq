@@ -10,6 +10,10 @@ Mobil sonuç özetinden 160 px dekoratif yıldız/çiçek, kutlama cümlesi, bü
 Backend/API/DB/native modül değişmedi; PHPUnit/Composer ve ilgisiz admin/web build/testleri tekrar çalıştırılmadı. Web öğrenci QA ekranı değişmedi; genel web soru çözme yayını kapalı. Native/fiziksel TestFlight/Play alımı ayrıca teyit edilmeli. Beta teslimi ayrıca kaydedilir.
 
 
+Device Hub iPhone 18 Pro / iOS 27’de mevcut bitmiş sonuç gerçek API ile salt okunur açıldı; yeni yüzde, üç cevap adedi ve kompakt düzen görsel/AX olarak doğrulandı. Yeni sınav başlatılmadı, aktif sınav açılmadı, yanıt/sonuç/favori değiştirilmedi. Android native görünüm ve fiziksel beta alımı ayrıca teyit edilmelidir.
+
+OTA kaynak `893f032`: iOS `testflight / 01a17f9a-5cd1-7559-a4d4-ba65135a9f1b`, grup `507d0c0a-3bec-4f53-acd4-00dcfe8ae02e`; Android `android-beta / 01a17f9b-0837-73ca-989b-d993e05d9bf5`, grup `c9b9bf0a-dd1e-43b9-a03a-9433d88b716d`. Native paket/runtime değişmedi. Kanal/runtime/API, native başlıklarla launch asset ve tüm ek dosya hash kontrolleri (iOS 18, Android 19) ayrıca kanıt klasöründe kayıtlıdır. Yeni özet kimlikleri var, eski kutlama cümlesi yok. Yanlış platform/runtime 204, production 404. Fiziksel cihaz alımı teyit edilmedi. Sunucu deploy’u, genel mağaza yayını ve Git push yok.
+
 ## 28 Ekim 2026 — Özgün matbu metinler ve gg/aa/yyyy
 
 Kullanıcı kararıyla kurum/firma kataloglarına ait bağlantılar kaldırıldı. 14 belge için ÖGG SOR'a özgü doldurulabilir metinler yazıldı (sürüm 2026-10-28.2). Matbu PDF yalnız etiket/boş çizgi değildir; türe özel açıklama ve sonuç cümleleri içerir. API `sources` alanı eski istemciler için yalnız boş dizi olarak kalır; yeni mobil ekranda kurumsal atıf veya dış belge bağlantısı yoktur. Dilekçelerde boş adres/iletişim alanları bulunur. Eski kurum PDF'leri ürün şablonu olarak kullanılmaz.
