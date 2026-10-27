@@ -1,5 +1,8 @@
 # Güvenlik, kişisel veri ve mevzuat
 
+
+27 Ekim 2026 kullanıcı kararı: yeni parola alt sınırı **8 karakter**, üst sınır 128; büyük/küçük harf, rakam, simge ve doğrulama tekrarı şartları sürer. Ortak kayıt/sıfırlama/değiştirme doğrulaması ve yönetici oluşturma komutu aynı alt sınırı uygular. Mevcut hesapların parolaları değiştirilmedi.
+
 ## 27 Ekim 2026: uygulama içi e-posta onayı
 
 E-posta kodu parola yerine giriş veya token üretimi için kullanılmaz. `POST /api/v1/auth/email-verification-code` aktif, giriş yapmış ve `api:access` yetkili hesabın yalnız kendi mevcut adresini doğrular. Altı hane kriptografik `random_int` ile üretilir; süre 10 dakika, kod başına en çok 5 yanlış tahmin, hesap başına kod kontrolü dakikada 10 istektir. Yeniden gönderim en az 60 saniye aralıklı ve saatte en çok 10'dur; yeni kod eskisini geçersizleştirir. Süresi geçmiş/yenilenmiş veya zaten doğrulanmış hesap için kuyrukta kalan kod postası gönderilmez. Hatalı tahminler transaction dışında fırlatılan hata sayesinde geri alınmaz. Yetkisiz ve doğrulanmamış içerik erişimi önceki middleware'lerle korunur.

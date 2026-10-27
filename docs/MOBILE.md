@@ -1,5 +1,10 @@
 # Expo mobil uygulaması
 
+
+## 27 Ekim 2026: sekiz karakterli parola alt sınırı
+
+Kayıt ve Hesabım açıklamaları sunucuyla birlikte en az **8 karakter** olarak güncellendi. Parola değiştirme/sıfırlama ve webdeki yeni parola alanları da aynı sınırdadır. iOS **01a17d42**, Android **01a17d43** beta OTA yayımlandı; native paket sürümü 0.1.1 korunur. Cihazın paketi alması ayrıca teyit edilmelidir.
+
 ## 27 Ekim 2026: uygulama içinde tek kayıt ve doğrulama akışı
 
 Kayıt formu başarılı olduğunda mevcut mobil token ucu ile otomatik oturum açılır; kullanıcı tekrar giriş formuna gönderilmez. E-postadaki **6 haneli kod**, uygulamadaki **Doğrula ve başla** alanına girilir ve aynı oturumla ana sayfa açılır. iOS/Android tek kullanımlık kod otomatik doldurma ve boşluk içeren kod yapıştırma desteklenir. Kod 10 dakika geçerlidir; yeni kod en erken 60 saniyede, saatte en çok 10 gönderimle istenir. Doğrulama beklerken içerik erişimi sunucuda kapalı kalır.
