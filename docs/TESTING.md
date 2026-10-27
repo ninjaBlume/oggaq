@@ -1,5 +1,14 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Dilekçe ve tutanak / PDF
+
+Yan menüde Dilekçe hazırla ve Tutanak hazırla; 14 sürümlü örnek, matbu/yönlendirmeli/serbest metin, düzenlenebilir rol/ad ve PDF tarayıcı handoff’u eklendi. Yeni native modül yoktur. AI sağlayıcısına aktarım veya kalıcı belge arşivi yoktur. API, kişisel belgeyi en çok 5 dakika şifreli cache’te tutar; tek kullanım, aktif hesap/oturum ve boyut/alan doğrulamaları sunucudadır. Ayrıntılar [DOCUMENT_GENERATION](DOCUMENT_GENERATION.md).
+
+**299 backend testi / 3120 assertion; 57 mobil, 16 admin, 10 web birim testi; workspace strict TypeScript; OpenAPI lint/tip üretimi; Composer lint/validate/audit; admin/web/site build geçti.** 10 yeni backend testi katalog erişimi/doğrulanmamış öğrenci, eksik/beklenmeyen alan, limit/geçersiz tarih, HTML kaçışı, şifreli cache, süre bitimi/tek kullanım, iptal edilen oturum, pasif/silinmiş hesap, CSP/fragment handoff ve tüm PDF örneklerini kapsar.
+
+**27 ilgili E2E geçti (3 yeni belge senaryosu ve 24 mevcut mobil akış):** gerçek API ile taslak/düzenleme/önizleme/PDF açma, matbu ve serbest tutanak, değişken imza rolleri, 320/390/834 px taşmama ve hata sonrası metin korunması. E2E/PHPUnit ayrı zamanlarda, yalnız `oggaq_test` üzerinde; E2E portları 8001/5183/5184/5186. 14 matbu PDF birer sayfa, uzun Türkçe belge altı sayfa; karakter/metin çıkarımı ve görüntü düzeni kontrol edildi. Tam ürün E2E ve bilinen eski yasal sayfa beklentileri tekrar koşulmadı; hepsi yeşil iddiası yoktur. Kanıtlar `artifacts/documents/`.
+
+
 ## 28 Ekim 2026 — Deneme/Ders kartlarında gün/ay/yıl
 
 Ortak `examPeriodLabel` tam sınav gününü eski başlığın parantezli tarihinden veya incelenmiş EGM kitapçık aktarımının belirli kaynak künye biçiminden okur. Gerçek takvim günü, yıl/varsa ay, kitapçık sınav numarası/eğitim türü ve kaynaklar arası uyum kontrol edilir. Kesin gün yok/çelişkiliyse mevcut dönem/ay-yıl korunur; genel kaynak metnindeki indirme/yayın tarihi veya URL kullanılmaz. Sınav başlıkları, kaynak/soru verileri ve geçmiş sonuçlar değiştirilmedi.

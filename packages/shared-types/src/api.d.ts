@@ -1761,6 +1761,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/document-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Belge örnekleri */
+        get: operations["documentTemplates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents/prepare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Alanlardan düzenlenebilir taslak */
+        post: operations["prepareDocument"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/document-exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Tek kullanımlık PDF erişimi oluştur */
+        post: operations["exportDocument"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/document-exports/viewer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fragment erişim anahtarını POST gövdesine aktaracak PDF açma sayfası */
+        get: operations["documentPdfViewer"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/document-exports/open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Tek kullanımlık, kısa süreli anahtarla PDF aç */
+        post: operations["openDocumentPdf"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3210,6 +3295,57 @@ export interface components {
             source_url: string | null;
             /** Format: date-time */
             verified_at: string | null;
+        };
+        DocumentField: {
+            key: string;
+            label: string;
+            multiline: boolean;
+        };
+        DocumentTemplate: {
+            id: string;
+            /** @enum {string} */
+            kind: "petition" | "report";
+            title: string;
+            description: string;
+            version: string;
+            fields: components["schemas"]["DocumentField"][];
+            signer_roles: string[];
+            sources: {
+                title: string;
+                /** Format: uri */
+                url: string;
+            }[];
+        };
+        DocumentDraft: {
+            title: string;
+            body: string;
+        };
+        DocumentSigner: {
+            role: string;
+            name: string | null;
+        };
+        DocumentExportInput: {
+            template_id: string;
+            /** @enum {string} */
+            mode: "blank" | "guided" | "free";
+            title?: string | null;
+            recipient?: string | null;
+            /** Format: date */
+            document_date?: string | null;
+            body?: string | null;
+            address?: string | null;
+            contact?: string | null;
+            attachments?: string | null;
+            signers?: components["schemas"]["DocumentSigner"][];
+        };
+        DocumentExport: {
+            /**
+             * Format: uri
+             * @description 5 dakika geçerli tek kullanımlık erişim; anahtar URL fragmentindedir. Loglamayın.
+             */
+            viewer_url: string;
+            /** Format: date-time */
+            expires_at: string;
         };
     };
     responses: {
@@ -6427,6 +6563,236 @@ export interface operations {
             403: components["responses"]["Problem"];
             422: components["responses"]["Problem"];
             429: components["responses"]["Problem"];
+        };
+    };
+    documentTemplates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DocumentTemplate"][];
+                    };
+                };
+            };
+            /** @description Oturum gerekli */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Hesap aktif değil */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Geçersiz belge alanları */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Çok sık istek */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    prepareDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    template_id: string;
+                    fields: {
+                        [key: string]: string;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Başarılı */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DocumentDraft"];
+                    };
+                };
+            };
+            /** @description Oturum gerekli */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Hesap aktif değil */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Geçersiz belge alanları */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Çok sık istek */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    exportDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentExportInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DocumentExport"];
+                    };
+                };
+            };
+            /** @description Oturum gerekli */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Hesap aktif değil */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Geçersiz belge alanları */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Çok sık istek */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    documentPdfViewer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No-store, CSP ile korunan açma sayfası */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+            /** @description Çok sık istek */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    openDocumentPdf: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/x-www-form-urlencoded": {
+                    ticket: string;
+                };
+            };
+        };
+        responses: {
+            /** @description PDF; aktif hesap/oturum kontrolünden sonra anahtar tüketilir */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+            /** @description Anahtar geçersiz, sona ermiş veya kullanılmış */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Çok sık istek */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
 }

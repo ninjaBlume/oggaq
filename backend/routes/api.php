@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ReadinessController;
 use App\Modules\Calendar\Http\Controllers\ExamCalendarController;
+use App\Modules\Documents\Http\Controllers\DocumentController;
 use App\Modules\Exams\Http\Controllers\ExamAttemptController;
 use App\Modules\Identity\Http\Controllers\AccountController;
 use App\Modules\Identity\Http\Controllers\AuthController;
@@ -25,6 +26,8 @@ use App\Modules\Tenancy\Http\Controllers\TenantController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
+    Route::get('document-exports/viewer', [DocumentController::class, 'viewer'])->middleware('throttle:document-open');
+    Route::post('document-exports/open', [DocumentController::class, 'open'])->middleware('throttle:document-open');
     // Instance readiness for monitors and the deploy script; booleans only (docs/DEPLOYMENT.md).
     Route::get('health/ready', ReadinessController::class)->middleware('throttle:health');
     Route::post('auth/register', [AuthController::class, 'register'])->middleware('throttle:registration');
@@ -47,6 +50,9 @@ Route::prefix('v1')->group(function () {
         Route::post('me/export', [AccountController::class, 'export'])->middleware('throttle:account');
         Route::delete('me', [AccountController::class, 'destroy'])->middleware('throttle:account');
 
+        Route::get('document-templates', [DocumentController::class, 'index']);
+        Route::post('documents/prepare', [DocumentController::class, 'prepare'])->middleware('throttle:documents');
+        Route::post('document-exports', [DocumentController::class, 'export'])->middleware('throttle:documents');
         Route::get('exam-calendar', ExamCalendarController::class);
         Route::get('exam-calendar/next', [ExamCalendarController::class, 'next']);
         Route::get('job-postings', [JobController::class, 'index']);

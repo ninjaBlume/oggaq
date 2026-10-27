@@ -21,6 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withCommands([SyncExamCalendar::class])
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
+        // Capability-only handoff: no cookie authorization; ticket is posted in the body.
+        $middleware->validateCsrfTokens(except: ['api/v1/document-exports/open']);
         $middleware->redirectGuestsTo(fn (Request $request) => rtrim(config('security.frontend_url'), '/').'/login');
         $middleware->prepend(RequestContext::class);
         $middleware->alias(['account.active' => EnsureActiveAccount::class, 'email.verified' => EnsureVerifiedEmail::class, 'abilities' => CheckAbilities::class]);

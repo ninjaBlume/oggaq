@@ -1,0 +1,434 @@
+[
+  {
+    "id": "petition-general",
+    "kind": "petition",
+    "title": "Genel talep / bildirim",
+    "description": "Talebini ve gerekçeni kendi sözlerinle belirt.",
+    "version": "2026-10-28.1",
+    "fields": [
+      {
+        "key": "request",
+        "label": "Talep veya bildirim",
+        "multiline": true
+      },
+      {
+        "key": "reason",
+        "label": "Açıklama / gerekçe",
+        "multiline": true
+      }
+    ],
+    "signer_roles": [
+      "Başvuran"
+    ],
+    "sources": [
+      {
+        "title": "Pamukkale Üniversitesi form ve dilekçe kataloğu",
+        "url": "https://www.pau.edu.tr/guvenlik/tr/sayfa/form-ve-dilekceler-56"
+      }
+    ]
+  },
+  {
+    "id": "petition-leave",
+    "kind": "petition",
+    "title": "İzin talebi",
+    "description": "İzin tarihlerini ve talebini düzenle.",
+    "version": "2026-10-28.1",
+    "fields": [
+      {
+        "key": "period",
+        "label": "İstenen izin tarihleri",
+        "multiline": false
+      },
+      {
+        "key": "reason",
+        "label": "İzin talebi ve açıklama",
+        "multiline": true
+      }
+    ],
+    "signer_roles": [
+      "Başvuran"
+    ],
+    "sources": [
+      {
+        "title": "Pamukkale Üniversitesi form ve dilekçe kataloğu",
+        "url": "https://www.pau.edu.tr/guvenlik/tr/sayfa/form-ve-dilekceler-56"
+      }
+    ]
+  },
+  {
+    "id": "petition-shift",
+    "kind": "petition",
+    "title": "Vardiya / nöbet değişikliği",
+    "description": "Mevcut ve talep edilen vardiyayı belirt.",
+    "version": "2026-10-28.1",
+    "fields": [
+      {
+        "key": "current",
+        "label": "Mevcut vardiya",
+        "multiline": false
+      },
+      {
+        "key": "requested",
+        "label": "İstenen vardiya",
+        "multiline": false
+      },
+      {
+        "key": "reason",
+        "label": "Gerekçe",
+        "multiline": true
+      }
+    ],
+    "signer_roles": [
+      "Başvuran"
+    ],
+    "sources": [
+      {
+        "title": "Pamukkale Üniversitesi form ve dilekçe kataloğu",
+        "url": "https://www.pau.edu.tr/guvenlik/tr/sayfa/form-ve-dilekceler-56"
+      }
+    ]
+  },
+  {
+    "id": "petition-renewal",
+    "kind": "petition",
+    "title": "Özel güvenlik kimlik yenileme",
+    "description": "Kurumun istediği başvuru yolu ve ekleri ayrıca kontrol et.",
+    "version": "2026-10-28.1",
+    "fields": [
+      {
+        "key": "request",
+        "label": "Yenileme talebi ve açıklama",
+        "multiline": true
+      }
+    ],
+    "signer_roles": [
+      "Başvuran"
+    ],
+    "sources": [
+      {
+        "title": "Antalya Emniyet Müdürlüğü işlem kataloğu",
+        "url": "https://antalya.pol.tr/ozel-guvenlik-islemleri"
+      }
+    ]
+  },
+  {
+    "id": "petition-lost-id",
+    "kind": "petition",
+    "title": "Kayıp kimlik bildirimi",
+    "description": "Kayıp durumunu ve talebini bildiren düzenlenebilir örnek.",
+    "version": "2026-10-28.1",
+    "fields": [
+      {
+        "key": "circumstances",
+        "label": "Kayıp tarihi, yeri ve bilinen durum",
+        "multiline": true
+      },
+      {
+        "key": "request",
+        "label": "Talep",
+        "multiline": true
+      }
+    ],
+    "signer_roles": [
+      "Başvuran"
+    ],
+    "sources": [
+      {
+        "title": "Antalya Emniyet Müdürlüğü işlem kataloğu",
+        "url": "https://antalya.pol.tr/ozel-guvenlik-islemleri"
+      }
+    ]
+  },
+  {
+    "id": "petition-identity",
+    "kind": "petition",
+    "title": "Kimlik bilgisi değişikliği",
+    "description": "Değişen bilgiyi ve talebini belirt.",
+    "version": "2026-10-28.1",
+    "fields": [
+      {
+        "key": "change",
+        "label": "Değişen bilgi ve açıklama",
+        "multiline": true
+      },
+      {
+        "key": "request",
+        "label": "Talep",
+        "multiline": true
+      }
+    ],
+    "signer_roles": [
+      "Başvuran"
+    ],
+    "sources": [
+      {
+        "title": "Antalya Emniyet Müdürlüğü işlem kataloğu",
+        "url": "https://antalya.pol.tr/ozel-guvenlik-islemleri"
+      }
+    ]
+  },
+  {
+    "id": "petition-weapon",
+    "kind": "petition",
+    "title": "Silah farkı başvurusu",
+    "description": "İlgili kurumun güncel başvuru usulünü ayrıca kontrol et.",
+    "version": "2026-10-28.1",
+    "fields": [
+      {
+        "key": "request",
+        "label": "Başvuru talebi ve açıklama",
+        "multiline": true
+      }
+    ],
+    "signer_roles": [
+      "Başvuran"
+    ],
+    "sources": [
+      {
+        "title": "Antalya Emniyet Müdürlüğü işlem kataloğu",
+        "url": "https://antalya.pol.tr/ozel-guvenlik-islemleri"
+      }
+    ]
+  },
+  {
+    "id": "petition-free",
+    "kind": "petition",
+    "title": "Serbest dilekçe",
+    "description": "Kendi metninle bir dilekçe hazırla.",
+    "version": "2026-10-28.1",
+    "fields": [
+      {
+        "key": "text",
+        "label": "Dilekçe metni",
+        "multiline": true
+      }
+    ],
+    "signer_roles": [
+      "Başvuran"
+    ],
+    "sources": [
+      {
+        "title": "Pamukkale Üniversitesi form ve dilekçe kataloğu",
+        "url": "https://www.pau.edu.tr/guvenlik/tr/sayfa/form-ve-dilekceler-56"
+      }
+    ]
+  },
+  {
+    "id": "report-incident",
+    "kind": "report",
+    "title": "Olay / tespit tutanağı",
+    "description": "Yalnız gözlemlediğin ve bildiğin olayları belirt.",
+    "version": "2026-10-28.1",
+    "fields": [
+      {
+        "key": "occurred",
+        "label": "Olay tarihi ve saati",
+        "multiline": false
+      },
+      {
+        "key": "place",
+        "label": "Olay yeri",
+        "multiline": false
+      },
+      {
+        "key": "description",
+        "label": "Olayın öğrenilme biçimi ve anlatımı",
+        "multiline": true
+      },
+      {
+        "key": "actions",
+        "label": "Yapılan işlemler",
+        "multiline": true
+      }
+    ],
+    "signer_roles": [
+      "Düzenleyen",
+      "Tanık (varsa)"
+    ],
+    "sources": [
+      {
+        "title": "Gelişim Üniversitesi olay tutanağı örneği",
+        "url": "https://panel.gelisim.edu.tr/assets/2018/dokumanlar/klk/DH.FR.16%20Olay%20Tutana%C4%9F%C4%B1_c8930a609e9a4db9882317598e7e3e2e.pdf"
+      }
+    ]
+  },
+  {
+    "id": "report-found",
+    "kind": "report",
+    "title": "Buluntu eşya tutanağı",
+    "description": "Buluntu kaydını teslim işleminden ayrı düzenle.",
+    "version": "2026-10-28.1",
+    "fields": [
+      {
+        "key": "occurred",
+        "label": "Bulunma tarihi ve saati",
+        "multiline": false
+      },
+      {
+        "key": "place",
+        "label": "Bulunduğu yer",
+        "multiline": false
+      },
+      {
+        "key": "items",
+        "label": "Eşyanın ayırt edici özellikleri",
+        "multiline": true
+      },
+      {
+        "key": "actions",
+        "label": "Muhafaza / yapılan işlem",
+        "multiline": true
+      }
+    ],
+    "signer_roles": [
+      "Bulan / teslim eden",
+      "Teslim alan"
+    ],
+    "sources": [
+      {
+        "title": "Boğaziçi Üniversitesi kayıp ve buluntu eşya yönergesi",
+        "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/105-bogazici-universitesi-kayip-ve-buluntu-esya-y-20250523-135209.pdf"
+      }
+    ]
+  },
+  {
+    "id": "report-handover",
+    "kind": "report",
+    "title": "Teslim-tesellüm tutanağı",
+    "description": "Eşya veya evrakın teslimini kayıt altına al.",
+    "version": "2026-10-28.1",
+    "fields": [
+      {
+        "key": "occurred",
+        "label": "Teslim tarihi ve saati",
+        "multiline": false
+      },
+      {
+        "key": "place",
+        "label": "Teslim yeri",
+        "multiline": false
+      },
+      {
+        "key": "items",
+        "label": "Teslim edilenler ve durumları",
+        "multiline": true
+      },
+      {
+        "key": "description",
+        "label": "Teslim açıklaması",
+        "multiline": true
+      }
+    ],
+    "signer_roles": [
+      "Teslim eden",
+      "Teslim alan"
+    ],
+    "sources": [
+      {
+        "title": "Boğaziçi Üniversitesi kayıp ve buluntu eşya yönergesi",
+        "url": "https://mediastore.cc.bogazici.edu.tr/web/upload/sayfalar/105-bogazici-universitesi-kayip-ve-buluntu-esya-y-20250523-135209.pdf"
+      }
+    ]
+  },
+  {
+    "id": "report-shift",
+    "kind": "report",
+    "title": "Nöbet devir-teslim tutanağı",
+    "description": "Görev durumunu, teslim edilenleri ve açık işleri belirt.",
+    "version": "2026-10-28.1",
+    "fields": [
+      {
+        "key": "occurred",
+        "label": "Devir tarihi ve saati",
+        "multiline": false
+      },
+      {
+        "key": "place",
+        "label": "Görev yeri",
+        "multiline": false
+      },
+      {
+        "key": "items",
+        "label": "Teslim edilen malzeme / evrak",
+        "multiline": true
+      },
+      {
+        "key": "description",
+        "label": "Görev durumu ve devreden işler",
+        "multiline": true
+      }
+    ],
+    "signer_roles": [
+      "Nöbeti devreden",
+      "Nöbeti devralan"
+    ],
+    "sources": [
+      {
+        "title": "Pamukkale Üniversitesi form ve dilekçe kataloğu",
+        "url": "https://www.pau.edu.tr/guvenlik/tr/sayfa/form-ve-dilekceler-56"
+      }
+    ]
+  },
+  {
+    "id": "report-fault",
+    "kind": "report",
+    "title": "Malzeme / teçhizat arıza tutanağı",
+    "description": "Tespit edilen durumu ve alınan önlemleri belirt.",
+    "version": "2026-10-28.1",
+    "fields": [
+      {
+        "key": "occurred",
+        "label": "Tespit tarihi ve saati",
+        "multiline": false
+      },
+      {
+        "key": "place",
+        "label": "Görev yeri",
+        "multiline": false
+      },
+      {
+        "key": "items",
+        "label": "Malzeme / teçhizat",
+        "multiline": false
+      },
+      {
+        "key": "description",
+        "label": "Tespit edilen arıza ve yapılan işlemler",
+        "multiline": true
+      }
+    ],
+    "signer_roles": [
+      "Düzenleyen",
+      "Teslim alan / ilgili (varsa)"
+    ],
+    "sources": [
+      {
+        "title": "Pamukkale Üniversitesi form ve dilekçe kataloğu",
+        "url": "https://www.pau.edu.tr/guvenlik/tr/sayfa/form-ve-dilekceler-56"
+      }
+    ]
+  },
+  {
+    "id": "report-free",
+    "kind": "report",
+    "title": "Serbest tutanak",
+    "description": "Başlığı, anlatımı ve imza rollerini kendin düzenle.",
+    "version": "2026-10-28.1",
+    "fields": [
+      {
+        "key": "text",
+        "label": "Tutanak metni",
+        "multiline": true
+      }
+    ],
+    "signer_roles": [
+      "Düzenleyen"
+    ],
+    "sources": [
+      {
+        "title": "Pamukkale Üniversitesi form ve dilekçe kataloğu",
+        "url": "https://www.pau.edu.tr/guvenlik/tr/sayfa/form-ve-dilekceler-56"
+      }
+    ]
+  }
+]

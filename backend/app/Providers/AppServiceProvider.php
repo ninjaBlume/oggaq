@@ -68,6 +68,8 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('reports', fn (Request $request) => Limit::perHour(20)->by('reports:'.$request->user()?->id));
         // Password-confirmed account actions: a stolen session must not be able to guess the password.
         RateLimiter::for('account', fn (Request $request) => Limit::perMinute(10)->by('account:'.$request->user()?->id));
+        RateLimiter::for('documents', fn (Request $request) => [Limit::perMinute(10)->by('documents:'.$request->user()?->id), Limit::perHour(60)->by('documents-hour:'.$request->user()?->id)]);
+        RateLimiter::for('document-open', fn (Request $request) => Limit::perMinute(30)->by('document-open:'.$request->ip()));
         RateLimiter::for('health', fn (Request $request) => Limit::perMinute(30)->by('health:'.$request->ip()));
         RateLimiter::for('api', fn (Request $request) => Limit::perMinute(120)->by('api:'.($request->user()?->id ?? $request->ip())));
     }

@@ -1,6 +1,6 @@
-# Dilekçe ve tutanak hazırlama — araştırma ve önerilen kapsam
+# Dilekçe ve tutanak hazırlama
 
-28 Ekim 2026. **Durum: araştırma/kapsam; henüz geliştirilmedi veya yayımlanmadı.** Bu belge yeni menülerin, PDF çıktısının ya da yapay zekâ entegrasyonunun hazır olduğunu göstermez.
+28 Ekim 2026. **Durum: mobil arayüz, API ve PDF üretimi uygulandı; yayın ve cihaz teyidi aşağıda ayrı kaydedilir.** Yapay zekâ entegrasyonu yoktur.
 
 Kullanıcının isteği: Türkiye'de özel güvenlik görevlilerine uygun Dilekçe hazırla ve Tutanak hazırla menüleri; matbu örnekler ve kişiye/olaya göre özgün düzenleme. Çıktı tercihi **PDF indir/paylaş/yazdır** olarak netleşti. Yapay zekâ yalnız uygun ücretsiz imkân varsa değerlendirilecek; ücretli servis açma veya gerçek belge verisini dış sağlayıcıya aktarma kararı verilmedi.
 
@@ -17,9 +17,9 @@ Kullanıcının isteği: Türkiye'de özel güvenlik görevlilerine uygun Dilek�
 
 PDF sayfa inceleme kanıtları `artifacts/document-research/2026-10-28/` altındadır. Bunlar referans kopyalardır; ÖGG SOR tarafından hazırlanmış resmî belgeler değildir.
 
-## Önerilen kullanıcı akışı
+## Uygulanan kullanıcı akışı
 
-Yan menünün yardımcı araçlarında iki öğe: **Dilekçe hazırla**, **Tutanak hazırla**. Ana sınav sekmeleri değişmez. Şablon seç → hazırlanma yöntemi → bilgileri gir → metni düzenle → A4 önizleme → PDF indir/paylaş/yazdır.
+Yan menünün yardımcı araçlarında iki öğe: **Dilekçe hazırla**, **Tutanak hazırla**. Ana sınav sekmeleri değişmez. Şablon seç → hazırlanma yöntemi → bilgileri gir → metni düzenle → metni önizle → PDF aç/indir. Tarayıcının PDF görünümünde kaydetme, paylaşma ve yazdırma kullanılır. Önizleme bir A4 ölçüm simülasyonu değildir; son sayfalama PDF’dedir.
 
 1. **Matbu örnek:** boş alanları bulunan, yazdırılıp elle doldurulabilen örnek; ayrıca alanları uygulamada doldurarak PDF alma.
 2. **Bilgilerimle oluştur:** belge türüne göre sorulan alanlardan ilgili şablonla taslak oluşturma. Bütün metinleri aynı genel belgeye sıkıştırma.
@@ -27,9 +27,9 @@ Yan menünün yardımcı araçlarında iki öğe: **Dilekçe hazırla**, **Tutan
 
 Kullanıcının kontrol etmediği olay, tanık, kişi, tarih veya hukuki sonuç üretilmez. Önizlemede düzenlenebilir taslak vardır; uygulama başvuru göndermez, belgeyi imzalamış gibi göstermez ve kurum adına onay üretmez. Geçerli elektronik imza entegrasyonu ilk kapsam değildir.
 
-## İlk şablon kataloğu önerisi
+## İlk şablon kataloğu
 
-**Dilekçe:** genel talep/bildirim; izin; vardiya/nöbet değişikliği; özel güvenlik kimlik yenileme; kayıp kimlik; kimlik bilgisi değişikliği; silah farkı başvurusu. Kurum/işlem özelinde metni doğrulanmayan örnek hazırmış gibi yayımlanmaz. E-Devlet üzerinden yürüyen işlemler için kâğıt dilekçe zorunluymuş izlenimi verilmez.
+**Dilekçe:** genel talep/bildirim; izin; vardiya/nöbet değişikliği; özel güvenlik kimlik yenileme; kayıp kimlik; kimlik bilgisi değişikliği; silah farkı başvurusu. Bunlar genel düzenlenebilir örneklerdir; katalog eklerinin birebir resmî kopyası veya zorunlu başvuru formu olarak sunulmaz. E-Devlet üzerinden yürüyen işlemler için kâğıt dilekçe zorunluymuş izlenimi verilmez.
 
 **Tutanak:** olay/tespit; kayıp-buluntu eşya; teslim-tesellüm; nöbet devir-teslim; malzeme/teçhizat arızası; serbest tutanak. Başlangıç alanları: olay ve düzenleme tarih/saatleri, görev yeri, düzenleyenler, olayın öğrenilme biçimi/anlatımı, gerçekleştirilen işlemler, varsa ekler ve ilgili imza rolleri. Eşya listeleri birden fazla satır alabilmeli. Tanık veya kimlik numarası her tür için otomatik zorunlu tutulmamalı.
 
@@ -41,15 +41,22 @@ PDF gereksinimleri: Türkçe karakterleri gömülü fontla doğru verme; A4 ve o
 
 Bu nedenle gerçek tutanak/dilekçe içeriğini ücretsiz Gemini'ye doğrudan gönderme önerilmez. Yalnız ad-soyadı maskelemek bir olayın anonim olduğunu garanti etmez. Bu araştırmada hiçbir gerçek belge, olay anlatımı, kişisel veri veya gizli anahtar dış yapay zekâ servisine gönderilmedi; hesap/anahtar/ücretli plan açılmadı.
 
-Öneri: ilk çalışan sürüm **şablon + yönlendirmeli form + serbest düzenleme + PDF** olsun; belge başına yapay zekâ API ücreti gerektirmesin. Genel şablon metinleri geliştirme sırasında hazırlanıp kaynaklarıyla incelenebilir. Canlı AI taslak desteği, veri şartları ve maliyeti uygun sağlayıcı/kurulum belirlenirse ayrı iş olarak ele alınır. Bu, öğrenciye PRO/ücretli özellik açılacağı anlamına gelmez; uygulamanın ücretsiz ürün kararı korunur.
+İlk sürüm **şablon + yönlendirmeli form + serbest düzenleme + PDF** olarak uygulandı; belge başına yapay zekâ API ücreti yoktur. Genel şablon metinleri geliştirme sırasında hazırlanıp kaynaklarıyla incelenebilir. Canlı AI taslak desteği, veri şartları ve maliyeti uygun sağlayıcı/kurulum belirlenirse ayrı iş olarak ele alınır. Bu, öğrenciye PRO/ücretli özellik açılacağı anlamına gelmez; uygulamanın ücretsiz ürün kararı korunur.
 
-## Uygulamaya geçmeden netleşecek teknik noktalar
+## Teknik uygulama ve veri yaşamı
 
-- İlk şablonların tam metin/alan/kaynak kontrolü ve il/kurum farkları; şablon sürümleme.
-- PDF'yi cihazda mı sunucuda mı oluşturacağımız; mevcut iOS/Android native modüllerinin uyumluluk incelemesi. Yeni native bağımlılık gerekirse yalnız OTA yeterli sayılmaz.
-- Taslak/kişisel belge saklama istenip istenmediği. İlk istekte bir kişisel belge arşivi, üçüncü kişi verisini kalıcı tutma veya kurumlarla paylaşma kapsamı verilmedi.
-- Kişisel alanların log/analitik/hata raporuna düşmemesi; dosya ve kullanıcı/bağlam izolasyonu; çıktı dosyalarının saklama/temizleme politikası.
-- Mevcut doğrudan öğrenci erişimi korunmalı. Yeni belge özelliklerine genel e-posta doğrulama kapısı eklenmemeli.
-- Otomatik kontroller: alan doğrulama, metin kaçışları, uzun metin/sayfa düzeni, Türkçe karakter, boş/iptal/hata durumları, çıktı paylaşma/yazdırma ve kullanıcılar arası izolasyon. Native ve fiziksel iOS/Android teslimi ayrı doğrulanmalı.
+- `backend/resources/document-templates.json`: 8 dilekçe ve 6 tutanak, sürüm `2026-10-28.1`, alan/rol/kaynak tanımları. Katalog verisi kullanıcı belgesi değildir. Kullanıcı alanları dışında olay/kişi/tarih/iddia üretilmez; alanlar taslağa etiketleriyle aktarılır ve bütün metin düzenlenebilir.
+- `Documents` modülü: aktif hesapla katalog, alanlardan taslak ve dışa aktarma API’si. Genel öğrenci erişiminde e-posta doğrulama kapısı yoktur. Kurum verisi okunmaz/yazılmaz; belge arşivi veya migration eklenmedi.
+- `POST /api/v1/document-exports`: doğrulanmış metin/roller şifrelenerek kısa süreli uygulama cache’inde saklanır. 256 bit rastgele erişim anahtarının yalnız SHA-256 özeti cache anahtarıdır. Geçerlilik 5 dakikadır. Belge verileri/erişim anahtarları loglanmaz; cache temizleme veya gerçek kullanıcı silme işlemi yoktur.
+- Mobil, dönen URL’nin API origin/yol ve fragment biçimini doğrular; işletim sisteminin tarayıcısını açar. Bearer oturum anahtarı URL’ye veya tarayıcıya aktarılmaz. Açma sayfası erişim anahtarını fragmentten alıp adres çubuğundan kaldırır ve yalnız POST gövdesiyle gönderir. Bu tek capability endpoint’i CSRF’den muaftır; cookie oturumu ona erişim yetkisi vermez. Diğer CSRF kontrolleri korunur.
+- Cache kilidiyle tek kullanım; tüketimde hesap aktifliği ve varsa mobil oturumun hâlâ geçerli oluşu kontrol edilir. Süre bitimi, yeniden kullanım, çıkış/oturum iptali ve hesap silinmesi PDF açılışını engeller. Linki paylaşmak süre içinde belgeye erişim verir; belgeyi paylaşmak için indirilen PDF kullanılmalıdır.
+- Dompdf 3.1.6 + gömülü DejaVu Sans; sabit/kaçışlanan Blade görünümü, A4, sayfa numarası. Uzak kaynak erişimi, PHP ve JavaScript yürütme kapalı; dosya okuma kökü font klasörüyle sınırlı. Kullanıcının HTML’i çalıştırılmaz. Bütün matbu örnekler birer sayfa, uzun metin otomatik sayfalanır; imza blokları bölünmez.
+- PDF dosyası sunucuda arşivlenmez; bellekte oluşturulup yanıtlanır. Cache kaydı kullanımla tüketilir veya TTL sonunda erişilemez olur. Altyapı/yedeklerin şifreli artık kayıtları normal saklama politikasına tabidir. Cihazda indirilen/paylaşılan/yazdırılan kopya kullanıcı tarafından yönetilir.
+- Taslak yalnız ekran belleğindedir; yardımcı menüden çıkıldığında kalıcı taslak tutulmaz. API/bağlantı hatasında aynı ekrandaki metin korunur. Yeni native bağımlılık veya izin eklenmedi; iOS/Android PDF işlemleri sistem tarayıcısına devredilir.
+- Gizlilik sayfası belge verisi, geçici şifreli saklama ve kullanıcının indirdiği kopya hakkında güncellendi. Yazılımın varlığı resmî kabul, mevzuat uygunluğu veya elektronik imza yerine geçmez.
 
-Araştırma tamamlandı; uygulama ekranı/API/PDF üretimi/testi henüz yapılmadı. Bu belge bir yayın veya tamamlanmış özellik kaydı değildir.
+## Doğrulama
+
+299 backend testi / 3120 assertion geçti (10 yeni belge testi / 107 assertion dahil). Testler yalnız `oggaq_test` üzerinde ve E2E’den ayrı yürütüldü. 57 mobil, 16 admin, 10 web birim testi; strict TypeScript, OpenAPI lint/tip üretimi, admin/web/site build, Composer lint/validate/audit geçti. Mevcut paketler değişmeden 5 PDF bağımlılığı eklendi; güvenlik duyurusu bulunmadı.
+
+Üç yeni mobil web QA E2E gerçek API ile yönlendirmeli dilekçe düzenleme/önizleme/PDF açma, matbu tutanak/PDF, serbest metin ve rol düzenleme, 320/390/834 px taşmama ve hata sonrası metnin korunmasını doğruladı. Bütün 14 boş PDF ile uzun Türkçe metin PDF’si üretildi; Türkçe metin çıkarımı ve render görüntüleri incelendi. Kanıtlar `artifacts/documents/` içinde. Fiziksel iOS/Android kaydet/paylaş/yazdır ve beta alımı ayrıca kullanıcı teyidi gerektirir; web QA bunların yerine sayılmaz.

@@ -14,9 +14,10 @@
         "ext-dom": "*",
         "ext-pdo": "*",
         "ext-pdo_pgsql": "*",
+        "dompdf/dompdf": "^3.1",
         "laravel/framework": "^13.17",
-        "laravel/sanctum": "^4.3",
         "laravel/horizon": "^5.50",
+        "laravel/sanctum": "^4.3",
         "predis/predis": "^3.0"
     },
     "require-dev": {

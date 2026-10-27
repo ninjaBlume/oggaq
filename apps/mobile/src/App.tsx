@@ -40,6 +40,7 @@ import { MotionProvider } from "./motion";
 import { ScoreCalculator } from "./scoring";
 import { ExamCalendarScreen } from "./calendar";
 import { Jobs } from "./jobs";
+import { DocumentBuilder } from "./documents";
 import { FaqScreen } from "./faq";
 import { vocabulary } from "@oggaq/study-core";
 import { AccountScreen } from "./account";
@@ -205,6 +206,8 @@ function MainTabs({
                     <ExamCalendarScreen initialYear={calendarYear} back={() => selectTab("home")} />
                   ) : page === "jobs" ? (
                     <Jobs user={user} refresh={refresh} />
+                  ) : page === "petition" || page === "report" ? (
+                    <DocumentBuilder kind={page === "petition" ? "petition" : "report"} user={user} />
                   ) : page === "faq" ? (
                     <FaqScreen />
                   ) : page === "stats" ? (
