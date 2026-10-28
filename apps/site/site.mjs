@@ -24,7 +24,7 @@ export function storeLinks(config, bundleIdentifier) {
 
 function storeCard(store, url) {
   const apple = store === 'appStore';const name = apple ? 'App Store' : 'Google Play';const platform = apple ? 'iPhone ve iPad' : 'Android';
-  const content = `<span class="store-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 5h4m-3 14h2"/></svg></span><span class="store-copy"><strong>${name}</strong><span>${platform}</span></span><span class="store-state">${url ? 'İndir ↗' : 'Yakında'}</span>`;
+  const content = `<span class="store-copy"><strong>${name}</strong><span>${platform}</span></span><span class="store-state">${url ? 'İndir ↗' : 'Yakında'}</span>`;
   return url ? `<a class="store-card available" data-store="${store}" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" aria-label="${name} üzerinden indir">${content}</a>` : `<div class="store-card pending" data-store="${store}" role="group" aria-label="${name}: yakında">${content}</div>`;
 }
 

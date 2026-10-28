@@ -51,17 +51,17 @@ Mobilde bölüm ikonları `apps/mobile/src/featureIcons.ts` kaynağından okunur
 |---|---|
 | Deneme sınavları | Soru listeli sınav panosu |
 | Ders sınavları | Açık kitap |
-| Sonuçlarım | Grafikli sonuç belgesi |
+| Sonuçlarım | Pasta grafiği |
 | Puan hesapla | Hesap makinesi |
-| Tekrar sınavı | Geri dönüş oklu liste |
+| Tekrar sınavı | Karşılıklı iki dönüş oku |
 | Başarı durumum | Sütun grafiği |
 | Sınav takvimi | Takvim |
 | Dilekçe hazırla | Kalemli belge |
-| Tutanak hazırla | Kalemli kayıt panosu |
+| Tutanak hazırla | Ciltli, sekmeli kayıt defteri |
 | Sıkça Sorulan Sorular | Soru işareti |
 | İş İlanları | İş çantası |
 
-Saat süreyi anlatır; deneme bölümünün genel simgesi değildir. Doğruluk özetinde yüzde, değerlendirilen sorularda cevap listesi, biten sınavda onaylı pano kullanılır. Geçmiş sonuçta belge, devam eden son sınavda sınav panosu gösterilir. Kurallarda terazi, uygulamalı atışta hedef; iş başvurusu boş durumunda gönderim simgesi bulunur. İstatistik yokken ödül/kupa gösterilmez. Marka yerine genel güvenlik kalkanı kullanılmaz; profil altındaki marka gerçek logoyu kullanır. Simgeler metin etiketlerinin yerine geçmez; erişilebilir adlar ve dokunma alanları korunur.
+Saat süreyi anlatır; deneme bölümünün genel simgesi değildir. Doğruluk özetinde çerçevesiz yüzde, değerlendirilen sorularda cevap listesi, biten sınavda daire içinde onay kullanılır. Geçmiş sonuçta pasta grafiği, devam eden son sınavda sınav panosu gösterilir. Kurallarda terazi, uygulamalı atışta nişangâh; iş başvurusu boş durumunda gönderim simgesi bulunur. İstatistik yokken ödül/kupa gösterilmez. Marka yerine genel güvenlik kalkanı kullanılmaz; profil altındaki marka gerçek logoyu kullanır. Hata uyarısında üçgen ünlem, geçici bağlantı bilgisinde bağlantısız bulut kullanılır; SSS soru işaretiyle karıştırılmaz. Web ve yönetim paneli aynı çizimleri `packages/design-tokens/src/icons.ts` kaynağından okur; geometri ve lisans güncellemesi `node scripts/sync-ui-icons.mjs` ile yapılır, `--check` sapmayı denetler. Yönetimde kapatma (X), seçenek silme (çöp kutusu), sınavdan çıkarma (eksi işaretli liste), yeni soru (kalem), mevcut soru ekleme (artılı liste), kataloglar (farklı şekiller) ve puanlama kuralları (terazi) ayrıdır. Ayrıntılı kapsam [ICONS](ICONS.md) içindedir. Simgeler metin etiketlerinin yerine geçmez; erişilebilir adlar ve dokunma alanları korunur.
 
 ## 3. Renk
 

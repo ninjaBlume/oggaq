@@ -10,8 +10,8 @@ import {
   ListChecks,
   Play,
   ClipboardList,
-  ClipboardCheck,
-  CirclePercent,
+  CheckCircle2,
+  Percent,
 } from "./icons";
 import type { StudyContext, User } from "@oggaq/shared-types";
 import { ExpressivePressable } from "./expressive";
@@ -80,8 +80,8 @@ export function Home({
   const totals = summary.data?.data;
   const metrics = [
     { label: "Soru", accessible: "Değerlendirilen soru", tone: "blue" as const, value: totals?.answers.total.toLocaleString("tr-TR"), icon: ListChecks },
-    { label: "Doğruluk", accessible: "Doğruluk", tone: "indigo" as const, value: typeof accuracy === "number" ? `%${accuracy.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}` : undefined, icon: CirclePercent },
-    { label: "Biten sınav", accessible: "Tamamlanan sınav", tone: "sand" as const, value: totals?.exams.completed.toLocaleString("tr-TR"), icon: ClipboardCheck },
+    { label: "Doğruluk", accessible: "Doğruluk", tone: "indigo" as const, value: typeof accuracy === "number" ? `%${accuracy.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}` : undefined, icon: Percent },
+    { label: "Biten sınav", accessible: "Tamamlanan sınav", tone: "sand" as const, value: totals?.exams.completed.toLocaleString("tr-TR"), icon: CheckCircle2 },
   ];
   return (
     <>

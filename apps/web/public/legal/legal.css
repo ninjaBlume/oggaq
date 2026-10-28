@@ -1,7 +1,7 @@
 /* Shared site.css is generated from apps/site/styles.css by npm run brand:apply. */
 @import url("tokens.css");
 @import url("/fonts/wordmark.css?v=f115a5bb52e1");
-@import url("site.css?v=58f3419fdb55");
+@import url("site.css?v=77869d15b18d");
 html { -webkit-text-size-adjust: 100%; }
 .legal-nav { display: flex; flex-wrap: wrap; gap: 4px 24px; padding-block: 12px; border-block: 1px solid var(--c-line); font-size: 14px; }
 .legal-nav a { display: inline-flex; align-items: center; min-height: 44px; color: var(--c-muted); }

@@ -4,21 +4,8 @@ import { createContext, useContext, useEffect, useId, useRef, useState } from 'r
 import type { ReactNode } from 'react';
 import { ApiError } from '@oggaq/api-client';
 
-const icons = {
-  briefcase: 'M3 7h18v14H3zM8 7V3h8v4M3 12c6 3 12 3 18 0M12 12v4',
-  book: 'M4 4h6a3 3 0 0 1 3 3v14a4 4 0 0 0-4-3H4V4Zm9 3a3 3 0 0 1 3-3h5v14h-5a3 3 0 0 0-3 3',
-  grid: 'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z',
-  plus: 'M12 5v14M5 12h14', arrow: 'm9 5 7 7-7 7', back: 'm15 5-7 7 7 7',
-  check: 'm5 12 4 4L19 6', logout: 'M9 4H4v16h5m5-4 4-4-4-4m-5 4h9',
-  history: 'M3 11a9 9 0 1 1 2 7M3 4v7h7m2-4v5l3 2',
-  eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Zm13 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
-  flag: 'M5 21V4m0 0h11l-2 4 2 4H5',
-  close: 'm6 6 12 12M6 18 18 6', shield: 'M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Zm-4 9 3 3 5-6',
-} satisfies Record<string, string>;
-
-export function Icon({ name, size = 20 }: { name: keyof typeof icons; size?: number }) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={icons[name]} /></svg>;
-}
+export { Icon } from './icons';
+import { Icon } from './icons';
 
 export function Loading({ text = 'Yükleniyor…' }: { text?: string }) {
   return <div className="loading" role="status"><span className="spinner" />{text}</div>;

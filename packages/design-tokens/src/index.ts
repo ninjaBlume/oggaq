@@ -87,3 +87,5 @@ export function cardTone(palette: Palette, tone: CardTone) {
     default: return { surface: palette.softPrimary, line: palette.primaryContainer, accent: palette.primary, iconSurface: palette.primaryContainer };
   }
 }
+
+export { iconNodes, featureIconNames, type IconName, type IconNode } from "./icons.ts";

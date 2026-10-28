@@ -3,12 +3,12 @@ import { Linking, View } from 'react-native';
 import { calendarDate, calendarDaysRemaining, calendarNotice, calendarRules, calendarStaleNotice, calendarToday, calendarYears, orderedCalendarEntries, upcomingCountdown } from '@oggaq/study-core';
 import { api } from './api';
 import { useOnReturn, useResource, useTask } from './hooks';
-import { ArrowLeft, BookOpen, CalendarDays, Target, Scale, ExternalLink, GraduationCap, ShieldCheck } from './icons';
+import { ArrowLeft, BookOpen, CalendarDays, Crosshair, Scale, ExternalLink, GraduationCap, ShieldCheck } from './icons';
 import { Badge, Button, Card, Columns, EmptyState, ErrorNotice, ReadNotice, IconButton, Loading, Sheet, TextLink } from './ui';
 import { Text } from './text';
 import { useTheme } from './themeContext';
 
-const ruleIcons = { unarmed: BookOpen, armed: ShieldCheck, shooting: Target, renewal: GraduationCap };
+const ruleIcons = { unarmed: BookOpen, armed: ShieldCheck, shooting: Crosshair, renewal: GraduationCap };
 const detailText = { fontSize: 14, lineHeight: 20 } as const;
 
 export function ExamCalendarScreen({ initialYear, back }: { initialYear?: number; back: () => void }) {

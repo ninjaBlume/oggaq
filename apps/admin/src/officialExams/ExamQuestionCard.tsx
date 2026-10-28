@@ -93,9 +93,9 @@ export function ExamQuestionCard({ row, number, examId, examPublished, catalogs,
       </div>
       <div className="exam-entry-actions">
         {actions && <>
-          <button type="button" className="icon-button" aria-label={`${number}. soruyu yukarı taşı`} disabled={!actions.canMoveUp} onClick={() => actions.onMove(-1)}>↑</button>
-          <button type="button" className="icon-button" aria-label={`${number}. soruyu aşağı taşı`} disabled={!actions.canMoveDown} onClick={() => actions.onMove(1)}>↓</button>
-          <button type="button" className="icon-button" aria-label={`${number}. soruyu sınavdan çıkar`} onClick={actions.onRemove}><Icon name="close" size={16} /></button>
+          <button type="button" className="icon-button" aria-label={`${number}. soruyu yukarı taşı`} disabled={!actions.canMoveUp} onClick={() => actions.onMove(-1)}><Icon name="arrowUp" size={16} /></button>
+          <button type="button" className="icon-button" aria-label={`${number}. soruyu aşağı taşı`} disabled={!actions.canMoveDown} onClick={() => actions.onMove(1)}><Icon name="arrowDown" size={16} /></button>
+          <button type="button" className="icon-button" aria-label={`${number}. soruyu sınavdan çıkar`} onClick={actions.onRemove}><Icon name="remove" size={16} /></button>
         </>}
       </div>
     </header>

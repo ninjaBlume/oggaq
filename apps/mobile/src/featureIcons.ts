@@ -1,7 +1,7 @@
 import {
   BookOpen, Briefcase, Calculator, CalendarDays, ChartColumn, CircleHelp,
-  ClipboardList, ClipboardPenLine, FileChartColumn, FilePenLine,
-  House, ListRestart, UserRound,
+  ClipboardList, NotebookTabs, ChartPie, FilePenLine,
+  House, Repeat2, UserRound,
 } from "./icons";
 
 // A destination keeps its meaning in the menu, tabs, home shortcuts and empty states.
@@ -10,14 +10,14 @@ export const featureIcons = {
   home: House,
   deneme: ClipboardList,
   ders: BookOpen,
-  history: FileChartColumn,
+  history: ChartPie,
   profile: UserRound,
   score: Calculator,
-  review: ListRestart,
+  review: Repeat2,
   stats: ChartColumn,
   calendar: CalendarDays,
   petition: FilePenLine,
-  report: ClipboardPenLine,
+  report: NotebookTabs,
   faq: CircleHelp,
   jobs: Briefcase,
 } as const;

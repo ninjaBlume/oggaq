@@ -29,8 +29,6 @@ h1 em { font-style: normal; color: var(--c-primary); }
 .download-caption { font-size: 13px; color: var(--c-muted); margin-top: 4px; }
 .store-list { display: flex; gap: 12px; margin-top: 18px; }
 .store-card { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; min-height: 76px; padding: 12px; background: var(--c-surface); border: 1px solid var(--c-line); border-radius: 12px; }
-.store-icon { width: 22px; flex-shrink: 0; color: var(--c-primary); }
-.store-icon svg { display: block; width: 22px; height: 26px; }
 .store-copy { display: grid; gap: 3px; }
 .store-copy strong { font-size: 15px; font-weight: 600; line-height: 1.2; white-space: nowrap; }
 .store-copy > span { font-size: 11px; color: var(--c-muted); }

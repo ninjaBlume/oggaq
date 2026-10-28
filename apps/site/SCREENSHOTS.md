@@ -20,3 +20,7 @@ Yerel çekim/önizleme kanıtları `artifacts/site-visual-refresh/` içindedir. 
 Önceki yayın: `8937c44` kaynaklı kompozisyon `site-visual-20261028` web imajıyla yayımlandı, ardından kullanıcı geri bildirimiyle geri alındı. Geri alımda 10 hesap/yönetim/bilgi/marka dosyasının hash'i ve diğer 7 servisin kimliği korundu; origin ve genel HTTPS readiness kontrolleri geçti. Mobil uygulama veya OTA paketi değiştirilmedi.
 
 Yeni önizleme: `artifacts/site-clean-preview/preview-light.png`, `preview-dark.png`, `mobile-light.png`, `mobile-dark.png`. Geçici 5189 önizleme sunucusu yalnız kendi süreç kimliğiyle kapatıldı. 4 Node testi, 6 Chromium E2E, site build ve marka tutarlılık kontrolü geçti. Kullanıcı onayından sonra bu taslak oggsor.com'a yayımlandı; Git push yapılmadı. Son kontrol `artifacts/site-clean-preview/live-report.json`, canlı görünümler `live-*.png` içinde. Dokuz site/bilgi dosyası origin üzerinde hash ile, ana HTML/CSS/görsel ve bilgi CSS'leri genel HTTPS üzerinde hash ile kontrol edildi. Dört bilgi sayfası tarayıcıda açıldı; 320/390/834/1280 px koyu düzen, sıfır API isteği/sayfa hatası ve genel API readiness geçti. Mobil uygulama/OTA/DB değiştirilmedi.
+
+## Sistem ikonları yenilemesi — 28 Ekim 2026
+
+Sonuç sekmesi pasta grafiği, doğruluk yalın yüzde, biten sınav daire içinde onay olacak şekilde ana ekran JPEG'i aynı 390×844@2 / anonim örnek verilerle yenilendi. Sitedeki mağaza kartlarında tekrarlanan telefon dekorları kaldırıldı; adlar/platform/Yakında bilgisi korunur. Çekim artifacts/system-icons/ içindedir; yayın kaydı TESTING içinde tutulur.

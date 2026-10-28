@@ -6,7 +6,7 @@ import { PageIntro, useStudyContext } from './App';
 import { Icon } from './icons';
 import { ErrorNotice, Field, Loading } from './ui';
 
-const ruleIcons = { unarmed: 'book', armed: 'shield', shooting: 'check', renewal: 'cap' } as const;
+const ruleIcons = { unarmed: 'book', armed: 'shield', shooting: 'target', renewal: 'cap' } as const;
 
 export function ExamCalendarPage() {
   const context = useStudyContext();
@@ -21,7 +21,7 @@ export function ExamCalendarPage() {
     <Link to={`/study/${context.id}/deneme`} className="calendar-back"><Icon name="arrowLeft" size={18} />Ana sayfaya dön</Link>
     <PageIntro eyebrow="RESMÎ TAKVİM" title="Sınav tarihleri ve kurallar"><p>Hazırlığını resmî takvime göre planla.</p></PageIntro>
     <section className="card card-tone-indigo calendar-rules" data-testid="calendar-rules" aria-labelledby="calendar-rules-title">
-      <div className="calendar-card-heading"><span className="calendar-symbol"><Icon name="shield" size={26} /></span><h2 id="calendar-rules-title">{calendarRules.title}</h2></div>
+      <div className="calendar-card-heading"><span className="calendar-symbol"><Icon name="rules" size={26} /></span><h2 id="calendar-rules-title">{calendarRules.title}</h2></div>
       <ul className="calendar-rule-list">{calendarRules.items.map(rule => <li key={rule.id}><Icon name={ruleIcons[rule.id]} /><div><h3>{rule.title}</h3><p>{rule.text}</p></div></li>)}</ul>
       <p className="muted">{calendarRules.note}</p>
       <div className="calendar-rule-links"><a className="button primary" href={calendarRules.sourceUrl} target="_blank" rel="noreferrer"><Icon name="external" size={18} />Resmî EGM sayfası</a><a href={calendarRules.regulationUrl} target="_blank" rel="noreferrer">Güncel yönetmeliği incele ↗</a></div>

@@ -11,7 +11,8 @@ import {
   Check,
   CheckCircle2,
   ChevronRight,
-  CircleHelp,
+  CloudOff,
+  TriangleAlert,
   Eye,
   EyeOff,
   Mail,
@@ -323,11 +324,12 @@ export function ErrorNotice({ error, retry, title = "İşlem tamamlanamadı", re
   if (!error) return null;
   const connection = read && isTransientReadError(error);
   const color = connection ? palette.primary : palette.red;
+  const NoticeIcon = connection ? CloudOff : TriangleAlert;
   return (
     <View testID={connection ? "read-connection-notice" : "read-error-notice"} accessibilityRole="alert"
       style={[styles.error, connection && { backgroundColor: palette.softPrimary, borderColor: palette.line }]}>
       <View style={[styles.row, { flexWrap: "nowrap", alignItems: "flex-start" }]}>
-        <CircleHelp size={20} color={color} />
+        <NoticeIcon size={20} color={color} />
         <View style={{ flex: 1, gap: 5 }}>
           <Text style={[styles.buttonText, { color }]}>{connection ? "Bağlantı yenilenemedi" : title}</Text>
           <Text style={[styles.muted, { color }]}>{connection && retained ? "Son yüklenen bilgiler gösteriliyor. Bağlantını kontrol edip yeniden deneyebilirsin." : errorMessage(error)}</Text>

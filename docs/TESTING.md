@@ -1,5 +1,17 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Tüm istemcilerde ikon ayrımı
+
+Kullanıcının kapsam düzeltmesiyle mobil, yönetim paneli, hesap/web kaynakları ve tanıtım sitesi birlikte incelendi. Sonuç pasta grafiği, tekrar iki yönlü dönüş oku, tutanak ciltli/sekmeli defter oldu; dilekçe kalemli belgedir. Yüzde/onay özetleri, hata/bağlantı bilgisi, yönetimde puanlama/kataloglar/konular/kaynaklar, silme/çıkarma/kapatma, yeni soru/mevcut soru ve taşıma eylemleri ayrıldı. Sitedeki aynı telefon dekorları kaldırıldı. Ortak web/admin SVG geometrisi 43 statik Lucide çiziminden oluşur; lisansları korunur, yeni runtime bağımlılığı/CDN eklenmez. [Kapsam, sembol listesi ve sınırlar](ICONS.md).
+
+**16 admin, 10 web, 65 mobil, 99 tasarım sistemi (2 yeni ikon veri testi dahil) ve 4 site testi; workspace strict TypeScript; admin/account-web/site build; iOS/Android/web Expo export geçti.** 18 gerçek API Chromium E2E (yönetim CRUD/yayın/sıralama, yetki/oturum/hata/taslak, web/mobil takvim ve mobil gezinme) ile 6 site/hesap/bilgi E2E geçti. PHPUnit/tam backend koşusu yapılmadı; API/migration değişmedi. E2E yalnız boş olduğu doğrulanmış 8001/5183/5184/5186 ve oggaq_test kullandı; site testleri 5187/5188 üzerinde bağımsız çalıştı. İlk Node export'ta TS modül yolu uzantısı ve ardından mobil derleyici uzantı izni eksikliği düzeltildi; son export/strict kontrolleri geçti.
+
+16/20/24 px bölüm/eylem levhası açık ve koyu görünümde; gerçek yönetim, mobil menü ve takvim görüntüleri gözle incelendi. Birebir ikon tekrar testi görsel benzerlik testi değildir; siluet incelemesi ayrıca yapıldı. Native iOS Expo Go'da ilk denemede mevcut ExpoAsset oturum hatası tekrar görüldü; tam yeniden başlatma + exp://localhost:8082 sonrası yeni yüzde/onay/pasta grafiği ana ekranda görüntülendi. Sınava girilmedi veya yanıt yazılmadı. Native Android/fiziksel cihaz kontrolü yapılmadı.
+
+Tanıtım ana ekran JPEG'i yalnız izole sentetik tarayıcı verileriyle 390×844@2 yeniden alındı; gerçek hesap/DB/dış istek kullanılmadı. 5189 çekim sunucusu kapatıldı. İki native fingerprint kurulu paketlerle eşleşti. Kanıtlar artifacts/system-icons/ altında. Yayın kimlikleri ve teslim doğrulaması, tamamlanınca bu kayda eklenecek; Git push yapılmadı.
+
+
+
 ## 28 Ekim 2026 — iOS ve Android ikon OTA teslimi
 
 Kullanıcının “Hepsinde yayınla” talimatıyla kaynak `324d5cf` mevcut iki beta kanalına ayrı EAS Update olarak yayımlandı. iPhone/iPad **testflight / 01a17fcd-138a-705e-a1bb-ba2074cdeef7**, grup `dc03027c-44e1-4669-b83b-061b31c76614`; Android **android-beta / 01a17fce-6e4e-7f9e-80a7-21e298de3bb3**, grup `cf5f7a95-d8cf-4b72-816e-78509f697066`. Sürüm 0.1.1, iOS build 4 / Android versionCode 3 ve mevcut native runtime'lar korunur; yeni mağaza paketi gerekmiyor. Webde öğrenci uygulaması açılmadı; genel mağaza yayını, Git push veya sunucu değişikliği yapılmadı.

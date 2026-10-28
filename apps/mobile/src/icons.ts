@@ -45,3 +45,13 @@ export { default as ClipboardCheck } from "lucide-react-native/icons/clipboard-c
 export { default as Target } from "lucide-react-native/icons/target";
 export { default as Scale } from "lucide-react-native/icons/scale";
 export { default as Send } from "lucide-react-native/icons/send";
+
+export { default as ChartPie } from "lucide-react-native/icons/chart-pie";
+export { default as NotebookTabs } from "lucide-react-native/icons/notebook-tabs";
+export { default as RotateCcw } from "lucide-react-native/icons/rotate-ccw";
+export { default as Percent } from "lucide-react-native/icons/percent";
+export { default as Crosshair } from "lucide-react-native/icons/crosshair";
+export { default as CloudOff } from "lucide-react-native/icons/cloud-off";
+export { default as TriangleAlert } from "lucide-react-native/icons/triangle-alert";
+
+export { default as Repeat2 } from "lucide-react-native/icons/repeat-2";
