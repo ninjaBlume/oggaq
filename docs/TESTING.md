@@ -1,5 +1,10 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Soru haritası Android beta teslimi tamamlandı
+
+Ürün kaynağı `2768b7d` sonrasında yalnız dokümantasyon değiştiği `git diff` ile doğrulandı. Yayın commit'i `1be0df0`, **android-beta / 01a1803b-9ad9-7f8f-baa3-76a2d153c68b**, grup `84c39986-539a-45e5-8f0f-afa6add6bb57`. Android native fingerprint kurulu 0.1.1 (3) paketiyle eşleşti; önceki 72 mobil test/8 E2E/export/29 araç testi/workspace strict sonuçları geçerli. Yeni ürün kodu ve DB işlemi yok; testler gereksiz yere tekrarlanmadı. Gerçek native başlıklarla doğru manifest ve launch asset, **19 ek dosyanın tamamının SHA-256 eşleşmesi**, soru haritası/başlık kodu, doğru HTTPS adresleri ve localPreview=false doğrulandı; QA harness'i bulunmadı. Uyumsuz runtime/platform 204, production 404. iOS/iPad eşdeğeri **01a18039** ile iki beta kanalı aynı ürün değişikliğini taşıyor. Fiziksel Android ve cihaz alımı henüz teyit edilmedi. Genel mağaza/site/sunucu/Git push yok. Kanıt `artifacts/android-question-map/ota/` içinde.
+
+
 ## 28 Ekim 2026 — iPad aktif sınav soru haritası ve iOS teslimi
 
 Mobilde görünürken iPad TestFlight'ta önceki beta bulunuyordu; mevcut kaynak `2768b7d` geniş yan paneli de kapsıyor. Yeni ürün kodu eklenmedi. Native iPad Air 11-inch (M4) / iPadOS 27 Expo Go'da gerçek Exam bileşeni **125 sentetik soruyla**, tüm API işlemleri bellek içindeki QA verisine yönlendirilerek açıldı. Yatay koyu “Soruların” yan paneli ile dikey açık soru listesinde doğru/yanlış/boş ve seçili durumlar, 125. düğmenin varlığı, sınav adı ve duraklatma sonrası işaretlerin korunması doğrulandı. Dikey ekran görüntüsü tüm 1–125 numaralarını içerir. Gerçek sınav/cevap/DB yazımı olmadı. Geçici yerel giriş hash kontrolüyle tam geri yüklendi; yayın normal uygulama girişiyle yapıldı. Yalnız 8083 QA süreci ve bu kontrol için açılan iPad kapatıldı; Device Hub iPhone ana sayfasına geri döndürüldü.
