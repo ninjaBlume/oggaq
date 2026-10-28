@@ -222,7 +222,7 @@ test('tekrar sınavı hatalardan kurulur ve sonuçla listeleri günceller', asyn
   await enterReview(page, 'Yanlışlarım');
   await expect(page.getByRole('heading', { name: 'Sentetik birinci soru' })).toBeVisible();
   await answer(page, 'A');
-  await finish(page);
+  await finish(page, true);
   await page.getByRole('link', { name: 'Tekrar sınavı', exact: true }).click();
   await expect(page.locator('.sinav-row').filter({ hasText: 'Yanlışlarım' })).toContainText('Şu an tekrar edeceğin yanlış soru yok.');
 });
@@ -247,7 +247,7 @@ test('tekrar sınavı başlatma yanıtı kaybolsa aynı işlem kimliğiyle tekra
   await card.getByRole('button', { name: 'Sınavı başlat' }).click();
   await expect(card.getByRole('alert')).toContainText('Sunucuya ulaşılamıyor.');
   await card.getByRole('button', { name: 'Yeniden dene' }).click();
-  await expect(page.getByRole('heading', { name: 'Denemen devam ediyor' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Tekrar çalışman' })).toBeVisible();
   expect(ids).toHaveLength(2); expect(ids[0]).toBe(ids[1]);
   await expect(page.getByText('Soru 1 / 2', { exact: false })).toBeVisible();
 });

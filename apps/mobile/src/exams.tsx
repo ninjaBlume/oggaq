@@ -257,6 +257,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
       <Loading />
     );
   if (done) return <CompletedExam exam={exam} context={context} updateQuestion={updateQuestion} error={query.error ?? query.refreshError} reload={() => { void query.reload(false); }} />;
+  const finishLabel = exam.review_kind ? "Tekrarı bitir" : "Denemeyi bitir";
   const blocked = task.pending || submission !== null || finishing !== null;
   const locked = done || blocked || seconds === 0 || exam.timer_paused || timer.pending || timer.error != null;
   const navigationBlocked = finishing !== null;
@@ -275,7 +276,8 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
       <ReadNotice resource={query} />
       <ConfirmDialog
         visible={confirm && !done}
-        title="Denemeyi bitir"
+        title={finishLabel}
+        confirmLabel="Bitir ve değerlendir"
         message={`${exam.question_count - answered} soru boş. Bitirip sonucu görmek istiyor musun?`}
         confirm={() => finish(exam.revision)}
         cancel={() => setConfirm(false)}
@@ -394,7 +396,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
             showsVerticalScrollIndicator={false}
             contentContainerStyle={[body, { paddingTop: 8 }]}
           >
-            <Text style={styles.eyebrow}>DENEMEN DEVAM EDİYOR</Text>
+            <Text style={styles.eyebrow}>{exam.review_kind ? "TEKRAR ÇALIŞMAN" : "DENEMEN DEVAM EDİYOR"}</Text>
             <Card>
               <Text style={[styles.heading, { fontSize: 21, lineHeight: 32 }]}>
                 {row.question.stem}
@@ -547,7 +549,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
                   </Text>
                   <Pressable
                     accessibilityRole="button"
-                    accessibilityLabel="Denemeyi bitir"
+                    accessibilityLabel={finishLabel}
                     accessibilityState={{ disabled: locked }}
                     disabled={locked}
                     onPress={() => setConfirm(true)}
@@ -557,7 +559,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
                       opacity: locked ? 0.45 : 1,
                     }}
                   >
-                    <Text style={styles.link}>Denemeyi bitir</Text>
+                    <Text style={styles.link}>{finishLabel}</Text>
                   </Pressable>
                 </View>
               )}
@@ -594,7 +596,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
                 disabled={locked}
                 onPress={() => setConfirm(true)}
               >
-                Denemeyi bitir
+                {finishLabel}
               </Button>
             )}
           </ScrollView>

@@ -1,3 +1,5 @@
+import { ResultRow } from './sinavlar';
+import { cursorFromLink } from '@oggaq/api-client';
 import { stageExamLaunch } from './exam-launch';
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -17,13 +19,19 @@ const kinds: { id: Kind; label: string; hint: string; empty: string }[] = [
   { id: 'favorite', label: 'Favorilerim', hint: 'Sınav sonucunda favoriye eklediğin sorular.', empty: 'Henüz favori soru eklemedin.' },
 ];
 
-// Review is an exam too: the student picks a list (wrong, blank, favorite) and sits a timed exam made of those questions.
+// Timed review uses the same engine but owns a separate history and does not count as an exam.
 export function Review() {
   const context = useStudyContext();
+  const [cursor, setCursor] = useState<string>();
+  const history = useQuery({ queryKey: ["exams", context.id, "review", cursor], queryFn: ({ signal }) => api.request("get", "/api/v1/contexts/{context}/exam-attempts", { params: { context: context.id }, query: { scope: "review", per_page: 10, cursor }, signal }) });
   const summary = useQuery({ queryKey: ['review', context.id, 'summary'], queryFn: ({ signal }) => api.request('get', '/api/v1/contexts/{context}/review-summary', { params: { context: context.id }, signal }) });
+  const reviews = history.data?.data.filter(item => item.review_kind != null) ?? [];
   return <>
-    <PageIntro eyebrow="HATALARINDAN ÖĞREN" title={vocabulary.review.title}><p>{context.name} alanında yanlış yaptığın, boş bıraktığın veya favoriye eklediğin sorulardan süreli bir sınav yap. Sonuçların listeleri günceller.</p></PageIntro>
+    <PageIntro eyebrow="HATALARINDAN ÖĞREN" title={vocabulary.review.title}><p>Yanlış, boş ve favori sorularını yeniden çöz. Çözümlerin soru ve doğruluk istatistiğine katılır; deneme sayısını ve ortalamasını değiştirmez.</p></PageIntro>
     {summary.isPending ? <Loading /> : summary.isError ? <ErrorNotice error={summary.error} retry={() => { void summary.refetch(); }} /> : <div className="sinav-list">{kinds.map((kind) => <ReviewExam key={kind.id} kind={kind} count={summary.data.data[kind.id]} />)}</div>}
+    <h2>Tekrar çalışmaların</h2>
+    {history.isPending ? <Loading /> : history.isError ? <ErrorNotice error={history.error} retry={() => { void history.refetch(); }} /> : reviews.length === 0 ? <p>Tekrar çalışmaların ve kaldığın yer burada görünür.</p> : <section className="history-list" aria-label="Tekrar geçmişi">{reviews.map(item => <ResultRow key={item.id} exam={item} to={`/study/${context.id}/exams/${item.id}`} />)}</section>}
+    {history.data && reviews.length > 0 && (history.data.links.prev || history.data.links.next) && <div className="pagination"><button className="button secondary" disabled={!history.data.links.prev} onClick={() => setCursor(cursorFromLink(history.data.links.prev))}>Önceki</button><button className="button secondary" disabled={!history.data.links.next} onClick={() => setCursor(cursorFromLink(history.data.links.next))}>Sonraki</button></div>}
   </>;
 }
 

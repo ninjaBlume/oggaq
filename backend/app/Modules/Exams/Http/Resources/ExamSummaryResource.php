@@ -20,6 +20,7 @@ class ExamSummaryResource extends JsonResource
             'resume_position' => $this->bookmark?->position,
             'timer_policy' => $this->timer_policy ?? 'continuous', 'timer_paused' => $pause !== null, 'remaining_seconds' => $remaining,
             'question_count' => $this->question_count, 'duration_seconds' => $this->duration_seconds,
+            'review_kind' => $this->resource->getRawOriginal('review_kind'),
             'random_exam' => $this->resource->getRawOriginal('random_weapon_status') === null ? null : [
                 'education_type' => $this->random_education_type, 'weapon_status' => $this->random_weapon_status,
                 'title' => 'Rastgele sınav · '.($this->random_education_type === 'renewal' ? 'Yenileme' : 'Temel eğitim').' · '.[

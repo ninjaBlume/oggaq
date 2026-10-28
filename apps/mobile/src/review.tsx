@@ -1,4 +1,5 @@
 import { Text } from "./text";
+import { Pagination, ResultCard } from "./sinavlar";
 import { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { vocabulary } from "@oggaq/study-core";
@@ -49,7 +50,7 @@ const kinds: { id: Kind; label: string; hint: string; empty: string }[] = [
   },
 ];
 
-// Review is an exam too: the student picks a list (wrong, blank, favorite) and sits a timed exam made of those questions.
+// Reuse the question/timer engine while keeping review history and exam totals separate.
 export function Review({
   context,
   openExam,
@@ -57,6 +58,9 @@ export function Review({
   context: StudyContext;
   openExam: (id: string, initialExam?: ExamAttempt) => void;
 }) {
+  const { styles } = useTheme();
+  const [cursor, setCursor] = useState<string>();
+  const history = useResource(signal => api.request("get", "/api/v1/contexts/{context}/exam-attempts", { params: { context: context.id }, query: { scope: "review", per_page: 10, cursor }, signal }), [context.id, cursor]);
   const summary = useResource(
     (signal) =>
       api.request("get", "/api/v1/contexts/{context}/review-summary", {
@@ -65,14 +69,16 @@ export function Review({
       }),
     [context.id],
   );
+  const reviews = history.data?.data.filter(item => item.review_kind != null) ?? [];
   useOnReturn(() => {
     void summary.reload();
+    void history.reload();
   });
   return (
     <>
       <ScreenTitle
         title={vocabulary.review.title}
-        subtitle="Yanlış yaptığın, boş bıraktığın veya favoriye eklediğin sorulardan süreli bir sınav yap."
+        subtitle="Yanlış, boş ve favori sorularını yeniden çöz. Çözümlerin soru ve doğruluk istatistiğine katılır; deneme sayısını ve ortalamasını değiştirmez."
         eyebrow="HATALARINDAN ÖĞREN"
       />
       <ReadNotice resource={summary} refreshOnly />
@@ -91,6 +97,10 @@ export function Review({
           />
         ))
       )}
+      <SectionTitle>Tekrar çalışmaların</SectionTitle>
+      <ReadNotice resource={history} refreshOnly />
+      {history.loading && !history.data ? <Loading label="Tekrar geçmişin yükleniyor" /> : history.error ? <ReadNotice resource={history} /> : reviews.length === 0 ? <Text style={styles.muted}>Tekrar çalışmaların ve kaldığın yer burada görünür.</Text> : reviews.map(item => <ResultCard key={item.id} attempt={item} open={() => openExam(item.id)} />)}
+      {history.data && reviews.length > 0 && <Pagination page={history.data} change={setCursor} />}
     </>
   );
 }

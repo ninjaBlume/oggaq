@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Schema;
 
 class ExamAttempt extends Model
 {
@@ -43,6 +44,13 @@ class ExamAttempt extends Model
     public function scopeNotAbandoned(Builder $query): void
     {
         $query->where(fn (Builder $inner) => $inner->whereNull('finished_at')->orWhereRaw('correct_count + incorrect_count > 0'));
+    }
+
+    public function scopeWithoutReviews(Builder $query): void
+    {
+        if (Schema::hasColumn('exam_attempts', 'review_kind')) {
+            $query->whereNull('review_kind');
+        }
     }
 
     public function officialExam(): BelongsTo

@@ -1,5 +1,11 @@
 # Veritabanı tasarımı
 
+## 28 Ekim 2026 — Tekrar türünün kalıcı ayrımı
+
+`2026_10_28_000002_distinguish_review_sessions`, `exam_attempts.review_kind` nullable varchar(16) ekler. CHECK yalnız `incorrect|blank|favorite` kabul eder; tekrar olan kayıtta `official_exam_id` ve `random_weapon_status` null olmalıdır. `guard_exam_review_kind` UPDATE ile türü değiştirmeyi engeller. Tekrar geçmişi için `(study_context_id, started_at DESC, id DESC) WHERE review_kind IS NOT NULL` kısmi indeks vardır. Mevcut soru, cevap, puan ve kullanıcı satırları değiştirilmez; eski türü bilinmeyen kayıtlar null kalır.
+
+Alan hesap export'una dahil edilir; mevcut hesap silme aynı exam_attempts ilişkisi üzerinden çalışır. Down, tekrar geçmişi varsa ayrımı kaybetmemek için reddeder. Ortak yerel `oggaq` veritabanına bu migration **henüz uygulanmadı**; önceki kullanıcı sınırı nedeniyle ayrı, adıyla onay gerekir. Yalnız `oggaq_test` üzerinde doğrulandı. [İş kuralı ve eski kayıt sınırı](STUDY.md).
+
 ## 28 Ekim 2026 — Rastgele sınavın sabit dağılımı
 
 `2026_10_28_000001_add_random_exam_mode`, `exam_attempts` üzerine beş nullable alan ekler: `random_education_type` (basic/renewal), `random_weapon_status` (armed/unarmed/weapon_difference), `random_reference_exam_id` (indeksli official_exams FK / RESTRICT), `random_distribution` (jsonb dizi) ve `random_scoring_period_id` (indeksli scoring_periods FK / RESTRICT). Eski denemelerde beşi de null kalır.

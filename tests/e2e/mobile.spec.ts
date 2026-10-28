@@ -639,7 +639,7 @@ test("mobil tekrar sınavı hatalardan kurulur; başarı durumu ve sınavlar ger
   await page.getByLabel("Süre (dakika)", { exact: true }).filter({ visible: true }).fill("5");
   await page.getByRole("button", { name: "Sınavı başlat" }).click();
   await expect(
-    page.getByText("DENEMEN DEVAM EDİYOR", { exact: true }),
+    page.getByText("TEKRAR ÇALIŞMAN", { exact: true }),
   ).toBeVisible();
   await expect(
     page.getByText("Sentetik birinci soru", { exact: true }),

@@ -50,7 +50,7 @@ export function CompletedExam({ exam, context, updateQuestion, error, reload }: 
 function ResultSummary({ exam }: { exam: ExamAttempt }) {
   const { palette, styles } = useTheme();
   const result = exam.result;
-  return <><Heading>Deneme sonucun</Heading>{result && <>
+  return <><Heading>{exam.review_kind ? "Tekrar sonucun" : "Deneme sonucun"}</Heading>{result && <>
     <View testID="exam-result-summary"><Card compact tone="blue">
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         <View style={{ flex: 1, gap: 2 }}>
@@ -71,7 +71,7 @@ function ResultSummary({ exam }: { exam: ExamAttempt }) {
         </View>)}
       </View>
     </Card></View>
-    <Text style={[styles.muted, { fontSize: 12, lineHeight: 18 }]}>{exam.finish_reason === 'expired' ? 'Süre dolduğunda tamamlandı.' : 'Denemeyi sen bitirdin.'} Çalışma puanı; geçme / kalma kararı değildir.</Text>
+    <Text style={[styles.muted, { fontSize: 12, lineHeight: 18 }]}>{exam.finish_reason === 'expired' ? 'Süre dolduğunda tamamlandı.' : exam.review_kind ? 'Tekrarı sen bitirdin.' : 'Denemeyi sen bitirdin.'} {exam.review_kind ? "Soru ve doğruluk istatistiğine katılır; deneme sayısı ve ortalamasına eklenmez." : "Çalışma puanı; geçme / kalma kararı değildir."}</Text>
   </>}</>;
 }
 function ResultQuestion({ row, total, contextId, examId, updateQuestion, favorite, toggleFavorite }: { row: Row; total: number; contextId: string; examId: string; updateQuestion: Props['updateQuestion']; favorite?: FavoriteState; toggleFavorite: (next: boolean) => void }) {

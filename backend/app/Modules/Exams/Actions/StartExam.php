@@ -36,6 +36,11 @@ class StartExam
                     'subject_id' => $input['subject_id'] ?? null, 'topic_id' => $input['topic_id'] ?? null, 'official_exam_id' => $input['official_exam_id'] ?? null,
                     'timer_policy' => $input['timer_policy'] ?? 'continuous',
                 ];
+                if (Schema::hasColumn('exam_attempts', 'review_kind')) {
+                    $settings['review_kind'] = $input['review_kind'] ?? null;
+                } elseif (isset($input['review_kind'])) {
+                    throw new ApiProblem(503, 'review_unavailable', 'Tekrar çalışmalarının sınavlardan ayrılması için sunucu güncellemesi gerekiyor.');
+                }
                 $timerSchema = Schema::hasColumn('exam_attempts', 'timer_policy');
                 if ($selection !== null) {
                     $settings += $selection->attributes;

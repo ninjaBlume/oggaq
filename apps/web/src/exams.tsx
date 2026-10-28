@@ -232,12 +232,12 @@ function ExamContent({
   if (done) return <CompletedExam exam={exam} contextId={context.id} />;
   return (
     <>
-      <Link className="back-link" to={`/study/${context.id}/sonuclar`}>
-        ← Sonuçlarıma dön
+      <Link className="back-link" to={`/study/${context.id}/${exam.review_kind ? "review" : "sonuclar"}`}>
+        {exam.review_kind ? "← Tekrar çalışmalarına dön" : "← Sonuçlarıma dön"}
       </Link>
       <PageIntro
         eyebrow={done ? "DENEME TAMAMLANDI" : "SÜRELİ ÇALIŞMA"}
-        title={done ? "Deneme sonucun" : "Denemen devam ediyor"}
+        title={exam.review_kind ? "Tekrar çalışman" : done ? "Deneme sonucun" : "Denemen devam ediyor"}
       >
         <p>
           {done
@@ -396,13 +396,13 @@ function ExamContent({
                 disabled={locked}
                 onClick={() => setConfirm(true)}
               >
-                Denemeyi bitir
+                {exam.review_kind ? "Tekrarı bitir" : "Denemeyi bitir"}
               </button>
             )}
             {confirm && !done && (
               <div className="notice">
                 <p>
-                  {exam.question_count - answered} soru boş. Denemeyi bitirip
+                  {exam.question_count - answered} soru boş. Çalışmayı bitirip
                   sonucu görmek istiyor musun?
                 </p>
                 <button

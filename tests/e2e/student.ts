@@ -37,10 +37,10 @@ export async function answer(page: Page, letter: string) {
   await page.getByRole("radio", { name: new RegExp(`Sentetik ${letter}`) }).check();
   await expect(page.getByText("Cevaplar sunucuda kayıtlı", { exact: true })).toBeVisible();
 }
-export async function finish(page: Page) {
-  await page.getByRole("button", { name: "Denemeyi bitir", exact: true }).click();
+export async function finish(page: Page, review = false) {
+  await page.getByRole("button", { name: review ? "Tekrarı bitir" : "Denemeyi bitir", exact: true }).click();
   await page.getByRole("button", { name: "Bitir ve değerlendir" }).click();
-  await expect(page.getByRole("heading", { name: "Deneme sonucun" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: review ? "Tekrar sonucun" : "Deneme sonucun" })).toBeVisible();
 }
 // Tekrar is an exam too: sit a timed exam made of the questions of a review list.
 export async function enterReview(page: Page, list = "Favorilerim", minutes = "5") {
@@ -49,5 +49,5 @@ export async function enterReview(page: Page, list = "Favorilerim", minutes = "5
   await card.getByRole("button", { name: "Tekrar sınavına gir" }).click();
   await card.getByLabel("Süre (dakika)", { exact: true }).fill(minutes);
   await card.getByRole("button", { name: "Sınavı başlat" }).click();
-  await expect(page.getByRole("heading", { name: "Denemen devam ediyor" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Tekrar çalışman" })).toBeVisible();
 }

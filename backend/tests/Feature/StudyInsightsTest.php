@@ -9,7 +9,9 @@ use App\Modules\QuestionBank\Models\QuestionSource;
 use App\Modules\QuestionBank\Models\Subject;
 use App\Modules\Tenancy\Actions\RevokeMembership;
 use App\Modules\Tenancy\Models\Tenant;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -266,5 +268,84 @@ class StudyInsightsTest extends TestCase
         $this->getJson('/api/v1/contexts/'.$this->context().'/review-questions')->assertUnprocessable()->assertJsonValidationErrors('kind');
         $this->review('everything')->assertUnprocessable();
         $this->getJson('/api/v1/contexts/'.$this->context().'/review-questions?kind=blank&per_page=101')->assertUnprocessable();
+    }
+
+    public function test_review_answers_count_as_practice_but_never_as_another_exam_or_normal_result(): void
+    {
+        $this->pool();
+        $this->asToken($this->createUser());
+        $context = $this->context();
+        $base = $this->postJson('/api/v1/contexts/'.$context.'/exam-attempts', ['id' => (string) Str::uuid(), 'question_count' => 3, 'duration_seconds' => 600])->assertOk()->json('data');
+        $row = $base['questions'][0];
+        $this->putJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$base['id'].'/answers/'.$row['id'], ['base_version' => 1, 'selected_option_id' => $row['question']['options'][1]['id']])->assertOk();
+        $this->postJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$base['id'].'/finish', ['base_version' => 2])->assertOk();
+        $this->putJson('/api/v1/contexts/'.$context.'/favorites/'.$row['question_id'])->assertOk();
+        $baseline = $this->getJson('/api/v1/contexts/'.$context.'/stats')->assertOk()->json('data');
+        $reviewIds = [];
+        foreach (['incorrect', 'blank', 'favorite'] as $kind) {
+            $this->travel(2)->seconds();
+            $review = $this->startReviewExam($kind, 1, $context)->assertOk()->assertJsonPath('data.review_kind', $kind)->json('data');
+            $reviewIds[] = $review['id'];
+            $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts')->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $base['id']);
+            $answer = $review['questions'][0];
+            $this->putJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$review['id'].'/answers/'.$answer['id'], ['base_version' => 1, 'selected_option_id' => $answer['question']['options'][0]['id']])->assertOk();
+            $this->postJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$review['id'].'/finish', ['base_version' => 2])->assertOk()->assertJsonPath('data.result.correct', 1);
+            $stats = $this->getJson('/api/v1/contexts/'.$context.'/stats')->assertOk()->json('data');
+            $this->assertSame($baseline['exams'], $stats['exams']);
+            $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$review['id'])->assertOk()->assertJsonPath('data.review_kind', $kind);
+        }
+        $this->assertSame($baseline['answers']['total'] + 3, $stats['answers']['total']);
+        $this->assertSame($baseline['answers']['correct'] + 3, $stats['answers']['correct']);
+        $this->assertSame(50, $stats['answers']['accuracy_percent']);
+        $this->review('incorrect', $context)->assertOk()->assertJsonCount(0, 'data');
+        $this->review('blank', $context)->assertOk()->assertJsonCount(1, 'data');
+        $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts?scope=exams')->assertOk()->assertJsonCount(1, 'data');
+        $history = $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts?scope=review')->assertOk()->assertJsonCount(3, 'data')->json('data');
+        $this->assertEqualsCanonicalizing($reviewIds, array_column($history, 'id'));
+        $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts?scope=all')->assertOk()->assertJsonCount(4, 'data');
+        $page = $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts?scope=review&per_page=1')->assertOk()->assertJsonCount(1, 'data')->json();
+        $this->assertStringContainsString('scope=review', $page['links']['next']);
+        $this->getJson($page['links']['next'])->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $reviewIds[1]);
+        $export = json_decode($this->post('/api/v1/me/export', ['current_password' => self::PASSWORD], ['Accept' => 'application/json'])->assertOk()->streamedContent(), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertCount(3, array_filter(array_column($export['exam_attempts'], 'review_kind')));
+        $this->asToken($this->createUser());
+        $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts?scope=review')->assertNotFound();
+    }
+
+    public function test_review_kind_is_immutable_and_part_of_idempotency_with_validated_history_scope(): void
+    {
+        [$a] = $this->pool();
+        $this->asToken($this->createUser());
+        $context = $this->context();
+        $this->practice($a, 1, $context);
+        $id = (string) Str::uuid();
+        $this->startReviewExam('incorrect', 1, $context, ['id' => $id])->assertOk();
+        $this->startReviewExam('incorrect', 1, $context, ['id' => $id])->assertOk()->assertJsonPath('data.id', $id);
+        $this->startReviewExam('favorite', 1, $context, ['id' => $id])->assertConflict();
+        try {
+            DB::transaction(fn () => DB::table('exam_attempts')->where('id', $id)->update(['review_kind' => null, 'revision' => 2]));
+            $this->fail('Review kind was changed');
+        } catch (QueryException $error) {
+            $this->assertSame('23514', $error->errorInfo[0]);
+        }
+        $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts?scope=unknown')->assertUnprocessable()->assertJsonValidationErrors('scope');
+        $this->assertDatabaseCount('exam_attempts', 1);
+    }
+
+    public function test_missing_review_schema_rejects_new_reviews_instead_of_recording_another_normal_exam(): void
+    {
+        $this->pool();
+        $this->asToken($this->createUser());
+        $context = $this->context();
+        DB::statement('ALTER TABLE exam_attempts RENAME COLUMN review_kind TO pending_review_kind');
+        try {
+            $this->startReviewExam('favorite', 1, $context)->assertStatus(503)->assertJsonPath('code', 'review_unavailable');
+            $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts?scope=review')->assertStatus(503);
+            $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts')->assertOk()->assertJsonCount(0, 'data');
+            $this->getJson('/api/v1/contexts/'.$context.'/stats')->assertOk()->assertJsonPath('data.exams.completed', 0);
+            $this->assertDatabaseCount('exam_attempts', 0);
+        } finally {
+            DB::statement('ALTER TABLE exam_attempts RENAME COLUMN pending_review_kind TO review_kind');
+        }
     }
 }

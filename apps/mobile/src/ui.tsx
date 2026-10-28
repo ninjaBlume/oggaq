@@ -530,6 +530,7 @@ export function ConfirmDialog({
   confirm,
   cancel,
   disabled = false,
+  confirmLabel = "Onayla",
 }: {
   visible: boolean;
   title: string;
@@ -537,6 +538,7 @@ export function ConfirmDialog({
   confirm: () => void;
   cancel: () => void;
   disabled?: boolean;
+  confirmLabel?: string;
 }) {
   const { styles } = useTheme();
   return (
@@ -549,9 +551,7 @@ export function ConfirmDialog({
     >
       <Text style={styles.text}>{message}</Text>
       <Button disabled={disabled} onPress={confirm} icon={Check}>
-        {title === "Denemeyi bitir"
-          ? "Bitir ve değerlendir"
-          : "Boş olarak kaydet"}
+        {confirmLabel}
       </Button>
       <Button secondary disabled={disabled} onPress={cancel}>
         Devam et

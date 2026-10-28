@@ -310,13 +310,13 @@ export function ExamList({
 }
 
 // One attempt of the history: the score first, then what the exam was, then how the answers split.
-function ResultCard({ attempt: e, open }: { attempt: Summary; open: () => void }) {
+export function ResultCard({ attempt: e, open }: { attempt: Summary; open: () => void }) {
   const { palette, styles } = useTheme();
   const live = e.status === "active" && Date.parse(e.deadline_at) > Date.parse(e.server_time);
   const result = e.result;
   const title = examAttemptTitle(e);
-  const kind = e.official_exam ? (/Ders Sınavı/.test(e.official_exam.title) ? "DERS SINAVI" : "DENEME SINAVI") : "DENEME";
-  const tint = cardTone(palette, kind === "DERS SINAVI" ? "indigo" : "blue");
+  const kind = e.review_kind ? "TEKRAR" : e.official_exam ? (/Ders Sınavı/.test(e.official_exam.title) ? "DERS SINAVI" : "DENEME SINAVI") : "DENEME";
+  const tint = cardTone(palette, kind === "TEKRAR" ? "sand" : kind === "DERS SINAVI" ? "indigo" : "blue");
   const tone = result ? scoreTone(result.score_percent, palette) : { backgroundColor: palette.softPrimary, color: palette.primary };
   const date = new Date(e.started_at).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" });
   const minutes = Math.round((result ? result.elapsed_seconds : e.duration_seconds) / 60);
@@ -324,7 +324,7 @@ function ResultCard({ attempt: e, open }: { attempt: Summary; open: () => void }
     <Pressable
       testID="exam-result-card"
       accessibilityRole="button"
-      accessibilityLabel={live ? "Sınava dön" : `${title} sonucunu incele`}
+      accessibilityLabel={live ? (e.review_kind ? "Tekrara devam et" : "Sınava dön") : `${title} sonucunu incele`}
       onPress={open}
       style={({ pressed }) => [
         { backgroundColor: tint.surface, borderWidth: 1, borderColor: tint.line, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 8, gap: 6, minHeight: 44 },

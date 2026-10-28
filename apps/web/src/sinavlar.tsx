@@ -4,7 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, cursorFromLink } from '@oggaq/api-client';
 import type { components } from '@oggaq/shared-types';
-import { examDisplayTitle, examPeriodLabel, examQuestionTitle, randomId, scoreBand, suggestedMinutes, vocabulary, examTimerChoices, type ExamTimerPolicy } from '@oggaq/study-core';
+import { examAttemptTitle, examPeriodLabel, examQuestionTitle, randomId, scoreBand, suggestedMinutes, vocabulary, examTimerChoices, type ExamTimerPolicy } from '@oggaq/study-core';
 import { api } from './api';
 import { Icon } from './icons';
 import { PageIntro, useStudyContext } from './App';
@@ -135,14 +135,14 @@ export function DersSinavlari() {
 }
 
 // One attempt of the history: the score first, then what the exam was, then how the answers split.
-function ResultRow({ exam, to }: { exam: Summary; to: string }) {
+export function ResultRow({ exam, to }: { exam: Summary; to: string }) {
   const result = exam.result;
   const expired = Date.parse(exam.deadline_at) <= Date.parse(exam.server_time);
-  const title = exam.official_exam ? examDisplayTitle(exam.official_exam.title) : `${exam.question_count} soruluk deneme`;
-  const kind = exam.official_exam ? (/Ders Sınavı/.test(exam.official_exam.title) ? 'DERS SINAVI' : 'DENEME SINAVI') : 'DENEME';
+  const title = examAttemptTitle(exam);
+  const kind = exam.review_kind ? 'TEKRAR' : exam.official_exam ? (/Ders Sınavı/.test(exam.official_exam.title) ? 'DERS SINAVI' : 'DENEME SINAVI') : 'DENEME';
   const tone = result ? scoreBand(result.score_percent) : 'pending';
   const minutes = Math.round((result ? result.elapsed_seconds : exam.duration_seconds) / 60);
-  return <Link className={`card history-row card-tone-${kind === 'DERS SINAVI' ? 'indigo' : 'blue'}`} to={to}>
+  return <Link className={`card history-row card-tone-${kind === 'TEKRAR' ? 'sand' : kind === 'DERS SINAVI' ? 'indigo' : 'blue'}`} to={to}>
     <span className={`result-score ${tone}`}>{result ? percent(result.score_percent) : expired ? 'Sonucu gör' : 'Devam et'}</span>
     <div className="history-main"><span className="eyebrow">{kind}</span><h3>{title}</h3><p>{dateLabel(exam.started_at)} · {minutes} dk · {exam.question_count} soru</p></div>
     <span className="history-arrow" aria-hidden="true">→</span>

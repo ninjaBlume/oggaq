@@ -1,5 +1,9 @@
 # Süreli deneme
 
+## 28 Ekim 2026 — Tekrar sonuçları ayrı çalışma geçmişidir
+
+Tekrar aynı cevap/süre/konum motorunu kullanır; bir deneme sonucu gibi sayılmaz. `review_kind` kayda sabitlenir, normal sonuç/ana sayfa listesi bu kayıtları dışlar; Tekrar bölümünde kendi geçmişinden devam edilir veya sonucu açılır. Tekrar cevapları soru ve doğruluk istatistiklerini etkiler; biten sınav sayısı, deneme ortalaması ve en iyi deneme puanını etkilemez. Mevcut cevap kilidi, süre sonu ve sonuç bütünlüğü korunur. [API, migration ve eski kayıtların sınırı](STUDY.md#28-ekim-2026--tekrar-çalışması-deneme-değildir).
+
 ## 28 Ekim 2026 — Rastgele sınav
 
 Mobil ana sayfada **Hızlı başla → Rastgele sınav** bulunur. Öğrenci Temel/Yenileme ve Silahlı (125), Silahsız (100), Silah farkı (25) seçer; süreyi ve çıkışta durma tercihini belirler. Menü/alt sekme sayısı değişmez. Bu özellik yerel kaynakta hazırdır; sunucu ve beta yayını ayrıca yapılmalıdır. Yayında önce API ve migration, ardından aynı havuzla duman testi, son olarak ayrı iOS/Android beta güncellemeleri uygulanır; eski API üzerine yeni mobil ekran yayımlanmaz.

@@ -12,9 +12,9 @@ type Row = ExamAttempt['questions'][number];
 export function CompletedExam({ exam, contextId }: { exam: ExamAttempt; contextId: string }) {
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [exam.id]);
   return <>
-    <Link className="back-link" to={`/study/${contextId}/sonuclar`}>← Sonuçlarıma dön</Link>
-    <PageIntro eyebrow="DENEME TAMAMLANDI" title="Deneme sonucun"><p>Cevapların, başladığın soru sürümlerinden değerlendirildi.</p></PageIntro>
-    {exam.result && <section className="card exam-result card-tone-blue" role="status"><div><span className="eyebrow">DOĞRU YÜZDESİ</span><strong>%{exam.result.score_percent}</strong></div><p><b>{exam.result.correct}</b> doğru · <b>{exam.result.incorrect}</b> yanlış · <b>{exam.result.blank}</b> boş</p><p>{exam.finish_reason === 'expired' ? 'Süre dolduğunda tamamlandı.' : 'Denemeyi sen bitirdin.'} Çalışma puanı; geçme / kalma kararı değildir.</p></section>}
+    <Link className="back-link" to={`/study/${contextId}/${exam.review_kind ? "review" : "sonuclar"}`}>{exam.review_kind ? "← Tekrar çalışmalarına dön" : "← Sonuçlarıma dön"}</Link>
+    <PageIntro eyebrow={exam.review_kind ? "TEKRAR TAMAMLANDI" : "DENEME TAMAMLANDI"} title={exam.review_kind ? "Tekrar sonucun" : "Deneme sonucun"}><p>Cevapların, başladığın soru sürümlerinden değerlendirildi.</p></PageIntro>
+    {exam.result && <section className="card exam-result card-tone-blue" role="status"><div><span className="eyebrow">DOĞRU YÜZDESİ</span><strong>%{exam.result.score_percent}</strong></div><p><b>{exam.result.correct}</b> doğru · <b>{exam.result.incorrect}</b> yanlış · <b>{exam.result.blank}</b> boş</p><p>{exam.finish_reason === 'expired' ? 'Süre dolduğunda tamamlandı.' : exam.review_kind ? 'Tekrarı sen bitirdin.' : 'Denemeyi sen bitirdin.'} {exam.review_kind ? "Soru ve doğruluk istatistiğine katılır; deneme sayısı ve ortalamasına eklenmez." : "Çalışma puanı; geçme / kalma kararı değildir."}</p></section>}
     <ExamScorePanel exam={exam} contextId={contextId} />
     <section className="exam-review" aria-label="Sınav soruları ve cevapların"><header><h2>Cevaplarını incele</h2><p className="muted">{exam.question_count} sorunun tamamı aşağıda. Cevaplarını ve açıklamaları kaydırarak inceleyebilirsin.</p></header>
       {exam.questions.map((row) => <ResultQuestion key={row.id} row={row} contextId={contextId} examId={exam.id} total={exam.question_count} />)}

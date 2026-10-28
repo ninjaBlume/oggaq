@@ -2597,7 +2597,7 @@
       "get": {
         "operationId": "listExams",
         "summary": "Bağlama ait süreli deneme geçmişi",
-        "description": "Salt okunur: süresi dolmuş ama henüz kapatılmamış kayıtlar status=active döner (deadline_at < server_time); kayıt zamanlanmış exams:expire komutuyla veya açıldığında tamamlanır. Hiçbir soru cevaplanmadan biten (terk edilmiş) denemeler listelenmez. started_at/id ile cursor sırası; yalnız sahibi ve aktif üyelik.",
+        "description": "Kendi çalışma alanının salt okunur geçmişi. Varsayılan scope=exams yalnız normal deneme/ders/rastgele sınavlarını döndürür; tekrar çalışmaları sayılmaz. scope=review yalnız tekrar geçmişi, scope=all birleşik kişisel geçmiş içindir. Terk edilmiş kayıtlar listelenmez; tamamlanmış veya devam eden tekrar kaydı kimliğiyle yine okunabilir.",
         "tags": [
           "Exams"
         ],
@@ -2637,6 +2637,16 @@
           },
           "429": {
             "$ref": "#/components/responses/Problem"
+          },
+          "503": {
+            "description": "Tekrar ayrımı migration’ı uygulanmamışsa review_unavailable; diğer durumlarda ilgili sunucu özelliği hazır değildir.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "parameters": [
@@ -2665,6 +2675,19 @@
             "schema": {
               "type": "string",
               "maxLength": 2048
+            }
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "exams",
+                "review",
+                "all"
+              ],
+              "default": "exams"
             }
           }
         ]
@@ -2712,6 +2735,16 @@
           },
           "429": {
             "$ref": "#/components/responses/Problem"
+          },
+          "503": {
+            "description": "Tekrar ayrımı migration’ı uygulanmamışsa review_unavailable; diğer durumlarda ilgili sunucu özelliği hazır değildir.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
           }
         },
         "parameters": [
@@ -9076,6 +9109,19 @@
               }
             ],
             "description": "Ders/konu dağılımı sabit rastgele sınav. Eski istemciler için ek ve isteğe bağlı metaveri."
+          },
+          "review_kind": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "incorrect",
+              "blank",
+              "favorite",
+              null
+            ],
+            "description": "Tekrar çalışmasının kalıcı türü. Null normal veya geçmişte türü kaydedilmemiş denemedir. Tekrar cevapları soru/doğruluk istatistiğine katılır; sınav sayısı, ortalama/en iyi deneme puanı ve varsayılan sonuç listesine katılmaz."
           }
         },
         "required": [
@@ -9298,6 +9344,19 @@
               }
             ],
             "description": "Ders/konu dağılımı sabit rastgele sınav. Eski istemciler için ek ve isteğe bağlı metaveri."
+          },
+          "review_kind": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "incorrect",
+              "blank",
+              "favorite",
+              null
+            ],
+            "description": "Tekrar çalışmasının kalıcı türü. Null normal veya geçmişte türü kaydedilmemiş denemedir. Tekrar cevapları soru/doğruluk istatistiğine katılır; sınav sayısı, ortalama/en iyi deneme puanı ve varsayılan sonuç listesine katılmaz."
           }
         },
         "required": [
@@ -9402,7 +9461,7 @@
               "blank",
               "favorite"
             ],
-            "description": "Tekrar sınavı: sorular öğrencinin o çalışma alanındaki yanlış, boş veya favori sorularından seçilir. official_exam_id ile birlikte gönderilemez; subject_id ile daraltılabilir. Yeterli soru yoksa 422."
+            "description": "Tekrar sınavı: sorular öğrencinin o çalışma alanındaki yanlış, boş veya favori sorularından seçilir. official_exam_id ile birlikte gönderilemez; subject_id ile daraltılabilir. Yeterli soru yoksa 422. Tür denemeye sabitlenir ve işlem kimliğinin parçasıdır; değiştirerek aynı UUID ile istek 409 döndürür. Tekrar çalışması deneme sayısı ve ortalamasına katılmaz."
           },
           "timer_policy": {
             "type": "string",

@@ -3,7 +3,6 @@
 namespace App\Modules\Exams\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\PaginationRequest;
 use App\Modules\Exams\Actions\AccessExam;
 use App\Modules\Exams\Actions\ListExams;
 use App\Modules\Exams\Actions\ReportExamQuestion;
@@ -11,6 +10,7 @@ use App\Modules\Exams\Actions\SaveExamPosition;
 use App\Modules\Exams\Actions\StartExam;
 use App\Modules\Exams\Actions\UpdateExamTimer;
 use App\Modules\Exams\Http\Requests\FinishExamRequest;
+use App\Modules\Exams\Http\Requests\ListExamsRequest;
 use App\Modules\Exams\Http\Requests\ReportQuestionRequest;
 use App\Modules\Exams\Http\Requests\SaveExamAnswerRequest;
 use App\Modules\Exams\Http\Requests\SaveExamPositionRequest;
@@ -25,9 +25,9 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ExamAttemptController extends Controller
 {
-    public function index(PaginationRequest $request, string $context, ListExams $action): AnonymousResourceCollection
+    public function index(ListExamsRequest $request, string $context, ListExams $action): AnonymousResourceCollection
     {
-        return ExamSummaryResource::collection($action->execute($request->user(), $context, $request->integer('per_page', 20)));
+        return ExamSummaryResource::collection($action->execute($request->user(), $context, $request->integer('per_page', 20), $request->validated('scope', 'exams')));
     }
 
     public function store(StartExamRequest $request, string $context, StartExam $action): JsonResponse

@@ -65,6 +65,9 @@ class ExportAccountData
         if (Schema::hasColumn('exam_attempts', 'timer_policy')) {
             $attempts->addSelect('a.timer_policy', 'a.paused_at', 'a.paused_seconds');
         }
+        if (Schema::hasColumn('exam_attempts', 'review_kind')) {
+            $attempts->addSelect('a.review_kind');
+        }
         if (Schema::hasColumn('exam_attempts', 'random_weapon_status')) {
             $attempts->addSelect('a.random_education_type', 'a.random_weapon_status', 'a.random_reference_exam_id', 'a.random_distribution', 'a.random_scoring_period_id');
         }
@@ -79,6 +82,7 @@ class ExportAccountData
                 $finished = $attempt->finished_at !== null;
                 yield [
                     'timer_policy' => $attempt->timer_policy ?? 'continuous', 'paused_at' => $attempt->paused_at ?? null, 'paused_seconds' => $attempt->paused_seconds ?? 0,
+                    'review_kind' => $attempt->review_kind ?? null,
                     'random_exam' => ($attempt->random_weapon_status ?? null) === null ? null : [
                         'education_type' => $attempt->random_education_type, 'weapon_status' => $attempt->random_weapon_status,
                         'reference_exam_id' => $attempt->random_reference_exam_id, 'distribution' => json_decode($attempt->random_distribution, true, flags: JSON_THROW_ON_ERROR),

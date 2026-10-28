@@ -49,7 +49,8 @@ export function examTypeShort(name: string): string {
 export function examDisplayTitle(title: string): string {
   return title.replace(/\s*\((?:\d{1,2}[./-]\d{1,2}[./-]\d{4}|\d{4}-\d{2}-\d{2})\)/gu, '').trim();
 }
-export function examAttemptTitle(exam: { official_exam: { title: string } | null; random_exam?: { title: string } | null; question_count: number }, fallback: 'deneme' | 'sınav' = 'deneme'): string {
+export function examAttemptTitle(exam: { official_exam: { title: string } | null; random_exam?: { title: string } | null; review_kind?: 'incorrect' | 'blank' | 'favorite' | null; question_count: number }, fallback: 'deneme' | 'sınav' = 'deneme'): string {
+  if (exam.review_kind) return `Tekrar çalışması · ${{ incorrect: 'Yanlışlarım', blank: 'Boş bıraktıklarım', favorite: 'Favorilerim' }[exam.review_kind]}`;
   return exam.random_exam?.title ?? (exam.official_exam ? examDisplayTitle(exam.official_exam.title) : `${exam.question_count} soruluk ${fallback}`);
 }
 // List labels use explicit education metadata; renewal numbers are never derived

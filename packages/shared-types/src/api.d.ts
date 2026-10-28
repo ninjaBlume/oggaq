@@ -733,7 +733,7 @@ export interface paths {
         };
         /**
          * Bağlama ait süreli deneme geçmişi
-         * @description Salt okunur: süresi dolmuş ama henüz kapatılmamış kayıtlar status=active döner (deadline_at < server_time); kayıt zamanlanmış exams:expire komutuyla veya açıldığında tamamlanır. Hiçbir soru cevaplanmadan biten (terk edilmiş) denemeler listelenmez. started_at/id ile cursor sırası; yalnız sahibi ve aktif üyelik.
+         * @description Kendi çalışma alanının salt okunur geçmişi. Varsayılan scope=exams yalnız normal deneme/ders/rastgele sınavlarını döndürür; tekrar çalışmaları sayılmaz. scope=review yalnız tekrar geçmişi, scope=all birleşik kişisel geçmiş içindir. Terk edilmiş kayıtlar listelenmez; tamamlanmış veya devam eden tekrar kaydı kimliğiyle yine okunabilir.
          */
         get: operations["listExams"];
         put?: never;
@@ -2365,6 +2365,11 @@ export interface components {
             remaining_seconds: number;
             /** @description Ders/konu dağılımı sabit rastgele sınav. Eski istemciler için ek ve isteğe bağlı metaveri. */
             random_exam?: components["schemas"]["RandomExamMetadata"] | null;
+            /**
+             * @description Tekrar çalışmasının kalıcı türü. Null normal veya geçmişte türü kaydedilmemiş denemedir. Tekrar cevapları soru/doğruluk istatistiğine katılır; sınav sayısı, ortalama/en iyi deneme puanı ve varsayılan sonuç listesine katılmaz.
+             * @enum {string|null}
+             */
+            review_kind?: "incorrect" | "blank" | "favorite" | null;
         };
         ExamQuestion: {
             /** Format: uuid */
@@ -2422,6 +2427,11 @@ export interface components {
             remaining_seconds: number;
             /** @description Ders/konu dağılımı sabit rastgele sınav. Eski istemciler için ek ve isteğe bağlı metaveri. */
             random_exam?: components["schemas"]["RandomExamMetadata"] | null;
+            /**
+             * @description Tekrar çalışmasının kalıcı türü. Null normal veya geçmişte türü kaydedilmemiş denemedir. Tekrar cevapları soru/doğruluk istatistiğine katılır; sınav sayısı, ortalama/en iyi deneme puanı ve varsayılan sonuç listesine katılmaz.
+             * @enum {string|null}
+             */
+            review_kind?: "incorrect" | "blank" | "favorite" | null;
         };
         ExamAttemptResponse: {
             data: components["schemas"]["ExamAttempt"];
@@ -2447,7 +2457,7 @@ export interface components {
              */
             official_exam_id?: string;
             /**
-             * @description Tekrar sınavı: sorular öğrencinin o çalışma alanındaki yanlış, boş veya favori sorularından seçilir. official_exam_id ile birlikte gönderilemez; subject_id ile daraltılabilir. Yeterli soru yoksa 422.
+             * @description Tekrar sınavı: sorular öğrencinin o çalışma alanındaki yanlış, boş veya favori sorularından seçilir. official_exam_id ile birlikte gönderilemez; subject_id ile daraltılabilir. Yeterli soru yoksa 422. Tür denemeye sabitlenir ve işlem kimliğinin parçasıdır; değiştirerek aynı UUID ile istek 409 döndürür. Tekrar çalışması deneme sayısı ve ortalamasına katılmaz.
              * @enum {string}
              */
             review_kind?: "incorrect" | "blank" | "favorite";
@@ -4732,6 +4742,7 @@ export interface operations {
             query?: {
                 per_page?: number;
                 cursor?: string;
+                scope?: "exams" | "review" | "all";
             };
             header?: never;
             path: {
@@ -4756,6 +4767,15 @@ export interface operations {
             409: components["responses"]["Problem"];
             422: components["responses"]["Problem"];
             429: components["responses"]["Problem"];
+            /** @description Tekrar ayrımı migration’ı uygulanmamışsa review_unavailable; diğer durumlarda ilgili sunucu özelliği hazır değildir. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     startExam: {
@@ -4788,6 +4808,15 @@ export interface operations {
             409: components["responses"]["Problem"];
             422: components["responses"]["Problem"];
             429: components["responses"]["Problem"];
+            /** @description Tekrar ayrımı migration’ı uygulanmamışsa review_unavailable; diğer durumlarda ilgili sunucu özelliği hazır değildir. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     showExam: {
