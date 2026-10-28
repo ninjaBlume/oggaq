@@ -1863,6 +1863,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/contexts/{context}/random-exam": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Açık rastgele sınavı bulma
+         * @description Bağlam başına yalnız bir açık rastgele sınav bulunur. Açık sınav varsa ayarlar değişse de aynı kayıt döner; bitirilen veya süresi dolan sınav yenisine izin verir. Temel/Yenileme havuzları ayrıdır. Silahlı 125 (ilk 100 genel, son 25 silah), silahsız 100 genel, silah farkı 25 silah sorusudur. Ders/konu kotaları seçilen eğitimin en yeni yayımlanmış 125 soruluk tam kitapçığından alınır; bu gözlenen dağılımdır, sabit mevzuat yüzdesi değildir. Yetersiz havuz 422; migration eksikse 503. Soru/sürüm/dağılım başlangıçta sabitlenir.
+         */
+        get: operations["currentRandomExam"];
+        put?: never;
+        /**
+         * Ders ve konu dağılımını koruyan rastgele sınav oluşturma veya devam etme
+         * @description Bağlam başına yalnız bir açık rastgele sınav bulunur. Açık sınav varsa ayarlar değişse de aynı kayıt döner; bitirilen veya süresi dolan sınav yenisine izin verir. Temel/Yenileme havuzları ayrıdır. Silahlı 125 (ilk 100 genel, son 25 silah), silahsız 100 genel, silah farkı 25 silah sorusudur. Ders/konu kotaları seçilen eğitimin en yeni yayımlanmış 125 soruluk tam kitapçığından alınır; bu gözlenen dağılımdır, sabit mevzuat yüzdesi değildir. Yetersiz havuz 422; migration eksikse 503. Soru/sürüm/dağılım başlangıçta sabitlenir.
+         */
+        post: operations["startRandomExam"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2339,6 +2363,8 @@ export interface components {
             timer_policy: "continuous" | "pause_on_exit";
             timer_paused: boolean;
             remaining_seconds: number;
+            /** @description Ders/konu dağılımı sabit rastgele sınav. Eski istemciler için ek ve isteğe bağlı metaveri. */
+            random_exam?: components["schemas"]["RandomExamMetadata"] | null;
         };
         ExamQuestion: {
             /** Format: uuid */
@@ -2394,6 +2420,8 @@ export interface components {
             timer_policy: "continuous" | "pause_on_exit";
             timer_paused: boolean;
             remaining_seconds: number;
+            /** @description Ders/konu dağılımı sabit rastgele sınav. Eski istemciler için ek ve isteğe bağlı metaveri. */
+            random_exam?: components["schemas"]["RandomExamMetadata"] | null;
         };
         ExamAttemptResponse: {
             data: components["schemas"]["ExamAttempt"];
@@ -3379,6 +3407,44 @@ export interface components {
             viewer_url: string;
             /** Format: date-time */
             expires_at: string;
+        };
+        RandomExamDistribution: {
+            /** Format: uuid */
+            subject_id: string;
+            subject_name: string;
+            /** Format: uuid */
+            topic_id: string | null;
+            topic_name: string | null;
+            /** @enum {string} */
+            section: "general" | "weapon";
+            question_count: number;
+        };
+        RandomExamMetadata: {
+            /** @enum {string} */
+            education_type: "basic" | "renewal";
+            /** @enum {string} */
+            weapon_status: "armed" | "unarmed" | "weapon_difference";
+            title: string;
+            /** Format: uuid */
+            reference_exam_id: string;
+            distribution: components["schemas"]["RandomExamDistribution"][];
+        };
+        StartRandomExamInput: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            education_type: "basic" | "renewal";
+            /** @enum {string} */
+            weapon_status: "armed" | "unarmed" | "weapon_difference";
+            duration_seconds: number;
+            /**
+             * @default continuous
+             * @enum {string}
+             */
+            timer_policy: "continuous" | "pause_on_exit";
+        };
+        RandomExamStatusResponse: {
+            data: components["schemas"]["ExamSummary"] | null;
         };
     };
     responses: {
@@ -6853,6 +6919,68 @@ export interface operations {
                 };
                 content?: never;
             };
+        };
+    };
+    currentRandomExam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RandomExamStatusResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+            503: components["responses"]["Problem"];
+        };
+    };
+    startRandomExam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartRandomExamInput"];
+            };
+        };
+        responses: {
+            /** @description Başarılı işlem. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamAttemptResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+            503: components["responses"]["Problem"];
         };
     };
 }

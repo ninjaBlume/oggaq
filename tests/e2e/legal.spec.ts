@@ -30,19 +30,19 @@ async function expectLegalLinks(scope: ReturnType<Page["locator"]>) {
   for (const page of legalPages) await expect(nav.getByRole("link", { name: page.title, exact: true })).toHaveAttribute("href", page.file);
 }
 
-test("herkese açık yasal sayfalar giriş yapmadan açılır; taslak bandı, işaretli alanlar ve bağlantılar vardır", async ({ page }) => {
+test("herkese açık bilgi sayfaları giriş yapmadan açılır; doldurulmuş bilgiler ve bağlantılar vardır", async ({ page }) => {
   for (const legal of legalPages) {
     const response = await page.goto(`${web}${legal.file}`);
     expect(response?.status(), legal.file).toBe(200);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await expect(page.locator("#taslak-bandi")).toContainText("TASLAK");
-    expect(await page.locator("mark[data-placeholder]").count(), `${legal.file} yer tutucu`).toBeGreaterThan(0);
-    for (const other of legalPages) await expect(page.locator("nav.site-nav").getByRole("link", { name: other.title, exact: true })).toHaveAttribute("href", other.file);
+    await expect(page.locator("#taslak-bandi")).toHaveCount(0);
+    await expect(page.locator("mark[data-placeholder]"), `${legal.file} yer tutucu`).toHaveCount(0);
+    for (const other of legalPages) await expect(page.getByRole("navigation", { name: "Bilgi ve destek", exact: true }).getByRole("link", { name: other.title, exact: true })).toHaveAttribute("href", other.file);
     await expect(page.getByRole("contentinfo")).toContainText(notOfficialNotice);
   }
   await page.goto(`${web}/legal/hesap-silme.html`);
   await expect(page.getByRole("main")).toContainText("Profil → Hesabım → Hesabı sil");
-  await expect(page.getByRole("main")).toContainText("giriş yap → Hesabım → Hesabı sil");
+  await expect(page.getByRole("link", { name: "Hesabım sayfasından giriş yap", exact: true })).toHaveAttribute("href", "/account");
   await expect(page.getByRole("link", { name: "Silme talebi gönder" })).toBeVisible();
   await page.goto(`${web}/legal/kosullar.html`);
   await expect(page.getByRole("main")).toContainText(scoreEstimateNotice);
@@ -85,7 +85,8 @@ test("web: giriş ve kayıt ekranında yasal bağlantılar, kayıt bildirimi ve 
   const [popup] = await Promise.all([page.context().waitForEvent("page"), page.locator("footer.site-footer").getByRole("link", { name: "Gizlilik Politikası", exact: true }).click()]);
   await popup.waitForLoadState();
   expect(new URL(popup.url()).pathname).toBe("/legal/gizlilik.html");
-  await expect(popup.locator("#taslak-bandi")).toBeVisible();
+  await expect(popup.getByRole("heading", { level: 1 })).toHaveText("Gizlilik Politikası ve KVKK Aydınlatma Metni");
+  await expect(popup.locator("#taslak-bandi")).toHaveCount(0);
   await popup.close();
   await expect(page.getByRole("heading", { name: "Deneme sınavları" })).toBeVisible();
   // The score calculator says it is an estimate.

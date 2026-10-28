@@ -19,7 +19,7 @@ import {
 } from "./icons";
 import type { StudyContext, User } from "@oggaq/shared-types";
 import { ExpressivePressable } from "./expressive";
-import { examDisplayTitle, vocabulary } from "@oggaq/study-core";
+import { examAttemptTitle, vocabulary } from "@oggaq/study-core";
 import { cardDensity, cardTone, type CardTone } from "@oggaq/design-tokens";
 import { buttonDensity, scoreTone, shape } from "./theme";
 import { api } from "./api";
@@ -39,6 +39,7 @@ export function Home({
   ders,
   history,
   review,
+  random,
   stats,
   exam,
   calendar,
@@ -49,6 +50,7 @@ export function Home({
   ders: (subject?: string) => void;
   history: () => void;
   review: () => void;
+  random: () => void;
   stats: () => void;
   exam: (id: string) => void;
   calendar: (year?: number) => void;
@@ -132,7 +134,7 @@ export function Home({
           </Text>
           <Text style={{ color: palette.onNavyMuted, fontSize: 14, lineHeight: 22 }}>
             {activeExam
-              ? activeExam.official_exam ? examDisplayTitle(activeExam.official_exam.title) : `${activeExam.question_count} soruluk deneme`
+              ? examAttemptTitle(activeExam)
               : "Silahlı veya silahsız sınavını seç, soruları çöz ve sonucunu incele."}
           </Text>
           {activeExam && <Text style={{ color: palette.onNavyMuted, fontSize: 12, lineHeight: 18 }}>{activeExam.question_count} soru · {activeExam.timer_paused ? "Süre duraklatıldı" : "Süren işlemeye devam ediyor"}</Text>}
@@ -186,6 +188,7 @@ export function Home({
       <HomeGroup>
         <HomeRow roomy={roomy} icon={featureIcons.ders} tone="indigo" title={vocabulary.ders.title} description="Dersini seç, ilgili sınavlara ulaş" onPress={() => ders()} />
         <HomeRow roomy={roomy} icon={featureIcons.deneme} tone="blue" title={vocabulary.deneme.title} description="Silahlı veya silahsız sınavını seç" onPress={deneme} />
+        <HomeRow roomy={roomy} icon={featureIcons.random} tone="blue" title={vocabulary.random.title} description="Ders dağılımına göre karışık sorular çöz" onPress={random} />
         <HomeRow roomy={roomy} icon={featureIcons.review} tone="sand" title={vocabulary.review.title} description="Yanlış, boş ve favori sorularından sınav yap"
           accessibilityLabel={`${vocabulary.review.title} ekranını aç`} onPress={review} />
       </HomeGroup>
@@ -218,7 +221,7 @@ export function Home({
       ) : (
         <HomeGroup columns={presentation.enabled && columns ? 2 : 1}>
           {recentExams.data?.data.map(attempt => {
-            const title = attempt.official_exam ? examDisplayTitle(attempt.official_exam.title) : `${attempt.question_count} soruluk deneme`;
+            const title = examAttemptTitle(attempt);
             const status = attempt.status === "active"
               ? Date.parse(attempt.deadline_at) > Date.parse(attempt.server_time) ? "Devam ediyor" : "Süresi doldu"
               : attempt.result ? `%${attempt.result.score_percent} doğru` : "Sonuç bekleniyor";

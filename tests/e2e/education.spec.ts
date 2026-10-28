@@ -59,7 +59,7 @@ for (const mobile of [false, true]) {
    const started = page.waitForResponse(r => r.request().method() === 'POST' && new URL(r.url()).pathname.endsWith('/exam-attempts'));
    await page.getByRole('button',{name:'Sınavı başlat',exact:true}).click();
    expect((await (await started).json()).data.official_exam.id).toBe(unarmed[0].id);
-   await expect(page.getByRole('heading',{name:mobile ? 'Sınav' : 'Denemen devam ediyor',exact:true})).toBeVisible();
+   await expect(page.getByRole('heading',{name:mobile ? 'Sentetik yenileme sınavı' : 'Denemen devam ediyor',exact:true})).toBeVisible();
    if (mobile) {
     await page.getByRole('button',{name:'Geri dön',exact:true}).click();
     await page.getByRole('tab',{name:'Ders',exact:true}).click();
@@ -105,7 +105,7 @@ for (const mobile of [false, true]) {
    const lessonStarted = page.waitForResponse(r => r.request().method() === 'POST' && new URL(r.url()).pathname.endsWith('/exam-attempts'));
    await lesson.getByRole('button',{name:'Sınavı başlat',exact:true}).click();
    expect((await (await lessonStarted).json()).data.official_exam.id).toBe(renewalLessonId);
-   await expect(page.getByRole('heading',{name:mobile ? 'Sınav' : 'Denemen devam ediyor',exact:true})).toBeVisible();
+   await expect(page.getByRole('heading',{name:mobile ? 'Sentetik yenileme ders sınavı' : 'Denemen devam ediyor',exact:true})).toBeVisible();
    if (mobile) {
     await page.getByRole('radio',{name:/Sentetik A/}).click();
     await expect(page.getByText('Doğru yanıt. Doğru cevap: A. Yanıtın kaydedildi ve kilitlendi.',{exact:true})).toBeVisible();

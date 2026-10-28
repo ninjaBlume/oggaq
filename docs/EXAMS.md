@@ -1,5 +1,17 @@
 # Süreli deneme
 
+## 28 Ekim 2026 — Rastgele sınav
+
+Mobil ana sayfada **Hızlı başla → Rastgele sınav** bulunur. Öğrenci Temel/Yenileme ve Silahlı (125), Silahsız (100), Silah farkı (25) seçer; süreyi ve çıkışta durma tercihini belirler. Menü/alt sekme sayısı değişmez. Bu özellik yerel kaynakta hazırdır; sunucu ve beta yayını ayrıca yapılmalıdır. Yayında önce API ve migration, ardından aynı havuzla duman testi, son olarak ayrı iOS/Android beta güncellemeleri uygulanır; eski API üzerine yeni mobil ekran yayımlanmaz.
+
+`GET /api/v1/contexts/{context}/random-exam` açık sınavı veya null döndürür; `POST` sabit soruları bir kez seçer. Bağlamda açık rastgele sınav varsa farklı cihazda farklı seçim yapılsa bile aynı sınav döner. Aynı UUID ve aynı ayarlarla tekrar, tamamlanmış olsa bile ilk işlemi döndürür; yanıt kaybı ikinci sınav üretmez. Kullanıcı satır kilidi ve PostgreSQL kısmi tekillik indeksi eşzamanlı oluşturmayı korur. Sınav bitirilince veya süre dolunca, boşlar kalsa da yenisi oluşturulabilir. Duraklatılmış sınav bekleme nedeniyle serbest kalmaz. Cevap kilidi, doğru yanıt geri bildirimi, konum kaydı ve mevcut süre politikası kullanılır.
+
+Dağılım, seçilen eğitimdeki en yeni yayımlanmış **tam 125 soruluk silahlı kitapçıktan** ders/konu/bölüm sayıları olarak alınır; bu bir mevzuat yüzdesi iddiası değildir. Sıralama sınav yılı ve sayısal dönem numarasıyladır; eski bir kitapçığın sonradan içe aktarılması referansı geriye götürmez. Havuz aynı eğitimin yayımlanmış tam kitapçıklarından oluşur. Ortak sorular kimliğine göre tekilleştirilir, her ders/konu kotası farklı sorularla doldurulur. Genel bölüm ilk 100, silah bölümü son 25 konumda kalır; her bölüm kendi içinde karıştırılır. Silahsız yalnız genel, silah farkı yalnız silah kotasını alır. Yeterli farklı soru veya referans yoksa 422 ile hiçbir kayıt oluşturmadan açıklama döner.
+
+Seçilen soru sürümleri, referans ve dağılım denemeye sabitlenir. Eşleşen yayımlanmış puanlama dönemi gerçekten varsa mevcut puan/atış değerlendirmesi sabit kuralıyla kullanılır. Doğrulanmış dönem yokken kural türetilmez; doğru/yanlış/boş ve doğru oranı yine hesaplanır. Yenileme + silah farkına temel eğitim kuralı kopyalanmaz. Geçmiş ve başlık rastgele sınavın eğitim/türünü gösterir; kişisel veri dışa aktarımı bu bilgiyi ve dağılımı içerir.
+
+Eski serbest soru sayılı `POST .../exam-attempts` davranışı korunur; yeni sabit mod ayrı endpoint'tir. Migration olmayan ortamda yalnız yeni endpoint açıklamalı 503 döndürür; eski sınav kaynakları yeni alan olmadan çalışır. Yerel `oggaq` migration'ı kullanıcının açık onayıyla uygulandı; mevcut 14 tablonun kayıt özetleri değişmedi. Gerçek içerik veya kullanıcı aktarımı yapılmadı.
+
 26 Ekim 2026 güncel arşiv: **76–98. yenileme**, 30 Ekim 2022’den itibaren **23 dönem / 46 tam seçenek / 253 ders sınavı** olarak canlıda. Son genişletmede 76–82 için 14 tam seçenek ve 77 ders eklendi; önceki içerik/sonuçlar korundu. Dersler aynı sabit soru sürümlerini paylaşır ve ortak Ders ekranında bulunur. Kanıtlar [EXAM_SOURCES](EXAM_SOURCES.md) içinde.
 
 ## Öğrencinin süre tercihi — 26 Ekim 2026

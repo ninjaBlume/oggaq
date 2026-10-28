@@ -55,3 +55,5 @@ export { default as CloudOff } from "lucide-react-native/icons/cloud-off";
 export { default as TriangleAlert } from "lucide-react-native/icons/triangle-alert";
 
 export { default as Repeat2 } from "lucide-react-native/icons/repeat-2";
+
+export { default as Shuffle } from "lucide-react-native/icons/shuffle";

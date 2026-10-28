@@ -7,6 +7,7 @@ use App\Modules\Exams\ExamClock;
 use App\Modules\Exams\Models\ExamAnswer;
 use App\Modules\Exams\Models\ExamAttempt;
 use App\Modules\Exams\Models\ExamBookmark;
+use App\Modules\Exams\RandomExamSelection;
 use App\Modules\QuestionBank\Models\OfficialExam;
 use App\Modules\QuestionBank\Models\Question;
 use App\Modules\Scoring\Actions\ScoreExam;
@@ -23,10 +24,10 @@ class StartExam
 {
     public function __construct(private ResolveStudyContext $contexts) {}
 
-    public function execute(User $actor, string $contextId, array $input): ExamAttempt
+    public function execute(User $actor, string $contextId, array $input, ?RandomExamSelection $selection = null): ExamAttempt
     {
         try {
-            return DB::transaction(function () use ($actor, $contextId, $input) {
+            return DB::transaction(function () use ($actor, $contextId, $input, $selection) {
                 $context = $this->contexts->execute($actor, $contextId, true);
                 // A past exam copies its published template (original order and pinned versions) and takes no filters.
                 $template = isset($input['official_exam_id']) ? $this->template($input['official_exam_id']) : null;
@@ -36,6 +37,9 @@ class StartExam
                     'timer_policy' => $input['timer_policy'] ?? 'continuous',
                 ];
                 $timerSchema = Schema::hasColumn('exam_attempts', 'timer_policy');
+                if ($selection !== null) {
+                    $settings += $selection->attributes;
+                }
                 if (! $timerSchema) {
                     if ($settings['timer_policy'] !== 'continuous') {
                         throw new ApiProblem(503, 'timer_unavailable', 'Süre tercihi için sunucu güncellemesi gerekiyor.');
@@ -56,7 +60,7 @@ class StartExam
 
                     return $existing->load(['answers.questionVersion.options', 'answers.questionVersion.source']);
                 }
-                $picked = $template ?? $this->randomQuestions($settings, $context->id, $input['review_kind'] ?? null);
+                $picked = $selection?->questions ?? $template ?? $this->randomQuestions($settings, $context->id, $input['review_kind'] ?? null);
                 if ($picked->count() !== $settings['question_count']) {
                     throw ValidationException::withMessages(['question_count' => ['Bu seçimde yeterli yayımlanmış soru yok. Daha az soru seçin.']]);
                 }

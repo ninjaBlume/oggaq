@@ -15,7 +15,8 @@ describe("legal pages", () => {
     const html = readFileSync(file, "utf8");
     // The shared wording lives in the page too, so the apps and the store listing say the same thing.
     expect(html).toContain(notOfficialNotice);
-    expect(html).toContain('id="taslak-bandi"');
+    // The approved public-page design removed the old draft banner.
+    expect(html).not.toContain('id="taslak-bandi"');
     for (const other of legalPages) expect(html).toContain(`href="${other.file}"`);
   });
   it("keeps the score note in the terms and support pages", () => {

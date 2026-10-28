@@ -7099,6 +7099,138 @@
           }
         }
       }
+    },
+    "/api/v1/contexts/{context}/random-exam": {
+      "get": {
+        "operationId": "currentRandomExam",
+        "summary": "Açık rastgele sınavı bulma",
+        "description": "Bağlam başına yalnız bir açık rastgele sınav bulunur. Açık sınav varsa ayarlar değişse de aynı kayıt döner; bitirilen veya süresi dolan sınav yenisine izin verir. Temel/Yenileme havuzları ayrıdır. Silahlı 125 (ilk 100 genel, son 25 silah), silahsız 100 genel, silah farkı 25 silah sorusudur. Ders/konu kotaları seçilen eğitimin en yeni yayımlanmış 125 soruluk tam kitapçığından alınır; bu gözlenen dağılımdır, sabit mevzuat yüzdesi değildir. Yetersiz havuz 422; migration eksikse 503. Soru/sürüm/dağılım başlangıçta sabitlenir.",
+        "tags": [
+          "Exams"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RandomExamStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "503": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "startRandomExam",
+        "summary": "Ders ve konu dağılımını koruyan rastgele sınav oluşturma veya devam etme",
+        "description": "Bağlam başına yalnız bir açık rastgele sınav bulunur. Açık sınav varsa ayarlar değişse de aynı kayıt döner; bitirilen veya süresi dolan sınav yenisine izin verir. Temel/Yenileme havuzları ayrıdır. Silahlı 125 (ilk 100 genel, son 25 silah), silahsız 100 genel, silah farkı 25 silah sorusudur. Ders/konu kotaları seçilen eğitimin en yeni yayımlanmış 125 soruluk tam kitapçığından alınır; bu gözlenen dağılımdır, sabit mevzuat yüzdesi değildir. Yetersiz havuz 422; migration eksikse 503. Soru/sürüm/dağılım başlangıçta sabitlenir.",
+        "tags": [
+          "Exams"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Başarılı işlem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamAttemptResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "503": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartRandomExamInput"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -8933,6 +9065,17 @@
           "remaining_seconds": {
             "type": "integer",
             "minimum": 0
+          },
+          "random_exam": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RandomExamMetadata"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Ders/konu dağılımı sabit rastgele sınav. Eski istemciler için ek ve isteğe bağlı metaveri."
           }
         },
         "required": [
@@ -9144,6 +9287,17 @@
           "remaining_seconds": {
             "type": "integer",
             "minimum": 0
+          },
+          "random_exam": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RandomExamMetadata"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Ders/konu dağılımı sabit rastgele sınav. Eski istemciler için ek ve isteğe bağlı metaveri."
           }
         },
         "required": [
@@ -12963,6 +13117,155 @@
           "expires_at": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "RandomExamDistribution": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "subject_id",
+          "subject_name",
+          "topic_id",
+          "topic_name",
+          "section",
+          "question_count"
+        ],
+        "properties": {
+          "subject_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subject_name": {
+            "type": "string"
+          },
+          "topic_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "topic_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "section": {
+            "type": "string",
+            "enum": [
+              "general",
+              "weapon"
+            ]
+          },
+          "question_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 125
+          }
+        }
+      },
+      "RandomExamMetadata": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "education_type",
+          "weapon_status",
+          "title",
+          "reference_exam_id",
+          "distribution"
+        ],
+        "properties": {
+          "education_type": {
+            "type": "string",
+            "enum": [
+              "basic",
+              "renewal"
+            ]
+          },
+          "weapon_status": {
+            "type": "string",
+            "enum": [
+              "armed",
+              "unarmed",
+              "weapon_difference"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "reference_exam_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "distribution": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RandomExamDistribution"
+            }
+          }
+        }
+      },
+      "StartRandomExamInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "education_type",
+          "weapon_status",
+          "duration_seconds"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "education_type": {
+            "type": "string",
+            "enum": [
+              "basic",
+              "renewal"
+            ]
+          },
+          "weapon_status": {
+            "type": "string",
+            "enum": [
+              "armed",
+              "unarmed",
+              "weapon_difference"
+            ]
+          },
+          "duration_seconds": {
+            "type": "integer",
+            "minimum": 60,
+            "maximum": 10800
+          },
+          "timer_policy": {
+            "type": "string",
+            "enum": [
+              "continuous",
+              "pause_on_exit"
+            ],
+            "default": "continuous"
+          }
+        }
+      },
+      "RandomExamStatusResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ExamSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       }

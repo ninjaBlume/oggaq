@@ -14,6 +14,7 @@
 | İşlev | Görsel |
 |---|---|
 | Deneme | Soru listeli sınav panosu |
+| Rastgele sınav | Çapraz karıştırma okları (Shuffle); tekrar ikonundan farklı |
 | Ders | Açık kitap |
 | Sonuç | Bölümlere ayrılmış pasta grafiği |
 | Tekrar | İki yönlü dönüş oku |

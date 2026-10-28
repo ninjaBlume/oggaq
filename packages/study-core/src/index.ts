@@ -49,6 +49,9 @@ export function examTypeShort(name: string): string {
 export function examDisplayTitle(title: string): string {
   return title.replace(/\s*\((?:\d{1,2}[./-]\d{1,2}[./-]\d{4}|\d{4}-\d{2}-\d{2})\)/gu, '').trim();
 }
+export function examAttemptTitle(exam: { official_exam: { title: string } | null; random_exam?: { title: string } | null; question_count: number }, fallback: 'deneme' | 'sınav' = 'deneme'): string {
+  return exam.random_exam?.title ?? (exam.official_exam ? examDisplayTitle(exam.official_exam.title) : `${exam.question_count} soruluk ${fallback}`);
+}
 // List labels use explicit education metadata; renewal numbers are never derived
 // from a basic exam number. Stored titles and historical attempts stay intact.
 export function examQuestionTitle(exam: { exam_number: string | null; education_type?: 'basic' | 'renewal' | 'weapon_difference' }): string {
@@ -97,6 +100,7 @@ export const vocabulary = {
   ders: { title: 'Ders sınavları', short: 'Ders', description: 'Çıkmış ÖGG sorularını derslerine göre çöz. Bir ders seçerek ilgili sınavlara ulaş.' },
   results: { title: 'Sonuçlarım', short: 'Sonuçlar' },
   review: { title: 'Tekrar sınavı', short: 'Tekrar' },
+  random: { title: 'Rastgele sınav', short: 'Rastgele' },
   stats: { title: 'Başarı durumum', short: 'Başarım' },
   profile: { title: 'Profil', short: 'Profil' },
   reports: { title: 'Bildirimler', short: 'Bildirimler' },

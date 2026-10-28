@@ -24,11 +24,11 @@ for (const colorScheme of ["light","dark"] as const) {
   await expect(summary.getByLabel(`Tamamlanan sınav: ${data.exams.completed.toLocaleString("tr-TR")}`,{exact:true})).toBeVisible();
   await expect(page.getByText("Çıkmış sorular",{exact:true})).toBeVisible();
   await expect(page.getByText(/\bPRO\b|premium|abonelik|yükselt|₺/i)).toHaveCount(0);
-  for (const name of ["Ders sınavları ekranını aç","Deneme sınavları ekranını aç","Tekrar sınavı ekranını aç","Sonuçlarım ekranını aç","Başarı durumum ekranını aç"]) {
+  for (const name of ["Ders sınavları ekranını aç","Deneme sınavları ekranını aç","Rastgele sınav ekranını aç","Tekrar sınavı ekranını aç","Sonuçlarım ekranını aç","Başarı durumum ekranını aç"]) {
    await expect(page.getByRole("button",{name,exact:true})).toBeEnabled();
   }
   expect(await page.getByTestId("home-quick-start").getByRole("button").evaluateAll(buttons => buttons.map(button => button.getAttribute("aria-label"))))
-    .toEqual(["Ders sınavları ekranını aç","Deneme sınavları ekranını aç","Tekrar sınavı ekranını aç"]);
+    .toEqual(["Ders sınavları ekranını aç","Deneme sınavları ekranını aç","Rastgele sınav ekranını aç","Tekrar sınavı ekranını aç"]);
   await expect(page.getByText("Derslerini keşfet",{exact:true})).toHaveCount(0);
   mkdirSync("artifacts/home-reference",{recursive:true});
   for (const width of [320,390,834,1280]) {

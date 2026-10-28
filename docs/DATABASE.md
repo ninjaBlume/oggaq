@@ -1,5 +1,13 @@
 # Veritabanı tasarımı
 
+## 28 Ekim 2026 — Rastgele sınavın sabit dağılımı
+
+`2026_10_28_000001_add_random_exam_mode`, `exam_attempts` üzerine beş nullable alan ekler: `random_education_type` (basic/renewal), `random_weapon_status` (armed/unarmed/weapon_difference), `random_reference_exam_id` (indeksli official_exams FK / RESTRICT), `random_distribution` (jsonb dizi) ve `random_scoring_period_id` (indeksli scoring_periods FK / RESTRICT). Eski denemelerde beşi de null kalır.
+
+CHECK, metadata'nın birlikte bulunmasını, filtre/resmî sınav alanlarının boş olmasını ve 125/100/25 sayısını doğrular. `guard_random_exam` INSERT sırasında yayımlanmış, aynı eğitime ait tam 125 soruluk referansı ve varsa puanlama eğitim/bölüm eşleşmesini denetler; UPDATE sırasında metadata'nın değişmesini engeller. `exam_one_active_random_per_context` kısmi unique indeksi, `finished_at IS NULL` olan tek rastgele denemeyi garanti eder. Normal denemeler etkilenmez. Uygulama, mevcut kullanıcı kilidi içinde bitirme/süre dolumunu uygulayıp yeni kayıt kararını verir; soru sürümleri mevcut `exam_answers` düzeninde korunur. Hesap silme mevcut ilişkiler üzerinden çalışır; veri dışa aktarımı rastgele eğitim/tür/referans/dağılım/puanlama dönemini içerir.
+
+Migration yalnız kullanıcı tarafından adıyla onaylandıktan sonra yerel ortak `oggaq` veritabanına uygulandı. İşlem öncesi/sonrası 14 tablo özeti eşleşti; hesaplar, içerik ve sonuçlar korunuyor (`artifacts/random-exam/local-migration-check.json`). Sunucuya uygulanmadı. Rastgele sınav geçmişi varken down() veri kaybını önlemek için reddeder; uygulama geri dönüşünde ek nullable alanlar bırakılır. İş kuralları ve havuz seçimi [EXAMS](EXAMS.md) içinde.
+
 ## 27 Ekim 2026: e-posta doğrulama kodları
 
 `2026_10_27_000001_create_email_verification_codes` migration'ı `email_verification_codes` tablosunu ekler. Her kullanıcı için tek satır: `user_id` UUID primary key ve `users` FK (ON DELETE CASCADE), `code_hash` (64 karakter HMAC-SHA256), `failed_attempts` (CHECK 0–5), `sent_at`, indeksli `expires_at` (`timestamptz`). Düz kod DB'de tutulmaz; özet kullanıcı kimliği + mevcut e-posta + kod ve uygulama anahtarına bağlıdır. Bildirim kuyruğu şifrelidir.

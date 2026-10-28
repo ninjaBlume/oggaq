@@ -65,6 +65,9 @@ class ExportAccountData
         if (Schema::hasColumn('exam_attempts', 'timer_policy')) {
             $attempts->addSelect('a.timer_policy', 'a.paused_at', 'a.paused_seconds');
         }
+        if (Schema::hasColumn('exam_attempts', 'random_weapon_status')) {
+            $attempts->addSelect('a.random_education_type', 'a.random_weapon_status', 'a.random_reference_exam_id', 'a.random_distribution', 'a.random_scoring_period_id');
+        }
         foreach ($attempts->lazyById(self::CHUNK, 'a.id', 'id')->chunk(self::CHUNK) as $chunk) {
             $answers = DB::table('exam_answers as x')->join('question_versions as v', 'v.id', '=', 'x.question_version_id')
                 ->whereIn('x.exam_attempt_id', $chunk->pluck('id')->all())->orderBy('x.exam_attempt_id')->orderBy('x.position')
@@ -76,6 +79,11 @@ class ExportAccountData
                 $finished = $attempt->finished_at !== null;
                 yield [
                     'timer_policy' => $attempt->timer_policy ?? 'continuous', 'paused_at' => $attempt->paused_at ?? null, 'paused_seconds' => $attempt->paused_seconds ?? 0,
+                    'random_exam' => ($attempt->random_weapon_status ?? null) === null ? null : [
+                        'education_type' => $attempt->random_education_type, 'weapon_status' => $attempt->random_weapon_status,
+                        'reference_exam_id' => $attempt->random_reference_exam_id, 'distribution' => json_decode($attempt->random_distribution, true, flags: JSON_THROW_ON_ERROR),
+                        'scoring_period_id' => $attempt->random_scoring_period_id,
+                    ],
                     'context_id' => $attempt->study_context_id, 'exam' => $attempt->exam, 'started_at' => $attempt->started_at, 'deadline_at' => $attempt->deadline_at,
                     'finished_at' => $attempt->finished_at, 'finish_reason' => $attempt->finish_reason, 'duration_seconds' => $attempt->duration_seconds,
                     'question_count' => $attempt->question_count, 'resume_position' => $attempt->resume_position, 'correct' => $attempt->correct_count, 'incorrect' => $attempt->incorrect_count,

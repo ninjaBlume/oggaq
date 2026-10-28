@@ -13,7 +13,7 @@ import {
 } from "./icons";
 import type { ExamAttempt, StudyContext } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
-import { mergeExamAnswerState, mergeExamTimer, anchorClock, remainingSeconds, timeLabel, resumeQuestionIndex, ExamPositionSaver, examDisplayTitle } from "@oggaq/study-core";
+import { mergeExamAnswerState, mergeExamTimer, anchorClock, remainingSeconds, timeLabel, resumeQuestionIndex, ExamPositionSaver, examAttemptTitle } from "@oggaq/study-core";
 import { QuestionMap } from "./questionMap";
 import { useExamTimer } from "./useExamTimer";
 import { api } from "./api";
@@ -136,7 +136,7 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
   const [seconds, setSeconds] = useState(0);
   const [confirm, setConfirm] = useState(false);
   const exam = query.data?.data;
-  const title = exam?.official_exam ? examDisplayTitle(exam.official_exam.title) : exam ? `${exam.question_count} soruluk sınav` : "Sınav";
+  const title = exam ? examAttemptTitle(exam, "sınav") : "Sınav";
   useLayoutEffect(() => { navigation.setOptions({ title }); }, [navigation, title]);
   const timer = useExamTimer(exam, summary => {
     if (summary.status === 'completed') { void query.reload(false); return; }

@@ -1,4 +1,5 @@
 import { Text } from "./text";
+import { RandomExam } from "./randomExam";
 import { ExamHeaderTitle } from "./examHeaderTitle";
 import { BrandWordmark, loadBrandFont } from "./wordmark";
 import { BrandLogo } from "./brandLogo";
@@ -183,6 +184,7 @@ function MainTabs({
                       ders={ders}
                       history={() => activateTab("history")}
                       review={() => activateTab("review")}
+                      random={() => activateTab("random")}
                       stats={() => activateTab("stats")}
                       calendar={(year) => { setCalendarYear(year); activateTab("calendar"); }}
                       exam={exam}
@@ -199,6 +201,8 @@ function MainTabs({
                     />
                   ) : page === "history" ? (
                     <Results context={context} openExam={exam} />
+                  ) : page === "random" ? (
+                    <RandomExam context={context} openExam={exam} />
                   ) : page === "review" ? (
                     <Review context={context} openExam={exam} />
                   ) : page === "score" ? (

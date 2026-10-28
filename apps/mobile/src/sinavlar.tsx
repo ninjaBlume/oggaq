@@ -6,7 +6,7 @@ import { Pressable, View } from "react-native";
 import { newId } from "./ids";
 import { ApiError, cursorFromLink } from "@oggaq/api-client";
 import type { ExamAttempt, Page, StudyContext, components } from "@oggaq/shared-types";
-import { examDisplayTitle, examPeriodLabel, examQuestionTitle, suggestedMinutes, vocabulary, examTimerChoices, type ExamTimerPolicy } from "@oggaq/study-core";
+import { examAttemptTitle, examPeriodLabel, examQuestionTitle, suggestedMinutes, vocabulary, examTimerChoices, type ExamTimerPolicy } from "@oggaq/study-core";
 import { api } from "./api";
 import { useOnReturn, useResource, useTask } from "./hooks";
 import {
@@ -314,7 +314,7 @@ function ResultCard({ attempt: e, open }: { attempt: Summary; open: () => void }
   const { palette, styles } = useTheme();
   const live = e.status === "active" && Date.parse(e.deadline_at) > Date.parse(e.server_time);
   const result = e.result;
-  const title = e.official_exam ? examDisplayTitle(e.official_exam.title) : `${e.question_count} soruluk deneme`;
+  const title = examAttemptTitle(e);
   const kind = e.official_exam ? (/Ders Sınavı/.test(e.official_exam.title) ? "DERS SINAVI" : "DENEME SINAVI") : "DENEME";
   const tint = cardTone(palette, kind === "DERS SINAVI" ? "indigo" : "blue");
   const tone = result ? scoreTone(result.score_percent, palette) : { backgroundColor: palette.softPrimary, color: palette.primary };

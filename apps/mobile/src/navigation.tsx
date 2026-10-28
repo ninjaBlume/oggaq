@@ -46,6 +46,7 @@ export const extraDestinations = [
   { id: "jobs", label: vocabulary.jobs.short, menuLabel: vocabulary.jobs.title, icon: featureIcons.jobs },
 ] as const;
 export type MainTab =
+  | "random"
   | (typeof destinations)[number]["id"]
   | (typeof extraDestinations)[number]["id"];
 

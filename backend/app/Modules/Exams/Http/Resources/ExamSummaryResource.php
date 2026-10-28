@@ -20,6 +20,13 @@ class ExamSummaryResource extends JsonResource
             'resume_position' => $this->bookmark?->position,
             'timer_policy' => $this->timer_policy ?? 'continuous', 'timer_paused' => $pause !== null, 'remaining_seconds' => $remaining,
             'question_count' => $this->question_count, 'duration_seconds' => $this->duration_seconds,
+            'random_exam' => $this->resource->getRawOriginal('random_weapon_status') === null ? null : [
+                'education_type' => $this->random_education_type, 'weapon_status' => $this->random_weapon_status,
+                'title' => 'Rastgele sınav · '.($this->random_education_type === 'renewal' ? 'Yenileme' : 'Temel eğitim').' · '.[
+                    'armed' => 'Silahlı', 'unarmed' => 'Silahsız', 'weapon_difference' => 'Silah farkı',
+                ][$this->random_weapon_status],
+                'reference_exam_id' => $this->random_reference_exam_id, 'distribution' => $this->random_distribution,
+            ],
             'subject_id' => $this->subject_id, 'topic_id' => $this->topic_id, 'scoring_rule' => $this->scoring_rule,
             'official_exam' => $this->officialExam === null ? null : [
                 'id' => $this->officialExam->id, 'title' => $this->officialExam->title, 'year' => $this->officialExam->year,
@@ -27,7 +34,7 @@ class ExamSummaryResource extends JsonResource
             ],
             'started_at' => $this->started_at->toISOString(), 'deadline_at' => ($pause === null ? $this->deadline_at : $now->copy()->addSeconds($remaining))->toISOString(),
             'server_time' => now()->toISOString(), 'finished_at' => $this->finished_at?->toISOString(), 'finish_reason' => $this->finish_reason,
-            'scoring_available' => $this->officialExam?->scoringLink !== null,
+            'scoring_available' => $this->resource->getRawOriginal('random_scoring_period_id') !== null || $this->officialExam?->scoringLink !== null,
             'score_result' => $this->finished_at === null || $this->scoreResult?->output === null ? null : new ScoreResultResource($this->scoreResult),
             'result' => $this->finished_at === null ? null : [
                 'correct' => $this->correct_count, 'incorrect' => $this->incorrect_count, 'blank' => $this->blank_count,

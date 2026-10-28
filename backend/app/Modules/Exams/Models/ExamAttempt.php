@@ -23,7 +23,7 @@ class ExamAttempt extends Model
 
     protected function casts(): array
     {
-        return ['started_at' => 'immutable_datetime', 'deadline_at' => 'immutable_datetime', 'finished_at' => 'immutable_datetime', 'score_percent' => 'float', 'timer_policy' => 'string', 'paused_at' => 'immutable_datetime', 'clock_seen_at' => 'immutable_datetime', 'paused_seconds' => 'integer'];
+        return ['started_at' => 'immutable_datetime', 'deadline_at' => 'immutable_datetime', 'finished_at' => 'immutable_datetime', 'score_percent' => 'float', 'timer_policy' => 'string', 'paused_at' => 'immutable_datetime', 'clock_seen_at' => 'immutable_datetime', 'paused_seconds' => 'integer', 'random_distribution' => 'array'];
     }
 
     public function pauseMoment(): ?CarbonInterface

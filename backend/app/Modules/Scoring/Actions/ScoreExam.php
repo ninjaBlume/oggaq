@@ -16,10 +16,8 @@ class ScoreExam
     // Called in StartExam's transaction. The pinned rule is never replaced on an existing attempt.
     public function pin(ExamAttempt $exam, string $userId): ?ExamScoreResult
     {
-        if (! $exam->official_exam_id) {
-            return null;
-        }
-        $periodId = DB::table('official_exam_scoring')->where('official_exam_id', $exam->official_exam_id)->value('scoring_period_id');
+        $periodId = $exam->random_scoring_period_id ?? ($exam->official_exam_id
+            ? DB::table('official_exam_scoring')->where('official_exam_id', $exam->official_exam_id)->value('scoring_period_id') : null);
         if (! $periodId) {
             return null;
         }
