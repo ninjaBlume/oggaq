@@ -6,7 +6,7 @@ Tekrar aynı cevap/süre/konum motorunu kullanır; bir deneme sonucu gibi sayıl
 
 ## 28 Ekim 2026 — Rastgele sınav
 
-Mobil ana sayfada **Hızlı başla → Rastgele sınav** bulunur. Öğrenci Temel/Yenileme ve Silahlı (125), Silahsız (100), Silah farkı (25) seçer; süreyi ve çıkışta durma tercihini belirler. Menü/alt sekme sayısı değişmez. Bu özellik yerel kaynakta hazırdır; sunucu ve beta yayını ayrıca yapılmalıdır. Yayında önce API ve migration, ardından aynı havuzla duman testi, son olarak ayrı iOS/Android beta güncellemeleri uygulanır; eski API üzerine yeni mobil ekran yayımlanmaz.
+Mobil ana sayfada **Hızlı başla → Rastgele sınav** bulunur. Öğrenci Temel/Yenileme ve Silahlı (125), Silahsız (100), Silah farkı (25) seçer; süreyi ve çıkışta durma tercihini belirler. Menü/alt sekme sayısı değişmez. Bu özellik `876c11e` ile canlı API ve iki beta kanalında yayımlandı; migration ve gerçek havuz kontrolleri [TESTING](TESTING.md) içinde. Yayında önce API ve migration, ardından aynı havuzla duman testi, son olarak ayrı iOS/Android beta güncellemeleri uygulanır; eski API üzerine yeni mobil ekran yayımlanmaz.
 
 `GET /api/v1/contexts/{context}/random-exam` açık sınavı veya null döndürür; `POST` sabit soruları bir kez seçer. Bağlamda açık rastgele sınav varsa farklı cihazda farklı seçim yapılsa bile aynı sınav döner. Aynı UUID ve aynı ayarlarla tekrar, tamamlanmış olsa bile ilk işlemi döndürür; yanıt kaybı ikinci sınav üretmez. Kullanıcı satır kilidi ve PostgreSQL kısmi tekillik indeksi eşzamanlı oluşturmayı korur. Sınav bitirilince veya süre dolunca, boşlar kalsa da yenisi oluşturulabilir. Duraklatılmış sınav bekleme nedeniyle serbest kalmaz. Cevap kilidi, doğru yanıt geri bildirimi, konum kaydı ve mevcut süre politikası kullanılır.
 

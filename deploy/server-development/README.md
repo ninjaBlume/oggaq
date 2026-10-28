@@ -1,5 +1,15 @@
 # Sunucuda ayrı geliştirme ortamı
 
+## 28 Ekim 2026 — Rastgele sınav ve tekrar ayrımı yayını
+
+Kaynak `876c11e`; app/worker/scheduler **`oggaq-development-app:exam-modes-876c11e`**, web **`oggaq-development-web:exam-modes-876c11e`**. Mevcut `manage` wrapper'ı korunarak yönettiği `publication/student-access-20261027/services.compose.yaml` içindeki dört image sabitlemesi güncellendi. Backend'de dokuz eski dosya hash'i doğrulandı, sekiz yeni dosyayla 17 runtime kaynak eşitlendi. İlgili backend ve web/ortak kaynaklar `current` içine eski dosyalar saklanarak kopyalandı; genel site/admin/nginx ve diğer servisler korundu.
+
+Yalnız `2026_10_28_000001_add_random_exam_mode` ve `2026_10_28_000002_distinguish_review_sessions` canlı `oggaq` DB'sine uygulandı. Tek transaction'da 20 iş tablosunun eski satır özetleri ve önceki migration defteri korundu. Gerçek içerik, hesap veya cevap eklenmedi; eski türsüz denemeler yeniden etiketlenmedi. Aday ve canlı app'te gerçek havuzun altı rastgele seçimi salt okunur doğrulandı; HTTPS hazırlığı, yetki sınırları ve hesap web dosyalarının hash'leri geçti. [Tam doğrulama](../../docs/TESTING.md).
+
+Önceki override `publication/exam-modes-876c11e/services.before.yaml`, kaynak kopyaları aynı dizindeki `source-before/` ve `frontend-source-before/` içinde korunur. Yayın öncesi DB snapshot'ı 0700 yayın dizininde **0600** izinlidir; `pg_restore --list` ve SHA-256 doğrulandı. Standart şifreli yedek betiğinin ihtiyaç duyduğu `age` sunucuda bulunmadı; bu snapshot düzenli şifreli/sunucu dışı yedekleme kurulumu yerine geçmez. Yedek sunucudan indirilmedi.
+
+Uygulama geri dönüşünde önceki override ile yalnız app/worker/scheduler/web yenilenir; nullable migration'lar ve yeni geçmiş yerinde bırakılır. DB'yi eski snapshot'a dönmek yeni kullanıcı işlemlerini kaybedebilir; normal kod geri dönüşü için DB restore veya down migration çalıştırılmaz. İki mobil beta güncellemesi ayrı geri dönüş gerektirir: [iOS](../../docs/IOS_BETA.md), [Android](../../docs/ANDROID_BETA.md).
+
 ## 27 Ekim 2026 — Doğrudan kişisel öğrenci erişimi
 
 Kaynak `8da8d13`. Yalnız mevcut çalışan app/web image'larının üzerine dar dosya katmanı uygulandı: app/worker/scheduler `oggaq-development-app:student-access-20261027`, web `oggaq-development-web:student-access-20261027`. Kayıt doğrulama postası göndermez; kişisel çalışmalar doğrulama beklemez, başvuru gönderimi ve kurumsal/yönetim işlemleri korunur. Beş backend dosyasının önceki HEAD ve yeni kaynak SHA256 eşleşmeleri, çalışan route middleware sınırları ve dış HTTPS readiness doğrulandı. Web hesap modundadır; genel sitede soru çözme açılmadı.
