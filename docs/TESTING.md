@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Google Play tablet görselleri
+
+Android 16 ARM64 emülatöründe 1440×2560 tablet ekran yapılandırmalarıyla iki ayrı yerleşim yakalandı: 360 dpi / 640 dp küçük tablette yan gezinme ve tek sütun, 272 dpi / yaklaşık 847 dp büyük tablette yan gezinme ve iki sütun. Her sınıf için ana sayfa ve deneme listesi olmak üzere **4 gerçek PNG** alındı, görsel inceleme ve boyut/uzunluk/SHA-256 kontrolleri geçti. Telefon ekranları büyütülmedi. Küçük tablette Standart, büyük tablette Küçük yazı tercihi kullanıldı; büyük tabletin Standart yazıda dar istatistik sütununda “Doğruluk” kelimesinin satıra bölünebildiği gözlendi. Bu tur arayüz kodu değiştirilmedi.
+
+Önceki ADB izniyle yalnız sentetik hesap ve ayrı geçici içerik DB'si kullanıldı. İş sonunda hesap tercihi Standart'a, emülatör boyutu/yoğunluğu eski değerine döndürüldü; yalnız kendi 8003 API, 8083 Metro ve emülatör süreçleri kapatıldı. Geçici DB'nin silindiği ve mevcut 8082 Metro'nun korunduğu doğrulandı. Fiziksel tablet/iPad veya production native paket testi değildir. [Dosyalar ve ekran yapılandırması](store-assets/README.md#tablet-ekranları). Uygulama kodu değişmediği için geniş testler tekrar çalıştırılmadı.
+
+Kullanıcının dört somut dosya ve hedef için açık onayıyla Google Play'in 7 ve 10 inç tablet alanlarına ikişer ekran yüklendi. **“Değişiklikleriniz kaydedildi”** görüldü; sayfa yeniden yüklendikten sonra her tablet alanında **2/8**, telefon alanında **4/8** ekran korundu ve taslak kaydet pasifti. İncelemeye gönderme, genel yayın veya paket/OTA dağıtımı yapılmadı.
+
 ## 28 Ekim 2026 — Android mağaza görselleri yüklendi ve kalıcılığı doğrulandı
 
 Kullanıcının açık ADB izniyle Android 16 ARM64/Expo Go SDK 58 üzerinde sentetik öğrenci hesabıyla ana sayfa, deneme listesi, gerçek soru çözme ve puan hesaplama ekranları alındı. Dört PNG **1080×1920**, simge **512×512**, özellik grafiği **1024×500**; boyut/dosya uzunluğu/SHA-256 manifesti üretildi ve altı görsel gözle incelendi. Ekranlar değiştirilmeden kopyalandı. Puan örneği 63 genel doğru + 13 silah doğrusu + 4 isabet = **64,5** tahmini puan; uygulamanın resmî sonuç olmadığı açıklaması görünür.

@@ -19,3 +19,11 @@ node apps/mobile/scripts/generate-store-assets.mjs <gercek-android-ekran-klasoru
 Kaynak klasörü yukarıdaki dört ekran dosyasını içermelidir. Üreteç ekranların boyutunu doğrular ve bunları değiştirmeden kopyalar; eksik/yanlış boyutlu ekranı reddeder. Simge/tanıtım çıktıları yerel Chromium ile üretilir. Yeni bağımlılık kurulmaz.
 
 Kullanıcı bu altı görselin Google Play Türkçe mağaza taslağına yüklenmesini onayladı. Taslak yüklemesi kullanım hakkı beyanı, incelemeye gönderim veya genel yayın değildir; [açık yayın koşulları](../STORE_RELEASE.md) korunur.
+
+## Tablet ekranları
+
+`android/tr-TR/tablet-7/` ve `tablet-10/` klasörlerinde ana sayfa ve deneme listesi için ikişer ayrı **1440×2560** ekran bulunur. Android emülatörünün ekran yapılandırması değiştirildi; mevcut telefon görüntülerine ölçekleme veya düzenleme uygulanmadı. Küçük tablet görünümü 360 dpi / 640 dp genişlik, büyük tablet görünümü 272 dpi / yaklaşık 847 dp genişlikle alındı. Bunlar Google Play'in tablet boyut sınıfları için önizlemedir; fiziksel 7/10 inç cihaz testi değildir. Küçük tablette Standart, büyük tablette uygulamanın Küçük yazı tercihi kullanıldı. Ayrıntılar ve hash'ler `tablet-manifest.json` içindedir.
+
+Yalnız ayrı geçici içerik veritabanındaki sentetik öğrenci kullanıldı. İş sonunda yazı tercihi Standart'a döndürüldü; ekran boyutu/yoğunluğu ve ADB yönlendirmesi geri alındı, kendi API/Metro/emülatör süreçleri kapatıldı ve geçici DB silindi. Canlı ve ortak geliştirme verileri değiştirilmedi. iPad/App Store ekranları bu dosyaların kapsamında değildir.
+
+Kullanıcı onayıyla dört tablet dosyası ilgili Google Play taslak alanlarına yüklendi; kaydetme başarı mesajı ve sayfa yeniden yüklemesinde her iki tablet alanında 2/8 ekran doğrulandı.

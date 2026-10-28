@@ -1,0 +1,44 @@
+{
+  "capturedAt": "2026-10-28",
+  "platform": "Android 16 emulator / Expo Go SDK 58",
+  "deviceConfiguration": "Existing emulator, tablet display overrides; original bitmap captures, no resizing",
+  "screenshotsUnmodified": true,
+  "files": [
+    {
+      "path": "tablet-7/01-home.png",
+      "width": 1440,
+      "height": 2560,
+      "densityDpi": 360,
+      "textSize": "standard",
+      "sha256": "27bf46969e57b418ed8145ecdcc61703e83fbb595dd989d50c9699267cc54632",
+      "bytes": 261837
+    },
+    {
+      "path": "tablet-7/02-exams.png",
+      "width": 1440,
+      "height": 2560,
+      "densityDpi": 360,
+      "textSize": "standard",
+      "sha256": "382ccea84561e9f138f5d1050e97ae8424adb55f07a4da0233274a7b45b315c7",
+      "bytes": 311820
+    },
+    {
+      "path": "tablet-10/01-home.png",
+      "width": 1440,
+      "height": 2560,
+      "densityDpi": 272,
+      "textSize": "small",
+      "sha256": "0eb899d559de539f912dfe8294b81ff99ba7ba75d922964d0f42c268a3aae4e1",
+      "bytes": 232729
+    },
+    {
+      "path": "tablet-10/02-exams.png",
+      "width": 1440,
+      "height": 2560,
+      "densityDpi": 272,
+      "textSize": "small",
+      "sha256": "3e76efb7168d8c2eae9479ed3f35b9670881663f75041643e39acdc18a247364",
+      "bytes": 319723
+    }
+  ]
+}
