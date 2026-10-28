@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## 29 Ekim 2026 — Apple mağaza metni/iOS OTA ve Google genel gönderim kontrolü
+
+Apple 1.0.0 Türkçe açıklamasına ilk yardım notu kaydedildi. Tam yenilemede 1.924 karakterlik açıklama kaynakla birebir eşleşti; anahtar kelimeler korundu, Save pasif ve Prepare for Submission durumu teyit edildi. Alan odağı nedeniyle anahtar kelimelere giden ara giriş kayıt öncesi geri alındı, doğru açıklama alanı üzerinden son kayıt doğrulandı. İncelemeye gönderilmedi.
+
+**72 mobil testi / 34 araç-güvenlik testi / tüm workspace strict TypeScript** geçti. Yerel iOS runtime kurulu 1.0.0 (6) ile aynı. Kaynak `8586a7e` → **testflight / `01a184f1-ef1d-7a18-9494-d2d34b77aa79`**, grup `e40a2583-4c50-49b1-a0a6-f21980891e1b`. Hermes paketinde yeni SSS kimliği ve sağlık açıklaması bulundu. Native başlıklarla manifest, launch asset ve 18 ek dosyanın tüm hash’leri, gerçek API/web, preview=false ve runtime/platform/production ayrımı doğrulandı. Cihaz alımı henüz teyit edilmedi; Android beta/genel mağaza/DB/sunucu/Git push değişmedi. Kanıt `artifacts/first-aid-ios-20261029/`.
+
+Google canlı Yayın özeti ekranında gönder düğmesi pasif; kontrol panelindeki üretim yayın akışı **0/5**, ülke/bölge seçimi ve yeni sürüm oluşturma açık, sonraki adımlar kilitli. Mağaza girişi hazır; genel gönderim hazır değil. Bağımsız yerel `check:store` exit 1: yasal inceleme taslak ve üç eksik alan nedeniyle iki engel; bu, Google reddi olarak sunulmadı. Kullanım hakkı/üretim paketi doğrulamaları atlanmadı. `git diff --check` temiz; uygulama kodu/API/veritabanı bu adımda değişmedi, mevcut SSS dağıtıldı; PHPUnit/E2E tekrarlanmadı.
+
 ## 29 Ekim 2026 — Apple takip mesajının gönderim alındısı
 
 Kullanıcının somut gönderim onayından sonra form metninin hazır mesajla eşleştiği kontrol edildi. Apple gönderim ekranı AX ve görüntüde **Thanks for contacting us**, **103012031344** olay numarası ve yanıt verileceği açıklamasını gösterdi. Bu, durum sorgusunun alındısıdır; önceki dönüşüm talebinin kaydı/onayı değildir. DSA dosyası ayrı, uygulama yayını yok. Yerel alındı dosyası güncellendi; yalnız operasyon belgeleri değiştiği için ürün testleri tekrarlanmadı.
