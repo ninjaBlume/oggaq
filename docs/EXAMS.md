@@ -2,6 +2,8 @@
 
 ## 28 Ekim 2026 — Sınav sorularından yapılan eski çalışmalar
 
+`1c997dd` canlı API'ye uygulandı; gerçek 1/11 soruluk parçaların iki listeden de çıktığı ve asıl 18 soruluk sonucun korunduğu salt okunur doğrulandı. Mevcut telefon paketi yeni listeyi alır; yeni migration/OTA yok ([kanıt](TESTING.md)).
+
 Sonuçlarım, Son sınavların ve biten sınav özeti aynı `forExamResults` kapsamını kullanır: resmî şablon bağlantısı veya tanımlı rastgele sınav metadata'sı gerekir; etiketli tekrarlar dışlanır. Eski etiketsiz 1/11 soruluk parçalar artık ayrı deneme görünmez. Cevaplar ve asıl sınav sonuçları birleştirilip yeniden puanlanmaz veya silinmez. Toplam soru/doğruluk hesabına çözümler katılmaya devam eder. [Ayrıntı](STUDY.md).
 
 ## 28 Ekim 2026 — Tekrar sonuçları ayrı çalışma geçmişidir

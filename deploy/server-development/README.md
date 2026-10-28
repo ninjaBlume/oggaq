@@ -1,5 +1,9 @@
 # Sunucuda ayrı geliştirme ortamı
 
+## 28 Ekim 2026 — Eski çalışma parçalarını sonuçlardan ayırma
+
+Kaynak `1c997dd`, app/worker/scheduler **`oggaq-development-app:legacy-results-1c997dd`**. Önceki üç runtime dosyası hash ile doğrulanarak katmanlandı. Aday ve aktif app'te gerçek etkilenen bağlamın ana sayfa ve sonuç sorguları salt okunur doğrulandı: eski 1/11 soruluk parçalar hariç, asıl sonuç ve cevaplar aynı. Migration/veri yazımı yok. Web image/konteyneri ve diğer servisler korundu; nginx upstream reload edildi. Önceki override/kaynaklar `publication/legacy-results-1c997dd/` içinde saklıdır. Geri dönüş önceki PHP image sabitlemeleriyle yapılır; DB restore gerekmez. Mobil OTA değişmedi. [Kontroller](../../docs/TESTING.md).
+
 ## 28 Ekim 2026 — Rastgele sınav ve tekrar ayrımı yayını
 
 Kaynak `876c11e`; app/worker/scheduler **`oggaq-development-app:exam-modes-876c11e`**, web **`oggaq-development-web:exam-modes-876c11e`**. Mevcut `manage` wrapper'ı korunarak yönettiği `publication/student-access-20261027/services.compose.yaml` içindeki dört image sabitlemesi güncellendi. Backend'de dokuz eski dosya hash'i doğrulandı, sekiz yeni dosyayla 17 runtime kaynak eşitlendi. İlgili backend ve web/ortak kaynaklar `current` içine eski dosyalar saklanarak kopyalandı; genel site/admin/nginx ve diğer servisler korundu.
