@@ -1,5 +1,12 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — iPad aktif sınav soru haritası ve iOS teslimi
+
+Mobilde görünürken iPad TestFlight'ta önceki beta bulunuyordu; mevcut kaynak `2768b7d` geniş yan paneli de kapsıyor. Yeni ürün kodu eklenmedi. Native iPad Air 11-inch (M4) / iPadOS 27 Expo Go'da gerçek Exam bileşeni **125 sentetik soruyla**, tüm API işlemleri bellek içindeki QA verisine yönlendirilerek açıldı. Yatay koyu “Soruların” yan paneli ile dikey açık soru listesinde doğru/yanlış/boş ve seçili durumlar, 125. düğmenin varlığı, sınav adı ve duraklatma sonrası işaretlerin korunması doğrulandı. Dikey ekran görüntüsü tüm 1–125 numaralarını içerir. Gerçek sınav/cevap/DB yazımı olmadı. Geçici yerel giriş hash kontrolüyle tam geri yüklendi; yayın normal uygulama girişiyle yapıldı. Yalnız 8083 QA süreci ve bu kontrol için açılan iPad kapatıldı; Device Hub iPhone ana sayfasına geri döndürüldü.
+
+72 mobil test/8 E2E/export sonuçları geçerli; **29 araç testi, workspace strict TypeScript ve iOS native fingerprint kontrolü geçti**. Kaynak `2768b7d`, **testflight / 01a18039-7bcf-7c12-93c5-fd71dc314865**, grup `11818a5a-9c8a-4393-a452-bf066f270218` olarak yayımlandı. Native başlıklarla son manifest, launch asset ve **18 ek dosyanın tamamının SHA-256 değeri eşleşti**. Soru haritası/başlık kodu mevcut, QA harness'i yok; HTTPS API/web, localPreview=false, runtime/platform/kanal ayrımı doğrulandı (uyumsuz runtime/platform 204, production 404). Fiziksel iPad alımı henüz teyit edilmedi. Android/site/sunucu/genel mağaza/Git push yok. Kanıt `artifacts/ipad-question-map/` altında.
+
+
 ## 28 Ekim 2026 — Soru numaralarında sonuç ve sınav adı
 
 Mobil soru haritası sunucu değerlendirmesine göre soluk yeşil/tik ve soluk kırmızı/çarpı kullanır; aktif çerçeve, nötr boş sorular ve cevap kilidi korunur. Üst başlık mevcut sınav adını; ad yoksa soru sayısını gösterir. **72 mobil birim testi, mobil strict TypeScript ve iOS/Android/web Expo export geçti.** Yeni birim testleriyle sunumu taklit etmek yerine gerçek test API'si üzerinden mevcut cevap testi genişletildi, iki başlık E2E'si eklendi. Son **8 Chromium E2E geçti**: deneme/ders cevap kilidi ve yeniden açma, kayıt beklerken sonuç işareti olmaması, doğru/yanlış/boş ayrımı, seçili soru, dar sayfa/geniş yan panel, açık/koyu tema, 320/390/1024 px ve büyük yazıda uzun/fallback başlık, sonuç ve tekrar sınavı. Başlık sınır testi sırasında bulunan geri düğmesi alanı çakışması güvenli maksimum genişlikle giderildi; RN web için seçili soruya açık ARIA özelliği eklendi. Son koşuda başarısız test yok.
