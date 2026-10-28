@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## 29 Ekim 2026 — Google ilk kurulum tamamlandı, Apple bireysel üyelik teyidi
+
+Google’da Eğitim kategorisi ve onaylı destek iletişim bilgileri kaydedildi; kayıt/yayın mesajları görüldü. Yenilenmiş kontrol paneli **10/11** gösterdi. Mağaza girişi metin ve görselleri son önizlemeden **Kaydet** ile tamamlandı; `İncelenmek üzere göndermeye hazır` mesajı ve yeniden açıldığında 1.924 karakterlik açıklamanın kaynakla birebir eşleşmesi doğrulandı. Kontrol panelindeki ilk kurulum bölümü kalktı; test/üretim adımları ve **Üretim: Etkin değil** görüldü. Genel inceleme/üretim yayını başlatılmadı. Görsel AI etiketi için kaynak yöntemi tahmin edilmedi; son gönderim değerlendirmesi açık.
+
+Apple oturumunu kullanıcı açtıktan sonra `Membership details → Enrolled as Individual` görüldü. Dönüşüm bağlantısı yeni talep formunu açıyor; eski talep durumu/beklenen belge görünmüyor. İlgili yerel e-posta aramasında dönüşüme özel alındı veya belge talebi bulunamadı; bu, hiç başvuru yapılmadığı kanıtı sayılmadı. Yeni destek mesajı gönderilmedi. DSA incelemesi dönüşüm durumu yerine kullanılmadı. Bu adımda yalnız operasyon belgeleri değişti; uygulama testleri/build/OTA tekrarlanmadı. Önceki ilk yardım metni için 72 mobil/21 araç testi ve mobil strict kontrolü geçerli.
+
 ## 29 Ekim 2026 — Google kurulum devamı ve Apple durum ayrımı
 
 Google finansal işlev yok seçimi kaydedildi; sonraki sayfada ek belge gerekmemesi, kayıt mesajı ve yenilenmiş kontrol panelinde finans görevinin tamamlanması/**8/11** doğrulandı. Ardından kullanıcı sağlık formunu açınca seçenekler okunur hâle geldi; **Acil durum ve ilk yardım** seçildi. Ek bölgesel koşul gerekmediği, kayıt mesajı ve kontrol panelinde sağlık görevinin tamamlanması/**9/11** doğrulandı. Kategori/iletişim ve mağaza girişi görevleri açık. Kategori düğmesinde Safari `elementHasNoFrame` hatası nedeniyle kullanıcıdan formu açması istendi. Genel inceleme/yayın başlatılmadı.
