@@ -1,5 +1,14 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Yatay telefon ana sayfası
+
+Kullanıcının talebiyle iPad ana sayfa sunumu native iOS/Android yatay telefon pencerelerine genişletildi. `homePresentationFor`, pencere yüksekliği/yönü, güvenli alan ve ray sonrası kalan genişlik ve yazı ölçeğini kullanır. Kompakt yatay ölçüler, küçük ekranda tek sütun, dikeye dönüş ve iPad davranışının korunması yedi politika testiyle doğrulandı; önceki dört iPad testi bunlara taşındı. **72 mobil birim testi, mobil strict TypeScript ve iOS/Android/web Expo export geçti.** İlk kök npm export komutunda çıktı klasörü argümanı yanlış katmana geçti; workspace komutuyla düzeltilen son export başarılı.
+
+Gerçek test API'siyle ana sayfa/özet hatası/boş durum/aktif sınava devam/menü/sekme/gezinme akışlarından **8 E2E geçti**. Yalnız boşluğu doğrulanmış 8001/5183/5184/5186 ve `oggaq_test` kullanıldı; geliştirme DB'sine veri yazılmadı. iPhone 18 Pro / iOS 27 Expo Go ana sayfasında yatay iki sütun ve dikeye dönüş salt okunur kontrol edildi; aktif sınav bilgisi korundu, sınava girilmedi/yanıt yazılmadı. Fiziksel iPhone, native Android ve bu değişiklik sonrası native iPad ayrıca denenmedi; iPad politikası birim testinde korundu. Chromium E2E native yön korumasını çalıştırmaz; native yerleşim kanıtı iPhone simülatörüdür.
+
+Kanıt `artifacts/landscape-home/` altında. Yeni bağımlılık, API/DB/migration, ortak gezinme veya güncelleme davranışı değişmedi; PHPUnit/tam backend koşusu gerektiren sunucu değişikliği yok. Git push, sunucu ve beta OTA yayını yapılmadı.
+
+
 ## 28 Ekim 2026 — iPad düzenlemesi iOS OTA teslimi
 
 Kaynak `6da1421`, kullanıcı talimatıyla yalnız iOS **testflight** kanalına yayımlandı: update `01a18022-f2fa-77c8-bb8c-6e03def2110d`, grup `e7446cc8-4113-4bbe-8398-b5cbcee634e1`. Yayın öncesi **29 araç testi ve workspace strict TypeScript geçti**; önceki 69 mobil test/8 E2E/export sonuçları geçerli. Yerel native fingerprint, kurulu TestFlight 0.1.1 (4) runtime'ıyla eşleşti. Gerçek endpoint eski `01a17fe8` native başlıklarından yeni paketi verdi: manifest/launch asset ve **18 ek dosyanın tamamının SHA-256 kontrolü geçti**. HTTPS API/web adresi, localPreview=false, yeni iPad yerleşimi/cihaz koruması ve geçici QA harness'inin bulunmadığı doğrulandı. Uyumsuz runtime/platform 204; production 404. Fiziksel cihazın `01a18022` alımı henüz teyit edilmedi. Android, site, sunucu, hesap/DB ve genel mağaza yayını değiştirilmedi; Git push yok. Kanıt `artifacts/ipad-home/ota/` altında.

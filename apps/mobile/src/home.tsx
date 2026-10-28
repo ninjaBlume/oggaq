@@ -1,10 +1,11 @@
 import { Children } from "react";
-import { ipadHomeLayoutFor } from "./ipadHomeLayout";
+import { homePresentationFor } from "./homePresentation";
 import { railWidth } from "./layout";
 import { featureIcons } from "./featureIcons";
 import { UpcomingExamCard } from "./upcomingExam";
 import { Text } from "./text";
-import { PixelRatio, Platform, Pressable, View } from "react-native";
+import { Platform, Pressable, useWindowDimensions, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react-native";
 import {
@@ -54,9 +55,20 @@ export function Home({
 }) {
   const { palette, styles, textSize } = useTheme();
   const layout = useLayout();
-  const contentWidth = Math.min(layout.width - (layout.railed ? railWidth : 0), layout.maxWidth) - 2 * layout.gutter;
-  const ipad = ipadHomeLayoutFor({ platform: Platform.OS, isPad: Platform.OS === "ios" && Platform.isPad === true, contentWidth, largeText: textSize === "large" || PixelRatio.getFontScale() > 1.15 });
-  const columns = ipad.enabled ? ipad.twoColumns : layout.columns === 2;
+  const { height, fontScale } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  // SafeAreaView and the navigation rail consume space before the content gutter.
+  const contentWidth = Math.min(layout.width - insets.left - insets.right - (layout.railed ? railWidth : 0), layout.maxWidth) - 2 * layout.gutter;
+  const presentation = homePresentationFor({
+    platform: Platform.OS,
+    isPad: Platform.OS === "ios" && Platform.isPad === true,
+    windowWidth: layout.width,
+    windowHeight: height,
+    contentWidth,
+    largeText: textSize === "large" || fontScale > 1.15,
+  });
+  const roomy = presentation.enabled && !presentation.compactLandscape;
+  const columns = presentation.enabled ? presentation.twoColumns : layout.columns === 2;
   // Reuse the real summary; missing data is never displayed as invented zeros.
   const summary = useResource(
     (signal) =>
@@ -92,18 +104,18 @@ export function Home({
   return (
     <>
       <View style={{ gap: 4 }}>
-        <Text accessibilityRole="header" style={[styles.heading, { fontSize: ipad.enabled ? 28 : 22, lineHeight: ipad.enabled ? 36 : 28 }]}>
+        <Text accessibilityRole="header" style={[styles.heading, { fontSize: roomy ? 28 : 22, lineHeight: roomy ? 36 : 28 }]}>
           {`Merhaba, ${user.name.trim().split(/\s+/)[0]}.`}
         </Text>
         <Text style={styles.muted}>Bir sınav seç, kaldığın yerden devam et.</Text>
       </View>
 
-      <View testID="home-primary-panels" style={{ flexDirection: columns ? "row" : "column", gap: ipad.enabled ? 16 : 20, alignItems: "stretch" }}>
-      <View style={{ flex: columns ? (ipad.enabled ? 1.35 : 2) : undefined, gap: 12 }}>
-      <View testID="home-focus" style={{ backgroundColor: palette.navy, borderRadius: shape.large, padding: ipad.enabled ? 24 : layout.cardPadding + 2, gap: 12, overflow: "hidden" }}>
-        {!ipad.enabled && <View pointerEvents="none" accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"
+      <View testID="home-primary-panels" style={{ flexDirection: columns ? "row" : "column", gap: presentation.enabled ? 16 : 20, alignItems: "stretch" }}>
+      <View style={{ flex: columns ? (presentation.enabled ? 1.35 : 2) : undefined, gap: 12 }}>
+      <View testID="home-focus" style={{ backgroundColor: palette.navy, borderRadius: shape.large, padding: presentation.compactLandscape ? 18 : presentation.enabled ? 24 : layout.cardPadding + 2, gap: 12, overflow: "hidden" }}>
+        {!presentation.enabled && <View pointerEvents="none" accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"
           style={{ position: "absolute", width: 210, height: 280, right: -120, top: -70, borderRadius: shape.extraLarge, backgroundColor: palette.primary, opacity: 0.24, transform: [{ rotate: "-18deg" }] }} />}
-        {!ipad.enabled && <View pointerEvents="none" accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"
+        {!presentation.enabled && <View pointerEvents="none" accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"
           style={{ position: "absolute", width: 170, height: 170, right: -38, bottom: -115, borderRadius: 85, borderWidth: 1, borderColor: palette.decorativeLine }} />}
         <View style={[styles.between, { flexWrap: "wrap" }]}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 7 }}>
@@ -115,7 +127,7 @@ export function Home({
           </View>
         </View>
         <View style={{ gap: 7 }}>
-          <Text accessibilityRole="header" style={{ color: palette.onNavy, fontSize: ipad.enabled ? 28 : 24, lineHeight: ipad.enabled ? 36 : 31, fontWeight: "700" }}>
+          <Text accessibilityRole="header" style={{ color: palette.onNavy, fontSize: roomy ? 28 : 24, lineHeight: roomy ? 36 : 31, fontWeight: "700" }}>
             {activeExam ? "Kaldığın yerden devam et" : "Deneme sınavına başla"}
           </Text>
           <Text style={{ color: palette.onNavyMuted, fontSize: 14, lineHeight: 22 }}>
@@ -143,22 +155,22 @@ export function Home({
       <UpcomingExamCard open={calendar} />
       </View>
 
-      <View testID="home-summary" style={{ flex: columns ? 1 : undefined, justifyContent: "flex-start", gap: 12, ...(ipad.enabled ? { padding: 16, backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.line, borderRadius: 20 } : {}) }}>
+      <View testID="home-summary" style={{ flex: columns ? 1 : undefined, justifyContent: "flex-start", gap: 12, ...(presentation.enabled ? { padding: presentation.compactLandscape ? 12 : 16, backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.line, borderRadius: 20 } : {}) }}>
         <View style={styles.between}>
           <Text style={{ color: palette.ink, fontSize: 14, fontWeight: "600" }}>Genel durumun</Text>
           <TextLink onPress={stats}>Detayları gör</TextLink>
         </View>
-        <View testID="home-metrics" style={{ flexDirection: ipad.verticalMetrics ? "column" : "row", gap: ipad.enabled ? 10 : 8 }}>
+        <View testID="home-metrics" style={{ flexDirection: presentation.verticalMetrics ? "column" : "row", gap: presentation.enabled ? 10 : 8 }}>
           {metrics.map(({ label, accessible, value, icon: Icon, tone }) => {
             const tint = cardTone(palette, tone);
             return (
             <View key={label} accessible accessibilityLabel={`${accessible}: ${value ?? (summary.loading && !summary.data ? "yükleniyor" : "henüz yok")}`}
-              style={{ flex: ipad.verticalMetrics ? undefined : 1, minWidth: 0, gap: ipad.verticalMetrics ? 12 : 5, padding: ipad.verticalMetrics ? 12 : 10, flexDirection: ipad.verticalMetrics ? "row" : "column", alignItems: ipad.verticalMetrics ? "center" : "stretch", backgroundColor: tint.surface, borderWidth: 1, borderRadius: shape.control, borderColor: tint.line }}>
-              <View style={{ width: ipad.verticalMetrics ? 34 : 28, height: ipad.verticalMetrics ? 34 : 28, borderRadius: shape.small, alignItems: "center", justifyContent: "center", backgroundColor: tint.iconSurface }}>
-                <Icon size={ipad.verticalMetrics ? 20 : 17} color={tint.accent} strokeWidth={1.8} />
+              style={{ flex: presentation.verticalMetrics ? undefined : 1, minWidth: 0, gap: presentation.verticalMetrics ? 12 : 5, padding: presentation.verticalMetrics && !presentation.compactLandscape ? 12 : 10, flexDirection: presentation.verticalMetrics ? "row" : "column", alignItems: presentation.verticalMetrics ? "center" : "stretch", backgroundColor: tint.surface, borderWidth: 1, borderRadius: shape.control, borderColor: tint.line }}>
+              <View style={{ width: presentation.verticalMetrics ? 34 : 28, height: presentation.verticalMetrics ? 34 : 28, borderRadius: shape.small, alignItems: "center", justifyContent: "center", backgroundColor: tint.iconSurface }}>
+                <Icon size={presentation.verticalMetrics ? 20 : 17} color={tint.accent} strokeWidth={1.8} />
               </View>
-              <View style={{ flex: ipad.verticalMetrics ? 1 : undefined, minWidth: 0, gap: ipad.verticalMetrics ? 2 : 5 }}>
-              <Text style={{ color: palette.ink, fontSize: ipad.verticalMetrics ? 26 : 22, lineHeight: ipad.verticalMetrics ? 32 : 29, fontWeight: "700", fontVariant: ["tabular-nums"] }}>{value ?? "—"}</Text>
+              <View style={{ flex: presentation.verticalMetrics ? 1 : undefined, minWidth: 0, gap: presentation.verticalMetrics ? 2 : 5 }}>
+              <Text style={{ color: palette.ink, fontSize: presentation.verticalMetrics && !presentation.compactLandscape ? 26 : 22, lineHeight: presentation.verticalMetrics && !presentation.compactLandscape ? 32 : 29, fontWeight: "700", fontVariant: ["tabular-nums"] }}>{value ?? "—"}</Text>
               <Text style={{ color: palette.muted, fontSize: 12, lineHeight: 18 }}>{label}</Text>
               </View>
             </View>
@@ -168,21 +180,21 @@ export function Home({
       </View>
       </View>
 
-      <View style={{ flexDirection: columns ? "row" : "column", gap: ipad.enabled ? 16 : 20, alignItems: "stretch" }}>
+      <View style={{ flexDirection: columns ? "row" : "column", gap: presentation.enabled ? 16 : 20, alignItems: "stretch" }}>
       <View testID="home-quick-start" style={{ flex: columns ? 1 : undefined, gap: 12 }}>
       <SectionTitle>Hızlı başla</SectionTitle>
       <HomeGroup>
-        <HomeRow ipad={ipad.enabled} icon={featureIcons.ders} tone="indigo" title={vocabulary.ders.title} description="Dersini seç, ilgili sınavlara ulaş" onPress={() => ders()} />
-        <HomeRow ipad={ipad.enabled} icon={featureIcons.deneme} tone="blue" title={vocabulary.deneme.title} description="Silahlı veya silahsız sınavını seç" onPress={deneme} />
-        <HomeRow ipad={ipad.enabled} icon={featureIcons.review} tone="sand" title={vocabulary.review.title} description="Yanlış, boş ve favori sorularından sınav yap"
+        <HomeRow roomy={roomy} icon={featureIcons.ders} tone="indigo" title={vocabulary.ders.title} description="Dersini seç, ilgili sınavlara ulaş" onPress={() => ders()} />
+        <HomeRow roomy={roomy} icon={featureIcons.deneme} tone="blue" title={vocabulary.deneme.title} description="Silahlı veya silahsız sınavını seç" onPress={deneme} />
+        <HomeRow roomy={roomy} icon={featureIcons.review} tone="sand" title={vocabulary.review.title} description="Yanlış, boş ve favori sorularından sınav yap"
           accessibilityLabel={`${vocabulary.review.title} ekranını aç`} onPress={review} />
       </HomeGroup>
       </View>
       <View style={{ flex: columns ? 1 : undefined, gap: 12 }}>
       <SectionTitle>Çalışmaların</SectionTitle>
       <HomeGroup>
-        <HomeRow ipad={ipad.enabled} icon={featureIcons.history} tone="blue" title={vocabulary.results.title} description="Girdiğin sınavları ve cevaplarını incele" onPress={history} />
-        <HomeRow ipad={ipad.enabled} icon={featureIcons.stats} tone="indigo" title={vocabulary.stats.title}
+        <HomeRow roomy={roomy} icon={featureIcons.history} tone="blue" title={vocabulary.results.title} description="Girdiğin sınavları ve cevaplarını incele" onPress={history} />
+        <HomeRow roomy={roomy} icon={featureIcons.stats} tone="indigo" title={vocabulary.stats.title}
           description={typeof accuracy === "number" ? `Doğruluk %${accuracy.toLocaleString("tr-TR", { maximumFractionDigits: 1 })}` : "İlerlemeni ve derslere göre durumunu gör"}
           accessibilityLabel={`${vocabulary.stats.title} ekranını aç`} onPress={stats} />
       </HomeGroup>
@@ -204,13 +216,13 @@ export function Home({
           </View>
         </HomeGroup>
       ) : (
-        <HomeGroup columns={ipad.enabled && columns ? 2 : 1}>
+        <HomeGroup columns={presentation.enabled && columns ? 2 : 1}>
           {recentExams.data?.data.map(attempt => {
             const title = attempt.official_exam ? examDisplayTitle(attempt.official_exam.title) : `${attempt.question_count} soruluk deneme`;
             const status = attempt.status === "active"
               ? Date.parse(attempt.deadline_at) > Date.parse(attempt.server_time) ? "Devam ediyor" : "Süresi doldu"
               : attempt.result ? `%${attempt.result.score_percent} doğru` : "Sonuç bekleniyor";
-            return <HomeRow ipad={ipad.enabled} key={attempt.id} icon={attempt.status === "completed" ? featureIcons.history : featureIcons.deneme} title={title}
+            return <HomeRow roomy={roomy} key={attempt.id} icon={attempt.status === "completed" ? featureIcons.history : featureIcons.deneme} title={title}
               description={new Date(attempt.started_at).toLocaleDateString("tr-TR")}
               accessibilityLabel={`${title}, ${status}`} onPress={() => exam(attempt.id)}
               badge={<Badge tone={attempt.status === "completed" && attempt.result ? scoreTone(attempt.result.score_percent, palette).badge : "primary"}>{status}</Badge>} />;
@@ -226,8 +238,8 @@ function HomeGroup({ children, columns = 1 }: { children: ReactNode; columns?: 1
   return <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>{Children.map(children, child => <View style={{ flexBasis: "46%", flexGrow: 1, minWidth: 0 }}>{child}</View>)}</View>;
 }
 
-function HomeRow({ icon: Icon, title, description, accessibilityLabel, onPress, badge, tone, ipad = false }: {
-  ipad?: boolean;
+function HomeRow({ icon: Icon, title, description, accessibilityLabel, onPress, badge, tone, roomy = false }: {
+  roomy?: boolean;
   icon: LucideIcon;
   title: string;
   description?: string;
@@ -239,13 +251,13 @@ function HomeRow({ icon: Icon, title, description, accessibilityLabel, onPress, 
   const { palette } = useTheme();
   const tint = tone ? cardTone(palette, tone) : null;
   return <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? `${title} ekranını aç`} onPress={onPress}
-    style={({ pressed }) => ({ minHeight: ipad ? 76 : 66, paddingHorizontal: ipad ? 16 : 14, paddingVertical: ipad ? 12 : cardDensity.paddingY, flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: pressed ? (tint?.iconSurface ?? palette.softPrimary) : (tint?.surface ?? palette.surface),
+    style={({ pressed }) => ({ minHeight: roomy ? 76 : 66, paddingHorizontal: roomy ? 16 : 14, paddingVertical: roomy ? 12 : cardDensity.paddingY, flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: pressed ? (tint?.iconSurface ?? palette.softPrimary) : (tint?.surface ?? palette.surface),
       borderWidth: 1, borderColor: tint?.line ?? palette.line, borderRadius: shape.control })}>
     <View style={{ width: 38, height: 38, borderRadius: shape.control, alignItems: "center", justifyContent: "center", backgroundColor: tint?.iconSurface ?? palette.softPrimary }}>
       <Icon size={21} color={tint?.accent ?? palette.primary} strokeWidth={1.8} />
     </View>
     <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-      <Text style={{ color: palette.ink, fontSize: ipad ? 16 : 15, lineHeight: ipad ? 23 : 22, fontWeight: "600" }}>{title}</Text>
+      <Text style={{ color: palette.ink, fontSize: roomy ? 16 : 15, lineHeight: roomy ? 23 : 22, fontWeight: "600" }}>{title}</Text>
       {description && <Text style={{ color: palette.muted, fontSize: 13, lineHeight: 20 }}>{description}</Text>}
       {badge}
     </View>
