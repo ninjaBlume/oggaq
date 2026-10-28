@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Yatay tablet mağaza görselleri
+
+Kullanıcının “telefonlar için gerekmez, tabletler için” düzeltmesiyle yalnız iki tablet sınıfına yatay ekranlar hazırlandı: ana sayfa ve deneme listesi için **4 adet 2560×1440 özgün PNG**. Android 16 emülatöründe 360/272 dpi ve Standart yazıyla gerçek yatay yerleşimler yakalandı; dikey görüntü döndürülmedi/ölçeklenmedi. Dört ekran görsel incelendi; boyut, uzunluk ve SHA-256 doğrulaması geçti. Dosyalar [tablet klasörlerinde](store-assets/README.md#yatay-tablet-ekranları); telefon varlıkları değişmedi.
+
+Yalnız ayrı geçici DB'de sentetik hesap kullanıldı; kullanıcı/oturum/geçmiş/başvuru verileri aktarılmadı. İş sonunda kendi 8003 API/8083 Metro/emülatör süreçleri kapatıldı, ekran/ADB ayarları geri alındı ve DB'nin silindiği doğrulandı. 8082 Metro korundu. Uygulama kodu/paket/OTA değişmedi; geniş testler tekrarlanmadı. Fiziksel tablet veya iPad doğrulaması değildir.
+
 ## 28 Ekim 2026 — Google Play tablet görselleri
 
 Android 16 ARM64 emülatöründe 1440×2560 tablet ekran yapılandırmalarıyla iki ayrı yerleşim yakalandı: 360 dpi / 640 dp küçük tablette yan gezinme ve tek sütun, 272 dpi / yaklaşık 847 dp büyük tablette yan gezinme ve iki sütun. Her sınıf için ana sayfa ve deneme listesi olmak üzere **4 gerçek PNG** alındı, görsel inceleme ve boyut/uzunluk/SHA-256 kontrolleri geçti. Telefon ekranları büyütülmedi. Küçük tablette Standart, büyük tablette Küçük yazı tercihi kullanıldı; büyük tabletin Standart yazıda dar istatistik sütununda “Doğruluk” kelimesinin satıra bölünebildiği gözlendi. Bu tur arayüz kodu değiştirilmedi.

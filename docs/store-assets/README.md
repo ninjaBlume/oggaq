@@ -27,3 +27,9 @@ Kullanıcı bu altı görselin Google Play Türkçe mağaza taslağına yüklenm
 Yalnız ayrı geçici içerik veritabanındaki sentetik öğrenci kullanıldı. İş sonunda yazı tercihi Standart'a döndürüldü; ekran boyutu/yoğunluğu ve ADB yönlendirmesi geri alındı, kendi API/Metro/emülatör süreçleri kapatıldı ve geçici DB silindi. Canlı ve ortak geliştirme verileri değiştirilmedi. iPad/App Store ekranları bu dosyaların kapsamında değildir.
 
 Kullanıcı onayıyla dört tablet dosyası ilgili Google Play taslak alanlarına yüklendi; kaydetme başarı mesajı ve sayfa yeniden yüklemesinde her iki tablet alanında 2/8 ekran doğrulandı.
+
+### Yatay tablet ekranları
+
+Her tablet klasöründeki `03-home-landscape.png` ve `04-exams-landscape.png`, ayrı yatay ekran yapılandırmasında alınan **2560×1440** özgün görüntülerdir. 7 inç sınıfı için 360 dpi, 10 inç sınıfı için 272 dpi; ikisinde de Standart yazı tercihi kullanıldı. Dosyalar döndürülmüş/büyütülmüş dikey görüntüler değildir; yan gezinme ve iki sütunlu gerçek yerleşimi gösterir. Dört dosyanın boyut/hash kaydı `landscape-manifest.json` içindedir. Kullanıcının düzeltmesiyle telefon için yatay ekran hazırlanmadı.
+
+Çekim yine yalnız geçici DB'deki sentetik öğrenciyle yapıldı; canlı/ortak geliştirme verisi kullanılmadı. Çekim servisleri kapatıldı, ekran ayarları geri alındı, geçici DB'nin silindiği ve mevcut 8082 Metro'nun korunduğu doğrulandı. iPad/App Store ekranları değildir.

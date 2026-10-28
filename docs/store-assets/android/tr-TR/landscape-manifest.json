@@ -1,0 +1,43 @@
+{
+  "capturedAt": "2026-10-28",
+  "platform": "Android 16 emulator / Expo Go SDK 58",
+  "screenshotsUnmodified": true,
+  "files": [
+    {
+      "path": "tablet-7/03-home-landscape.png",
+      "width": 2560,
+      "height": 1440,
+      "densityDpi": 360,
+      "textSize": "standard",
+      "bytes": 214742,
+      "sha256": "901f8d258e15c1e8eaa113b9f8740866b0539fce69f1810c849f1f8a05415188"
+    },
+    {
+      "path": "tablet-7/04-exams-landscape.png",
+      "width": 2560,
+      "height": 1440,
+      "densityDpi": 360,
+      "textSize": "standard",
+      "bytes": 194152,
+      "sha256": "b2456e4b317cc830aa5a201672d9f74a0e88118d52d7da8c6f2be9666d8f6e33"
+    },
+    {
+      "path": "tablet-10/03-home-landscape.png",
+      "width": 2560,
+      "height": 1440,
+      "densityDpi": 272,
+      "textSize": "standard",
+      "bytes": 210043,
+      "sha256": "e93603db994189dca0aa6e4eac2dea2abbf7a15820efde1e55dca8aa87eccdac"
+    },
+    {
+      "path": "tablet-10/04-exams-landscape.png",
+      "width": 2560,
+      "height": 1440,
+      "densityDpi": 272,
+      "textSize": "standard",
+      "bytes": 189731,
+      "sha256": "d93cae6d7075534a06cee2e770f8268418d3724540efc099fd763cf0a1f27a43"
+    }
+  ]
+}
