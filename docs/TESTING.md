@@ -1,5 +1,9 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Eski parçaların Expo Go ekranında doğrulanması
+
+Device Hub iPhone 18 Pro / iOS 27 Expo Go'da açık kalmış Sonuçlarım ekranı önce eski 1/11 soruluk kayıtları gösteriyordu. Çalışan 8082 Metro manifesti `https://oggsor.com`, SDK 58 ve `localPreview=false` olarak doğrulandı; Metro durdurulmadı. Ana sayfaya geçilip mevcut API yenilemesi tamamlandığında parçalar kayboldu, tamamlanan sınav sayısı 3'ten 1'e indi. Sonuçlarım'a dönülünce yalnız asıl 18 soruluk sonuç (7 doğru / 11 yanlış, %38,9) ve iki duraklatılmış 125 soruluk sınav kaldığı native erişilebilirlik ağacı ve ekran görüntüsüyle doğrulandı. Sorun bu kontrolde açık ekranın eski bellekteki listesiydi; yeni kod, OTA, hesap/cevap/DB değişikliği gerekmedi. Fiziksel cihaz teyidi değildir.
+
 ## 28 Ekim 2026 — Eski 1/11 soruluk parçalar canlıda düzeltildi
 
 Önceki ayrım yalnız `review_kind` alanı dolu yeni tekrarlara bakıyordu. Kullanıcının eski 1 ve 11 soruluk kayıtlarında bu etiket bulunmadığından Sonuçlarım, Son sınavların ve sınav özetinde kalmışlardı. Canlı salt okunur sorgu, iki parçanın sorularının önceden girilmiş asıl sınavda bulunduğunu doğruladı. Kaynak **`1c997dd`**, ortak `forExamResults` kapsamıyla yalnız resmî şablona bağlı deneme/ders veya tanımlı rastgele sınavları kabul eder. Soru adedine göre eşik yoktur; gerçek tek soruluk ders şablonu korunur. Eski çalışmalar, cevapları ve özgün asıl sonuç silinmez/yeniden etiketlenmez; ham soru/doğruluk istatistiği ve kendi `scope=all`/export geçmişi korunur.
