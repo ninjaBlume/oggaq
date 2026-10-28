@@ -234,6 +234,69 @@ class ReviewedBookletImportTest extends TestCase
         $this->preview();
     }
 
+    private function useOfficialEvidence(): void
+    {
+        file_put_contents($this->files[2], '%PDF-1.4 synthetic B booklet evidence');
+        $this->plan['source_url'] = 'https://www.egm.gov.tr/kurumlar/egm.gov.tr/IcSite/ozelguvenlik/Sinav-Kitapcik/synthetic/A.pdf';
+        $this->plan['evidence_url'] = 'https://www.egm.gov.tr/kurumlar/egm.gov.tr/IcSite/ozelguvenlik/Sinav-Kitapcik/synthetic/B.pdf';
+        $this->plan += ['primary_source_verified' => true, 'evidence_sha256' => hash_file('sha256', $this->files[2]),
+            'evidence_format' => 'pdf', 'evidence_reviewed' => true, 'evidence_matching_questions' => 125];
+        $this->writePlan();
+    }
+
+    public function test_direct_official_booklets_preserve_provenance_and_approval(): void
+    {
+        $this->useOfficialEvidence();
+        $batch = $this->preview();
+        $this->assertTrue($batch->report['primary_source_verified']);
+        $this->assertSame(125, $this->commit($batch)['armed_questions']);
+        $source = QuestionSource::firstOrFail();
+        $this->assertSame($this->plan['source_url'], $source->url);
+        $this->assertStringContainsString('doğrudan indirildi', $source->citation);
+        $this->assertStringNotContainsString('erişilemediği', $source->citation);
+        $this->assertSame(125, $this->commit($batch)['armed_questions']);
+        $this->plan['primary_source_verified'] = false;
+        $this->plan['evidence_url'] = 'https://mirror.example.test/B.pdf';
+        $this->writePlan();
+        $this->expectExceptionMessage('önizlemeyle');
+        $this->commit($batch);
+    }
+
+    public function test_official_provenance_rejects_untrusted_hosts_and_non_booklet_paths(): void
+    {
+        $this->useOfficialEvidence();
+        $original = $this->plan;
+        foreach (['https://www.egm.gov.tr.example.test/kurumlar/egm.gov.tr/IcSite/ozelguvenlik/Sinav-Kitapcik/B.pdf',
+            'https://www.egm.gov.tr/other/B.pdf', 'https://www.egm.gov.tr:8443/kurumlar/egm.gov.tr/IcSite/ozelguvenlik/Sinav-Kitapcik/B.pdf'] as $url) {
+            $this->plan = array_replace($original, ['evidence_url' => $url]);
+            $this->writePlan();
+            try {
+                $this->preview();
+                $this->fail('Invalid official source accepted');
+            } catch (\RuntimeException $e) {
+                $this->assertStringContainsString('doğrudan EGM', $e->getMessage());
+            }
+        }
+        $this->assertDatabaseCount('import_batches', 0);
+    }
+
+    public function test_official_provenance_requires_distinct_reviewed_pdf_evidence(): void
+    {
+        $this->useOfficialEvidence();
+        $original = $this->plan;
+        foreach ([['evidence_sha256' => $original['pdf_sha256']], ['evidence_url' => $original['source_url']], ['evidence_format' => 'doc']] as $change) {
+            $this->plan = array_replace($original, $change);
+            $this->writePlan();
+            try {
+                $this->preview();
+                $this->fail('Missing independent A/B evidence accepted');
+            } catch (\RuntimeException $e) {
+                $this->assertStringContainsString('farklı A/B PDF', $e->getMessage());
+            }
+        }
+        $this->assertDatabaseCount('questions', 0);
+    }
+
     public function test_subject_exams_share_versions_and_are_idempotent_without_whole_exam_scoring(): void
     {
         $whole = $this->commit($this->preview());

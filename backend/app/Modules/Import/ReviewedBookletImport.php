@@ -44,10 +44,10 @@ class ReviewedBookletImport
             'report' => ['education_type' => $plan['education_type'], 'exam_number' => $plan['exam_number'], 'exam_date' => $plan['exam_date'],
                 'question_count' => 125, 'reusable_questions' => $reusable, 'new_question_candidates' => 125 - $reusable,
                 'pdf_sha256' => $plan['pdf_sha256'], 'source_url' => $plan['source_url'], 'evidence_url' => $plan['evidence_url'],
-                'verification' => isset($plan['evidence_sha256']) ? 'Two source documents with reviewed content/answer comparison.' : 'Identical PDF bytes from two hosts, A/B answer comparison and visual/subject review.',
+                'verification' => ($plan['primary_source_verified'] ?? false) ? 'Official EGM A/B PDFs with reviewed content/answer and visual/subject comparison.' : (isset($plan['evidence_sha256']) ? 'Two source documents with reviewed content/answer comparison.' : 'Identical PDF bytes from two hosts, A/B answer comparison and visual/subject review.'),
                 'evidence_sha256' => $plan['evidence_sha256'] ?? $plan['pdf_sha256'],
                 'ab_matching_questions' => $plan['ab_matching_questions'], 'comparison_exceptions' => $plan['comparison_exceptions'] ?? [],
-                'primary_source_verified' => false, 'subjects' => array_count_values(array_column($plan['questions'], 'subject_code'))],
+                'primary_source_verified' => $plan['primary_source_verified'] ?? false, 'subjects' => array_count_values(array_column($plan['questions'], 'subject_code'))],
             'status' => 'previewed', 'created_by' => $actor->id,
         ]);
         $batch->report_sha256 = $this->reportHash($batch->report);
@@ -103,8 +103,11 @@ class ReviewedBookletImport
         $title = 'Özel Güvenlik '.$plan['exam_number'].'. '.$label.' Eğitim Sınavı soruları';
         $source = QuestionSource::where('title', $title)->first();
         if (! $source) {
+            $verification = ($plan['primary_source_verified'] ?? false)
+                ? 'Asıl EGM A/B PDF dosyaları doğrudan indirildi; soru, seçenek, cevap ve ders eşlemesi incelendi. B kitapçığı: '
+                : 'İki kaynak kopyası ve A/B cevapları karşılaştırıldı; soru görünümleri incelendi. Asıl EGM adresine erişilemediği için kaynak kopyası kullanıldı. İkinci kopya: ';
             $source = app(CreateCatalogEntry::class)->execute($actor, 'question-sources', ['title' => $title, 'url' => $plan['source_url'],
-                'citation' => 'EGM '.$plan['exam_number'].'. '.$label.' Eğitim A kitapçığı, '.$plan['exam_date'].'. İki kaynak kopyası ve A/B cevapları karşılaştırıldı; soru görünümleri incelendi. Asıl EGM adresine erişilemediği için kaynak kopyası kullanıldı. İkinci kopya: '.$plan['evidence_url']]);
+                'citation' => 'EGM '.$plan['exam_number'].'. '.$label.' Eğitim A kitapçığı, '.$plan['exam_date'].'. '.$verification.$plan['evidence_url']]);
         }
         $periods = [];
         foreach (['armed', 'unarmed'] as $weapon) {
@@ -162,6 +165,7 @@ class ReviewedBookletImport
             'comparison_exceptions' => 'sometimes|array|list|max:25', 'comparison_exceptions.*.position' => 'required|integer|distinct|between:1,125',
             'comparison_exceptions.*.reason' => 'required|string|min:20|max:2000',
             'evidence_sha256' => 'sometimes|required|regex:/^[a-f0-9]{64}$/', 'evidence_format' => 'required_with:evidence_sha256|in:pdf,doc',
+            'primary_source_verified' => 'sometimes|boolean',
             'evidence_reviewed' => 'exclude_without:evidence_sha256|required|accepted', 'evidence_matching_questions' => 'required_with:evidence_sha256|integer|in:125',
             'scoring_rule_codes.armed' => 'required|string|max:80', 'scoring_rule_codes.unarmed' => 'required|string|max:80',
             'questions' => 'required|array|list|size:125', 'questions.*.position' => 'required|integer|distinct|between:1,125',
@@ -172,7 +176,21 @@ class ReviewedBookletImport
         if ($plan['ab_matching_questions'] + count($plan['comparison_exceptions'] ?? []) !== 125) {
             throw new RuntimeException('A/B farklarının her biri ayrı inceleme notuyla açıklanmalı.');
         }
-        if (parse_url($plan['source_url'], PHP_URL_HOST) === parse_url($plan['evidence_url'], PHP_URL_HOST)) {
+        if ($plan['primary_source_verified'] ?? false) {
+            foreach (['source_url', 'evidence_url'] as $key) {
+                $url = parse_url($plan[$key]);
+                if (($url['scheme'] ?? '') !== 'https' || ! in_array($url['host'] ?? '', ['www.egm.gov.tr', 'egm.gov.tr'], true)
+                    || isset($url['user']) || isset($url['pass']) || isset($url['port'])
+                    || ! str_starts_with($url['path'] ?? '', '/kurumlar/egm.gov.tr/IcSite/ozelguvenlik/Sinav-Kitapcik/')) {
+                    throw new RuntimeException('Asıl kaynak doğrulaması yalnız doğrudan EGM kitapçık adresleriyle yapılabilir.');
+                }
+            }
+            if (($plan['evidence_format'] ?? null) !== 'pdf' || ! ($plan['evidence_reviewed'] ?? false)
+                || ($plan['evidence_matching_questions'] ?? null) !== 125 || ! isset($plan['evidence_sha256'])
+                || $plan['source_url'] === $plan['evidence_url'] || $plan['pdf_sha256'] === $plan['evidence_sha256']) {
+                throw new RuntimeException('Asıl kaynak için farklı A/B PDF kanıtı ve 125 sorunun incelemesi gerekir.');
+            }
+        } elseif (parse_url($plan['source_url'], PHP_URL_HOST) === parse_url($plan['evidence_url'], PHP_URL_HOST)) {
             throw new RuntimeException('İkinci PDF farklı bir sunucudan gelmeli.');
         }
         foreach ([$pdf, $evidence] as $i => $path) {
