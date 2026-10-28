@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## 29 Ekim 2026 — Apple destek geçmişi ve hesap doğrulama araştırması
+
+Apple `recent-cases` sayfasında son 90 gün için etkinlik bulunmadığı hem AX hem görüntüde görüldü; bilinen DSA dosyası da listelenmediğinden başvuru yapılmadığı sonucuna varılmadı. Yerel e-posta Team ID aramasında dönüşüm alındısı bulunamadı. App Store Connect Business tekrar kontrol edildi: Free Apps Agreement Active, DSA In Review/16 Ekim 2026, yasal kişi Harun Altay. Durum/belge soran yeni destek mesajı hazır; gönderme onayı bekliyor, gönderilmedi. Google’da şirket/D‑U‑N‑S ve doğrulanmış site/iletişim bilgileri görüldü; ayrı Android kimlik/paket durumunun tüm ayrıntıları teyit edilmedi.
+
+Yalnız belge/araştırma kaydı değişti; `git diff --check` temiz. Uygulama kodu, API, veritabanı, build ve dağıtım değişmedi; ürün testleri tekrarlanmadı.
+
 ## 29 Ekim 2026 — Google ilk kurulum tamamlandı, Apple bireysel üyelik teyidi
 
 Google’da Eğitim kategorisi ve onaylı destek iletişim bilgileri kaydedildi; kayıt/yayın mesajları görüldü. Yenilenmiş kontrol paneli **10/11** gösterdi. Mağaza girişi metin ve görselleri son önizlemeden **Kaydet** ile tamamlandı; `İncelenmek üzere göndermeye hazır` mesajı ve yeniden açıldığında 1.924 karakterlik açıklamanın kaynakla birebir eşleşmesi doğrulandı. Kontrol panelindeki ilk kurulum bölümü kalktı; test/üretim adımları ve **Üretim: Etkin değil** görüldü. Genel inceleme/üretim yayını başlatılmadı. Görsel AI etiketi için kaynak yöntemi tahmin edilmedi; son gönderim değerlendirmesi açık.
