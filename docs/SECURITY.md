@@ -1,5 +1,11 @@
 # Güvenlik, kişisel veri ve mevzuat
 
+## 28 Ekim 2026 — Yayın öncesi açık bulgular
+
+Güncel `npm run audit`, [GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4) nedeniyle **başarısızdır**. `deepmerge@4.3.1`, `@expo/config` altında kullanılan düşük önem dereceli prototype poisoning bulgusunu taşır. İnceleme anında advisory düzeltilmiş sürüm göstermiyor. Görülen çağrı yolları Expo yapılandırma/eklenti birleştirmesidir; mobil kullanıcı girdisinden çalışan bir saldırı yolu bu incelemede gösterilmedi. Çözüm: SDK 58 uyumluluğu korunarak doğrulanmış upstream düzeltmesi veya dar anahtar doğrulama yaması ve regresyon testi; advisory'yi yalnız susturmak veya `npm audit fix --force` ile Expo sürümünü düşürmek çözüm sayılmaz. Bu tur incelemedir, yama uygulanmadı. Node-forge'un mevcut yaması hash ve imza testlerinden geçmektedir; ham audit'teki yüksek upstream kaydı bu yamanın doğrulanmasıyla ayrı değerlendirilir.
+
+Canlı HTTP HTTPS'e yönleniyor; **HSTS yok**. Alan adına özel HSTS eklenmeli; başka siteleri/alt alanları kapsayacak `includeSubDomains` veya preload, tüm alanlar ayrıca doğrulanmadan açılmamalı. ÖGG SOR için hazırlanmış otomatik şifreli yedek/sunucu dışı kopya ve bağımsız silme listesi dışa aktarımı henüz kurulu değil; işlem öncesi özel snapshot'lar düzenli yedek güvencesi değildir. Canlı gizlilik metni Expo/EAS güncelleme isteklerinin teknik tanımlayıcı, IP ve olası sınırlı hata metni akışını içermiyor; genel yayın öncesi açıklama ve mağaza veri beyanları eşleştirilmeli. Geçmiş konuşmada paylaşılmış sunucu parolası, değiştirilmediyse döndürülmeli; bu incelemede parolayla giriş denenmedi veya parola değiştirilmedi.
+
 ## 27 Ekim 2026: kişisel çalışma erişimi
 
 Kullanıcı kararıyla aktif, giriş yapmış öğrencinin kişisel çalışması e-posta doğrulaması beklemez. Kayıt doğrulama e-postası göndermez; doğrulanmış hesap rozeti sunulmaz. Bu, adresin sahibini doğrulamış saymak değildir: `email_verified_at` boş kalır. İş başvurusu gönderimi, tüm yönetim/tenant uçları ve kurumsal çalışma bağlamları doğrulama gerektirir. Bağlam listesi doğrulanmamış kullanıcıya yalnız kişisel bağlamını döndürür; kurumsal kimliği tahmin etmek policy denetimini aşmaz. Askıya alınmış hesap, rol/sahiplik kontrolleri, CSRF ve mevcut hız sınırları korunur. Parola sıfırlama ve e-posta değişimindeki sahiplik kanıtı kaldırılmadı.
