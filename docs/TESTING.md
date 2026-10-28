@@ -4,7 +4,7 @@
 
 Sekiz gerçek native iOS simülatör görüntüsü hazırlandı: iPhone 18 Pro'da dört 1206×2622; iPad Pro 13-inch (M5)'te iki 2064×2752 dikey ve iki 2752×2064 yatay. Güncel uygulama/gerçek yerel API, ayrı geçici içerik DB'si ve sentetik hesap kullanıldı; gerçek kullanıcı verisi taşınmadı. Örnek sonuç gerçek sınav motoruyla 72 doğru/18 yanlış/10 boş olarak hesaplandı. Her görsel görsel incelendi; opaklık, Apple ölçüleri ve SHA-256 kontrolü geçti. Yalnız tamamen opak alfa kanalı kaldırıldı; RGBA pikselleri değişmedi. Ekranlar Expo Go'dan alınmıştır; TestFlight paketinin fiziksel testinin yerine geçmez. [Varlık kaydı](store-assets/README.md#app-store-iphone-ve-ipad-ekranları--28-ekim-2026).
 
-Türkçe Apple 1.0.0 taslağında iPhone dört dosya adı/4 of 10 görüldü. iPad yüklemesi/kayıt kalıcılığı kontrolü sürüyor; genel inceleme/yayın yapılmadı. Uygulama kodu değişmediği için PHPUnit/E2E/build/OTA tekrarlanmadı; bu teslimde doğrulananlar görüntü dosyaları ve mağaza taslağıdır.
+Türkçe Apple 1.0.0 taslağında iPhone ve 13 inç iPad alanlarında ayrı ayrı **4 of 10** ekran görüldü. Sayfa tamamen yeniden yüklenip App Previews and Screenshots açıldığında her iki sınıfın dört dosya adı; iPad’de iki dikey/iki yatay kayıt korundu. `Save` pasif ve sürüm **Prepare for Submission**; yüklemeler otomatik kaydedilmişti, incelemeye/genel yayına gönderilmedi. Uygulama kodu değişmediği için PHPUnit/E2E/build/OTA tekrarlanmadı; bu teslimde doğrulananlar görüntü dosyaları ve mağaza taslağıdır.
 
 ## 28 Ekim 2026 — Cihaz betalarını 1.0.0 ile eşitleme
 
