@@ -109,7 +109,7 @@ async function recordOpens(page: Page) {
 }
 const opened = (page: Page) => page.evaluate(() => (window as unknown as { __opened: string[] }).__opened);
 
-test("mobil: giriş/kayıt bağlantıları ve profilde sade gizlilik/koşul erişimi korunur", async ({ page }) => {
+test("mobil: giriş/kayıt bağlantıları ve profilde gizlilik/koşul/destek erişimi korunur", async ({ page }) => {
   await recordOpens(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${mobile}/`);
@@ -123,7 +123,7 @@ test("mobil: giriş/kayıt bağlantıları ve profilde sade gizlilik/koşul eri�
   await mobileLogin(page);
   await page.getByRole("tab", { name: "Profil", exact: true }).click();
   await expect(page.getByText("Yasal ve destek", { exact: true })).toHaveCount(0);
-  for (const legal of legalPages.filter(item => item.id === "gizlilik" || item.id === "kosullar")) {
+  for (const legal of legalPages.filter(item => item.id === "gizlilik" || item.id === "kosullar" || item.id === "destek")) {
     await page.getByRole("link", { name: `${legal.title} sayfasını aç`, exact: true }).click();
     expect((await opened(page)).at(-1), legal.id).toMatch(new RegExp(`^https?://.+${legal.file.replace(/[.]/g, "\\.")}$`));
   }
@@ -135,6 +135,8 @@ test("mobil: sade gizlilik bağlantıları 320/390/834 px'te erişilebilir", asy
   for (const width of [320, 390, 834]) {
     await page.setViewportSize({ width, height: 900 });
     await expect(page.getByRole("link", { name: "Gizlilik Politikası sayfasını aç", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Destek sayfasını aç", exact: true })).toBeVisible();
+    expect((await page.getByRole("link", { name: "Destek sayfasını aç", exact: true }).boundingBox())!.height).toBeGreaterThanOrEqual(44);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `@${width}`).toBe(true);
   }
 });

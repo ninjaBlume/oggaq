@@ -18,11 +18,11 @@ function useLegalLink() {
 }
 
 // Keep privacy readily accessible without a separate legal card stack.
-// Support lives in FAQ; account deletion also remains in Profile → Hesabım.
+// Keep support beside privacy/terms; account deletion also remains in Profile → Hesabım.
 export function LegalSection({ includeAccountDeletion = false }: { includeAccountDeletion?: boolean }) {
   const { styles } = useTheme();
   const { open, error } = useLegalLink();
-  const pages = legalPages.filter(page => page.id === "gizlilik" || page.id === "kosullar" || (includeAccountDeletion && page.id === "hesap-silme"));
+  const pages = legalPages.filter(page => page.id === "gizlilik" || page.id === "kosullar" || page.id === "destek" || (includeAccountDeletion && page.id === "hesap-silme"));
   return (
     <View style={{ gap: 4 }}>
       <View style={{ flexDirection: "row", flexWrap: "wrap", columnGap: 16, justifyContent: "center" }}>
