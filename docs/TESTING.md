@@ -1,5 +1,14 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — iOS ve Android ikon OTA teslimi
+
+Kullanıcının “Hepsinde yayınla” talimatıyla kaynak `324d5cf` mevcut iki beta kanalına ayrı EAS Update olarak yayımlandı. iPhone/iPad **testflight / 01a17fcd-138a-705e-a1bb-ba2074cdeef7**, grup `dc03027c-44e1-4669-b83b-061b31c76614`; Android **android-beta / 01a17fce-6e4e-7f9e-80a7-21e298de3bb3**, grup `cf5f7a95-d8cf-4b72-816e-78509f697066`. Sürüm 0.1.1, iOS build 4 / Android versionCode 3 ve mevcut native runtime'lar korunur; yeni mağaza paketi gerekmiyor. Webde öğrenci uygulaması açılmadı; genel mağaza yayını, Git push veya sunucu değişikliği yapılmadı.
+
+Önceki 65 birim/10 gerçek API E2E ve iOS Expo Go ikon kontrolünden sonra **29 araç testi ve workspace strict TypeScript yeniden geçti**. Yayın öncesi iki platformun native fingerprint'i kurulu paketlerle ayrı eşleşti. Yayınlar önizleme kapalı/HTTPS oggsor.com API ve web adresleriyle, doğru kanal ve platforma yapıldı. Native OTA başlıklarıyla iki manifest/launch asset, ikon verileri ve dağıtım güncelleme kontrolleri doğrulandı; launch asset + **iOS 18 / Android 19 ek dosyanın tamamı** SHA-256 ile eşleşti. Uyumsuz runtime ve diğer platforma 204; production'da bu beta güncellemesi yok (404). Önceki native gömülü tarihten yeniler. Kanıtlar `artifacts/icon-review/ota/` altında.
+
+Telefonların bu kimlikleri aldığı henüz kullanıcı tarafından teyit edilmedi; sunucu teslim doğrulaması fiziksel cihaz testi değildir. Profil → Uygulama güncellemesi → Güncellemeleri denetle → Güncellemeyi uygula, sınav dışında kullanılır; otomatik zorunlu reload yoktur. Önceki güncellemeler iOS `01a17f9a` / Android `01a17f9b` tarihsel kayıtlarda korunur. Geri dönüş yalnız ilgili kanal/platform/runtime için IOS_BETA / ANDROID_BETA belgelerindeki komutla yapılır; çalışan cihazlara test için geri dönüş gönderilmedi.
+
+
 ## 28 Ekim 2026 — Mobil ikonların anlamlarına göre düzenlenmesi
 
 13 gezinme hedefinin simgeleri `apps/mobile/src/featureIcons.ts` içinde merkezileştirildi; menü, alt sekme, ana sayfa kısayolları ve ilgili boş durumlar aynı anlamı kullanır. Deneme: sınav panosu; sonuç: grafikli belge; tekrar: geri dönüş oklu liste; puan: hesap makinesi; dilekçe: kalemli belge; tutanak: kalemli pano. Soru/doğruluk/biten sınav özeti ayrıldı; sürede saat korundu. Takvim kurallarına terazi, atışa hedef, başvuru boş durumuna gönderim simgesi verildi. İstatistik boş durumunda kupa yerine grafik, profil marka bağlantısında genel kalkan yerine gerçek logo kullanıldı. Yeni bağımlılık/native modül eklenmedi; mevcut Lucide ikonları tek tek import edilir. Tasarım eşleştirmesi [DESIGN](DESIGN.md#ikonların-anlamı) içinde.
