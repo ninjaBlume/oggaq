@@ -1,0 +1,48 @@
+{
+  "brand": "ÖGGSor - Soru Bankası",
+  "screenshotsUnmodified": true,
+  "files": [
+    {
+      "name": "play-icon-512.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 183406,
+      "sha256": "aed8eae75947d7be52d3c8de88f0f91d059e16b0a4044922b5038334f223ec4c"
+    },
+    {
+      "name": "play-feature-1024x500.png",
+      "width": 1024,
+      "height": 500,
+      "bytes": 74394,
+      "sha256": "b26e358def61d7dcfc45c54279e06b333a94cf8ad8f11dc288d4fc131be7b158"
+    },
+    {
+      "name": "01-home.png",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 180282,
+      "sha256": "60fc74d8d7988dd04d6d5c8904751022783f58b932981ae451f291ea65d58f14"
+    },
+    {
+      "name": "02-exams.png",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 215513,
+      "sha256": "96cb0ef56fb25d6aa79b1c09021ad73fe25ed9ab5c0bb0fdcbf613579ef0d24d"
+    },
+    {
+      "name": "03-question.png",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 145102,
+      "sha256": "51372d86625389258b5d8e280edb681de768f6f108d859f5623589dfa1118f23"
+    },
+    {
+      "name": "04-score.png",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 148665,
+      "sha256": "c7c78bd2110cc4e7bb462884d779fc03b22736faf835ef3ad6572dbb7f661d22"
+    }
+  ]
+}

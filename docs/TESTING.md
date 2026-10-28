@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Android mağaza görselleri yüklendi ve kalıcılığı doğrulandı
+
+Kullanıcının açık ADB izniyle Android 16 ARM64/Expo Go SDK 58 üzerinde sentetik öğrenci hesabıyla ana sayfa, deneme listesi, gerçek soru çözme ve puan hesaplama ekranları alındı. Dört PNG **1080×1920**, simge **512×512**, özellik grafiği **1024×500**; boyut/dosya uzunluğu/SHA-256 manifesti üretildi ve altı görsel gözle incelendi. Ekranlar değiştirilmeden kopyalandı. Puan örneği 63 genel doğru + 13 silah doğrusu + 4 isabet = **64,5** tahmini puan; uygulamanın resmî sonuç olmadığı açıklaması görünür.
+
+Kullanıcının dosya/hedef onayıyla Google Play `tr-TR` mağaza taslağına altı görsel yüklendi. **“Değişiklikleriniz kaydedildi”** görüldü; sayfa yenilenince simge **1/1**, özellik grafiği **1/1**, telefon ekranları **4/8** ve doğru marka adı korundu; taslak kaydet düğmesi pasifti. İnceleme/genel yayın veya paket/OTA dağıtımı yapılmadı. Tablet/iOS görüntüsü ve fiziksel production paket testi değildir.
+
+Ayrı geçici içerik DB'sine kullanıcı/geçmiş/token/başvuru verileri kopyalanmadı; yalnız sentetik hesap ve bu hesaba ait geçici deneme kullanıldı. İş sonunda DB silindi (yokluğu PostgreSQL'de doğrulandı), yalnız kendi 8003 API/8083 Metro/emülatör süreçleri kapatıldı, ADB yönlendirmeleri ve ekran ölçüleri geri alındı. Mevcut 8082 Metro korundu. Uygulama/API kodu değişmediğinden geniş testler tekrarlanmadı; üreteç gerçek dört ekranla çalıştırıldı ve çıktı doğrulaması geçti. [Görseller/üretim komutu](store-assets/README.md).
+
 ## 28 Ekim 2026 — Play Store metin taslağı kalıcı kaydedildi
 
 Kullanıcının açık Play Console varsayılan giriş sayfasından devam talimatıyla, `tr-TR` formuna **ÖGGSor - Soru Bankası**, 77 karakterlik kısa açıklama ve 1.649 karakterlik tam açıklama kaydedildi. Tam açıklama EGM/mevzuat kaynak URL’lerini ve resmî kurumla bağlantı bulunmadığını içerir; içerik `docs/store-metadata.tr.json` ile aynıdır. Taslak kaydetmede “Değişiklikleriniz kaydedildi” görüldü, sayfa yeniden yüklenince üç alanın kalıcılığı doğrulandı. Eksik simge/özellik grafiği/en az iki ekran görüntüsü doğrulama uyarıları tamamlama için kalır; kaydın taslak olması bu varlıkların tamamlandığı anlamına gelmez. Mağaza incelemesine/genel yayına gönderilmedi, yeni paket/OTA yok. Uygulama kodu değişmediğinden testler tekrarlanmadı.
