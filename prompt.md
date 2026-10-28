@@ -1,4 +1,4 @@
-# ÖGG SOR — Codex Proje Başlangıç Talimatı
+# ÖGGSor — Codex Proje Başlangıç Talimatı
 
 ## 1. Projenin amacı
 

@@ -13035,11 +13035,11 @@
             },
             "deprecated": true,
             "maxItems": 0,
-            "description": "Eski istemciler için boş dizi; örnekler ÖGG SOR için özgün olarak yazılmıştır."
+            "description": "Eski istemciler için boş dizi; örnekler ÖGGSor için özgün olarak yazılmıştır."
           },
           "body": {
             "type": "string",
-            "description": "ÖGG SOR için yazılmış özgün metin; {alan} yerleri kullanıcı bilgisi veya boş doldurma alanıyla değiştirilir."
+            "description": "ÖGGSor için yazılmış özgün metin; {alan} yerleri kullanıcı bilgisi veya boş doldurma alanıyla değiştirilir."
           }
         }
       },

@@ -7,7 +7,7 @@ for (const colorScheme of ['light', 'dark'] as const) test(`tanıtım sitesi: ${
   try {
     await page.goto('http://127.0.0.1:5187/');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Çıkmış sorularla');
-    const screen = page.getByRole('img', { name: /^ÖGG SOR ana ekranı:/ });
+    const screen = page.getByRole('img', { name: /^ÖGGSor ana ekranı:/ });
     await expect(screen).toBeVisible();
     await expect.poll(() => screen.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth === 780 && img.naturalHeight === 1688)).toBe(true);
     await expect(page.getByText('Örnek veriler', { exact: true })).toBeVisible();
@@ -91,7 +91,7 @@ for (const colorScheme of ['light', 'dark'] as const) test(`bilgi sayfaları: or
       }
     }
     expect(apiRequests).toEqual([]);
-    await page.getByRole('banner').getByRole('link', { name: 'ÖGG SOR ana sayfa', exact: true }).click();
+    await page.getByRole('banner').getByRole('link', { name: 'ÖGGSor ana sayfa', exact: true }).click();
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Çıkmış sorularla');
   } finally { await context.close(); }
 });

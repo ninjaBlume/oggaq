@@ -44,13 +44,13 @@ for (const width of [390, 1024]) {
     await clickLogo("header-brand-home");
     await expect(home).toHaveAttribute("aria-selected", "true");
     await page.getByRole("tab", { name: "Deneme", exact: true }).click();
-    await page.getByTestId("header-brand-home").getByText("ÖGG SOR", { exact: true }).click();
+    await page.getByTestId("header-brand-home").getByText("ÖGGSor", { exact: true }).click();
     await expect(home).toHaveAttribute("aria-selected", "true");
     for (const image of [true, false]) {
       await page.getByRole("tab", { name: "Profil", exact: true }).click();
       await page.getByRole("button", { name: "Menüyü aç", exact: true }).click();
       if (image) await clickLogo("menu-brand-home");
-      else await page.getByTestId("menu-brand-home").getByText("ÖGG SOR", { exact: true }).click();
+      else await page.getByTestId("menu-brand-home").getByText("ÖGGSor", { exact: true }).click();
       await expect(page.getByRole("dialog")).toHaveCount(0);
       await expect(home).toHaveAttribute("aria-selected", "true");
     }

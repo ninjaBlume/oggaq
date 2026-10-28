@@ -30,6 +30,9 @@ function repo(mutate = () => {}) {
   writeFileSync(join(root, 'apps/mobile/package.json'), '{"dependencies":{"expo-splash-screen":"1.0.0"}}');
   writeFileSync(join(root, 'docs/STORE_RELEASE.md'), '# x\n\n## Elle kontrol\n\n- [x] Yapıldı\n\n## Sonraki\n');
   writeFileSync(join(root, 'docs/legal-values.json'), JSON.stringify({ taslak: false, degerler: Object.fromEntries(Object.keys(labels).map(key => [key, 'Configured test value'])) }));
+  writeFileSync(join(root, 'docs/store-metadata.tr.json'), JSON.stringify({ appStore: { name: 'Test', subtitle: 'Test', description: 'Test', keywords: 'test' }, googlePlay: {
+    title: 'Test', shortDescription: 'Test', fullDescription: 'Bu uygulama resmî kurumla bağlantılı değildir. Kaynak: https://www.egm.gov.tr/ozelguvenlik'
+  } }));
   mutate(root);
   return root;
 }
@@ -115,4 +118,19 @@ test('the production profile override is checked instead of the default identity
     EXPO_PUBLIC_API_URL: 'https://soru.gercek.net', EXPO_PUBLIC_WEB_URL: 'https://soru.gercek.net', OGGAQ_BUNDLE_ID: 'invalid'
   } } } })));
   assert.match(result.blockers.join('\n'), /Paket kimliği/);
+});
+
+test('government sources must be genuine HTTPS links, with a non-affiliation disclosure', () => {
+  for (const source of ['', 'http://www.egm.gov.tr', 'https://www.egm.gov.tr.example.org', 'https://example.org/egm.gov.tr']) {
+    const result = run(root => writeFileSync(join(root, 'docs/store-metadata.tr.json'), JSON.stringify({ googlePlay: { fullDescription: source } })));
+    assert.match(result.blockers.join('\n'), /EGM kaynak bağlantısı eksik/);
+    assert.match(result.blockers.join('\n'), /bağlantı bulunmadığı/);
+  }
+});
+
+test('store descriptions respect required fields and published character limits', () => {
+  const result = run(root => writeFileSync(join(root, 'docs/store-metadata.tr.json'), JSON.stringify({ appStore: { name: 'x'.repeat(31) }, googlePlay: { shortDescription: 'x'.repeat(81) } })));
+  assert.match(result.blockers.join('\n'), /appStore.name.*30 karakteri/);
+  assert.match(result.blockers.join('\n'), /googlePlay.shortDescription.*80 karakteri/);
+  assert.match(result.blockers.join('\n'), /appStore.description boş olamaz/);
 });

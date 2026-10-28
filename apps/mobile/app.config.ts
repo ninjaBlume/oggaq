@@ -9,7 +9,7 @@ const config: ExpoConfig = {
   name: localPreview ? `${brand.displayName} Önizleme` : brand.displayName,
   slug: "oggaq",
   owner: "ninjablume",
-  version: "0.1.1",
+  version: "1.0.0",
   // Native dependency/config changes produce a different OTA compatibility key.
   runtimeVersion: { policy: "fingerprint" },
   updates: {

@@ -33,6 +33,14 @@
         "EXPO_PUBLIC_LOCAL_PREVIEW": "0",
         "EXPO_PUBLIC_API_URL": "https://oggsor.com",
         "EXPO_PUBLIC_WEB_URL": "https://oggsor.com"
+      },
+      "distribution": "store",
+      "node": "24.22.0",
+      "ios": {
+        "simulator": false
+      },
+      "android": {
+        "buildType": "app-bundle"
       }
     },
     "play-internal": {

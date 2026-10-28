@@ -51,7 +51,7 @@ if [ "$send_only" = 0 ]; then
       echo "MAIL_USERNAME=$username"; printf 'MAIL_PASSWORD=%s\n' "$(head -n 1 "$password_file")"
     fi
     echo "MAIL_FROM_ADDRESS=$from"
-    echo 'MAIL_FROM_NAME="ÖGG SOR - Soru Bankası"'
+    echo 'MAIL_FROM_NAME="ÖGGSor - Soru Bankası"'
   } >>"$tmp"
   chmod 600 "$tmp"; mv "$tmp" "$env_file"
   rollback() {

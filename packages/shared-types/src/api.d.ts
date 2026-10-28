@@ -3373,14 +3373,14 @@ export interface components {
             signer_roles: string[];
             /**
              * @deprecated
-             * @description Eski istemciler için boş dizi; örnekler ÖGG SOR için özgün olarak yazılmıştır.
+             * @description Eski istemciler için boş dizi; örnekler ÖGGSor için özgün olarak yazılmıştır.
              */
             sources: {
                 title: string;
                 /** Format: uri */
                 url: string;
             }[];
-            /** @description ÖGG SOR için yazılmış özgün metin; {alan} yerleri kullanıcı bilgisi veya boş doldurma alanıyla değiştirilir. */
+            /** @description ÖGGSor için yazılmış özgün metin; {alan} yerleri kullanıcı bilgisi veya boş doldurma alanıyla değiştirilir. */
             body: string;
         };
         DocumentDraft: {

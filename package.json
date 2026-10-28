@@ -25,9 +25,9 @@
     "test:mobile": "npm run test --workspace @oggaq/mobile",
     "export:mobile": "npm run export --workspace @oggaq/mobile",
     "test:core": "npm run test --workspace @oggaq/study-core",
-    "postinstall": "node scripts/forge-security-patch.mjs",
-    "security:prepare": "node scripts/forge-security-patch.mjs",
-    "test:toolchain": "node --test scripts/expo-toolchain.test.mjs scripts/forge-security.test.mjs scripts/forge-security-patch.test.mjs scripts/audit-node.test.mjs scripts/eas-sdk58.test.cjs scripts/mobile-updates.test.mjs",
+    "postinstall": "node scripts/forge-security-patch.mjs && node scripts/deepmerge-security-patch.mjs",
+    "security:prepare": "node scripts/forge-security-patch.mjs && node scripts/deepmerge-security-patch.mjs",
+    "test:toolchain": "node --test scripts/expo-toolchain.test.mjs scripts/forge-security.test.mjs scripts/forge-security-patch.test.mjs scripts/deepmerge-security.test.mjs scripts/audit-node.test.mjs scripts/eas-sdk58.test.cjs scripts/mobile-updates.test.mjs",
     "audit": "node scripts/audit-node.mjs",
     "export:mobile:preview": "EXPO_PUBLIC_LOCAL_PREVIEW=1 EXPO_PUBLIC_API_URL=http://127.0.0.1:8001 npm run export:mobile",
     "test:tokens": "npm run test --workspace @oggaq/design-tokens",
@@ -43,7 +43,9 @@
     "build:ios:beta": "npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs build --platform ios --profile testflight --freeze-credentials",
     "update:ios:beta": "npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs update --channel testflight --platform ios --environment preview",
     "build:android:beta": "npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs build --platform android --profile play-internal --freeze-credentials",
-    "update:android:beta": "npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs update --channel android-beta --platform android --environment preview"
+    "update:android:beta": "npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs update --channel android-beta --platform android --environment preview",
+    "build:ios:production": "npm run check:store && npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs build --platform ios --profile production --freeze-credentials",
+    "build:android:production": "npm run check:store && npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs build --platform android --profile production --freeze-credentials"
   },
   "devDependencies": {
     "@redocly/cli": "2.60.0",

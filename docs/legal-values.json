@@ -11,7 +11,7 @@
     "verbis": "",
     "barindirma-konumu": "Türkiye (İstanbul); barındırma sağlayıcısı Hosting Dünyam Bilişim Teknolojileri Tic. Ltd. Şti.",
     "eposta-saglayicisi": "Hesap ve güvenlik bildirimlerinin gönderimi: Resend (Plus Five Five, Inc., ABD); gönderim bölgesi İrlanda (eu-west-1). Destek postalarının alımı ve yönlendirmesi: Cloudflare Email Routing; destek posta kutusu: Google Gmail.",
-    "yurt-disi-aktarim": "Uygulama veritabanı Türkiye’deki sunucuda saklanır. Siteye ve uygulamaya erişim trafiği, güvenlik ve performans için Cloudflare, Inc. (ABD) ağı üzerinden iletilir. Hesap ve güvenlik bildirimlerinin alıcı e-posta adresleri ile ileti içerikleri Resend (Plus Five Five, Inc., ABD) üzerinden kullanıcının e-posta hizmet sağlayıcısına iletilir. Gönderim bölgesi İrlanda seçilmiştir; bu seçim veri saklama yerini belirlemez. Resend hesap verileri, e-posta üst verileri, günlükleri ve API kayıtlarını ABD’de sakladığını belirtir. Destek adresine gönderilen e-postalar Cloudflare Email Routing üzerinden Google Gmail destek posta kutusuna yönlendirilir.",
+    "yurt-disi-aktarim": "Uygulama veritabanı Türkiye’deki sunucuda saklanır. Siteye ve uygulamaya erişim trafiği, güvenlik ve performans için Cloudflare, Inc. (ABD) ağı üzerinden iletilir. Hesap ve güvenlik bildirimlerinin alıcı e-posta adresleri ile ileti içerikleri Resend (Plus Five Five, Inc., ABD) üzerinden kullanıcının e-posta hizmet sağlayıcısına iletilir. Gönderim bölgesi İrlanda seçilmiştir; bu seçim veri saklama yerini belirlemez. Resend hesap verileri, e-posta üst verileri, günlükleri ve API kayıtlarını ABD’de sakladığını belirtir. Destek adresine gönderilen e-postalar Cloudflare Email Routing üzerinden Google Gmail destek posta kutusuna yönlendirilir. Mobil uygulamanın uyumlu güncellemeleri Expo/EAS Update (650 Industries, Inc., ABD) ve dosya dağıtım ağı üzerinden alınır. Bu isteklerde IP adresi, platform, proje/sürüm/kanal bilgileri, rastgele kurulum tanımlayıcısı ve varsa sınırlı ciddi hata metni işlenebilir. Uygulama bu hizmete hesap adı, e-posta, oturum anahtarı veya sınav cevaplarını eklemez.",
     "uygulanacak-hukuk": "",
     "hukuki-sebep": "Hesabı ve sınav hizmetini sunmak, sonuçlarını saklamak ve iş ilanı başvurusunu işleme almak için sözleşmenin kurulması veya ifasıyla doğrudan ilgili olması (KVKK m.5/2-c); güvenliği sağlamak ve hataları gidermek için veri sorumlusunun meşru menfaati (KVKK m.5/2-f).",
     "yanit-suresi": "en geç 30 gün",
@@ -32,6 +32,8 @@
     "kontrol-tarihi": "2026-10-25",
     "eposta-saglayicisi": "https://resend.com/legal/privacy-policy",
     "eposta-bolge-ve-saklama": "https://resend.com/docs/dashboard/domains/regions",
-    "eposta-kontrol-tarihi": "2026-10-27"
+    "eposta-kontrol-tarihi": "2026-10-27",
+    "guncelleme-saglayicisi": "https://expo.dev/privacy-explained",
+    "guncelleme-gizlilik": "https://expo.dev/privacy"
   }
 }

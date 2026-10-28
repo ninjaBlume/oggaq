@@ -74,7 +74,25 @@ export function checkRelease(root) {
   const mobilePackage = read(join(mobile, 'package.json')) ?? '';
   if (!mobilePackage.includes('"expo-splash-screen"')) warnings.push('expo-splash-screen kurulu değil: yerel açılış ekranı markalı değil (paket eklemek onay ister).');
 
-  // 6. Things only a person can verify: unchecked items under "## Elle kontrol" of docs/STORE_RELEASE.md.
+  // 6. Unaffiliated apps presenting government information need visible sources and a disclaimer.
+  try {
+    const metadata = JSON.parse(read(join(root, 'docs/store-metadata.tr.json')) ?? 'null');
+    const description = metadata?.googlePlay?.fullDescription;
+    const urls = typeof description === 'string' ? [...description.matchAll(/https?:\/\/[^\s]+/g)].map(match => match[0]) : [];
+    if (!urls.some(url => { try { const parsed = new URL(url); return parsed.protocol === 'https:' && (parsed.hostname === 'egm.gov.tr' || parsed.hostname.endsWith('.egm.gov.tr')); } catch { return false; } }))
+      blockers.push('store-metadata.tr.json: Google Play açıklamasında görünür HTTPS EGM kaynak bağlantısı eksik.');
+    if (typeof description !== 'string' || !description.includes('resmî kurumla bağlantılı değildir'))
+      blockers.push('store-metadata.tr.json: Google Play açıklamasında resmî kurumla bağlantı bulunmadığı açıklanmalı.');
+    for (const [field, value, limit] of [
+      ['appStore.name', metadata?.appStore?.name, 30], ['appStore.subtitle', metadata?.appStore?.subtitle, 30],
+      ['appStore.description', metadata?.appStore?.description, 4000], ['appStore.keywords', metadata?.appStore?.keywords, 100],
+      ['googlePlay.title', metadata?.googlePlay?.title, 30], ['googlePlay.shortDescription', metadata?.googlePlay?.shortDescription, 80],
+      ['googlePlay.fullDescription', description, 4000],
+    ]) if (typeof value !== 'string' || value.trim().length === 0 || [...value].length > limit)
+      blockers.push(`store-metadata.tr.json: ${field} boş olamaz ve ${limit} karakteri aşamaz.`);
+  } catch { blockers.push('docs/store-metadata.tr.json okunamadı.'); }
+
+  // 7. Things only a person can verify: unchecked items under "## Elle kontrol" of docs/STORE_RELEASE.md.
   const doc = read(join(root, 'docs/STORE_RELEASE.md'));
   if (doc === null) blockers.push('docs/STORE_RELEASE.md yok.');
   else {

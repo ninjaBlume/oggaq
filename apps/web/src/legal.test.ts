@@ -13,7 +13,10 @@ describe('public legal pages', () => {
       const html = readFileSync(new URL(`../public/legal/${page}.html`, import.meta.url), 'utf8');
       expect(html).not.toMatch(/<script(?![^>]*\ssrc=)/);
       expect(html).not.toMatch(/\sstyle=/);
-      expect(html).not.toMatch(/(src|href)="https?:\/\//);
+      // Ordinary links to provider privacy policies do not load external resources.
+      expect(html).not.toMatch(/\bsrc="https?:\/\//);
+      expect(html).not.toMatch(/<link\b[^>]*\bhref="https?:\/\//);
+      expect(html).not.toMatch(/<a\b[^>]*\bhref="(?:javascript:|http:\/\/)/);
     }
   });
 });

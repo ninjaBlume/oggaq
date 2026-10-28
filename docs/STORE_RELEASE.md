@@ -1,217 +1,72 @@
-# App Store ve Play Store yayın hazırlığı
+# App Store ve Google Play yayın hazırlığı
 
-> Güncel kapalı beta durumu ve sürüm/güncelleme akışı: [iOS TestFlight](IOS_BETA.md), [Android Dahili Test](ANDROID_BETA.md). Aşağıdaki ilk hazırlık kontrol listesi genel mağaza yayını içindir; tarihli eski paket/hesap bilgileri güncel beta durumunu temsil etmez.
+28 Ekim 2026. Marka **ÖGGSor - Soru Bankası**, kısa yazım **ÖGGSor**; alan adı `oggsor.com`, teknik kimlik `net.codentum.oggsor`, hedef yayıncı Codentum L.L.C. Kullanıcı son yazımı özellikle bu şekilde belirledi; büyük harfe dönüştürülmez. Günlük geliştirme [iOS beta](IOS_BETA.md) ve [Android beta](ANDROID_BETA.md) akışıyla sürer.
 
-Durum (25 Ekim 2026): **yayına hazır değil.** Kod tarafında hesap silme, sorun bildirme, takip SDK'sı olmaması ve HTTPS-yalnızca iletişim gibi mağaza kurallarının teknik şartları karşılanıyor. Eksik olanlar: hukuki metinlerin son hâli, yayıncı ve veri sorumlusu kararı, soru içeriğinin hak teyidi, puanlama uzman onayı, nihai marka ikonu, derleme ve mağaza hesapları. Bu belge neyin hazır, neyin kimde olduğunu ve adım adım ne yapılacağını anlatır. Otomatik ön kontrol: `npm run check:store` (engel varsa çıkış kodu 1).
+**Genel yayın henüz tamamlanmış sayılmaz.** Testlerin geçmesi kullanım hakkı veya hukuki onay değildir. `npm run check:store` kaynak/HTTPS/ikon/mağaza metin limitlerini ve yasal kararları denetler; aşağıdaki insan kontrollerinin yerine geçmez.
 
-**Hesap işlemleri ile paket gönderimi ayrıdır.** Kullanıcı Google Play kayıt ödemesini ve iletişim doğrulamasını tamamladığını bildirdi; Apple için Codentum Organization/DSA süreci ayrıca yürütüldü. Bu oturumda panellerin son onay durumu yeniden doğrulanmadı; EAS derlemesi veya mağazaya paket gönderimi yapılmadı. Anahtar ve inceleme hesabı parolası depoda tutulmaz.
+## Teknik olarak tamamlananlar
 
-## 1. Hazırlık tablosu
+- Kayıt/giriş, kişisel çalışma, e-posta değişimi/parola yenileme, cihaz oturumları, veri dışa aktarma ve uygulama içi hesap silme gerçek API ile çalışır. Öğrencinin soru çözmesi için e-posta doğrulaması gerekmez; iş başvurusu ve kurumsal/yönetim işlemleri ayrıca korunur.
+- Hesap silme web yolu: <https://oggsor.com/legal/hesap-silme.html>; gizlilik: <https://oggsor.com/legal/gizlilik.html>; destek: <https://oggsor.com/legal/destek.html>. Mobilde Profil alt bağlantıları; hesap işlemleri Profil → Hesabım.
+- Reklam, ödeme, sosyal giriş ve kullanıcı takibi SDK’sı yok. Bu uygulama için abonelik/PRO veya Apple ile Giriş akışı eklemek gerekmiyor.
+- HTTPS, güvenli oturum/CSRF/token/tenant kontrolleri mevcut. Host ile sınırlı HSTS canlıda; iki yerel güvenlik yaması kaynak ve gerçek regresyonlarla doğrulanır. [Güvenlik](SECURITY.md).
+- Günlük şifreli yedek, saatlik ayrı silme defteri, Mac’e otomatik aktarım kuruldu; gerçek yedek ayrı geçici DB’ye geri yüklenerek doğrulandı. [Kurtarma](../deploy/server-development/backup/README.md).
+- Expo/EAS Update teknik veri akışı kamu gizlilik metnine eklendi. Hesap/cevap verileri güncelleme isteğine eklenmez. Sağlayıcı saklama ve yurt dışı aktarımın hukuki değerlendirmesi açık.
+- [Mağaza metinleri](store-metadata.tr.json) resmî kurumla bağlantı olmadığını ve görünür EGM/mevzuat kaynak URL’lerini içerir. Otomatik kontrol sahte EGM alan adını/HTTP kaynağını ve metin limit aşımını reddeder.
+- Apple’da 1.0.0 sürümü **Prepare for Submission**; tanıtım/açıklama/anahtar kelime/destek/marketing URL/inceleme adımları taslak kaydedildi, yayın seçimi **manuel**. Gizlilik ve hesap silme URL’leri kaydedildi. 10 veri türünün App Privacy taslağı işlev/hesap bağlantısı/takip yok seçimleriyle hazırlandı; Publish yapılmadı. Apple incelemesine gönderilmedi. Hesap üstünde hâlâ Harun Altay görünür; Organization/DSA sürecinin tamamlandığı çıkarılamaz.
 
-| Konu | Durum | Kimde |
-| --- | --- | --- |
-| Uygulama içi hesap silme (Apple 5.1.1(v), Google) | Hazır: web ve mobilde, parola + onay yazısı | — |
-| Hesap silme için herkese açık web sayfası (Google) | Taslak hazır: `/legal/hesap-silme.html` | Hukukçu + e-posta adresi |
-| Gizlilik politikası / KVKK aydınlatma metni | **Taslak**: `/legal/gizlilik.html` | Hukukçu |
-| Kullanım koşulları | **Taslak**: `/legal/kosullar.html` | Hukukçu |
-| Destek sayfası ve iletişim | `destek@oggsor.com` yönlendirmesi gerçek testte Gmail gelen kutusunda doğrulandı; yasal sayfa onayı bekleniyor | Kullanıcı |
-| Uygulama içinde yasal bağlantılar | Hazır: web altbilgisi, giriş/kayıt, mobil Profil → Yasal ve destek, giriş ekranı | — |
-| "Resmî kurum değildir" uyarısı | Hazır: web altbilgisi, giriş, mobil Profil; kullanım koşullarında | — |
-| "Hesaplama resmî sonuç değildir" notu | Hazır: puan hesaplama ekranları (web, mobil) | — |
-| Uygulama ikonu, uyumlu (adaptive) ikon, açılış simgesi, favicon | Kullanıcının seçtiği ÖGG SOR görselinden türetildi; opak iOS simgesi ve Android güvenli alanı hazır | Yeni native pakette cihaz kontrolü |
-| Yerel açılış ekranı (native splash) | SDK 58 uyumlu eklentiyle mevcut simge, mavi zemin ve koyu tema hazır; iki native proje üretimi doğrulandı | Yeni release paketinde görsel kontrol |
-| Derleme yapılandırması | `eas.json` üç profilde `https://oggsor.com`; canlı HTTPS/API ve oturum doğrulandı, yasal taslak onayı bekleniyor | Alan adı bağlantısı + paket doğrulama |
-| Paket kimliği | **`net.codentum.oggsor`** (Android/iOS ortak marka kimliği); mağaza kaydı ve imzalama yeni kimlikle doğrulanacak | Paket gönderimi öncesi |
-| Takip, reklam, analitik SDK'sı | Yok (gizlilik beyanı basit) | — |
-| Üçüncü taraf girişi (Apple ile Giriş zorunluluğu) | Yok | — |
-| Ödeme / uygulama içi satın alma | Yok | — |
-| Soru bildirme (Apple 1.2 benzeri) | Hazır: "Soruyu bildir" + yönetici kuyruğu | — |
-| İnceleme demo hesabı | Hazırlanmadı | Kullanıcı |
-| Soru içeriğinin hak teyidi | **Engel** | Kullanıcı + hukukçu |
-| Puanlama kurallarının uzman onayı | **Engel** | Kullanıcı + uzman |
-| Veri sorumlusu, VERBİS, yurt dışı aktarım | **Engel** | Kullanıcı + hukukçu |
-| Gerçek e-posta gönderimi | `no-reply@oggsor.com` aktif; gerçek kuyruk testi Gmail’de SPF/DKIM/DMARC PASS fakat Spam. Destek yönlendirmesi gelen kutusunda doğrulandı; doğrudan gönderimin gelen kutusu yerleşimi açık | Codex |
-| Yedekleme | Betikler hazır, sunucuda çalıştırılmadı | Kullanıcı |
-| Apple DSA (AB tüccar) doğrulaması | Sürüyor (Codentum hesabı) | Kullanıcı / Apple |
+Google Play’de mevcut Dahili Test hâlâ 0.1.1 (3) olarak göründü. Varsayılan mağaza formu açıldı; Safari aracı sayfayı tekrar boş görüp alanlara yazarken `elementHasNoFrame`/kullanıcı değişimi hataları verdi. **Yeni metin/adın Google panelinde kaydedildiği doğrulanamadı.** Hazır metinler JSON içindedir; Data safety, yaş, görseller ve inceleme erişimi tamamlanmış sayılmadı.
 
-### Yer tutucu alanlar (yasal sayfalarda)
+**Yeni native paketler hazır:** iOS 1.0.0 (5) / `2eb481cf-0d3f-41d1-ae8d-dfec271948b0`, Android 1.0.0 (4) / `1bd0045c-9172-4a63-a795-d6d1f01c9004`. Production kanalı, gömülü gerçek API/önizleme kapalı, imza/manifest ve Android 16 KB statik kontrolleri geçti. Paketler `~/.config/oggaq-development/store-release-2026-10-28/` içinde; mağazalara yüklenmedi ve fiziksel kurulum denenmedi. Yeni paketlerin hazırlanması kamu yayını değildir.
 
-`npm run check:store`, `docs/legal-values.json` içindeki inceleme durumunu (`taslak`) ve aşağıdaki eksik kararları doğrudan denetler. Herkese açık sayfalarda iç inceleme notları veya boş karar etiketleri gösterilmez; bu metin temizliği mağaza onayı sayılmaz. Sayfada yanlışlıkla kalan `data-placeholder` veya eski taslak bandı da ayrıca engeldir. Alanlar:
+## Gerçek yayın engelleri ve çözümleri
 
-| Anahtar | Ne yazılacak |
+| Açık nokta | Gerekli çözüm |
 | --- | --- |
-| `destek-eposta`, `destek-eposta-baglantisi` | Destek e-posta adresi (ayrıca `config/brand.json` içindeki `supportEmail`) |
-| `veri-sorumlusu-unvan`, `veri-sorumlusu-adres`, `verbis` | Veri sorumlusunun unvanı, adresi, VERBİS durumu |
-| `yayinci-adi` | Mağazadaki yayıncı adı (Apple/Google kaydıyla birebir aynı) |
-| `hukuki-sebep` | KVKK m.5/6 hukuki sebepler (hukukçu belirler) |
-| `barindirma-konumu`, `eposta-saglayicisi`, `yurt-disi-aktarim` | Sunucu konumu, e-posta sağlayıcısı, yurt dışı aktarım kararı |
-| `gunluk-suresi`, `yedek-suresi`, `basvuru-saklama` | Günlük, yedek ve iş başvurusu saklama süreleri |
-| `basvuru-sureci` | İş başvurusunun işleyişi (yalnızca platform yöneticisi mi görüyor, işverene iletiliyor mu) |
-| `uygulanacak-hukuk` | Uygulanacak hukuk ve yetkili mahkeme |
-| `yanit-suresi` | Talebe yanıt süresi |
-| `yururluk-tarihi` | Yayın tarihi |
+| Hukuki inceleme taslak; yürürlük tarihi, VERBİS ve uygulanacak hukuk boş | Codentum’un mevcut kayıtları ve hizmet kapsamıyla hukuki değerlendirme; gerçek kararları `legal-values.json` içine kaydet, metinleri onaylandıktan sonra uygula. Boş alanı uydurarak veya yalnız `taslak:false` yaparak geçme. |
+| Soru kitapçıkları ve logodaki amblem için kullanım hakkı belgesi yok (kullanıcı 28 Ekim teyidi) | Hak sahibinden/lisans koşullarından yeniden dağıtım yetkisini belgelemek veya hakları teyit edilmiş içerik/amblem seçmek. Kamuya açık PDF tek başına lisans kanıtı değildir. Yazılı izin talebi göndermek ayrıca açık talimat gerektirir. |
+| Apple/Google mağaza gizlilik, yaş/kitle ve hesap uyumu son durumları tamamlanmış değil | Aşağıdaki envanterle panelleri doldur, son paket ve sağlayıcı davranışıyla karşılaştır. Apple yayıncı/DSA ve Google kuruluş doğrulamasını panellerden teyit et. |
+| Yeni 1.0.0 paketlerinin native ve temiz kurulum kontrolü | Son kaynak gömülü, production kanallı imzalı IPA/AAB oluştur; iPhone/iPad ve Android temiz kurulum, eski hesaptan yükseltme ve bağlantı kesintisini gerçek cihazda kontrol et. Eski beta gömülü kodunu doğrudan genel sürüme yükseltme. |
+| Mağaza görselleri ve inceleme erişimi | Son ÖGGSor yazımını kullanan gerçek ekranları örnek hesapla al; özel inceleme hesabı ve iletişim bilgisini yalnız mağazanın güvenli alanlarına gir. Parolayı depoya koyma. |
 
-Sayfaların header/footer ve temel stilleri ana sayfadan `npm run brand:apply` ile üretilir; `legal/site.css` elle düzenlenmez. İçerik bilgileri, haklar ve hesap silme yolları korunur. Açıklamaların kapsamı için [KVKK aydınlatma rehberi](https://www.kvkk.gov.tr/Icerik/2033/Aydinlatma-Yukumlulugu-) kontrol edildi (26 Ekim 2026); tasarım değişikliği tek başına hukuki uygunluk sonucu değildir.
+## Veri beyanı için teknik envanter
 
-Sayfalar JavaScript olmadan çalışan statik HTML'dir; web uygulamasıyla aynı adreste sunulur (`/legal/...`). Geliştirme sunucusu nginx ayarı `X-Robots-Tag: noindex` ekler; yayın alan adında bu başlık olmamalı. Üretim şablonunda (`deploy/nginx/oggaq-app.conf`) `/legal/` ayrı konumdur: SPA'ya düşmez, bilinmeyen yol 404 verir.
+Bu tablo nihai hukuk görüşü veya mağazaya gönderilmiş form değildir. Apple ve Google tanımları farklıdır. Özellikle üçüncü taraf hizmet işleyenleri Google’ın paylaşım istisnalarıyla ayrıca karşılaştırılır; otomatik olarak “veri toplanmıyor” seçilmez.
 
-## 2. Kimlik kararları (gönderimden önce)
+| Veri | Kullanım / gerekli oluşu | Hesapla bağlantı |
+| --- | --- | --- |
+| Ad, e-posta, hesap kimliği | Hesap ve hizmet; zorunlu | Evet |
+| Telefon, iş başvurusu/ön yazı | İsteğe bağlı iş başvurusu | Evet |
+| Cevaplar, süre, sonuç, favoriler/çalışma geçmişi | Çalışma, kaldığı yerden devam, istatistik | Evet |
+| Soru bildirimi/destek metni | İsteğe bağlı kalite/destek | Evet; silmede bildiren/not kaldırılır |
+| Rastgele kurulum tanımlayıcısı, platform/runtime/kanal | Expo/EAS güncellemesi ve cihaz oturumu; reklam kimliği değil | API oturumu hesapla bağlantılı; Expo güncelleme kimliğine hesap eklenmez |
+| Sınırlı ciddi hata metni / teknik istek bilgisi | Expo/EAS hatadan kurtarma; IP hizmet sağlayıcısına görünür | Hesap/cevap bilerek eklenmez; sağlayıcı kapsamı ayrıca değerlendirilir |
+| Dilekçe/tutanak alanları ve PDF | Kullanıcı isteğiyle HTTPS üretim; şifreli geçici dosya en çok 5 dakika, tek kullanımlık bağlantı | Kalıcı belge arşivi yok; geçici işlem/sağlayıcı ve isteğe bağlı veri türleri ayrıca beyan değerlendirmesine katılır |
 
-- **Yayıncı:** mağazada görünen satıcı/yayıncı adı. Gizlilik politikasındaki veri sorumlusuyla uyumlu olmalı. Karar kullanıcıdadır.
-- **Paket kimliği:** Ortak kaynak `config/brand.json` → `bundleIdentifier: "net.codentum.oggsor"`; `apps/mobile/app.config.ts` iki platformda bu kimliği kullanır. `OGGAQ_BUNDLE_ID` profil değişkeni yalnız bilinçli ayrı test uygulaması için kullanılabilir. Önceki `net.harunaltay.oggaq` geliştirme kimliğidir; yeni paket ayrı kurulur ve yeniden giriş ister. Mağaza kaydı, imzalama ve ilk gönderim yeni kimlikle doğrulanmalıdır. [Apple](https://developer.apple.com/documentation/xcode/changing-the-bundle-identifier) ilk build gönderildikten sonra mevcut kaydın Bundle ID’sini değiştirmez; [Google](https://support.google.com/googleplay/android-developer/answer/9859152) paket adını kalıcı kabul eder. Bu değişiklik mağazada kayıt veya paket yüklemesi yapmaz.
-- **Sürüm:** `version` `0.1.0`; `ios.buildNumber` ve `android.versionCode` `1`. EAS `production` profili derleme numaralarını `autoIncrement` ile artırır.
+Aktarım HTTPS ile şifrelenir; silme uygulamada ve webden talep edilebilir. Reklam amaçlı veri paylaşımı/takip yok. Barındırma Türkiye; Cloudflare, Resend, Google destek posta kutusu ve Expo/EAS sağlayıcı akışları [PRIVACY](PRIVACY.md) ve kamu metninde açıklanır. Saklama/silme kararlarının hukuki onayı açık.
 
-## 2a. Yasal sayfa değerlerini tek dosyadan doldurma
+## Paket ve dağıtım
 
-Dört yasal sayfadaki ve uygulamalardaki boş alanlar `docs/legal-values.json` dosyasından doldurulur; HTML elle düzenlenmez.
+Kaynak sürüm **1.0.0**; EAS uzaktaki iOS build ve Android versionCode değerlerini otomatik artırır. `production`: Node 24.22.0, store dağıtımı, gerçek HTTPS adresleri, iOS simulator=false, Android app-bundle, production EAS kanalı. Genel kanalda beta OTA dağıtımı yapılmaz. `testflight` ve `play-internal` profilleri kendi kanal/ortamlarını korur.
 
-1. `docs/legal-values.json` içindeki `degerler` alanlarını doldurun. Dolu gelenler uygulamanın bugünkü davranışına göre yazılmış önerilerdir (hukuki sebep, saklama süreleri, başvuru süreci); doğruysa bırakın, değilse değiştirin. `_oneriler` bölümü boş alanlar için ne yazılabileceğini gösterir.
-2. `npm run legal:apply` sayfaları ve `supportEmail` değerini (`config/brand.json`; üç uygulama bu değeri okur) günceller. Tekrar çalıştırmak güvenlidir; bir alanı boşaltmak işaretli yer tutucuyu geri getirir. `npm run legal:apply -- --check` yazmadan boş alanları listeler.
-3. Metin incelemesi tamamlandığında dosyanın başındaki `"taslak": true` değeri `false` olarak işaretlenir. Bu iç durum yalnız mağaza ön kontrolünü etkiler; herkese açık sayfalara inceleme bandı eklenmez. Eksik kararlar doldurulmadan ön kontrol yine engel verir.
-4. `npm run check:store` kalan engelleri gösterir. Mağazadaki yayıncı adı, iletişim e-postası, veri sorumlusu ve yürürlük tarihi gerçek değerlerle dolmalıdır.
+Onaylar tamamlandığında `npm run build:ios:production` ve `npm run build:android:production` önce `check:store` çalıştırır. Teknik inceleme için hazırlanmış imzalı paket, incelemeye gönderilmiş veya kamuya açılmış demek değildir. Native bağımlılık/SDK/runtime değişiminde yeni paket gerekir; uyumlu JS/görsel değişikliği kanal ve runtime doğrulanarak OTA olabilir. İnceleme sırasında incelenen paketin davranışı farklılaştırılmaz.
 
-Not: dolu gelen öneriler hukuki görüş değildir; sorumluluk metni onaylayanındır.
+Ekran görüntüleri gerçek uygulamadan ve sentetik hesapla alınır. Silah bilgisi içeren eğitim soruları nedeniyle yaş derecelendirme/IARC soruları dürüstçe yanıtlanır; 18+ hedef kitle, anket sonucunu kendimiz seçme yetkisi vermez. Çocuk/aile kategorisi hedeflenmez. Android güncel target API/16 KB gereği ve iOS SDK gereği son paket üzerinde tekrar doğrulanır; eski arşivlerin statik incelemesi [TESTING](TESTING.md) içindedir.
 
-## 3. Derleme (EAS) — çalıştırılmadı
+## Resmî kaynaklar
 
-`apps/mobile/eas.json`: `development` ve `preview` (içeride dağıtım, Android APK; API ve web adresi geliştirme sunucusu), `production` (mağaza paketi). **Üretim adresleri bilerek yer tutucudur** (`https://alan-adi-belirlenmedi.invalid`); gerçek alan adı belli olunca `EXPO_PUBLIC_API_URL` ve `EXPO_PUBLIC_WEB_URL` değerlerini HTTPS olarak yazın (`check:store` yer tutucuyu engel sayar). `development` profili bir geliştirme istemcisi değildir (`expo-dev-client` kurulu değil); geliştirme API'sine bağlı bir sürüm paketidir.
-
-EAS kullanmak **sizin Expo hesabınızı** gerektirir ve ücretsiz plan sınırları geçerlidir; bu çalışmada hesap açılmadı, `eas-cli` kurulmadı, derleme yapılmadı. Sırayla (kendi makinenizde): `eas login`, `eas build --platform android --profile preview` ile deneme APK'sı, sonra `eas build --platform all --profile production`, `eas submit`. iOS imzalı derleme için Apple Developer hesabı gerekir. İmzalı iOS derlemesi için Xcode/EAS, doğru Apple takım kimliği ve imzalama yetkisi ayrıca doğrulanmalıdır; bu oturumda imzalı paket üretilmedi.
-
-`expo prebuild` ile çıkan yerel yapılandırma gözle kontrol edildi (geçici klasörde): Android izinleri yalnızca `INTERNET` ve `VIBRATE`; Expo şablonunun eklediği `READ/WRITE_EXTERNAL_STORAGE` ve `SYSTEM_ALERT_WINDOW` `blockedPermissions` ile kaldırıldı. iOS `Info.plist` içinde kullanım açıklaması (Face ID vb.) yok; `ITSAppUsesNonExemptEncryption=false` yazılı, çünkü uygulama yalnızca sistemin HTTPS'ini ve anahtar zincirini (`expo-secure-store`) kullanır, kendi şifreleme kodu yoktur (`expo-crypto` yalnızca rastgele kimlik üretir). İhracat uyumluluğu sorularını App Store Connect'te yine de dürüstçe yanıtlayın. iOS App Icon katalogunda 1024×1024 ve alfa kanalsız PNG üretildi.
-
-**Açılış ekranı (25 Ekim):** SDK 58 ile uyumlu `expo-splash-screen@58.0.11` kuruldu. Config plugin mevcut `assets/splash-icon.png` görselini 200 genişlikle, ortak paletin lacivert zemini ve koyu tema zeminiyle üretir. Yapay bekleme veya ağ isteğini bekleyen splash kilidi eklenmedi. Android XML ve iOS storyboard/renk varlıkları geçici projede doğrulandı; normal kaynak ağacında native klasör/node_modules kopyası oluşturulmadı. [Expo belgesine](https://docs.expo.dev/versions/latest/sdk/splash-screen/) göre Expo Go nihai açılış ekranını tam yansıtmaz; görünüm yeni release paketinde kontrol edilmelidir.
-
-**Simgeler (geçici):** `node apps/mobile/scripts/generate-icons.mjs` tasarım jetonlarından lacivert zeminde beyaz kalkan + açık kitap üretir (Playwright'ın Chromium'unu kullanır). Nihai logo gelince aynı boyutlarda dosyaları değiştirin: `icon.png` 1024×1024 alfa kanalsız, `adaptive-icon.png` 1024×1024 saydam (güvenli bölge: ortadaki yaklaşık %66), `splash-icon.png`, `favicon.png`.
-
-## 4. Apple (App Store) — adım adım
-
-1. **Apple Developer hesabı:** Codentum hesabı (kurumsal) üzerinden. DSA (AB tüccar) doğrulaması Apple'da sürüyor ([resmî sayfa](https://developer.apple.com/help/app-store-connect/manage-compliance-information/manage-european-union-digital-services-act-trader-requirements/)): doğrulanmamış uygulamalar AB mağazasından kaldırılır.
-2. **App Store Connect kaydı:** ad, ikincil ad, paket kimliği (bölüm 2), birincil dil Türkçe.
-3. **Zorunlu URL'ler:** Gizlilik politikası URL'si = `<alan adı>/legal/gizlilik.html`; destek URL'si = `<alan adı>/legal/destek.html`. Gizlilik politikası uygulamanın içinden de erişilebilir olmalı (Profil → Yasal ve destek).
-4. **Gizlilik "besin etiketi"** (bölüm 6'daki taslağı kullanın).
-5. **Yaş derecelendirmesi** (bölüm 7).
-6. **İhracat uyumluluğu:** `ITSAppUsesNonExemptEncryption=false` zaten yazılı; soruları dürüstçe yanıtlayın.
-7. **Ekran görüntüleri** (bölüm 9) ve açıklama metni (bölüm 8).
-8. **İnceleme bilgisi:** demo hesap ve notlar (bölüm 5).
-9. **TestFlight:** önce iç test grubuyla; ardından incelemeye gönderin.
-10. Kaynak: [App Review Guidelines](https://developer.apple.com/app-store/review/guidelines/) — özellikle 5.1.1 (gizlilik politikası, onay, hesap silme), 1.2 (kullanıcı içeriği), 2.1 (tam ve çalışır uygulama, demo hesap), 5.2 (fikri mülkiyet).
-
-## 5. İnceleme notları ve demo hesap
-
-- **Demo hesap:** hedef sunucuda uygulamanın kayıt ekranından normal bir öğrenci hesabı oluşturun, e-posta doğrulamasını tamamlayın (gerçek e-posta sağlayıcısı kurulmadan doğrulama bağlantısı alınamaz; yerel geliştirme sunucusunda Mailpit'ten alınır). Kimlik bilgilerini **yalnızca** App Store Connect "App Review Information" ve Play Console "App access" alanlarına yazın; depoya, belgeye veya sohbete yazmayın. İnceleme boyunca sunucu açık olmalı (Apple 2.1).
-- **İnceleme notu taslağı:** "Uygulama özel güvenlik sınavlarına hazırlık için deneme ve ders sınavları sunar. Giriş için ekteki demo hesabı kullanın. Hesap silme: Profil → Hesabım → Hesabı sil. Yasal sayfalar: Profil → Yasal ve destek. İş ilanları menüden açılır (isteğe bağlı özellik; başvuru için ad, e-posta, telefon istenir). Uygulama resmî bir kurum uygulaması değildir ve resmî sonuç üretmez; puan hesaplama bir tahmindir."
-- Ekran görüntülerinde gerçek kişi verisi kullanmayın (Apple 2.3.9).
-
-## 6. Gizlilik beyanı taslakları (gerçek veriden)
-
-Toplanan veri: hesap (ad, e-posta, parola özeti), kullanım içeriği (sınav cevapları, sonuçlar, favoriler, puan hesaplama geçmişi, soru bildirim notu), iş başvurusu (ad, e-posta, telefon, ön yazı; isteğe bağlı özellik), oturum bilgisi (tarayıcıda IP ve tarayıcı bilgisi; mobilde uygulamanın kuruluma özel ürettiği rastgele cihaz numarası ve cihaz türü etiketi), sunucu günlükleri. Takip, reklam, analitik, konum, rehber, fotoğraf, sağlık, ödeme verisi yoktur.
-
-**Apple — App Privacy (taslak; kategorileri App Store Connect'in güncel açıklamasıyla karşılaştırın):**
-
-| Veri türü | Toplanıyor mu | Kullanıcıya bağlı | Takip | Amaç |
-| --- | --- | --- | --- | --- |
-| İletişim bilgisi: ad, e-posta | Evet | Evet | Hayır | Uygulama işlevi, hesap yönetimi |
-| İletişim bilgisi: telefon | Evet (yalnızca iş başvurusu) | Evet | Hayır | Uygulama işlevi |
-| Kullanıcı içeriği: diğer kullanıcı içeriği (cevaplar, bildirim ve başvuru notları) | Evet | Evet | Hayır | Uygulama işlevi |
-| Tanımlayıcılar: kullanıcı kimliği (hesap kimliği) | Evet | Evet | Hayır | Uygulama işlevi |
-| Tanımlayıcılar: cihaz kimliği (kuruluma özel rastgele numara; reklam kimliği değil) | Evet | Evet | Hayır | Uygulama işlevi (oturum yönetimi) |
-| Kullanım verisi, tanılama, konum, satın alma, arama/gezinme geçmişi | Hayır | — | — | — |
-
-IP adresi oturum güvenliği için sunucuda tutulur; Apple'ın hangi kategoriye saydığını (ör. "diğer veri") teyit edin. Barındırma ve e-posta sağlayıcıları verileri bizim adımıza işler; Apple tanımında "üçüncü taraf toplama" saymayın ama sağlayıcıyı gizlilik politikasında belirtin.
-
-**Google — Data safety (taslak; formdaki güncel alanları kontrol edin):**
-
-| Veri | Toplanıyor | Paylaşılıyor | İsteğe bağlı | Amaç |
-| --- | --- | --- | --- | --- |
-| Kişisel bilgi: ad, e-posta | Evet | Hayır | Hayır (hesap için gerekli) | Uygulama işlevi, hesap yönetimi |
-| Kişisel bilgi: telefon | Evet | Hayır | Evet (yalnızca iş başvurusu) | Uygulama işlevi |
-| Uygulama etkinliği: diğer kullanıcı tarafından oluşturulan içerik (cevaplar, notlar) | Evet | Hayır | Hayır | Uygulama işlevi |
-| Cihaz veya diğer kimlikler (kuruluma özel rastgele numara) | Evet | Hayır | Hayır | Uygulama işlevi |
-| Konum, finansal bilgi, sağlık, mesajlar, fotoğraf/video, kişiler | Hayır | — | — | — |
-
-Aktarımda şifreleme: evet (yalnızca HTTPS). Kullanıcı silme talep edebilir: evet (uygulama içi yol + herkese açık web sayfası). Aile politikası kapsamında değil. Hizmet sağlayıcıya (barındırma, e-posta) aktarım Google tanımında "paylaşma" sayılmayabilir; formdaki tanıma göre karar verin.
-
-## 7. Yaş derecelendirmesi ve kitle
-
-Hedef kitle: özel güvenlik görevlisi adayları ve görevlileri, **18 yaş üstü**. Çocuk kategorisine veya "Designed for Families"e girmeyin. Sorularda silah bilgisi (kullanma, güvenlik, mevzuat) geçer; Apple derecelendirme anketi ve Google IARC anketini bu içeriği düşünerek **dürüstçe** doldurun (soru metinlerindeki şiddet/silah ifadesinin eğitim amaçlı olması anketin yerine geçmez). Sonucu siz seçersiniz; ben tahmin etmiyorum.
-
-## 8. Mağaza metni taslağı (Türkçe; yalnızca gerçek özellikler)
-
-Güncel kopyalanabilir metinler [store-metadata.tr.json](store-metadata.tr.json) içinde: Apple ad/alt başlık/tanıtım/açıklama/anahtar kelime; Play başlık/kısa ve uzun açıklama; iki mağazanın inceleme adımları ve yasal sayfa yolları. Resmî [Apple](https://developer.apple.com/app-store/product-page/) ve [Google](https://support.google.com/googleplay/android-developer/answer/13393723) uzunluk sınırları kontrol edildi. Kimlik bilgisi içermez. `productionBaseUrl: "https://oggsor.com"`, kullanıcının alan adı kararını gösterir; metinler taslaktır, mağazada adın kullanılabilirliği kontrol edilmedi.
-
-- **Ad:** ÖGG SOR - Soru Bankası (21 karakter; mağazada kullanılabilirliği ayrıca kontrol edilmeli)
-- **Alt başlık (Apple):** Özel güvenlik sınavlarına hazırlan
-- **Kısa açıklama (Google, en çok 80 karakter):** Özel güvenlik sınavlarına deneme ve ders sınavlarıyla hazırlan.
-- **Uzun açıklama:** "ÖGG SOR, özel güvenlik görevlisi adayları ve görevlileri için ücretsiz bir sınav hazırlık platformudur. Deneme Sınavı: geçmiş sınavların tamamını gerçek sınav düzeninde ve süreyle çöz. Ders Sınavı: bir dersin sorularını sınav olarak çöz. Sonuçlarını ve doğru/yanlış/boş dağılımını görürsün; yanlış ve boş bıraktığın sorulardan Tekrar sınavı kurarsın. Başarı durumunu derslere göre izlersin. Puan hesaplama aracıyla cevap sayılarından tahmini puanını hesaplarsın. Hatalı bir soru görürsen sonuç ekranından bildirirsin. Açık ve koyu tema; telefon ve tablet düzeni. Hesabını ve verilerini istediğin zaman uygulamadan silebilirsin. Bu uygulama resmî bir kurum uygulaması değildir; Emniyet Genel Müdürlüğü veya başka bir resmî kurumla bağlantılı değildir. Puan hesaplama bir tahmindir ve resmî sınav sonucu değildir."
-- **Anahtar kelimeler (Apple, en çok 100 karakter):** özel güvenlik,ÖGG,sınav,deneme sınavı,soru çöz,silahlı,silahsız,temel eğitim
-- **Kullanmayın:** "resmî", "garantili geçiş", kurum logoları ve adları (EGM logosu vb.), kurumun sınav adını başlıkta kendi markanız gibi kullanmak (Apple 2.3.7 ve 5.2; Google yanıltıcı beyan kuralı).
-
-## 9. Ekran görüntüsü rehberi (ölçüleri yükleme ekranından doğrulayın)
-
-Ölçüleri yükleme ekranları belirler ve zamanla değişir; bu çalışmada doğrulanmadı. Bilinen kural: Apple en az bir iPhone boyutu ister; uygulama iPad'i destekliyor (`supportsTablet: true`) olduğundan iPad ekran görüntüsü de gerekir; her cihaz boyutu için 1–10 görüntü. Google: telefon için en az 2, en çok 8 görüntü, her kenar 320–3.840 px, en–boy oranı en çok 2:1; mağaza simgesi 512×512 PNG; öne çıkan görsel 1.024×500. Görüntüleri, örnek (gerçek olmayan) bir öğrenci hesabıyla ve yalnızca gerçek ekranlardan alın; kişisel veri ve geliştirme sunucusu adresi görünmesin.
-
-## 10. Google Play — adım adım
-
-1. **Play Console hesabı** ve uygulama kaydı (paket adı bölüm 2).
-2. **Gizlilik politikası URL'si:** `/legal/gizlilik.html`. Politika uygulamada ve mağaza sayfasında kolay bulunmalı.
-3. **Hesap silme:** hem uygulama içinde yol (`Profil → Hesabım → Hesabı sil`) hem de Data safety formundaki "veri silme" sorularına **herkese açık web bağlantısı** girilir: `<alan adı>/legal/hesap-silme.html`. Sayfa hatasız yüklenmeli, uygulama ve yayıncı adını mağazadaki gibi anmalı, silme talebi yolunu belirgin göstermeli ([resmî gereksinim](https://support.google.com/googleplay/android-developer/answer/13327111)).
-4. **Data safety formu** (bölüm 6), **içerik derecelendirme anketi** (bölüm 7), hedef kitle ve içerik, reklam beyanı: **reklam yok**.
-5. **Hedef API düzeyi:** Expo SDK 58 / React Native 0.88 şablonu güncel bir hedef düzey kullanır; yayından önce Play Console'un güncel zorunlu düzeyini kontrol edin (bu çalışmada doğrulanmadı).
-6. **Test şartı:** Google'ın resmî sayfasına göre 13 Kasım 2023'ten sonra açılan **kişisel** geliştirici hesaplarında üretim erişimi için en az 12 test kullanıcısı kapalı testte kesintisiz 14 gün katılmış olmalıdır ([resmî sayfa](https://support.google.com/googleplay/android-developer/answer/14151465?hl=en)). Hesap **kurumsal** ise bu kuralın geçerli olup olmadığını aynı sayfadan ve Play Console'dan **doğrulayın**; okuduğum sayfa kişisel hesapları anlatıyor.
-7. **Yanıltıcı beyan:** hükûmetle bağlantı ima eden ad, ikon, metin kullanmayın; "resmî değildir" uyarısı uygulamada ve mağaza metninde var ([resmî kural](https://support.google.com/googleplay/android-developer/answer/9514050)).
-
-## 11. Engeller ve kimde oldukları
-
-### 11.1 Soru içeriğinin hakkı (Apple 5.2.1 — yalnızca kendi ürettiğiniz veya lisanslı içerik)
-
-Sorular, bir kurumun eski veritabanı dökümünden ve EGM'nin yayımladığı sınav soru kitapçıklarından geliyor. Mağaza incelemesi talep ederse yetkiyi gösterebilmelisiniz. Yazılı teyit isteyin:
-
-1. Eski veritabanının (`u987447310_asvip.sql`) sahibi kim; soruları platformda **ücretsiz ve herkese açık** yayımlama (mağaza dağıtımı dahil) için yazılı izni var mı; ticari kullanım ve reklam geliri (ileride) kapsanıyor mu?
-2. Veritabanındaki soruları kimler yazdı (eğitmenler, yayınevi, EGM kitapçıkları); telif devri veya lisans var mı?
-3. EGM'nin yayımladığı çıkmış soru kitapçıklarının yeniden yayımlanmasına ilişkin kullanım koşulu nedir? Kamuya açık olmak yeniden dağıtım izni anlamına gelmeyebilir; resmî kurumdan yazılı görüş veya hukukçu değerlendirmesi isteyin.
-4. Hak sahibi kaldırma talep ederse süreç ne (uygulamada "Soruyu bildir" yalnızca hata içindir; hak ihlali bildirimi için destek e-postası)?
-
-Bu soruların cevabı alınmadan mağazaya gönderilmesini önermem. **Kimde: kullanıcı + hukukçu.**
-
-### 11.2 Puanlama doğruluğu (Apple 1.1.6 yanıltıcı bilgi)
-
-Puan hesaplama modülü resmî kaynaklarla belgelenmiştir (`docs/EXAM_SCORING_RULES.md`) ama bir uzmanın metinlerle kural kural karşılaştırması yapılmadı. 2025 yönetmeliğinin dönem geçişi tahmin edilerek etkinleştirilmemiştir. Uygulama "geçtin/kaldın" demez ve her hesaplamada "tahmindir" notu vardır. **Kimde: kullanıcı + uzman.**
-
-### 11.3 KVKK ve hukuk
-
-Veri sorumlusunun belirlenmesi, aydınlatma metninin ve kullanım koşullarının hukukçu onayı, VERBİS kaydı gerekip gerekmediği, saklama sürelerinin hukuki dayanağı (özellikle iş başvuruları), yurt dışı aktarım koşulları (sunucunun konumuna bağlı) ve yedeklerde silinen verinin kalma süresi. Teknik envanter `docs/PRIVACY.md` içindedir; o belge hukuki metin değildir. **Kimde: kullanıcı + hukukçu.**
-
-## 12. Yayından hemen önce kuralları yeniden doğrulayın
-
-Mağaza kuralları sık değişir; bu belgedeki bilgi 24 Ekim 2026 tarihli okumaya dayanır.
-
-- Apple: [App Review Guidelines](https://developer.apple.com/app-store/review/guidelines/), [DSA tüccar gereksinimleri](https://developer.apple.com/help/app-store-connect/manage-compliance-information/manage-european-union-digital-services-act-trader-requirements/)
-- Google: [hesap silme](https://support.google.com/googleplay/android-developer/answer/13327111), [yeni kişisel hesap test şartı](https://support.google.com/googleplay/android-developer/answer/14151465), [hükûmet bilgisi ve yanıltıcı beyan](https://support.google.com/googleplay/android-developer/answer/9514050)
-
-## 13. Doğrulanamayanlar
-
-- Apple yönergelerinin son bölümü (metnin yaklaşık son 14 bin karakteri) okunamadı; hükûmet veya sınav uygulamalarına özel bir kural görülmedi ama okunmayan kısımda olabilir.
-- Google Data safety formunun güncel alanları ve Google Play politikalarının tam metni okunmadı; yalnızca hesap silme, test şartı ve hükûmet bilgisi sayfaları okundu.
-- Ekran görüntüsü ölçüleri, Apple ad/alt başlık/anahtar kelime sınırları ve Play'in güncel hedef API düzeyi yükleme ekranlarından doğrulanmalı.
-- Ürün sahibi gerçek cihaz denemelerini yürüttüğünü bildirdi. Ayrıntılı sonuçlar bu belgeye henüz işlenmedi; tüm senaryolar tamamlanmış sayılmaz. Bu oturumda yeni EAS/release paketi, TestFlight veya Play iç test dağıtımı yapılmadı.
-- Apple "App Privacy" ve Google "Data safety" kategorileri taslaktır; son seçim sizindir.
+28 Ekim 2026’da kontrol edildi: [Apple inceleme](https://developer.apple.com/app-store/review/guidelines/), [Apple App Privacy](https://developer.apple.com/app-store/app-privacy-details/), [Google resmî kurum bilgisi](https://support.google.com/googleplay/android-developer/answer/9514050), [Google Data safety](https://support.google.com/googleplay/android-developer/answer/10787469), [Google hesap silme](https://support.google.com/googleplay/android-developer/answer/13327111), [Expo gizlilik](https://expo.dev/privacy-explained). Politika ve nihai form yanıtı, ilgili güncel sayfa/hesap üzerinde doğrulanır.
 
 ## Elle kontrol
 
-- [ ] Dört metnin incelemesi tamamlandı; gerçek kararlar legal-values.json içinde dolduruldu ve inceleme durumu kaydedildi
-- [ ] Yayıncı adı ve paket kimliği kararı verildi (mağaza hesabıyla uyumlu)
-- [ ] Soru veritabanının ve EGM yayınlarının kullanım hakkı yazılı teyit edildi
-- [ ] Puanlama kuralları uzman tarafından resmî metinlerle karşılaştırıldı
-- [ ] Veri sorumlusu, VERBİS durumu ve yurt dışı aktarım kararı yazıldı
-- [ ] Seçilen logo, Android maskelemesi ve yerel açılış ekranı release paketinde cihazda kontrol edildi
-- [ ] Gerçek e-posta sağlayıcısı kuruldu; doğrulama ve parola yenileme e-postaları gerçek adrese ulaşıyor
-- [ ] İnceleme demo hesabı sunucuda oluşturuldu, e-postası doğrulandı; sunucu inceleme boyunca açık
-- [ ] Apple gizlilik etiketleri ve Google Data safety formu bu belgedeki taslakla karşılaştırılıp dolduruldu
-- [ ] Yaş derecelendirme anketleri dürüstçe dolduruldu
-- [ ] Google hesap silme URL'si Play Console'a girildi
-- [ ] Kişisel Play hesabıysa 12 test kullanıcısı / 14 gün kuralı karşılandı (kurumsal hesapta geçerliliği doğrulandı)
-- [ ] Ekran görüntüleri örnek hesapla alındı, kişisel veri ve geliştirme adresi içermiyor
-- [ ] Gerçek iPhone ve Android cihazda tam akış denendi: kayıt, doğrulama, sınav, soru bildirme, hesap silme
-- [ ] Sunucuda yedekleme çalışıyor ve geri yükleme provası yapıldı
-- [ ] Yayından hemen önce Apple ve Google kuralları yeniden okundu
+- [ ] Hukuki inceleme ve üç eksik karar tamamlandı; metinlerin son hâli onaylandı
+- [ ] Soru kitapçıkları ve amblem kullanım hakkı belgelendi
+- [ ] Apple yayıncı/Organization ve DSA, Google kuruluş doğrulaması son durumu teyit edildi
+- [ ] Apple App Privacy ve Google Data safety son paket/sağlayıcı envanteriyle tamamlandı
+- [ ] Yaş derecelendirmesi, hedef kitle, reklam yok ve resmî kurumla bağlantı yok beyanları dolduruldu
+- [ ] Güncel gerçek ekran görüntüleri ve güvenli inceleme hesabı hazır
+- [ ] 1.0.0 imzalı paketleri gerçek iPhone/iPad ve Android’de temiz kurulum/yükseltme kontrolünden geçti
+- [ ] Parola yenileme/isteğe bağlı iş başvurusu kod postası farklı sağlayıcılarda doğrulandı; Outlook spam durumu ayrıca takip edildi
+- [x] Sunucuda şifreli yedek ve Mac aktarımı çalıştı, gerçek geri yükleme provası geçti
+- [ ] Özel yedek anahtarı ve ayrı silme defteri anahtarının çevrimdışı kopyası kullanıcıda
+- [ ] Son sürümün kamuya açılması kullanıcı tarafından ayrıca istendi

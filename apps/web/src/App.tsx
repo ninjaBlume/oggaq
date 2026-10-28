@@ -46,7 +46,7 @@ export function PageIntro({ eyebrow, title, children }: { eyebrow: string; title
 }
 function WebsiteRedirect() {
   useEffect(() => { window.location.replace('/'); }, []);
-  return <main className="center"><a href="/">ÖGG SOR sitesine dön</a></main>;
+  return <main className="center"><a href="/">{brand.name} sitesine dön</a></main>;
 }
 export function App() {
   // Auth routes preserve signed link/reset parameters until the server accepts them.

@@ -1,6 +1,17 @@
 # Sunucu geliştirme ortamı: yedekleme, geri yükleme ve izleme
 
-Bu klasör `deploy/server-development/` Docker Compose ortamının (Ubuntu 22.04 sunucu, `oggaq-development` projesi) **veritabanını** yedekler. Sunucuda hâlâ **hiç yedek yok**; gerçek soru içeriği (2.765 soru, 286 sınav) yalnızca o sunucunun `database` volume'ündedir. Bu belge ve betikler hazırlanmıştır, **gerçek sunucuda hiçbir şey çalıştırılmamıştır** (bkz. [Doğrulanmayanlar](#doğrulanmayanlar)).
+Bu klasör `oggaq-development` Docker Compose ortamının uygulama veritabanını yedekler. **28 Ekim 2026’da gerçek sunucuda kuruldu ve doğrulandı.** Günlük 00:30 UTC şifreli DB yedeği, saatlik 7. dakikada silme defteri, 07:15 UTC tazelik kontrolü ve Mac’te saatlik çekme etkindir. Mevcut diğer cron işleri korundu; ana makine/diğer siteler değiştirilmedi.
+
+İlk canlı yedek `oggaq-oggaq-20261028T132509Z.dump.age` (2.085.853 bayt), 7 kayıtlık bağımsız silme defteriyle Mac’e SSH/rsync üzerinden alındı ve checksum doğrulandı. Ayrı geçici PostgreSQL DB’sine gerçek geri yükleme, 15 tetikleyici/bütünlük kontrolü, manifestte 4.292 soru/624 sınav/2 hesap/7 deneme eşleşmesi ve silme listesi kuru çalıştırması geçti. Geçici DB kaldırıldı; yerel `oggaq` ve canlı veriler değiştirilmedi. Bu sayılar ilk yedeğin anlık durumudur.
+
+Kurulu yollar:
+
+- Sunucu: `$HOME/oggaq-development/backup-tools/`, `shared/backup.env` ve `shared/backup.age.pub`; age 1.3.2 yalnız `$HOME/.local/bin` altında (resmî Linux paketi SHA256 doğrulandı).
+- Mac: `~/.config/oggaq-backup/identity.txt` **0600 özel anahtar**, `erasure-ledger-key` **0600 ayrı silme defteri anahtarı**, `pull.env`; şifreli kopyalar `~/oggaq-backups/server-development/`.
+- Kullanıcı LaunchAgent: `~/Library/LaunchAgents/com.oggaq.backup-pull.plist` yüklü; ilk otomatik çalışma başarılı. Anahtarlar depoya, sunucu yedek klasörüne veya sohbete yazılmaz.
+- Sunucu yayın/geri dönüş kayıtları: `publication/store-hardening-20261028/`; yerel kanıt `artifacts/store-hardening-20261028/` (Git dışı).
+
+**Tamamlanmayan kurtarma sorumluluğu:** özel age anahtarının ve ayrı silme defteri anahtarının kullanıcı tarafından şifreli çevrimdışı/parola yöneticisi kopyası tutulmalıdır. Mac kapalıysa sunucu dışı kopya güncellenmez; ikinci bağımsız hedef henüz kurulmadı. İlk kurulum testleri otomatik gece cron’unun gelecekteki başarı garantisi değildir.
 
 ## Nasıl çalışır
 
@@ -101,7 +112,7 @@ ls -la ~/oggaq-development/backups && cat ~/oggaq-development/backups/LATEST
 df -h ~                                              # disk yeterli mi?
 ```
 
-Zamanlama (cron; kullanıcı crontab'ı, başka hiçbir servise dokunmaz): `crontab -e` ile `crontab.example` içindeki satırları ekleyin. Cron'un `docker` komutunu bulabilmesi için dosyanın başındaki `PATH=` satırı gereklidir. Alternatif: systemd kullanıcı birimleri (`systemd/`; tek seferlik `sudo loginctl enable-linger harun` gerekir).
+Zamanlama (cron; kullanıcı crontab'ı, başka hiçbir servise dokunmaz): `crontab -e` ile `crontab.example` içindeki satırları ekleyin. Mevcut kurulum kendi `backup.env` dosyasında PATH tanımlar; diğer cron işleri için global PATH değiştirilmez. Alternatif: systemd kullanıcı birimleri (`systemd/`; tek seferlik `sudo loginctl enable-linger harun` gerekir).
 
 `backup.sh` kendi kendine kilitlenir (aynı anda iki örnek çalışmaz), yedek dizini `0700`'dür, şifresiz kopya diske hiç yazılmaz; başarısız bir çalışma yarım dosya bırakmaz ve sıfırdan farklı çıkış kodu verir.
 
@@ -221,18 +232,15 @@ dc() { docker compose --env-file "$OGGAQ_ENV_FILE" -f deploy/server-development/
 
 ## Doğrulanmayanlar
 
-- **Gerçek sunucuda hiçbir şey çalıştırılmadı** (SSH yok): kurulum, cron, izinler, sunucudaki Ubuntu 22.04 / Docker sürümü (Mac'te Colima ile denendi; sunucudaki Docker ve `cron` ortamının `PATH`'i farklı olabilir).
-- `gpg` yolu bu turda yeniden denenmedi (önceki turda geçmişti); `age` yolu Docker provasında denendi. Sunucuda `age` kurulu olmayabilir (`apt install age`).
-- `launchd` plist'i yalnızca `plutil -lint` ile sözdizimi açısından denendi; gerçek yükleme/çalıştırma ve Mac uykusu davranışı denenmedi.
-- Gerçek SSH üzerinden `rsync`: yerel klasörlerle denendi. macOS'un `openrsync`'i (2.6.9 uyumlu) `--chmod`'u desteklemediği için betik `rsync -rt` kullanır; ssh'li kullanım denenmedi.
-- systemd kullanıcı birimleri yazıldı ama hiç yüklenmedi; cron satırları sözdizimi açısından incelendi, çalıştırılmadı. `shellcheck` taraması yapıldı (yukarıda).
-- Felaket kurtarma akışının uçtan uca provası yapılmadı (gerçek volume kaybı, kesinti süresi, `stop`/`start` sırası). Parçaları (geri yükleme, doğrulama, yeniden adlandırma, silme listesi) ayrı ayrı denendi.
-- Büyük veritabanında süre/disk: şimdi yedek ~1,3 MB; boyut büyüdükçe süreler değişir.
+- Gelecek gece cron koşusu, Mac’in uzun süre kapalı/uykuda kalıp uyanması ve macOS bildiriminin kullanıcıya görünmesi henüz gözlenmedi. Cron/launchd kurulu; aynı betiklerin gerçek ilk yedek/aktarım/geri yüklemesi geçti.
+- Gerçek volume kaybı/kesinti ve üretim DB adını değiştirme tatbikatı canlıda yapılmadı; ayrı geçici DB’ye gerçek geri yükleme yapıldı.
+- Çevrimdışı anahtar kopyası, ikinci bağımsız sunucu dışı hedef ve saklama sürelerinin hukuki teyidi açık.
+- systemd alternatifi kurulu değil; cron kullanılır. Çok büyük DB’de süre/disk ayrıca izlenmelidir.
 
 ## Kullanıcı kararları
 
 1. **Sunucu dışı kopya hedefi.** Şu anki tasarımda tek kopya Mac'tir; Mac kaybolursa/bozulursa yedekler de gider. Önerim: ikinci bir kopya (harici disk ya da şifreli yedekleri alan bir bulut/nesne depolama). Şifreli olduğu için hedefin güvenilir olması gerekmez. Hangisi? (Seçerseniz `rclone`/`rsync` adımı Mac tarafına eklenir.)
 2. **Özel anahtarın saklayıcısı.** Anahtarı kim, nerede tutacak (parola yöneticisi + çevrimdışı kopya)? Yedekleri yalnızca bu kişi açabilir.
 3. **Saklama süreleri.** 7/4/6 (sunucu) ve 14/8/12 (Mac) önerilerdir; silinmiş hesap verisinin yedekte kalma süresi nedeniyle hukuki teyitle belirlenmelidir.
-4. **age mi gpg mi.** `age` daha basit ve hatasızdır; sunucuya kurulabiliyorsa onu seçin.
+4. **Şifreleme seçimi:** mevcut kurulum `age` kullanır; gpg yalnız alternatif yol olarak korunur.
 5. **Yönetici uyarıları.** Şu an uyarılar yalnızca Mac'e gelir. E-posta/webhook (`ALERT_WEBHOOK_URL`) isterseniz eklenebilir.

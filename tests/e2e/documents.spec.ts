@@ -29,7 +29,7 @@ test('dilekçe: gerçek API ile taslak, düzenleme, önizleme ve tek kullanıml�
   await page.getByRole('button', { name: 'Dilekçe hazırla', exact: true }).click();
   const create = page.getByRole('button', { name: 'Taslağı oluştur', exact: true });
   await expect(create).toBeDisabled();
-  await expect(page.getByText('ÖGG SOR için hazırlanmış özgün ve düzenlenebilir örnektir.', { exact: true })).toBeVisible();
+  await expect(page.getByText('ÖGGSor için hazırlanmış özgün ve düzenlenebilir örnektir.', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: /Üniversitesi|Emniyet Müdürlüğü/ })).toHaveCount(0);
   await page.getByLabel('Talep veya bildirim', { exact: true }).fill('Görev çizelgemin bir örneğini talep ediyorum.');
   await page.getByLabel('Açıklama / gerekçe', { exact: true }).fill('Sentetik kayıt kontrolü.');

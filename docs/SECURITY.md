@@ -1,6 +1,15 @@
 # Güvenlik, kişisel veri ve mevzuat
 
-## 28 Ekim 2026 — Yayın öncesi açık bulgular
+## 28 Ekim 2026 — Güvenlik düzeltmeleri
+
+- `deepmerge@4.3.1` / GHSA-gcqx-w48m-w2h4 için dar yerel yama uygulanır. Gerçek Expo yapılandırma çözümündeki `index.js`, `dist/cjs.js` ve `dist/umd.js` kaynakları sürüm ve SHA256 ile sınırlandırılır. Her iki birleştirme döngüsü `__proto__`, `constructor`, `prototype` anahtarlarını reddeder; kopyalama kendi veri özelliğini tanımlar. Null hedefli saldırı yamasız kaynakta yeniden üretildi, yamalı gerçek girişte reddedildi; normal Expo birleştirmeleri korunur. Bu upstream tarafından yayımlanmış bir düzeltme değildir.
+- `npm ci` postinstall veya `npm run security:prepare` iki yerel yamayı kurar; `npm run audit` yalnız doğrulanan kaynak/advisory/bağımlılık yolunu kabul eder. **34 araç testi ve audit geçti: 2 doğrulanmış yerel yama, 0 incelenmemiş/yamasız bulgu.** Ham registry audit'i upstream sürümlerini listeler.
+- Canlı ÖGGSor vhost'unda `Strict-Transport-Security: max-age=31536000` etkin. `includeSubDomains` ve preload yok; diğer sitelerin ayarı değişmedi.
+- Asimetrik şifreli günlük DB yedeği, saatlik silme defteri ve saatlik Mac aktarımı kuruldu. Gerçek yedek Mac'teki ayrı geçici DB'ye geri yüklenip 15 tetikleyici, manifest ve silme defteriyle doğrulandı; geçici DB silindi. Özel age anahtarı sunucuda bulunmaz. [İşletim ve kalan kurtarma sorumlulukları](../deploy/server-development/backup/README.md).
+- Expo/EAS teknik veri akışı canlı gizlilik metnine eklendi. Mağaza gizlilik formlarının tamamlanması ve hukuki aktarım değerlendirmesi ayrıca gerekir.
+- **Açık risk:** kullanıcı 28 Ekim'de daha önce sohbette paylaşılan sunucu parolasını değiştirmediğini ve değiştirmeyeceğini bildirdi. Tercih kaydedildi; parola döndürülmüş veya risk giderilmiş sayılmadı. Bu işte parola ile giriş denenmedi, SSH anahtarı kullanıldı.
+
+## 28 Ekim 2026 — İlk inceleme bulguları (tarihsel kayıt)
 
 Güncel `npm run audit`, [GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4) nedeniyle **başarısızdır**. `deepmerge@4.3.1`, `@expo/config` altında kullanılan düşük önem dereceli prototype poisoning bulgusunu taşır. İnceleme anında advisory düzeltilmiş sürüm göstermiyor. Görülen çağrı yolları Expo yapılandırma/eklenti birleştirmesidir; mobil kullanıcı girdisinden çalışan bir saldırı yolu bu incelemede gösterilmedi. Çözüm: SDK 58 uyumluluğu korunarak doğrulanmış upstream düzeltmesi veya dar anahtar doğrulama yaması ve regresyon testi; advisory'yi yalnız susturmak veya `npm audit fix --force` ile Expo sürümünü düşürmek çözüm sayılmaz. Bu tur incelemedir, yama uygulanmadı. Node-forge'un mevcut yaması hash ve imza testlerinden geçmektedir; ham audit'teki yüksek upstream kaydı bu yamanın doğrulanmasıyla ayrı değerlendirilir.
 

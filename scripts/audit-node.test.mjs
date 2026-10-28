@@ -28,6 +28,14 @@ test('the Expo signing helper is accepted only inside the reviewed CLI chain', (
 test('a clean registry report is accepted without inventing advisory exceptions', () => {
   assert.deepEqual(inspectAudit({ vulnerabilities: {} }, tree, true), { patched: [], failures: [] });
 });
+test('deepmerge is recognized only with the installed fix and reviewed Expo config path', () => {
+  const config = { dependencies: { '@oggaq/mobile': { dependencies: { expo: { dependencies: { '@expo/config': { dependencies: { deepmerge: {} } } } } } } } };
+  const advisory = report('deepmerge', 'GHSA-gcqx-w48m-w2h4');
+  assert.deepEqual(inspectAudit(advisory, config, true, true), { patched: ['GHSA-gcqx-w48m-w2h4'], failures: [] });
+  assert.equal(inspectAudit(advisory, config, true, false).failures.length, 1);
+  assert.equal(inspectAudit(advisory, { dependencies: { deepmerge: {} } }, true, true).failures.length, 1);
+  assert.equal(inspectAudit(report('deepmerge', 'GHSA-new-advisory'), config, true, true).failures.length, 1);
+});
 test('the OTA signing helper uses the same verified patch and no other update dependency is exempt', () => {
   const updates = { dependencies: { '@oggaq/mobile': { dependencies: { 'expo-updates': { dependencies: { '@expo/code-signing-certificates': { dependencies: { 'node-forge': {} } } } } } } } };
   assert.deepEqual(inspectAudit(report('node-forge', 'GHSA-86w9-cpqp-85rv'), updates, true).failures, []);

@@ -20,7 +20,7 @@ test('the site renders without scripts, session requests or study forms and pres
   try {
     await buildSite({ output: temp, links: { appStoreUrl: null, googlePlayUrl: null } });
     const html = await readFile(path.join(temp, 'index.html'), 'utf8');
-    assert.match(html, /<html lang="tr">/);assert.match(html, /ÖGG SOR/);assert.match(html, /App Store: yakında/);assert.match(html, /Google Play: yakında/);
+    assert.match(html, /<html lang="tr">/);assert.match(html, /ÖGGSor/);assert.match(html, /App Store: yakında/);assert.match(html, /Google Play: yakında/);
     assert.doesNotMatch(html, /<script\b|<form\b|\/api\/|href="#"|\{\{/i);
     assert.match(html, /href="\/legal\/hesap-silme.html"/);
     assert.match(html, /class="app-screen" src="\/screens\/mobile-home.jpg\?v=[a-f0-9]{12}"/);
