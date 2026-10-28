@@ -1,5 +1,12 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Yatay telefon düzeni iki beta kanalında
+
+Kullanıcı talimatıyla kaynak `8d2bdba` ayrı güncellemeler olarak yayımlandı: iOS **testflight / 01a18029-6c50-748b-9f8d-2869bfc40b0a**, grup `3b7d716a-619a-42a6-834a-17c42d45258b`; Android **android-beta / 01a18029-e53c-77cf-9ab5-38cbdb2e2cc4**, grup `4a125e35-4a82-402a-9116-901f59b7e772`. Önceki 72 mobil test/8 E2E/export ve native iPhone yön kontrolü geçerli; yayın öncesi **29 araç testi ve workspace strict TypeScript geçti**. Her iki yerel native fingerprint kurulu paketle eşleşti.
+
+Native güncelleme başlıklarıyla doğru manifest/launch asset, HTTPS API/web adresleri ve localPreview=false doğrulandı. Launch asset ve **iOS 18 / Android 19 ek dosyanın tamamının SHA-256 değerleri eşleşti**; yeni yatay telefon politikası ve QA önizlemesinin bulunmaması doğrulandı. Uyumsuz runtime ve platform 204; production 404. Bu teslim doğrulaması fiziksel cihazın güncellemeyi aldığını göstermez; iki platformda da alım henüz teyit edilmedi. Yeni native mağaza paketi, genel mağaza/site/sunucu yayını, hesap/DB işlemi veya Git push yok. Kanıt `artifacts/landscape-home/ota/` altında.
+
+
 ## 28 Ekim 2026 — Yatay telefon ana sayfası
 
 Kullanıcının talebiyle iPad ana sayfa sunumu native iOS/Android yatay telefon pencerelerine genişletildi. `homePresentationFor`, pencere yüksekliği/yönü, güvenli alan ve ray sonrası kalan genişlik ve yazı ölçeğini kullanır. Kompakt yatay ölçüler, küçük ekranda tek sütun, dikeye dönüş ve iPad davranışının korunması yedi politika testiyle doğrulandı; önceki dört iPad testi bunlara taşındı. **72 mobil birim testi, mobil strict TypeScript ve iOS/Android/web Expo export geçti.** İlk kök npm export komutunda çıktı klasörü argümanı yanlış katmana geçti; workspace komutuyla düzeltilen son export başarılı.
