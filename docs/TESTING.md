@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## 29 Ekim 2026 — Google kurulum devamı ve Apple durum ayrımı
+
+Google finansal işlev yok seçimi kaydedildi; sonraki sayfada ek belge gerekmemesi, kayıt mesajı ve yenilenmiş kontrol panelinde finans görevinin tamamlanması/**8/11** doğrulandı. Sağlık, kategori/iletişim ve mağaza girişi görevleri açık. Sağlık seçenekleri etiketsiz göründüğünden tahmini kategori kaydedilmedi. Kategori düğmesinde Safari `elementHasNoFrame` hatası nedeniyle kullanıcıdan formu açması istendi. Genel inceleme/yayın başlatılmadı.
+
+Apple kişisel yasal kişi/DSA inceleme bilgileri, Organization dönüşümünün beklediği adımı doğrulamıyor. Ayrı Apple Developer oturumu Touch ID gerektirdi; üyelik dönüşümünün nedeni henüz bilinmiyor. Yalnız operasyon belgeleri değişti; uygulama/API/veritabanı değişmedi, uygulama testleri tekrarlanmadı.
+
 ## 29 Ekim 2026 — Google Veri güvenliği beyanının kaydı
 
 Kullanıcı, gerçek kullanıcı kaydı veya parola içermeyen `oggsor-data-safety.csv` dosyasının Google Play’e yüklenmesini ve taslağın tamamlanmasını açıkça onayladı. Native dosya seçicisinin pasif düğmesi kullanıcı tarafından tamamlandı; Google’da doğru dosya adı ve `CSV dosyası başarıyla yüklendi` görüldü. İçe aktarma sonrası `Yanıtlar CSV’den içe aktarıldı` mesajı; HTTPS, kullanıcı adı/parola, hesap silme ve kısmi veri silme URL’lerinin korunduğu doğrulandı.
