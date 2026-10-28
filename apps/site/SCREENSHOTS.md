@@ -1,13 +1,13 @@
 # Tanıtım sayfasındaki uygulama görselleri
 
-**Güncel durum (28 Ekim 2026):** Kullanıcı lacivert panel, eğik telefon ve öne bindirilmiş sonuç kartını reddetti. Canlı site yalnız web imajı `oggaq-development-web:documents-20261028` seçilerek önceki sade görünüme geri alındı. Ardından kullanıcı “yayınlasana” diyerek tek düz telefon önizlemesini onayladı; bu görünüm `site-clean-7f9d88f` web imajıyla yayımlandı.
+**Güncel durum (28 Ekim 2026):** Onaylanan tek düz telefon düzeni ve güncel sistem ikonlarını gösteren ana ekran `oggaq-development-web:system-icons-20261028-r2` imajıyla yayındadır. Genel HTTPS üzerinden görsel/yerleşim, hesap/yönetim girişleri ve API kontrol edildi. Önceki reddedilen kompozisyonun geri alım geçmişi aşağıda korunur.
 
 28 Ekim 2026: görseller mevcut `apps/mobile` Expo web önizlemesinden, açık tema / standart yazı / 390 × 844 px / 2× yoğunluk ile yeniden alındı. HTML ile taklit edilmiş ekran veya AI ile üretilmiş resim değildir. Native cihaz testi yerine sayılmaz.
 
 - `public/screens/mobile-home.jpg`: 780 × 1688 px; güncel ortalanmış marka başlığı, kaldırılmış profil kısayolu, kompakt düğmeler ve ana ekran kartları.
-Önceki sonuç kartı görseli ve şablon alanı kaldırıldı; yeni hero yalnız ana ekran JPEG'ini kullanır (143.081 byte).
+Önceki sonuç kartı görseli ve şablon alanı kaldırıldı; yeni hero yalnız ana ekran JPEG'ini kullanır (143.096 byte).
 
-Veriler yalnız çekime özel izole tarayıcı yanıtlarıdır: “Öğrenci” adlı tanıtım kullanıcısı, 100 soru / 72 doğru / 18 yanlış / 10 boş / %72 ve bir tamamlanan çalışma. Ekranda gerçek kişinin adı, e-postası, hesabı veya sınav geçmişi yayımlanmaz. Gerçek kullanıcıyla giriş yapılmadı, sunucuda hesap oluşturulmadı, geliştirme/test/üretim veritabanına yazılmadı. Yanıtlar yerelde karşılandı; dış ağ isteği engellendi. Hiçbir soru veya yapay sorunun resmî içerik gibi gösterimi yoktur; yayımlanan sonuç görseli yalnız özet kartıdır.
+Veriler yalnız çekime özel izole tarayıcı yanıtlarıdır: “Öğrenci” adlı tanıtım kullanıcısı, 100 soru / 72 doğru / 18 yanlış / 10 boş / %72 ve bir tamamlanan çalışma. Ekranda gerçek kişinin adı, e-postası, hesabı veya sınav geçmişi yayımlanmaz. Gerçek kullanıcıyla giriş yapılmadı, sunucuda hesap oluşturulmadı, geliştirme/test/üretim veritabanına yazılmadı. Yanıtlar yerelde karşılandı; dış ağ isteği engellendi. Hiçbir soru veya yapay sorunun resmî içerik gibi gösterimi yoktur; sitede yalnız anonim ana ekran örneği gösterilir.
 
 Takvimde daha önce platformda doğrulanmış 27 Aralık 2026 / 124. Temel / 100. Yenileme bilgisi kullanıldı; bu çekim yeni bir resmî takvim araştırması değildir. Sayaç çekim gününe göre 28 Ekim 2026 için 60 gündür. Görseller statiktir; sayfadaki “Örnek veriler” açıklaması bunların canlı takvim/istatistik olmadığını belirtir.
 
@@ -24,3 +24,5 @@ Yeni önizleme: `artifacts/site-clean-preview/preview-light.png`, `preview-dark.
 ## Sistem ikonları yenilemesi — 28 Ekim 2026
 
 Sonuç sekmesi pasta grafiği, doğruluk yalın yüzde, biten sınav daire içinde onay olacak şekilde ana ekran JPEG'i aynı 390×844@2 / anonim örnek verilerle yenilendi. Sitedeki mağaza kartlarında tekrarlanan telefon dekorları kaldırıldı; adlar/platform/Yakında bilgisi korunur. Çekim artifacts/system-icons/ içindedir; yayın kaydı TESTING içinde tutulur.
+
+Son sistem ikonları ve yönetim/hesap ön yüzleri `system-icons-20261028-r2` ile yayımlandı. İlk yayın yol hatası geri alınıp düzeltildi; son genel tarayıcı kontrolü geçti. Ayrıntılar docs/TESTING.md içindedir.

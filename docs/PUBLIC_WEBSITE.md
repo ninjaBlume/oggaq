@@ -38,3 +38,15 @@ Bilgi sayfaları (26 Ekim 2026): `/legal/*` header/footer'ı `apps/site/index.ht
 Bilgi sayfalarının ortak tasarımı `site-legal-5af3e01` web imajıyla yayımlandı. Dört genel HTTPS sayfasında yeni CSS/marka çerçevesi ve hesap silme bağlantıları doğrulandı; yalnız web yenilendi. İç inceleme/eksik karar kayıtları mağaza kontrolünde beklemeye devam eder.
 
 28 Ekim 2026: `site-visual-20261028` hero tasarımı kullanıcı tarafından reddedildi; canlı web `documents-20261028` imajına geri alındı. Güncel gerçek uygulama ekranını tek düz telefonda gösteren yeni önizleme, kullanıcının “yayınlasana” onayıyla `site-clean-7f9d88f` web imajı üzerinden yayımlandı. Detaylar [görsel kaynağı ve yayın durumu](../apps/site/SCREENSHOTS.md) ile [TESTING](TESTING.md) içinde.
+
+28 Ekim 2026 sistem ikonları: `system-icons-20261028-r2` site + hesap + yönetim statik yayını etkin. Aynı telefon dekorları kaldırıldı; tanıtım JPEG'i güncel mobil ikonlarla yenilendi. Yönetim kaynak ve eylem ikonları da ayrıldı. İlk base yolu hatası geri alınıp doğru üretim ayarlarıyla düzeltildi; adayda HTML'in referans verdiği dosyalar, son genel tarayıcıda iki giriş ekranı doğrulandı. Backend/DB servisleri değiştirilmedi.
+
+Üretim statik derlemesinde Dockerfile ile aynı ayarları kullanın:
+
+```sh
+VITE_API_URL=/ VITE_WEB_MODE=account npm run build:web
+VITE_API_URL=/ VITE_ADMIN_BASE_PATH=/yonetim/ npm run build:admin
+npm run build:site
+```
+
+Admin'i varsayılan `/` base ile yayımlamayın. Tahmini dosya listesi hash kontrolü tek başına yetmez; aday HTML'deki script/stylesheet URL'leri ve gerçek tarayıcıda yönetim/hesap girişleri de doğrulanır.
