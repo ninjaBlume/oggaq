@@ -35,7 +35,7 @@ if (config('database.default') !== 'pgsql' || config('database.connections.pgsql
     throw new RuntimeException('Browser fixtures require the isolated oggaq_test PostgreSQL database.');
 }
 $operation = $argv[1] ?? '';
-if (! in_array($operation, ['setup', 'setup-study', 'random-pool', 'verification-link', 'verification-code', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'renewal-exams', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'long-result', 'paired-exam-draft', 'scoring', 'scored-exam-draft', 'calendar', 'calendar-stale', 'upcoming-calendar', 'upcoming-empty', 'cleanup'], true)) {
+if (! in_array($operation, ['setup', 'setup-study', 'legacy-exam-fragments', 'random-pool', 'verification-link', 'verification-code', 'reset-link', 'near-deadline', 'disposable-user', 'user-exists', 'email-change-link', 'official-exam', 'renewal-exams', 'subject-exam', 'more-subject-exams', 'favorite', 'jobs', 'long-result', 'paired-exam-draft', 'scoring', 'scored-exam-draft', 'calendar', 'calendar-stale', 'upcoming-calendar', 'upcoming-empty', 'cleanup'], true)) {
     throw new InvalidArgumentException('Expected setup or cleanup.');
 }
 if ($operation === 'verification-code') {
@@ -160,6 +160,10 @@ if (in_array($operation, ['long-result', 'paired-exam-draft', 'scored-exam-draft
     }
     DB::transaction(fn () => app(FinalizeExam::class)->execute(ExamAttempt::whereKey($exam->id)->lockForUpdate()->firstOrFail()));
     echo '/study/'.$context->id.'/exams/'.$exam->id;
+    exit;
+}
+if ($operation === 'legacy-exam-fragments') {
+    echo json_encode(Tests\Support\LegacyExamFragments::create(User::where('email', 'e2e-admin@example.test')->firstOrFail(), User::where('email', 'e2e-student@example.test')->firstOrFail()), JSON_THROW_ON_ERROR);
     exit;
 }
 if ($operation === 'random-pool') {

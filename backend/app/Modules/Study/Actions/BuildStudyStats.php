@@ -28,7 +28,7 @@ class BuildStudyStats
         );
         $subjects = array_map(fn ($row) => ['subject_id' => $row->subject_id, 'name' => $row->name] + $this->counts((int) $row->correct, (int) $row->incorrect, (int) $row->blank), $rows);
         $sum = fn (string $key) => array_sum(array_column($subjects, $key));
-        $exams = ExamAttempt::withoutReviews()->where('study_context_id', $context->id)->whereNotNull('finished_at')->whereRaw('correct_count + incorrect_count > 0')
+        $exams = ExamAttempt::forExamResults()->where('study_context_id', $context->id)->whereNotNull('finished_at')->whereRaw('correct_count + incorrect_count > 0')
             ->toBase()->selectRaw('count(*) AS completed, avg(score_percent) AS average, max(score_percent) AS best')->first();
 
         return [

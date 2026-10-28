@@ -46,8 +46,17 @@ class ExamAttempt extends Model
         $query->where(fn (Builder $inner) => $inner->whereNull('finished_at')->orWhereRaw('correct_count + incorrect_count > 0'));
     }
 
-    public function scopeWithoutReviews(Builder $query): void
+    public function scopeForExamResults(Builder $query): void
     {
+        // A partial/free question session is practice, even when an old client did not persist review_kind.
+        // The question count is not a classifier: a genuine one-question subject exam still has its template.
+        $randomSchema = Schema::hasColumn('exam_attempts', 'random_weapon_status');
+        $query->where(function (Builder $exam) use ($randomSchema) {
+            $exam->whereNotNull('official_exam_id');
+            if ($randomSchema) {
+                $exam->orWhereNotNull('random_weapon_status');
+            }
+        });
         if (Schema::hasColumn('exam_attempts', 'review_kind')) {
             $query->whereNull('review_kind');
         }

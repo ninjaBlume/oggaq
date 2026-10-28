@@ -20,7 +20,7 @@ class ListExams
 
         $query = ExamAttempt::notAbandoned()->where('study_context_id', $context->id);
         if ($scope === 'exams') {
-            $query->withoutReviews();
+            $query->forExamResults();
         } elseif ($scope === 'review') {
             if (! Schema::hasColumn('exam_attempts', 'review_kind')) {
                 throw new ApiProblem(503, 'review_unavailable', 'Tekrar geçmişi için sunucu güncellemesi gerekiyor.');

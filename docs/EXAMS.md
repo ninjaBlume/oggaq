@@ -1,5 +1,9 @@
 # Süreli deneme
 
+## 28 Ekim 2026 — Sınav sorularından yapılan eski çalışmalar
+
+Sonuçlarım, Son sınavların ve biten sınav özeti aynı `forExamResults` kapsamını kullanır: resmî şablon bağlantısı veya tanımlı rastgele sınav metadata'sı gerekir; etiketli tekrarlar dışlanır. Eski etiketsiz 1/11 soruluk parçalar artık ayrı deneme görünmez. Cevaplar ve asıl sınav sonuçları birleştirilip yeniden puanlanmaz veya silinmez. Toplam soru/doğruluk hesabına çözümler katılmaya devam eder. [Ayrıntı](STUDY.md).
+
 ## 28 Ekim 2026 — Tekrar sonuçları ayrı çalışma geçmişidir
 
 Tekrar aynı cevap/süre/konum motorunu kullanır; bir deneme sonucu gibi sayılmaz. `review_kind` kayda sabitlenir, normal sonuç/ana sayfa listesi bu kayıtları dışlar; Tekrar bölümünde kendi geçmişinden devam edilir veya sonucu açılır. Tekrar cevapları soru ve doğruluk istatistiklerini etkiler; biten sınav sayısı, deneme ortalaması ve en iyi deneme puanını etkilemez. Mevcut cevap kilidi, süre sonu ve sonuç bütünlüğü korunur. [API, migration ve eski kayıtların sınırı](STUDY.md#28-ekim-2026--tekrar-çalışması-deneme-değildir).

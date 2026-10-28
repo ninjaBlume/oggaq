@@ -2,8 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
+use App\Modules\QuestionBank\Actions\PublishOfficialExam;
 use App\Modules\QuestionBank\Actions\PublishQuestion;
+use App\Modules\QuestionBank\Actions\SaveOfficialExam;
 use App\Modules\QuestionBank\Actions\SaveQuestion;
+use App\Modules\QuestionBank\Models\ExamType;
 use App\Modules\QuestionBank\Models\Question;
 use App\Modules\QuestionBank\Models\QuestionSource;
 use App\Modules\QuestionBank\Models\Subject;
@@ -233,7 +237,7 @@ class StudyInsightsTest extends TestCase
         $this->putJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$exam['id'].'/answers/'.$row['id'], ['base_version' => 1, 'selected_option_id' => $row['question']['options'][1]['id']])->assertOk();
         $this->postJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$exam['id'].'/finish', ['base_version' => 2])->assertOk();
         $stats = $this->getJson('/api/v1/contexts/'.$context.'/stats')->assertOk()->json('data');
-        $this->assertEquals(['completed' => 1, 'average_score_percent' => 0.0, 'best_score_percent' => 0.0], $stats['exams']);
+        $this->assertEquals(['completed' => 0, 'average_score_percent' => null, 'best_score_percent' => null], $stats['exams']);
         $this->assertSame(6, $stats['answers']['total']);
         $this->assertSame(2, $stats['answers']['incorrect']);
         $this->assertSame(2, $stats['answers']['blank']);
@@ -245,7 +249,7 @@ class StudyInsightsTest extends TestCase
         $this->asToken($this->createUser());
         $context = $this->context();
         $exam = $this->postJson('/api/v1/contexts/'.$context.'/exam-attempts', ['id' => (string) Str::uuid(), 'question_count' => 3, 'duration_seconds' => 60])->assertOk()->json('data');
-        $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts')->assertOk()->assertJsonCount(1, 'data');
+        $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts?scope=all')->assertOk()->assertJsonCount(1, 'data');
         $this->postJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$exam['id'].'/finish', ['base_version' => 1])->assertOk();
         // The attempt itself stays readable, but it is no result: not listed, not in the stats, not in the review lists.
         $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$exam['id'])->assertOk()->assertJsonPath('data.status', 'completed');
@@ -273,9 +277,14 @@ class StudyInsightsTest extends TestCase
     public function test_review_answers_count_as_practice_but_never_as_another_exam_or_normal_result(): void
     {
         $this->pool();
+        $admin = User::where('platform_role', 'platform_admin')->firstOrFail();
+        $versionIds = Question::orderBy('id')->pluck('published_version_id')->all();
+        $type = ExamType::create(['name' => 'Sentetik tam sınav', 'code' => (string) Str::uuid()]);
+        $template = app(SaveOfficialExam::class)->execute($admin, ['exam_type_id' => $type->id, 'title' => 'Sentetik asıl sınav', 'year' => 2026, 'weapon_status' => 'armed', 'exam_number' => '1', 'question_version_ids' => $versionIds]);
+        app(PublishOfficialExam::class)->execute($admin, $template);
         $this->asToken($this->createUser());
         $context = $this->context();
-        $base = $this->postJson('/api/v1/contexts/'.$context.'/exam-attempts', ['id' => (string) Str::uuid(), 'question_count' => 3, 'duration_seconds' => 600])->assertOk()->json('data');
+        $base = $this->postJson('/api/v1/contexts/'.$context.'/exam-attempts', ['id' => (string) Str::uuid(), 'official_exam_id' => $template->id, 'duration_seconds' => 600])->assertOk()->json('data');
         $row = $base['questions'][0];
         $this->putJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$base['id'].'/answers/'.$row['id'], ['base_version' => 1, 'selected_option_id' => $row['question']['options'][1]['id']])->assertOk();
         $this->postJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$base['id'].'/finish', ['base_version' => 2])->assertOk();

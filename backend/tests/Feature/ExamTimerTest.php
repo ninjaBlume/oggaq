@@ -140,7 +140,7 @@ class ExamTimerTest extends TestCase
         $session = (string) Str::uuid();
         $clock = $this->timer($exam, 'resume', $session);
         $this->travel(35)->seconds();
-        $this->getJson('/api/v1/contexts/'.$exam['context_id'].'/exam-attempts')->assertOk()->assertJsonPath('data.0.timer_paused', true)->assertJsonPath('data.0.remaining_seconds', 90);
+        $this->getJson('/api/v1/contexts/'.$exam['context_id'].'/exam-attempts?scope=all')->assertOk()->assertJsonPath('data.0.timer_paused', true)->assertJsonPath('data.0.remaining_seconds', 90);
         $this->assertDatabaseHas('exam_attempts', ['id' => $exam['id'], 'paused_at' => null, 'revision' => $clock['revision']]);
         $clock = $this->timer($exam, 'resume', $session);
         for ($i = 0; $i < 5; $i++) {

@@ -733,7 +733,7 @@ export interface paths {
         };
         /**
          * Bağlama ait süreli deneme geçmişi
-         * @description Kendi çalışma alanının salt okunur geçmişi. Varsayılan scope=exams yalnız normal deneme/ders/rastgele sınavlarını döndürür; tekrar çalışmaları sayılmaz. scope=review yalnız tekrar geçmişi, scope=all birleşik kişisel geçmiş içindir. Terk edilmiş kayıtlar listelenmez; tamamlanmış veya devam eden tekrar kaydı kimliğiyle yine okunabilir.
+         * @description Kendi çalışma alanının salt okunur geçmişi. Varsayılan scope=exams yalnız yayımlanmış sınav şablonuna bağlı deneme/ders veya tanımlı rastgele sınavları döndürür. Tekrar etiketi hiç kaydedilmemiş eski bağımsız soru çalışmaları da bu listeden ve sınav sayısı/ortalamasından dışlanır; soru sayısına göre eşik uygulanmaz. scope=review etiketli tekrar geçmişi, scope=all bütün kişisel çalışma kayıtları içindir. Cevap ve özgün sınav sonuçları değişmez; tüm çözümler soru/doğruluk istatistiklerine katılır. Terk edilmiş kayıtlar listelenmez; kendi kaydı kimliğiyle yine okunabilir.
          */
         get: operations["listExams"];
         put?: never;

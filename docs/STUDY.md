@@ -1,5 +1,9 @@
 # Tek soru alıştırması — uygulanmış akış
 
+## 28 Ekim 2026 — Eski parçalar da sınav sayılmaz
+
+1 ve 11 soruluk eski kayıtların `review_kind` alanının boş olması, onları normal sınav yapmaz. Varsayılan Sonuçlarım / Son sınavların ve sınav sayısı/ortalaması artık yalnız **yayımlanmış sınav şablonuna bağlı deneme/ders** veya **tanımlı rastgele sınav** kayıtlarını kullanır. Serbest/eski soru çalışmaları bu listelerden ve sınav özetinden dışlanır. Soru adedine göre eşik yoktur: gerçek bir soruluk ders şablonu korunur. Ham kayıt/cevap, özgün asıl sınav puanı ve çözülen soru/doğruluk istatistiği değişmez; kendi ham çalışma kaydı `scope=all`, doğrudan kimliği ve veri export'uyla erişilebilir kalır. Eski tekrar türü tahmin edilerek DB'ye yazılmaz. Ayrım ortak API sorgusunda olduğundan mevcut telefon sürümü de listeyi yeniden aldığında düzelir; migration veya OTA gerektirmez.
+
 ## 28 Ekim 2026 — Tekrar çalışması deneme değildir
 
 Kullanıcı kararı: tekrar cevapları **çözülen soru, doğru/yanlış/boş, doğruluk ve ders istatistiklerine katılır**; **tamamlanan sınav sayısına, deneme ortalamasına ve en iyi deneme puanına katılmaz**. Yanlış/boş listeleri son tamamlanmış cevaba göre güncellenmeye devam eder. `AnswerEvents` ve kaynak sonuç puanları yeniden yazılmaz; yalnız sınav özetinin hesabı tekrarları dışlar.

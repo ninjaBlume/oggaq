@@ -312,7 +312,7 @@ class ExamTest extends TestCase
         $this->answer($exam, 0, 0);
         $this->answer($other, 0, 0);
         $this->travel(60)->seconds();
-        $list = '/api/v1/contexts/'.$exam['context_id'].'/exam-attempts';
+        $list = '/api/v1/contexts/'.$exam['context_id'].'/exam-attempts?scope=all';
         $this->getJson($list)->assertOk()->assertJsonCount(2, 'data')->assertJsonPath('data.0.status', 'active')->assertJsonPath('data.1.status', 'active')->assertJsonMissingPath('data.0.questions');
         $this->assertDatabaseCount('exam_attempts', 2);
         $this->assertSame(2, ExamAttempt::whereNull('finished_at')->count());
