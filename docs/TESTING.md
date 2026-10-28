@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — iPad ilk kurulumdaki eski doğrulama ekranından çıkış
+
+Yeni iPad kurulumunda kullanıcı eski genel e-posta doğrulama ekranına düştü. Mevcut TestFlight 0.1.1 (4) metadata'sında native açılış denetimi ALWAYS, bekleme 0 ms ve testflight kanalı doğrulandı; gömülü commit 26 Ekim 23:44 UTC'dir. Gömülü iOS update kimliği `50d0d4c8-bb87-472d-9a2e-774a8d41f82e` ile gerçek endpoint'e yapılan istek son `01a17fe8-1517-7ace-9c5e-af69c51ff188` güncellemesini doğru runtime/API/kanalla verdi. Native delta isteği 226; tam launch asset yeniden alınıp SHA-256 doğrulandı. 18 ek dosyanın tamamı eşleşti; uyumsuz runtime/platform 204 ve production beta sunmadı. Kanıt `artifacts/ipad-update-bootstrap/` altında.
+
+Kullanıcı tam kapat/aç → internet bağlı yaklaşık 1 dakika bekle → tam kapat/aç işleminden sonra **“Kayboldu; uygulama açıldı”** yanıtıyla iPad'de doğrulama engelinin kalkmasını teyit etti. Kısa sürüm kodu ve iPad'de sınav çözümü ayrıca teyit edilmedi. Yeni kaynak değişikliği, OTA/native yayın, e-posta gönderimi/doğrulaması veya hesap/DB müdahalesi yapılmadı. Yalnız teslim ve cihaz açılışı doğrulandı; ürün testleri gereksiz yere yeniden koşturulmadı.
+
+
+
 ## 28 Ekim 2026 — Tüm istemcilerde ikon ayrımı
 
 Kullanıcının kapsam düzeltmesiyle mobil, yönetim paneli, hesap/web kaynakları ve tanıtım sitesi birlikte incelendi. Sonuç pasta grafiği, tekrar iki yönlü dönüş oku, tutanak ciltli/sekmeli defter oldu; dilekçe kalemli belgedir. Yüzde/onay özetleri, hata/bağlantı bilgisi, yönetimde puanlama/kataloglar/konular/kaynaklar, silme/çıkarma/kapatma, yeni soru/mevcut soru ve taşıma eylemleri ayrıldı. Sitedeki aynı telefon dekorları kaldırıldı. Ortak web/admin SVG geometrisi 43 statik Lucide çiziminden oluşur; lisansları korunur, yeni runtime bağımlılığı/CDN eklenmez. [Kapsam, sembol listesi ve sınırlar](ICONS.md).
