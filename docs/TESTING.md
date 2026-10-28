@@ -6,6 +6,8 @@ Kullanıcının “telefonlar için gerekmez, tabletler için” düzeltmesiyle 
 
 Yalnız ayrı geçici DB'de sentetik hesap kullanıldı; kullanıcı/oturum/geçmiş/başvuru verileri aktarılmadı. İş sonunda kendi 8003 API/8083 Metro/emülatör süreçleri kapatıldı, ekran/ADB ayarları geri alındı ve DB'nin silindiği doğrulandı. 8082 Metro korundu. Uygulama kodu/paket/OTA değişmedi; geniş testler tekrarlanmadı. Fiziksel tablet veya iPad doğrulaması değildir.
 
+Kullanıcının dört dosya için açık onayıyla yatay ekranlar Google Play 7/10 inç tablet alanlarına yüklendi. “Değişiklikleriniz kaydedildi” görüldü; sayfa yenilenince yatay dosya adları ve iki tablet alanında **4/8**, telefon alanında değişmeden **4/8** ekran korundu. Taslak kaydet pasifti. Genel yayın veya incelemeye gönderme yapılmadı.
+
 ## 28 Ekim 2026 — Google Play tablet görselleri
 
 Android 16 ARM64 emülatöründe 1440×2560 tablet ekran yapılandırmalarıyla iki ayrı yerleşim yakalandı: 360 dpi / 640 dp küçük tablette yan gezinme ve tek sütun, 272 dpi / yaklaşık 847 dp büyük tablette yan gezinme ve iki sütun. Her sınıf için ana sayfa ve deneme listesi olmak üzere **4 gerçek PNG** alındı, görsel inceleme ve boyut/uzunluk/SHA-256 kontrolleri geçti. Telefon ekranları büyütülmedi. Küçük tablette Standart, büyük tablette Küçük yazı tercihi kullanıldı; büyük tabletin Standart yazıda dar istatistik sütununda “Doğruluk” kelimesinin satıra bölünebildiği gözlendi. Bu tur arayüz kodu değiştirilmedi.
