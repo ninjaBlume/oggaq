@@ -1,5 +1,6 @@
 import { Text } from "./text";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import type { ScrollViewInstance } from "react-native";
 import { AppState, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -12,7 +13,8 @@ import {
 } from "./icons";
 import type { ExamAttempt, StudyContext } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
-import { mergeExamAnswerState, mergeExamTimer, anchorClock, remainingSeconds, timeLabel, resumeQuestionIndex, ExamPositionSaver } from "@oggaq/study-core";
+import { mergeExamAnswerState, mergeExamTimer, anchorClock, remainingSeconds, timeLabel, resumeQuestionIndex, ExamPositionSaver, examDisplayTitle } from "@oggaq/study-core";
+import { QuestionMap } from "./questionMap";
 import { useExamTimer } from "./useExamTimer";
 import { api } from "./api";
 import { CompletedExam } from "./exam-results";
@@ -28,51 +30,6 @@ import {
   Sheet,
 } from "./ui";
 import { useBody, useLayout, useTheme } from "./themeContext";
-// The numbered question buttons: in a sheet on narrow windows, in the side panel on expanded ones.
-function QuestionMap({
-  questions,
-  index,
-  blocked,
-  choose,
-}: {
-  questions: ExamAttempt["questions"];
-  index: number;
-  blocked: boolean;
-  choose: (index: number) => void;
-}) {
-  const { palette, styles } = useTheme();
-  return (
-    <View style={styles.row}>
-      {questions.map((q, i) => (
-        <Pressable
-          key={q.id}
-          accessibilityRole="button"
-          accessibilityLabel={`Soru ${i + 1}`}
-          accessibilityState={{ selected: i === index, disabled: blocked }}
-          disabled={blocked}
-          onPress={() => choose(i)}
-          style={[
-            styles.smallButton,
-            q.selected_option_id !== null && {
-              backgroundColor: palette.softPrimary,
-            },
-            i === index && { borderWidth: 2, borderColor: palette.primary },
-          ]}
-        >
-          <Text
-            style={{
-              color: q.selected_option_id ? palette.primary : palette.muted,
-              fontSize: 14,
-              fontWeight: "700",
-            }}
-          >
-            {i + 1}
-          </Text>
-        </Pressable>
-      ))}
-    </View>
-  );
-}
 function TimerBadge({
   seconds,
   large = false,
@@ -113,6 +70,7 @@ function TimerBadge({
 }
 type Save = { row: string; option: string | null; revision: number };
 export function Exam({ context, id, initialExam }: { context: StudyContext; id: string; initialExam?: ExamAttempt }) {
+  const navigation = useNavigation();
   const { palette, styles } = useTheme();
   const layout = useLayout();
   const body = useBody();
@@ -178,6 +136,8 @@ export function Exam({ context, id, initialExam }: { context: StudyContext; id: 
   const [seconds, setSeconds] = useState(0);
   const [confirm, setConfirm] = useState(false);
   const exam = query.data?.data;
+  const title = exam?.official_exam ? examDisplayTitle(exam.official_exam.title) : exam ? `${exam.question_count} soruluk sınav` : "Sınav";
+  useLayoutEffect(() => { navigation.setOptions({ title }); }, [navigation, title]);
   const timer = useExamTimer(exam, summary => {
     if (summary.status === 'completed') { void query.reload(false); return; }
     if (latest.current) { const data = mergeExamTimer(latest.current, summary);latest.current = data;query.setData({data}); }

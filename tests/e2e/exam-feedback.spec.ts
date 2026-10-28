@@ -11,6 +11,8 @@ for (const platform of ['web', 'mobile'] as const) {
     test.use({ baseURL: platform === 'web' ? 'http://127.0.0.1:5183' : mobilePreviewUrl, viewport: { width: 390, height: 950 } });
     for (const kind of ['deneme', 'ders'] as const) {
       test(`${kind}: ilk cevap anahtarı açar, değiştirme/temizleme engellenir ve yeniden açılınca kilit korunur`, async ({ page }) => {
+        const colorScheme = kind === 'deneme' ? 'light' : 'dark';
+        if (platform === 'mobile') await page.addInitScript(value => localStorage.setItem('oggaq.theme', value), colorScheme);
         if (platform === 'web') await login(page);
         else {
           await page.goto('/');
@@ -29,14 +31,41 @@ for (const platform of ['web', 'mobile'] as const) {
         const start = await started;
         const initial = (await start.json()).data;
         expect(initial.questions.every((q: { feedback: unknown }) => q.feedback === null)).toBe(true);
+        if (platform === 'mobile') {
+          await expect(page.getByTestId('exam-header-title')).toHaveText(initial.official_exam.title);
+          await page.getByRole('button', { name: 'Soru listesi', exact: true }).click();
+          await expect(page.getByTestId('question-map-1')).toHaveAttribute('aria-label', 'Soru 1');
+          await expect(page.getByTestId(/question-map-\d+-(correct|incorrect)/)).toHaveCount(0);
+          await page.getByRole('button', { name: 'Kapat', exact: true }).click();
+        }
         await expect(page.getByText('Seçimin kaydedilince doğru cevap gösterilir. Yanıtını değiştiremezsin.', { exact: true })).toBeVisible();
         const saved = page.waitForResponse(r => r.request().method() === 'PUT' && /\/answers\//.test(new URL(r.url()).pathname));
-        await page.getByRole('radio', { name: /Sentetik B/ }).click();
+        let release = () => {};
+        if (platform === 'mobile') {
+          const gate = new Promise<void>(resolve => { release = resolve; });
+          await page.route('**/answers/**', async route => { await gate; await route.continue(); }, { times: 1 });
+        }
+        try {
+          await page.getByRole('radio', { name: /Sentetik B/ }).click();
+          if (platform === 'mobile') {
+            await page.getByRole('button', { name: 'Soru listesi', exact: true }).click();
+            await expect(page.getByTestId(/question-map-\d+-(correct|incorrect)/)).toHaveCount(0);
+            await page.getByRole('button', { name: 'Kapat', exact: true }).click();
+          }
+        } finally { release(); }
         const response = await saved;
         const state = (await response.json()).data;
         expect(state.answers[0].feedback.outcome).toBe('incorrect');
         expect(state.answers.slice(1).every((a: { feedback: unknown }) => a.feedback === null)).toBe(true);
         await expect(page.getByText('Yanlış yanıt. Doğru cevap: A. Yanıtın kaydedildi ve kilitlendi.', { exact: true })).toBeVisible();
+        if (platform === 'mobile') {
+          await page.getByRole('button', { name: 'Soru listesi', exact: true }).click();
+          await expect(page.getByTestId('question-map-1')).toHaveAttribute('aria-label', 'Soru 1, yanlış');
+          await expect(page.getByTestId('question-map-1-incorrect')).toBeVisible();
+          await expect(page.getByTestId('question-map-2-correct')).toHaveCount(0);
+          await expect(page.getByTestId('question-map-2-incorrect')).toHaveCount(0);
+          await page.getByRole('button', { name: 'Kapat', exact: true }).click();
+        }
         for (const option of await page.getByRole('radio', { name: /Sentetik/ }).all()) await expect(option).toBeDisabled();
         await expect(page.getByRole('button', { name: 'Cevabı temizle', exact: true })).toHaveCount(0);
         const authorization = start.request().headers()['authorization'];
@@ -59,12 +88,36 @@ for (const platform of ['web', 'mobile'] as const) {
           await page.getByRole('button', { name: 'Denemene devam et', exact: true }).click();
         }
         await expect(page.getByText('Yanlış yanıt. Doğru cevap: A. Yanıtın kaydedildi ve kilitlendi.', { exact: true })).toBeVisible();
+        if (platform === 'mobile') await expect(page.getByTestId('exam-header-title')).toHaveText(initial.official_exam.title);
         for (const option of await page.getByRole('radio', { name: /Sentetik/ }).all()) await expect(option).toBeDisabled();
         await page.getByRole('button', { name: 'Sonraki soru', exact: true }).click();
         await expect(page.getByText('Soru 2 / 3', { exact: true })).toBeVisible();
         await expect(page.getByRole('radio', { name: /Sentetik A/ })).toBeEnabled();
         await page.getByRole('radio', { name: /Sentetik A/ }).click();
         await expect(page.getByText('Doğru yanıt. Doğru cevap: A. Yanıtın kaydedildi ve kilitlendi.', { exact: true })).toBeVisible();
+        if (platform === 'mobile') {
+          await page.getByRole('button', { name: 'Soru listesi', exact: true }).click();
+          await expect(page.getByTestId('question-map-1-incorrect')).toBeVisible();
+          await expect(page.getByTestId('question-map-2-correct')).toBeInViewport();
+          await expect(page.getByTestId('question-map-2')).toHaveAttribute('aria-selected', 'true');
+          await expect(page.getByTestId('question-map-2')).toHaveAttribute('aria-label', 'Soru 2, doğru');
+          await expect(page.getByTestId('question-map-3')).toHaveAttribute('aria-label', 'Soru 3');
+          const correct = await page.getByTestId('question-map-2').evaluate(node => getComputedStyle(node).backgroundColor);
+          const incorrect = await page.getByTestId('question-map-1').evaluate(node => getComputedStyle(node).backgroundColor);
+          expect(correct).not.toBe(incorrect);
+          await page.screenshot({ animations: "disabled", path: `artifacts/exam-feedback/mobile-${kind}-question-map.png` });
+          await page.getByTestId('question-map-1').click();
+          await expect(page.getByText('Soru 1 / 3', { exact: true })).toBeVisible();
+          await expect(page.getByRole('button', { name: 'Kapat', exact: true })).toHaveCount(0);
+          for (const width of [1024, 320]) {
+            await page.setViewportSize({ width, height: 950 });
+            if (width < 840) await page.getByRole('button', { name: 'Soru listesi', exact: true }).click();
+            await expect(page.getByTestId('question-map-1-incorrect')).toBeVisible();
+            await expect(page.getByTestId('question-map-2-correct')).toBeInViewport();
+            expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+            await page.screenshot({ animations: "disabled", path: `artifacts/exam-feedback/mobile-${kind}-map-${colorScheme}-${width}.png` });
+          }
+        }
       });
     }
   });

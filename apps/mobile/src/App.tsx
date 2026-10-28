@@ -1,4 +1,5 @@
 import { Text } from "./text";
+import { ExamHeaderTitle } from "./examHeaderTitle";
 import { BrandWordmark, loadBrandFont } from "./wordmark";
 import { BrandLogo } from "./brandLogo";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -405,7 +406,9 @@ function Workspace({
         <Stack.Screen name="Account" options={{ title: vocabulary.account.title }}>
           {() => <AccountScreen user={user} refresh={refresh} finished={signedOut} />}
         </Stack.Screen>
-        <Stack.Screen name="Exam" options={{ title: "Sınav" }}>
+        <Stack.Screen name="Exam" options={{ title: "Sınav", headerTitle: ({ children }) =>
+          <ExamHeaderTitle>{children}</ExamHeaderTitle>
+        }}>
           {({ route }) => <ExamDetail context={context} id={route.params.id} initialExam={route.params.initialExam} />}
         </Stack.Screen>
       </Stack.Navigator>

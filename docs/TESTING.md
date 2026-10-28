@@ -1,5 +1,14 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Soru numaralarında sonuç ve sınav adı
+
+Mobil soru haritası sunucu değerlendirmesine göre soluk yeşil/tik ve soluk kırmızı/çarpı kullanır; aktif çerçeve, nötr boş sorular ve cevap kilidi korunur. Üst başlık mevcut sınav adını; ad yoksa soru sayısını gösterir. **72 mobil birim testi, mobil strict TypeScript ve iOS/Android/web Expo export geçti.** Yeni birim testleriyle sunumu taklit etmek yerine gerçek test API'si üzerinden mevcut cevap testi genişletildi, iki başlık E2E'si eklendi. Son **8 Chromium E2E geçti**: deneme/ders cevap kilidi ve yeniden açma, kayıt beklerken sonuç işareti olmaması, doğru/yanlış/boş ayrımı, seçili soru, dar sayfa/geniş yan panel, açık/koyu tema, 320/390/1024 px ve büyük yazıda uzun/fallback başlık, sonuç ve tekrar sınavı. Başlık sınır testi sırasında bulunan geri düğmesi alanı çakışması güvenli maksimum genişlikle giderildi; RN web için seçili soruya açık ARIA özelliği eklendi. Son koşuda başarısız test yok.
+
+Yalnız boşluğu doğrulanan 8001/5183/5184/5186 ve `oggaq_test` kullanıldı. Sentetik uzun/isimsiz başlık testinde yalnız yanıt metadata'sı yerel tarayıcıda değiştirildi; diğer cevap/kilit/devam testleri gerçek API verisiyle çalıştı. Soru paneli ekran görüntüleri `artifacts/exam-feedback/`, başlık/export/log kanıtları `artifacts/question-map/` içinde. iPhone 18 Pro / iOS 27 Expo Go üzerinde tamamlanmış bir sonuca salt okunur girilerek uzun native başlık kontrol edildi; aktif sınava girilmedi, cevap/favori/bildirim/hesap yazımı yapılmadı. Native soru haritası, Android ve fiziksel cihazlar ayrıca denenmedi.
+
+API/DB/native bağımlılık değişmedi; PHPUnit/tam backend koşusu yapılmadı. Git push, sunucu veya beta OTA yayını yok.
+
+
 ## 28 Ekim 2026 — Yatay telefon düzeni iki beta kanalında
 
 Kullanıcı talimatıyla kaynak `8d2bdba` ayrı güncellemeler olarak yayımlandı: iOS **testflight / 01a18029-6c50-748b-9f8d-2869bfc40b0a**, grup `3b7d716a-619a-42a6-834a-17c42d45258b`; Android **android-beta / 01a18029-e53c-77cf-9ab5-38cbdb2e2cc4**, grup `4a125e35-4a82-402a-9116-901f59b7e772`. Önceki 72 mobil test/8 E2E/export ve native iPhone yön kontrolü geçerli; yayın öncesi **29 araç testi ve workspace strict TypeScript geçti**. Her iki yerel native fingerprint kurulu paketle eşleşti.
