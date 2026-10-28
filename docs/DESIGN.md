@@ -137,3 +137,10 @@ Reklam ilk sürümde yoktur. Eklenirse: yalnızca liste ve özet ekranlarında, 
 - Fiziksel iPhone/iPad/Android tablet doğrulaması ayrıca yapılmalıdır; Chromium görüntüleri bunun kanıtı değildir.
 
 Takvim kuralları: 14/20 px tek paragrafta kalın madde adı + açıklama, maddeler arası 8 px. Kural/tarih kartları `Card.compact`, bölüm arası 12 px kullanır. Tarih etiketi tarihle aynı satırdadır; kaynak ve eğitim bitişi görünür kalır. Dokunma hedefleri en az 44 px ve büyük metinde doğal büyüme korunur.
+
+
+## iPad ana sayfası — 28 Ekim 2026
+
+Yalnız native iOS `Platform.isPad` üzerinde ana sayfa, kullanılabilir içerik genişliği 660 px olduğunda iki sütuna geçer: sınava hazırlık/sıradaki sınav solda, dikey genel durum özeti sağdadır. Hızlı başla ve Çalışmaların bölümleri yan yana; son sınavlar iki sütunda görünür. Başlıklar ve dokunma alanları iPad için ölçülendirilir; dekoratif hero şekilleri kaldırılır. Mevcut renk rolleri, ortalanmış marka ve gezinme rayı korunur.
+
+Dar pencere tek sütuna döner. Büyük yazı veya sistem font ölçeği 1,15 üzerinde iki sütun için en az 960 px içerik gerekir; özet satırları dikey kalır. Bu, ortak `layoutFor` kuralını değiştirmeyen, kullanıcının yalnız iPad ana sayfası talebine özel bir istisnadır. iPhone, Android (tablet dahil), web ve diğer ekranlar aynı yerleşimi kullanmaya devam eder.

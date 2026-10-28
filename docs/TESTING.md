@@ -1,5 +1,14 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Yalnız iPad ana sayfa düzeni
+
+Native iPad ana sayfası için içerik genişliğine ve yazı boyutuna uyarlanan iki sütun eklendi. iPhone/Android/web cihaz ayrımı, 660 px sütun sınırı, dar pencere ve büyük yazıda 960 px sınırı dört yeni birim testiyle doğrulandı. **69 mobil test, mobil strict TypeScript ve iOS/Android/web Expo export geçti.** Gerçek test API'siyle ana sayfa, boş durum, özet hatası, devam eden sınav, sekme/menü/gezinme akışlarından **8 E2E geçti**; yalnız `oggaq_test` ve 8001/5183/5184/5186 kullanıldı. Backend/API/veri modeli değişmedi; PHPUnit/tam backend koşusu yapılmadı.
+
+iPad Air 11-inch (M4), iPadOS 27.0 / Expo Go üzerinde gerçek Home bileşeni sentetik verilerle incelendi: dikey/yatay, açık/koyu, Standart/Büyük yazı ve devam eylemi. Büyük yazıda dikey ekran tek sütuna dönüyor; yatayda iki sütun kalıyor. Dar çoklu pencere sınırları birim testinde doğrulandı; native Split View ayrıca denenmedi. Fiziksel iPad/TestFlight teyidi henüz yok. Önizleme araç çubuğu ve API taklidi yalnız geçici yerel QA girişindeydi; uygulama girişi byte olarak geri yüklendi ve son export normal girişle alındı.
+
+390×844@2 sentetik telefon görüntüsünün önce/sonra PNG SHA-256 değeri birebir aynı: `f77f82a78d1eb379a6fb184ceff036938dece7a8992691faed8471d6ae1dc9f5`. Bu Chromium/non-iPad karşılaştırmasıdır, fiziksel telefon testi değildir. Kanıtlar `artifacts/ipad-home/` altında. Yeni bağımlılık, hesap/DB yazımı, Git push, sunucu veya beta OTA yayını yok. Yalnız bu kontrol için açılan 8083/5192/5193 süreçleri ve iPad simülatörü kapatıldı; mevcut 8081/8082 servisleri korundu.
+
+
 ## 28 Ekim 2026 — iPad ilk kurulumdaki eski doğrulama ekranından çıkış
 
 Yeni iPad kurulumunda kullanıcı eski genel e-posta doğrulama ekranına düştü. Mevcut TestFlight 0.1.1 (4) metadata'sında native açılış denetimi ALWAYS, bekleme 0 ms ve testflight kanalı doğrulandı; gömülü commit 26 Ekim 23:44 UTC'dir. Gömülü iOS update kimliği `50d0d4c8-bb87-472d-9a2e-774a8d41f82e` ile gerçek endpoint'e yapılan istek son `01a17fe8-1517-7ace-9c5e-af69c51ff188` güncellemesini doğru runtime/API/kanalla verdi. Native delta isteği 226; tam launch asset yeniden alınıp SHA-256 doğrulandı. 18 ek dosyanın tamamı eşleşti; uyumsuz runtime/platform 204 ve production beta sunmadı. Kanıt `artifacts/ipad-update-bootstrap/` altında.
