@@ -4,7 +4,7 @@
 
 **Genel yayın henüz tamamlanmış sayılmaz.** Testlerin geçmesi kullanım hakkı veya hukuki onay değildir. `npm run check:store` kaynak/HTTPS/ikon/mağaza metin limitlerini ve yasal kararları denetler; aşağıdaki insan kontrollerinin yerine geçmez.
 
-**28 Ekim beta eşitlemesi:** Aynı güncel kaynak `0314c5e` ile iOS **1.0.0 (6)** TestFlight'ta mevcut iç test grubuna, Android **1.0.0 (5)** Play Dahili Test'e dağıtıldı. iPhone ve iPad kurulum/açılışını kullanıcı teyit etti; Android cihaz teyidi bekleniyor. Yeni runtime'larda kendi beta OTA'ları da yayımlandı. Aşağıdaki eski production adayları 5/4 bu betalarla karıştırılmaz; genel yayın hâlâ yapılmadı. Ayrıntı [iOS](IOS_BETA.md), [Android](ANDROID_BETA.md), [doğrulama](TESTING.md).
+**28 Ekim beta eşitlemesi:** Aynı güncel kaynak `0314c5e` ile iOS **1.0.0 (6)** TestFlight'ta mevcut iç test grubuna, Android **1.0.0 (5)** Play Dahili Test'e dağıtıldı. iPhone, iPad ve Android kurulum/açılışını ve 1.0.0 görünmesini kullanıcı teyit etti; kısa OTA kodlarının cihaz teyidi ayrı izlenir. Yeni runtime'larda kendi beta OTA'ları da yayımlandı. Aşağıdaki eski production adayları 5/4 bu betalarla karıştırılmaz; genel yayın hâlâ yapılmadı. Ayrıntı [iOS](IOS_BETA.md), [Android](ANDROID_BETA.md), [doğrulama](TESTING.md).
 
 ## Teknik olarak tamamlananlar
 
