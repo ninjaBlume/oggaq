@@ -2,9 +2,9 @@
 
 ## 29 Ekim 2026 — Google kurulum devamı ve Apple durum ayrımı
 
-Google finansal işlev yok seçimi kaydedildi; sonraki sayfada ek belge gerekmemesi, kayıt mesajı ve yenilenmiş kontrol panelinde finans görevinin tamamlanması/**8/11** doğrulandı. Sağlık, kategori/iletişim ve mağaza girişi görevleri açık. Sağlık seçenekleri etiketsiz göründüğünden tahmini kategori kaydedilmedi. Kategori düğmesinde Safari `elementHasNoFrame` hatası nedeniyle kullanıcıdan formu açması istendi. Genel inceleme/yayın başlatılmadı.
+Google finansal işlev yok seçimi kaydedildi; sonraki sayfada ek belge gerekmemesi, kayıt mesajı ve yenilenmiş kontrol panelinde finans görevinin tamamlanması/**8/11** doğrulandı. Ardından kullanıcı sağlık formunu açınca seçenekler okunur hâle geldi; **Acil durum ve ilk yardım** seçildi. Ek bölgesel koşul gerekmediği, kayıt mesajı ve kontrol panelinde sağlık görevinin tamamlanması/**9/11** doğrulandı. Kategori/iletişim ve mağaza girişi görevleri açık. Kategori düğmesinde Safari `elementHasNoFrame` hatası nedeniyle kullanıcıdan formu açması istendi. Genel inceleme/yayın başlatılmadı.
 
-Apple kişisel yasal kişi/DSA inceleme bilgileri, Organization dönüşümünün beklediği adımı doğrulamıyor. Ayrı Apple Developer oturumu Touch ID gerektirdi; üyelik dönüşümünün nedeni henüz bilinmiyor. Yalnız operasyon belgeleri değişti; uygulama/API/veritabanı değişmedi, uygulama testleri tekrarlanmadı.
+Apple kişisel yasal kişi/DSA inceleme bilgileri, Organization dönüşümünün beklediği adımı doğrulamıyor. Ayrı Apple Developer oturumu Touch ID gerektirdi; mevcut doldurulmuş giriş formu ilerletilince Apple hesabının güvenlik nedeniyle kilitli olduğu görüldü. Kullanıcıya kurtarma adımı bırakıldı; dönüşümün beklediği adım henüz bilinmiyor. Google’ın sağlık politikası doğrultusunda iki mağaza kaynak açıklamasına ve mobil SSS’ye ilk yardımın eğitim amaçlı olması/tıbbi cihaz olmaması/sağlık uzmanına danışma metni eklendi. Mobil strict tip kontrolü, **72 mobil testi** ve **21 mağaza/yasal araç testi** geçti; `git diff --check` temiz. Yeni açıklamalar henüz mağaza panellerine veya OTA’ya dağıtılmadı. API/veritabanı değişmedi; PHPUnit/E2E tekrarlanmadı.
 
 ## 29 Ekim 2026 — Google Veri güvenliği beyanının kaydı
 
