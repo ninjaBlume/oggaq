@@ -1,5 +1,13 @@
 # Test ve doğrulama stratejisi
 
+## 29 Ekim 2026 — Google Veri güvenliği beyanının kaydı
+
+Kullanıcı, gerçek kullanıcı kaydı veya parola içermeyen `oggsor-data-safety.csv` dosyasının Google Play’e yüklenmesini ve taslağın tamamlanmasını açıkça onayladı. Native dosya seçicisinin pasif düğmesi kullanıcı tarafından tamamlandı; Google’da doğru dosya adı ve `CSV dosyası başarıyla yüklendi` görüldü. İçe aktarma sonrası `Yanıtlar CSV’den içe aktarıldı` mesajı; HTTPS, kullanıcı adı/parola, hesap silme ve kısmi veri silme URL’lerinin korunduğu doğrulandı.
+
+**12 veri türü** (5 kişisel bilgi, 2 tanılama, 1 belge, 3 uygulama etkinliği, 1 cihaz kimliği) için tüm kullanım alanları `Tamamlandı`. Önizlemede amaçlar, isteğe bağlı adres/telefon/belge/kullanıcı içeriği, hesap/silme ve HTTPS beyanları kontrol edildi. `Kaydet` ardından `Değişiklik kaydedildi` görüldü. Sayfa tamamen yenilenip Google’dan yeniden CSV dışa aktarıldı: **782 yanıtın tamamı yüklenecek dosyayla aynı, 0 fark**. Kontrol panelinde `Görev tamamlandı. Veri güvenliği` ve **7/11** kurulum görevi doğrulandı. Google incelemesi veya kamu yayını başlatılmadı; DSA/Organization ve hukuki açıklar tamamlandı sayılmadı.
+
+Bu teslim mağaza formu/dokümantasyon işlemidir; uygulama/API/DB değişmedi. Ek uygulama testi veya build/OTA çalıştırılmadı. Dosya/satır/anahtar/amaç/seçim ve kayıt sonrası karşılaştırma kontrolleri ile `git diff --check` geçti. Kanıtlar `artifacts/store-compliance-20261029/` içinde; önceki bekleyen yükleme notları bu teslimle kapanmıştır.
+
 ## 28–29 Ekim 2026 — Mağaza gizlilik, yaş ve inceleme erişimi
 
 Son çapraz kontrolde belge/PDF adres alanı ayrıca beyan edildi; kullanıcı düzeltme onayından sonra Apple’da yeni `Published …` ve **11 veri türü** doğrulandı. Google IARC anketi kaydedildi; PEGI 3 / IARC Generic 3+ / USK 6 hesaplandı. Metinsel şiddet/madde referansları ve eğitim amacı belirtildi; hedef kitle 18+ ile karıştırılmaz.
@@ -10,7 +18,7 @@ Yalnız mağaza incelemesine ayrılmış, gerçek kullanıcı verisi içermeyen 
 
 Google Play'de gizlilik URL'si ve reklam yok beyanı `Değişiklik kaydedildi` mesajıyla taslağa kaydedildi. Veri güvenliğinde toplama var/HTTPS/e-posta+parola/hesap ve veri silme bağlantıları, cihaz kimliği seçimi taslak olarak kaydedildi; bazı veri türü etiketleri araçta ve görselde boş olduğundan anket tamamlandı sayılmadı. Google inceleme erişimi formunu kullanıcı açtıktan sonra aynı hesap ve 393 karakterlik İngilizce not kaydedildi. `Değişiklik kaydedildi` görüldü; sayfa yenilenince giriş gerekli seçimi ve ek iş ortağı test paylaşımının kapalı seçimi korundu. Kontrol panelinde erişim görevi tamamlandı (3/11); ardından hedef kitle 18 yaş ve üstü olarak kaydedildi ve kayıt mesajı görüldü.
 
-VERBİS mevcut kayıt/temsilci durumu kullanıcı beyanıyla iç nota işlendi; muafiyet, hukuk veya yürürlük tarihi uydurulmadı. JSON ayrıştırma, `git diff --check`, mevcut yasal değer/mağaza kontrol araçlarının **21 testi**, tanıtım sitesinin **4 testi** ve site derlemesi geçti. Kamu metnindeki teknik tanılama açıklaması kaynakta hazır; sunucu dağıtımı yapılmadı. Google resmî şablonundan oluşturulan 12 veri türü/782 satırlık güncel dışa aktarımla eşleştirilmiş CSV’nin seçili tür/amaç/tekli seçim ve örnek konum/reklam yanıtı kalmaması kontrolleri geçti; yükleme onayı bekleniyor, anket tamamlandı sayılmadı. `legal:apply -- --check` hâlâ üç eksik kararı bildirerek exit 1 verir; bu bekleyen hukuk kararıdır. Uygulama kodu/API sözleşmesi/migration değişmediğinden PHPUnit, E2E ve uygulama build/OTA tekrarlanmadı.
+VERBİS mevcut kayıt/temsilci durumu kullanıcı beyanıyla iç nota işlendi; muafiyet, hukuk veya yürürlük tarihi uydurulmadı. JSON ayrıştırma, `git diff --check`, mevcut yasal değer/mağaza kontrol araçlarının **21 testi**, tanıtım sitesinin **4 testi** ve site derlemesi geçti. Kamu metnindeki teknik tanılama açıklaması kaynakta hazır; sunucu dağıtımı yapılmadı. Google resmî şablonundan oluşturulan 12 veri türü/782 satırlık güncel dışa aktarımla eşleştirilmiş CSV’nin seçili tür/amaç/tekli seçim ve örnek konum/reklam yanıtı kalmaması kontrolleri geçti; ilk aşamada yükleme onayı bekleniyordu; yukarıdaki 29 Ekim tesliminde içe aktarım, kayıt ve 0 fark kalıcılık kontrolü tamamlandı. `legal:apply -- --check` hâlâ üç eksik kararı bildirerek exit 1 verir; bu bekleyen hukuk kararıdır. Uygulama kodu/API sözleşmesi/migration değişmediğinden PHPUnit, E2E ve uygulama build/OTA tekrarlanmadı.
 
 ## 28 Ekim 2026 — App Store gerçek iPhone/iPad görselleri
 
