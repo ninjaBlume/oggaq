@@ -39,6 +39,8 @@ Apple `Membership and Account → Account Information Update → Email` formunda
 
 Google hesap ayrıntılarında Codentum L.L.C., D‑U‑N‑S ve kurumsal site kaydı görüldü; site ve iki iletişim e-posta/telefon çifti doğrulanmış görünüyor. Ayrı Android geliştirici doğrulama sayfasının Kimlik sekmesi şirket ad/adresini gösterdi; durum başlığı ve paket listesi güvenilir biçimde görüntülenemedi. Bu sınırlı kontrolden tüm kimlik/paket doğrulama adımlarının geçtiği sonucu çıkarılmadı; yeni kayıt, ödeme, kimlik yükleme veya yayın işlemi yapılmadı.
 
+**29 Ekim Apple takip mesajı gönderildi:** Kullanıcı somut takip mesajının Apple Developer Support’a gönderilmesini açıkça onayladı. `Account Information Update → Email` formundaki metnin onaylanan taslakla eşleşmesi kontrol edildi; gönderim sonrasında hem AX hem ekran görüntüsünde **Thanks for contacting us**, olay numarası **103012031344** ve Apple’ın mesajı inceleyip yanıtlayacağı açıklaması görüldü. Bu numara yeni **durum sorgusu** içindir; önceki dönüşüm başvurusunun kayıt numarası olarak sunulmaz. DSA **102997852699** ayrı tutuldu. Dönüşümün kayıtlı olup olmadığı, mevcut durumu ve gereken belge/işlem için Apple yanıtı bekleniyor; üyelik dönüşümü veya genel yayın tamamlandı sayılmaz. Önceki “gönderme onayı bekleniyor” notu bu onay/gönderim öncesinin tarihçesidir. Alındı `artifacts/store-compliance-20261029/apple-membership-followup-receipt.json` içinde.
+
 ## Teknik olarak tamamlananlar
 
 - Kayıt/giriş, kişisel çalışma, e-posta değişimi/parola yenileme, cihaz oturumları, veri dışa aktarma ve uygulama içi hesap silme gerçek API ile çalışır. Öğrencinin soru çözmesi için e-posta doğrulaması gerekmez; iş başvurusu ve kurumsal/yönetim işlemleri ayrıca korunur.

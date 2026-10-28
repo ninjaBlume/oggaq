@@ -1,5 +1,9 @@
 # Test ve doğrulama stratejisi
 
+## 29 Ekim 2026 — Apple takip mesajının gönderim alındısı
+
+Kullanıcının somut gönderim onayından sonra form metninin hazır mesajla eşleştiği kontrol edildi. Apple gönderim ekranı AX ve görüntüde **Thanks for contacting us**, **103012031344** olay numarası ve yanıt verileceği açıklamasını gösterdi. Bu, durum sorgusunun alındısıdır; önceki dönüşüm talebinin kaydı/onayı değildir. DSA dosyası ayrı, uygulama yayını yok. Yerel alındı dosyası güncellendi; yalnız operasyon belgeleri değiştiği için ürün testleri tekrarlanmadı.
+
 ## 29 Ekim 2026 — Apple destek geçmişi ve hesap doğrulama araştırması
 
 Apple `recent-cases` sayfasında son 90 gün için etkinlik bulunmadığı hem AX hem görüntüde görüldü; bilinen DSA dosyası da listelenmediğinden başvuru yapılmadığı sonucuna varılmadı. Yerel e-posta Team ID aramasında dönüşüm alındısı bulunamadı. App Store Connect Business tekrar kontrol edildi: Free Apps Agreement Active, DSA In Review/16 Ekim 2026, yasal kişi Harun Altay. Durum/belge soran yeni destek mesajı hazır; gönderme onayı bekliyor, gönderilmedi. Google’da şirket/D‑U‑N‑S ve doğrulanmış site/iletişim bilgileri görüldü; ayrı Android kimlik/paket durumunun tüm ayrıntıları teyit edilmedi.
