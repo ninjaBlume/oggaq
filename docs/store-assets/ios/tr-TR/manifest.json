@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-28",
+  "sourceCommit": "20244c7",
+  "productSourceCommit": "0314c5e",
+  "platform": "ios",
+  "runtime": "iOS/iPadOS 27.0 · Expo Go SDK 58",
+  "devices": {
+    "iphone": "iPhone 18 Pro",
+    "ipad": "iPad Pro 13-inch (M5)"
+  },
+  "account": "synthetic isolated preview account; no real user data",
+  "pixelChanges": false,
+  "alphaRemoved": true,
+  "files": [
+    {
+      "file": "iphone/01-home.png",
+      "width": 1206,
+      "height": 2622,
+      "format": "PNG RGB (no alpha)",
+      "bytes": 272246,
+      "sha256": "6c5ffd1cc5ea58b04bfab68765edf13fc2c7d9daedf95c609f7fd7dfa11ace1c"
+    },
+    {
+      "file": "iphone/02-exams.png",
+      "width": 1206,
+      "height": 2622,
+      "format": "PNG RGB (no alpha)",
+      "bytes": 320385,
+      "sha256": "4d2ad5ce2a715603f516dc1634cccd9b747670c23a02e946b8a013cafcee16a4"
+    },
+    {
+      "file": "iphone/03-question.png",
+      "width": 1206,
+      "height": 2622,
+      "format": "PNG RGB (no alpha)",
+      "bytes": 253056,
+      "sha256": "533f6c8adcae5c0f7d899b880fc1041a74bcba636f0aaeff02f6c2888ba182ba"
+    },
+    {
+      "file": "iphone/04-result.png",
+      "width": 1206,
+      "height": 2622,
+      "format": "PNG RGB (no alpha)",
+      "bytes": 299256,
+      "sha256": "31b39dac73f3ef3070dc75e192e1af676fe774d0c6d554a148d8a0c277e379ad"
+    },
+    {
+      "file": "ipad/01-home.png",
+      "width": 2064,
+      "height": 2752,
+      "format": "PNG RGB (no alpha)",
+      "bytes": 384806,
+      "sha256": "dad3c79ed9ee41a1ed5f92e5860e608ce0dfe0421167c44c601c5789dc9515a4"
+    },
+    {
+      "file": "ipad/02-exams.png",
+      "width": 2064,
+      "height": 2752,
+      "format": "PNG RGB (no alpha)",
+      "bytes": 611433,
+      "sha256": "79c0354f44cced04521f47b6f41a1588462248efd8a99de5d8c0695c1fbbca75"
+    },
+    {
+      "file": "ipad/03-home-landscape.png",
+      "width": 2752,
+      "height": 2064,
+      "format": "PNG RGB (no alpha)",
+      "bytes": 326200,
+      "sha256": "1da4e3ee8ca41096e3708b2fe4f90cd7e629a46d1ec756644b57f12ed9796aa5"
+    },
+    {
+      "file": "ipad/04-exams-landscape.png",
+      "width": 2752,
+      "height": 2064,
+      "format": "PNG RGB (no alpha)",
+      "bytes": 461895,
+      "sha256": "83442b5312701d313e01148dfc9edc060691c969eda7aeafd81216e93249d659"
+    }
+  ]
+}

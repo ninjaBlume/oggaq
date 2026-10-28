@@ -6,6 +6,8 @@
 
 **28 Ekim beta eşitlemesi:** Aynı güncel kaynak `0314c5e` ile iOS **1.0.0 (6)** TestFlight'ta mevcut iç test grubuna, Android **1.0.0 (5)** Play Dahili Test'e dağıtıldı. iPhone, iPad ve Android kurulum/açılışını ve 1.0.0 görünmesini kullanıcı teyit etti; kısa OTA kodlarının cihaz teyidi ayrı izlenir. Yeni runtime'larda kendi beta OTA'ları da yayımlandı. Aşağıdaki eski production adayları 5/4 bu betalarla karıştırılmaz; genel yayın hâlâ yapılmadı. Ayrıntı [iOS](IOS_BETA.md), [Android](ANDROID_BETA.md), [doğrulama](TESTING.md).
 
+**App Store görselleri:** Güncel gerçek iPhone/iPad simülatörlerinden sekiz ekran hazırlandı. Türkçe 1.0.0 taslağında iPhone dört dosya/4 of 10 görüldü; iki dikey ve iki yatay iPad dosyası yükleme seçicisinde hazır, yükleme/kayıt kalıcılığı teyidi henüz tamamlanmadı. [Görsel kaydı](store-assets/README.md#app-store-iphone-ve-ipad-ekranları--28-ekim-2026).
+
 ## Teknik olarak tamamlananlar
 
 - Kayıt/giriş, kişisel çalışma, e-posta değişimi/parola yenileme, cihaz oturumları, veri dışa aktarma ve uygulama içi hesap silme gerçek API ile çalışır. Öğrencinin soru çözmesi için e-posta doğrulaması gerekmez; iş başvurusu ve kurumsal/yönetim işlemleri ayrıca korunur.

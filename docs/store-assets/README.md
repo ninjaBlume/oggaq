@@ -1,4 +1,4 @@
-# Google Play görselleri
+# Mağaza görselleri
 
 28 Ekim 2026, Türkçe mağaza taslağı için hazırlandı. Dosyalar `android/tr-TR/` altında; boyut, dosya uzunluğu ve SHA-256 değerleri `manifest.json` içindedir.
 
@@ -35,3 +35,14 @@ Her tablet klasöründeki `03-home-landscape.png` ve `04-exams-landscape.png`, a
 Çekim yine yalnız geçici DB'deki sentetik öğrenciyle yapıldı; canlı/ortak geliştirme verisi kullanılmadı. Çekim servisleri kapatıldı, ekran ayarları geri alındı, geçici DB'nin silindiği ve mevcut 8082 Metro'nun korunduğu doğrulandı. iPad/App Store ekranları değildir.
 
 Kullanıcının açık onayıyla dört yatay görüntü Google Play'de ilgili 7/10 inç tablet alanlarına eklendi; “Değişiklikleriniz kaydedildi” mesajı görüldü. Sayfa yenilenince her tablet alanında iki dikey + iki yatay olmak üzere 4/8 ekran ve yatay dosya adları korundu. Telefon görselleri değişmedi, inceleme veya genel yayın yapılmadı.
+
+
+## App Store iPhone ve iPad ekranları — 28 Ekim 2026
+
+`ios/tr-TR/iphone/` içinde dört **1206×2622** iPhone ekranı vardır: ana sayfa, deneme listesi, aktif soru ve tamamlanmış sonuç. `ios/tr-TR/ipad/` içinde **2064×2752** iki dikey ve **2752×2064** iki yatay iPad ekranı vardır: ana sayfa ve deneme listesi. iPhone 18 Pro ve iPad Pro 13-inch (M5), iOS/iPadOS 27.0 simülatörlerinde aynı güncel uygulama kaynağı, Expo Go SDK 58 ve Standart yazı/Açık görünüm kullanıldı. Android görüntüsü iOS görüntüsü olarak kullanılmadı. iPadOS sistem çubuğundaki Expo Go adı çekim ortamına aittir; görselin production/TestFlight paketinden alındığı iddia edilmez.
+
+Kullanıcı `simctl` ile yalnız örnek hesapta uygulamayı açıp dikey/yatay görüntü alma yöntemini onayladı. Ayrı geçici `oggaq_store_ios_20261028` PostgreSQL veritabanına yalnız şema ve yayımlanmış soru/takvim/puanlama içerikleri alındı; gerçek kullanıcı/oturum/başvuru/geçmiş aktarılmadı. Sentetik öğrenci için uygulamanın gerçek sınav işlemleriyle **72 doğru / 18 yanlış / 10 boş** örnek sonuç oluşturuldu; ayrıca 125 soruluk duraklatılabilir örnek deneme soru ekranı açıldı. Canlı ve ortak geliştirme verileri değiştirilmedi.
+
+Görseller kırpılmadı, döndürülmedi veya büyütülmedi; yataylar gerçek yatay yerleşimden alındı. Apple'ın şeffaflık kuralı nedeniyle tamamen opak alfa kanalı PNG RGB'ye çevrildi; dönüşüm sonrası çözülmüş RGBA piksellerinin birebir eşitliği doğrulandı. Sekiz görsel ayrı ayrı görsel incelendi; ölçü, PNG/RGB ve SHA-256 kaydı `ios/tr-TR/manifest.json` içindedir. Bu varlık tesliminde uygulama kodu, native paket veya OTA değiştirilmedi; ürün testleri yeniden koşulmadı.
+
+Apple Türkçe 1.0.0 taslağında iPhone **4/10** dosya adı görüldü. iPad yüklemesi ve yeniden yüklemede kalıcılık doğrulaması sürüyor; genel inceleme/yayın yapılmaz. Yalnız bu işin 8003 API/8083 Metro süreçleri belirli PID’leriyle durduruldu; geçici veritabanı, sentetik giriş dosyası ve iki çekim simülatörü silindi. Diğer cihaz/servislere dokunulmadı. Yerel işlem kanıtı `artifacts/app-store-20261028/` içindedir. Ölçü ve şeffaflık kaynağı: [Apple ekran görüntüsü şartları](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/).
