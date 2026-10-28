@@ -1,5 +1,9 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — Play Store metin taslağı kalıcı kaydedildi
+
+Kullanıcının açık Play Console varsayılan giriş sayfasından devam talimatıyla, `tr-TR` formuna **ÖGGSor - Soru Bankası**, 77 karakterlik kısa açıklama ve 1.649 karakterlik tam açıklama kaydedildi. Tam açıklama EGM/mevzuat kaynak URL’lerini ve resmî kurumla bağlantı bulunmadığını içerir; içerik `docs/store-metadata.tr.json` ile aynıdır. Taslak kaydetmede “Değişiklikleriniz kaydedildi” görüldü, sayfa yeniden yüklenince üç alanın kalıcılığı doğrulandı. Eksik simge/özellik grafiği/en az iki ekran görüntüsü doğrulama uyarıları tamamlama için kalır; kaydın taslak olması bu varlıkların tamamlandığı anlamına gelmez. Mağaza incelemesine/genel yayına gönderilmedi, yeni paket/OTA yok. Uygulama kodu değişmediğinden testler tekrarlanmadı.
+
 ## 28 Ekim 2026 — Güvenlik, kurtarma ve ÖGGSor yayın hazırlığı
 
 Kullanıcının “gerekli olan her şeyi yap” ve son marka yazımı talimatıyla **ÖGGSor - Soru Bankası / ÖGGSor** merkezi ayara ve çalışma zamanı yüzeylerine uygulandı. Sürüm 1.0.0; kimlik/domain değişmedi. Brand üretimi, API açıklama tipleri, mağaza JSON metinleri, site/yasal başlıklar, yönetim, PDF viewer ve bildirim gönderen adları eşitlendi. EGM/mevzuat kaynak URL’leri ve resmî kurumla bağlantı bulunmadığı açıklaması iki mağaza metninde hazır; HTTPS gerçek kaynak ve metin limit kontrolleri eklendi.
