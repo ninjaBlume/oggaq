@@ -1,5 +1,10 @@
 # Test ve doğrulama stratejisi
 
+## 28 Ekim 2026 — iPad düzenlemesi iOS OTA teslimi
+
+Kaynak `6da1421`, kullanıcı talimatıyla yalnız iOS **testflight** kanalına yayımlandı: update `01a18022-f2fa-77c8-bb8c-6e03def2110d`, grup `e7446cc8-4113-4bbe-8398-b5cbcee634e1`. Yayın öncesi **29 araç testi ve workspace strict TypeScript geçti**; önceki 69 mobil test/8 E2E/export sonuçları geçerli. Yerel native fingerprint, kurulu TestFlight 0.1.1 (4) runtime'ıyla eşleşti. Gerçek endpoint eski `01a17fe8` native başlıklarından yeni paketi verdi: manifest/launch asset ve **18 ek dosyanın tamamının SHA-256 kontrolü geçti**. HTTPS API/web adresi, localPreview=false, yeni iPad yerleşimi/cihaz koruması ve geçici QA harness'inin bulunmadığı doğrulandı. Uyumsuz runtime/platform 204; production 404. Fiziksel cihazın `01a18022` alımı henüz teyit edilmedi. Android, site, sunucu, hesap/DB ve genel mağaza yayını değiştirilmedi; Git push yok. Kanıt `artifacts/ipad-home/ota/` altında.
+
+
 ## 28 Ekim 2026 — Yalnız iPad ana sayfa düzeni
 
 Native iPad ana sayfası için içerik genişliğine ve yazı boyutuna uyarlanan iki sütun eklendi. iPhone/Android/web cihaz ayrımı, 660 px sütun sınırı, dar pencere ve büyük yazıda 960 px sınırı dört yeni birim testiyle doğrulandı. **69 mobil test, mobil strict TypeScript ve iOS/Android/web Expo export geçti.** Gerçek test API'siyle ana sayfa, boş durum, özet hatası, devam eden sınav, sekme/menü/gezinme akışlarından **8 E2E geçti**; yalnız `oggaq_test` ve 8001/5183/5184/5186 kullanıldı. Backend/API/veri modeli değişmedi; PHPUnit/tam backend koşusu yapılmadı.
