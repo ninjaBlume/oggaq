@@ -2,6 +2,14 @@
   "_nasil": "Bu dosya dört yasal sayfanın ve uygulamaların boş alanlarını tek yerden doldurur. Boş bırakılan alan sayfada işaretli yer tutucu olarak kalır. Doldurduktan sonra `npm run legal:apply` çalıştırın; kalan eksikleri `npm run legal:apply -- --check` ve `npm run check:store` gösterir.",
   "_dikkat": "Dolu alanlar uygulamanın belgelenen davranışını anlatır. taslak alanı mağaza ön kontrolündeki iç inceleme durumudur; herkese açık sayfalarda inceleme notu gösterilmez. Tasarım/metin temizliği hukuki uygunluk onayı yerine geçmez.",
   "taslak": true,
+  "_inceleme": {
+    "tarih": "2026-10-28",
+    "verbis-mevcut-durum": "Kullanıcı, bildiği kadarıyla Codentum adına VERBİS kaydı ve Türkiye'de atanmış veri sorumlusu temsilcisi bulunmadığını belirtti. Muafiyet teyidi değildir.",
+    "verbis-yerlesiklik": "Veri sorumlusu ABD'de kurulu Codentum L.L.C. olarak kayıtlıdır. KVKK Sorularla VERBİS (Ekim 2025), soru 51/sayfa 46, yurt dışında yerleşik veri sorumluları bakımından çalışan sayısı, mali bilanço ve özel nitelikli veri ana faaliyeti ölçütlerinin dikkate alınmadığını açıklar. Küçük işletme eşikleri tek başına muafiyet dayanağı olarak kullanılmadı.",
+    "verbis-guncel-esikler": "04.09.2025 tarihli 2025/1572 ve 25.12.2025 tarihli 2025/2393 kararlarının uygulama duyurusu kontrol edildi. Mali bilanço toplamı ciro ile aynı ölçüt değildir; bu kararlar Codentum için muafiyet kararı olarak kaydedilmedi.",
+    "verbis-rehber": "https://www.kvkk.gov.tr/SharedFolderServer/CMSFiles/2f2fbcf4-932b-4dad-af8a-cd32e315d815.pdf#page=46",
+    "verbis-guncel-duyuru": "https://www.kvkk.gov.tr/Icerik/8577/kisisel-verileri-koruma-kurulunun-04-09-2025-tarihli-ve-2025-1572-sayili-kararinin-uygulama-esaslarina-iliskin-kamuoyu-duyurusu"
+  },
   "degerler": {
     "veri-sorumlusu-unvan": "Codentum L.L.C. (Wyoming, ABD)",
     "veri-sorumlusu-adres": "30 N Gould St Ste N, Sheridan, WY 82801, ABD (şirketin kayıtlı ofis adresi)",

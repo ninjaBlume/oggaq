@@ -4,6 +4,8 @@
 
 Çözüm: EGM’nin yayımladığı kullanım koşulunun bu kapsamı kapsadığını belgelemek veya yetkili hak sahibinden yazılı izin almak; amblemin ayrıca onayını/lisansını doğrulamak. Yetki alınamazsa yazılı hakları teyit edilmiş sorular ve kuruma aidiyet izlenimi vermeyen özgün amblem kullanmak. Soru içeriği ile logo izni birbirinin yerine geçmez. Kaynak veri dökümünün hak zinciri de ayrıca saklanmalı.
 
+Mağazalar her uygulamadan ilk başvuruda ayrı bir izin dosyası yüklemesini otomatik istemez. Gereken, içeriği ve markaları kullanmak için geçerli hakka sahip olmaktır; inceleme sırasında yetki kanıtı istenebilir. Yazılı izin, uygun lisans veya uygulanabilir başka bir hukuki dayanak birbirinden ayrılmalıdır. Henüz belge bulunmaması tek başına ihlal kararı değildir; kaynak göstermek ve uygulamanın ücretsiz olması da tek başına yeniden kullanım hakkını kanıtlamaz. 28 Ekim 2026 kontrolü: [Apple 5.2](https://developer.apple.com/app-store/review/guidelines/#intellectual-property), [Google fikrî mülkiyet politikası](https://support.google.com/googleplay/android-developer/answer/9888072?hl=en).
+
 ## Gönderilmemiş talep taslağı
 
 Konu: ÖGGSor sınava hazırlık uygulaması için soru kitapçıkları kullanım koşulu
