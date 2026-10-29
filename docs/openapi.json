@@ -3,7 +3,7 @@
   "info": {
     "title": "Ogg Sor API",
     "version": "0.3.0",
-    "description": "Uygulanmış Identity, Tenancy ve merkezi QuestionBank API uçları. Arayüz, sınav/cevap değerlendirme, import ve offline uçları henüz yoktur."
+    "description": "Identity, Tenancy, soru bankası, sınav, belge ve diğer ürün API uçları. Çevrimdışı sınav paketi hazırlama ucu mevcuttur; çevrimdışı sınav senkronizasyonu henüz tamamlanmamıştır."
   },
   "servers": [
     {
@@ -7270,6 +7270,143 @@
           }
         }
       }
+    },
+    "/api/v1/contexts/{context}/offline-exams/{exam}": {
+      "get": {
+        "tags": [
+          "Exams"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Yayımlanmış ve kişisel hesaba bağlı çevrimdışı soru paketi.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OfflineExamPackageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "exam",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "operationId": "downloadOfflineExam",
+        "summary": "Çevrimdışı sınav paketi",
+        "description": "Yalnız kişisel bağlam için yayımlanmış soru sürümlerini ve cevap anahtarlarını indirir. Eşitleme henüz uygulanmamıştır."
+      }
+    },
+    "/api/v1/contexts/{context}/offline-exam-imports": {
+      "post": {
+        "operationId": "importOfflineExam",
+        "summary": "Tamamlanmış çevrimdışı sınavı aktar",
+        "description": "Kişisel bağlam ve imzalı paket doğrulanır; aynı kimlik ve içerik tekrarında tek sonuç döner. Güncellenmiş paket çakışma döndürür. Cihaz zamanları doğrulanmış sunucu zamanı değildir. Rastgele sınavlar ve başlamış çevrimiçi sınavlar desteklenmez.",
+        "tags": [
+          "Exams"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportOfflineExamInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sunucuda yeniden değerlendirilmiş sınav sonucu.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExamAttemptResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -9134,6 +9271,25 @@
               null
             ],
             "description": "Tekrar çalışmasının kalıcı türü. Null normal veya geçmişte türü kaydedilmemiş denemedir. Tekrar cevapları soru/doğruluk istatistiğine katılır; sınav sayısı, ortalama/en iyi deneme puanı ve varsayılan sonuç listesine katılmaz."
+          },
+          "offline_import": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "received_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "device_time_unverified": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "received_at",
+              "device_time_unverified"
+            ]
           }
         },
         "required": [
@@ -13387,6 +13543,274 @@
             ]
           }
         }
+      },
+      "OfflineExamPackageResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "package_id": {
+                "type": "string"
+              },
+              "claim": {
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "const": 1
+                  },
+                  "user_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "context_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "official_exam_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "questions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "question_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "question_version_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "position": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "question_id",
+                        "question_version_id",
+                        "position"
+                      ]
+                    }
+                  },
+                  "content_hash": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "scoring_period_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "uuid"
+                  },
+                  "scoring_rule_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "uuid"
+                  }
+                },
+                "required": [
+                  "version",
+                  "user_id",
+                  "context_id",
+                  "official_exam_id",
+                  "questions",
+                  "content_hash",
+                  "scoring_period_id",
+                  "scoring_rule_id"
+                ]
+              },
+              "signature": {
+                "type": "string"
+              },
+              "exam": {
+                "$ref": "#/components/schemas/OfficialExam"
+              },
+              "questions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "question_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "position": {
+                      "type": "integer"
+                    },
+                    "question": {
+                      "$ref": "#/components/schemas/QuestionVersion"
+                    },
+                    "correct_option_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "explanation": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "question_id",
+                    "position",
+                    "question",
+                    "correct_option_id",
+                    "explanation"
+                  ]
+                }
+              },
+              "content_json": {
+                "type": "string",
+                "description": "SHA-256 özeti claim.content_hash içinde bulunan UTF-8 JSON içeriği."
+              }
+            },
+            "required": [
+              "package_id",
+              "claim",
+              "signature",
+              "exam",
+              "questions",
+              "content_json"
+            ]
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "ImportOfflineExamInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "package_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "signature": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "claim": {
+            "type": "object",
+            "properties": {
+              "version": {
+                "type": "integer",
+                "const": 1
+              },
+              "user_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "context_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "official_exam_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "questions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "question_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "question_version_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "position": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "question_id",
+                    "question_version_id",
+                    "position"
+                  ]
+                }
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "scoring_period_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "scoring_rule_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "version",
+              "user_id",
+              "context_id",
+              "official_exam_id",
+              "questions",
+              "content_hash",
+              "scoring_period_id",
+              "scoring_rule_id"
+            ]
+          },
+          "duration_seconds": {
+            "type": "integer",
+            "minimum": 60,
+            "maximum": 10800
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finished_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "elapsed_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10800
+          },
+          "answers": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "package_id",
+          "signature",
+          "claim",
+          "duration_seconds",
+          "started_at",
+          "finished_at",
+          "elapsed_seconds",
+          "answers"
+        ]
       }
     },
     "responses": {

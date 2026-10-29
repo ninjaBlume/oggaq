@@ -3,6 +3,7 @@ import { PrivacyNoticeLink } from './legal';
 import { useState } from "react";
 import { View } from "react-native";
 import type { components, User } from "@oggaq/shared-types";
+import { readDocumentTemplates } from "./offline/documentTemplates";
 import brand from "../../../config/brand.json";
 import { api } from "./api";
 import { outputDocument } from './document-output';
@@ -23,7 +24,7 @@ const modes = [
 
 export function DocumentBuilder({ kind, user }: { kind: Template["kind"]; user: User }) {
   const { styles } = useTheme();
-  const catalog = useResource(signal => api.request("get", "/api/v1/document-templates", { signal }), []);
+  const catalog = useResource(signal => readDocumentTemplates(signal, () => api.request("get", "/api/v1/document-templates", { signal })), []);
   const [selected, setSelected] = useState<string | null>(null);
   const [picker, setPicker] = useState(false);
   const templates = catalog.data?.data.filter(t => t.kind === kind) ?? [];

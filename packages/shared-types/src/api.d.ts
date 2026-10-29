@@ -1887,6 +1887,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/contexts/{context}/offline-exams/{exam}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Çevrimdışı sınav paketi
+         * @description Yalnız kişisel bağlam için yayımlanmış soru sürümlerini ve cevap anahtarlarını indirir. Eşitleme henüz uygulanmamıştır.
+         */
+        get: operations["downloadOfflineExam"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contexts/{context}/offline-exam-imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Tamamlanmış çevrimdışı sınavı aktar
+         * @description Kişisel bağlam ve imzalı paket doğrulanır; aynı kimlik ve içerik tekrarında tek sonuç döner. Güncellenmiş paket çakışma döndürür. Cihaz zamanları doğrulanmış sunucu zamanı değildir. Rastgele sınavlar ve başlamış çevrimiçi sınavlar desteklenmez.
+         */
+        post: operations["importOfflineExam"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2375,6 +2415,11 @@ export interface components {
              * @enum {string|null}
              */
             review_kind?: "incorrect" | "blank" | "favorite" | null;
+            offline_import?: {
+                /** Format: date-time */
+                received_at: string;
+                device_time_unverified: boolean;
+            } | null;
         };
         ExamQuestion: {
             /** Format: uuid */
@@ -3479,6 +3524,83 @@ export interface components {
         };
         RandomExamStatusResponse: {
             data: components["schemas"]["ExamSummary"] | null;
+        };
+        OfflineExamPackageResponse: {
+            data: {
+                package_id: string;
+                claim: {
+                    /** @constant */
+                    version: 1;
+                    /** Format: uuid */
+                    user_id: string;
+                    /** Format: uuid */
+                    context_id: string;
+                    /** Format: uuid */
+                    official_exam_id: string;
+                    questions: {
+                        /** Format: uuid */
+                        question_id: string;
+                        /** Format: uuid */
+                        question_version_id: string;
+                        position: number;
+                    }[];
+                    content_hash: string;
+                    /** Format: uuid */
+                    scoring_period_id: string | null;
+                    /** Format: uuid */
+                    scoring_rule_id: string | null;
+                };
+                signature: string;
+                exam: components["schemas"]["OfficialExam"];
+                questions: {
+                    /** Format: uuid */
+                    question_id: string;
+                    position: number;
+                    question: components["schemas"]["QuestionVersion"];
+                    /** Format: uuid */
+                    correct_option_id: string;
+                    explanation: string | null;
+                }[];
+                /** @description SHA-256 özeti claim.content_hash içinde bulunan UTF-8 JSON içeriği. */
+                content_json: string;
+            };
+        };
+        ImportOfflineExamInput: {
+            /** Format: uuid */
+            id: string;
+            package_id: string;
+            signature: string;
+            claim: {
+                /** @constant */
+                version: 1;
+                /** Format: uuid */
+                user_id: string;
+                /** Format: uuid */
+                context_id: string;
+                /** Format: uuid */
+                official_exam_id: string;
+                questions: {
+                    /** Format: uuid */
+                    question_id: string;
+                    /** Format: uuid */
+                    question_version_id: string;
+                    position: number;
+                }[];
+                content_hash: string;
+                /** Format: uuid */
+                scoring_period_id: string | null;
+                /** Format: uuid */
+                scoring_rule_id: string | null;
+            };
+            duration_seconds: number;
+            /** Format: date-time */
+            started_at: string;
+            /** Format: date-time */
+            finished_at: string;
+            elapsed_seconds: number;
+            answers: {
+                [key: string]: string;
+            };
         };
     };
     responses: {
@@ -7039,6 +7161,67 @@ export interface operations {
             422: components["responses"]["Problem"];
             429: components["responses"]["Problem"];
             503: components["responses"]["Problem"];
+        };
+    };
+    downloadOfflineExam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+                exam: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Yayımlanmış ve kişisel hesaba bağlı çevrimdışı soru paketi. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfflineExamPackageResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
+        };
+    };
+    importOfflineExam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportOfflineExamInput"];
+            };
+        };
+        responses: {
+            /** @description Sunucuda yeniden değerlendirilmiş sınav sonucu. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamAttemptResponse"];
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            409: components["responses"]["Problem"];
+            422: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
         };
     };
 }

@@ -3,10 +3,11 @@ import { ApiClient } from "@oggaq/api-client";
 import { session } from "./storage";
 import { validateApiUrl } from "./session";
 export const apiUrl = validateApiUrl(
-  process.env.EXPO_PUBLIC_API_URL ??
+  (Constants.expoConfig?.extra?.localPreview === true ? Constants.expoConfig?.extra?.apiUrl : undefined) ??
+    process.env.EXPO_PUBLIC_API_URL ??
     Constants.expoConfig?.extra?.apiUrl ??
     "http://127.0.0.1:8000",
-  __DEV__ || process.env.EXPO_PUBLIC_LOCAL_PREVIEW === "1",
+  __DEV__ || Constants.expoConfig?.extra?.localPreview === true || process.env.EXPO_PUBLIC_LOCAL_PREVIEW === "1",
 );
 export const frontendUrl: string =
   process.env.EXPO_PUBLIC_WEB_URL ??

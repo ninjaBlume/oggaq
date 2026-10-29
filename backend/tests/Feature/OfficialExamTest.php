@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Modules\Exams\OfflinePackageSignature;
 use App\Modules\QuestionBank\Actions\PublishQuestion;
 use App\Modules\QuestionBank\Actions\SaveQuestion;
 use App\Modules\QuestionBank\Models\ExamType;
@@ -10,15 +11,117 @@ use App\Modules\QuestionBank\Models\Question;
 use App\Modules\QuestionBank\Models\QuestionSource;
 use App\Modules\QuestionBank\Models\Subject;
 use App\Modules\QuestionBank\Models\Topic;
+use App\Modules\Study\AnswerEvents;
+use App\Modules\Tenancy\Models\Tenant;
+use App\Support\ApiProblem;
+use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class OfficialExamTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_offline_package_is_bound_to_personal_owner_and_pins_published_questions(): void
+    {
+        $published = $this->createExam([], true);
+        $draft = $this->createExam(['exam_number' => 'draft']);
+        $student = $this->createUser();
+        $other = $this->createUser();
+        $context = $student->studyContexts()->firstOrFail()->id;
+        $otherContext = $other->studyContexts()->firstOrFail()->id;
+        $this->asToken($student);
+        $url = '/api/v1/contexts/'.$context.'/offline-exams/'.$published['id'];
+        $response = $this->getJson($url)->assertOk()->assertHeader('Cache-Control', 'no-store, private')
+            ->assertJsonCount(3, 'data.questions')->assertJsonPath('data.claim.context_id', $context)
+            ->assertJsonPath('data.claim.user_id', $student->id)->assertJsonPath('data.exam.question_count', 3)
+            ->assertJsonPath('data.questions.0.question.id', $this->questions[0]->published_version_id);
+        $data = $response->json('data');
+        $this->assertSame(hash('sha256', $data['content_json']), $data['claim']['content_hash']);
+        $this->assertSame($data['questions'][0]['question']['options'][0]['id'], $data['questions'][0]['correct_option_id']);
+        $this->assertSame('Gizli açıklama', $data['questions'][0]['explanation']);
+        $signer = app(OfflinePackageSignature::class);
+        $signer->verify($data['claim'], $data['package_id'], $data['signature'], $student->id, $context);
+        $tampered = $data['claim'];
+        $tampered['questions'][0]['question_version_id'] = (string) Str::uuid();
+        try {
+            $signer->verify($tampered, $data['package_id'], $data['signature'], $student->id, $context);
+            $this->fail('Changed package was accepted.');
+        } catch (ApiProblem $error) {
+            $this->assertSame('offline_package_invalid', $error->problemCode);
+        }
+        try {
+            $signer->verify($data['claim'], $data['package_id'], $data['signature'], $other->id, $otherContext);
+            $this->fail('Another account was able to use the package.');
+        } catch (ApiProblem $error) {
+            $this->assertSame('offline_package_invalid', $error->problemCode);
+        }
+        $this->assertSame($data['package_id'], $this->getJson($url)->assertOk()->json('data.package_id'));
+        $this->getJson('/api/v1/contexts/'.$otherContext.'/offline-exams/'.$published['id'])->assertNotFound();
+        $this->getJson('/api/v1/contexts/'.$context.'/offline-exams/'.$draft['id'])->assertNotFound();
+        $tenant = Tenant::create(['name' => 'Test kurumu', 'slug' => 'offline-test']);
+        $this->createMembership($student, $tenant);
+        $institution = $student->studyContexts()->whereNotNull('tenant_id')->firstOrFail();
+        $this->getJson('/api/v1/contexts/'.$institution->id.'/offline-exams/'.$published['id'])->assertForbidden()->assertJsonPath('code', 'offline_personal_only');
+        $this->asToken($other)->getJson($url)->assertNotFound();
+    }
+
+    public function test_offline_completed_exam_import_is_atomic_owned_and_idempotent(): void
+    {
+        $exam = $this->createExam([], true);
+        $student = $this->createUser();
+        $other = $this->createUser();
+        $context = $student->studyContexts()->firstOrFail()->id;
+        $this->asToken($student);
+        $pack = $this->getJson('/api/v1/contexts/'.$context.'/offline-exams/'.$exam['id'])->assertOk()->json('data');
+        $url = '/api/v1/contexts/'.$context.'/offline-exam-imports';
+        $payload = ['id' => (string) Str::uuid(), 'package_id' => $pack['package_id'], 'signature' => $pack['signature'], 'claim' => $pack['claim'],
+            'duration_seconds' => 600, 'started_at' => '2026-01-01T12:00:00Z', 'finished_at' => '2026-01-01T12:05:00Z', 'elapsed_seconds' => 300,
+            'answers' => [$pack['questions'][0]['question_id'] => $pack['questions'][0]['correct_option_id'],
+                $pack['questions'][1]['question_id'] => $pack['questions'][1]['question']['options'][1]['id']]];
+        $this->postJson($url, $payload)->assertOk()->assertJsonPath('data.status', 'completed')
+            ->assertJsonPath('data.result.correct', 1)->assertJsonPath('data.result.incorrect', 1)->assertJsonPath('data.result.blank', 1)
+            ->assertJsonPath('data.result.elapsed_seconds', 300)->assertJsonPath('data.offline_import.device_time_unverified', true);
+        $this->postJson($url, $payload)->assertOk()->assertJsonPath('data.result.correct', 1);
+        $this->assertDatabaseCount('offline_exam_imports', 1);
+        $this->assertRejectedByDatabase(fn () => DB::table('offline_exam_imports')->where('exam_attempt_id', $payload['id'])->update(['payload_hash' => str_repeat('a', 64)]));
+        $this->assertRejectedByDatabase(fn () => DB::table('offline_exam_imports')->where('exam_attempt_id', $payload['id'])->delete());
+        $events = DB::select('SELECT happened_at FROM ('.AnswerEvents::sql().') events WHERE question_id = ?', [$context, $context, $pack['questions'][0]['question_id']]);
+        $this->assertSame('2026-01-01T12:05:00+00:00', Carbon::parse($events[0]->happened_at)->toIso8601String());
+        $this->getJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$payload['id'])->assertOk()
+            ->assertJsonPath('data.result.elapsed_seconds', 300)->assertJsonPath('data.offline_import.device_time_unverified', true);
+        $this->assertDatabaseCount('exam_attempts', 1);
+        $different = $payload;
+        $different['answers'][$pack['questions'][0]['question_id']] = $pack['questions'][0]['question']['options'][1]['id'];
+        $this->postJson($url, $different)->assertConflict()->assertJsonPath('code', 'offline_import_conflict');
+        $newAttempt = $payload;
+        $newAttempt['id'] = (string) Str::uuid();
+        $newAttempt['answers'][$pack['questions'][0]['question_id']] = (string) Str::uuid();
+        $this->postJson($url, $newAttempt)->assertUnprocessable();
+        $this->assertDatabaseCount('exam_attempts', 1);
+        $first = $this->questions[0];
+        $next = app(SaveQuestion::class)->execute($this->admin, ['source_id' => $this->source->id, 'subject_id' => $this->subject->id, 'stem' => 'Sentetik düzeltme', 'options' => ['A', 'B'], 'correct_option_position' => 2, 'base_version' => $first->revision], $first);
+        $next = app(PublishQuestion::class)->execute($this->admin, $next, $next->revision);
+        $this->asToken($this->admin)->putJson('/api/v1/admin/official-exams/'.$exam['id'].'/questions/'.$first->id, ['question_version_id' => $next->published_version_id])->assertOk();
+        $stale = $payload;
+        $stale['id'] = (string) Str::uuid();
+        $this->asToken($student)->postJson($url, $stale)->assertConflict()->assertJsonPath('code', 'offline_package_changed');
+        $this->postJson($url, $payload)->assertOk()->assertJsonPath('data.result.correct', 1);
+        $this->assertDatabaseCount('exam_attempts', 1);
+        $otherContext = $other->studyContexts()->firstOrFail()->id;
+        $this->asToken($other)->postJson('/api/v1/contexts/'.$otherContext.'/offline-exam-imports', $payload)->assertConflict();
+        $this->assertDatabaseCount('exam_attempts', 1);
+        $export = $this->asToken($student)->post('/api/v1/me/export', ['current_password' => self::PASSWORD], ['Accept' => 'application/json'])->assertOk();
+        $data = json_decode($export->streamedContent(), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertSame(300, (int) $data['exam_attempts'][0]['offline_import']['client_elapsed_seconds']);
+        Notification::fake();
+        $this->deleteJson('/api/v1/me', ['current_password' => self::PASSWORD, 'confirmation' => 'HESABIMI SİL'])->assertOk();
+        $this->assertDatabaseCount('offline_exam_imports', 0);
+    }
 
     public function test_education_types_have_independent_identity_and_filters_and_preserve_draft_edits(): void
     {

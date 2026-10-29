@@ -12,6 +12,7 @@ class ExamSummaryResource extends JsonResource
     {
         $now = now()->startOfSecond();
         $pause = $this->resource->pauseMoment();
+        $offline = $this->resource->relationLoaded('offlineImport') ? $this->resource->offlineImport : null;
         $remaining = $this->finished_at !== null ? 0 : max(0, (int) ceil(($pause ?? $now)->diffInSeconds($this->deadline_at, false)));
 
         return [
@@ -33,14 +34,15 @@ class ExamSummaryResource extends JsonResource
                 'id' => $this->officialExam->id, 'title' => $this->officialExam->title, 'year' => $this->officialExam->year,
                 'term' => $this->officialExam->term, 'exam_number' => $this->officialExam->exam_number,
             ],
-            'started_at' => $this->started_at->toISOString(), 'deadline_at' => ($pause === null ? $this->deadline_at : $now->copy()->addSeconds($remaining))->toISOString(),
-            'server_time' => now()->toISOString(), 'finished_at' => $this->finished_at?->toISOString(), 'finish_reason' => $this->finish_reason,
+            'started_at' => ($offline?->client_started_at ?? $this->started_at)->toISOString(), 'deadline_at' => ($pause === null ? $this->deadline_at : $now->copy()->addSeconds($remaining))->toISOString(),
+            'server_time' => now()->toISOString(), 'finished_at' => ($offline?->client_finished_at ?? $this->finished_at)?->toISOString(), 'finish_reason' => $this->finish_reason,
+            'offline_import' => $offline === null ? null : ['received_at' => $offline->received_at->toISOString(), 'device_time_unverified' => true],
             'scoring_available' => $this->resource->getRawOriginal('random_scoring_period_id') !== null || $this->officialExam?->scoringLink !== null,
             'score_result' => $this->finished_at === null || $this->scoreResult?->output === null ? null : new ScoreResultResource($this->scoreResult),
             'result' => $this->finished_at === null ? null : [
                 'correct' => $this->correct_count, 'incorrect' => $this->incorrect_count, 'blank' => $this->blank_count,
                 'score_percent' => $this->score_percent,
-                'elapsed_seconds' => min($this->duration_seconds, max(0, (int) $this->started_at->diffInSeconds($this->finished_at) - (int) $this->paused_seconds)),
+                'elapsed_seconds' => $offline?->client_elapsed_seconds ?? min($this->duration_seconds, max(0, (int) $this->started_at->diffInSeconds($this->finished_at) - (int) $this->paused_seconds)),
             ],
         ];
     }

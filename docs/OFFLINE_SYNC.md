@@ -1,6 +1,8 @@
 # Çevrimdışı paket ve senkronizasyon protokolü
 
-Durum: **kapsam onayı bekleyen tasarım önerisi**. Güncel `prompt.md` offline çalışmayı otomatik zorunlu kabul etmez. SQLite, IndexedDB, paket ve sync endpoint'leri yoktur; bu belgeye dayanarak geliştirme kapsamı kendiliğinden genişletilmez. Protokol `protocol_version: 1` ile başlar; sunucu desteklemediği sürümü açık hata ile reddeder.
+Durum: **geliştirme sürüyor; tam kapsam henüz hazır değil**. Mobilde kişisel bağlam için resmî deneme ve ders sınavlarının indirilmesi, çevrimdışı açılması ve tamamlanan sonucun sunucuya aktarılması geliştirildi. Test API'si kapatılarak iPhone simülatöründe soru çözme, çıkıp aynı soruya dönme, yeniden açılış ve sunucu döndüğünde otomatik aktarım kontrol edildi. Rastgele sınav, tekrar sınavı ve çevrimiçi başlamış sınavı bağlantı kesilince sürdürme desteği henüz tamamlanmamıştır; iPad ve Android cihaz kontrolleri de bekliyor. Aşağıdaki protokolün kalan bölümleri hedef tasarımdır.
+
+Mevcut hazırlık ucu `GET /api/v1/contexts/{context}/offline-exams/{exam}` yalnız oturum sahibinin kişisel bağlamında yayımlanmış sınavı döndürür. Hesap/bağlam, sınav ve sıralı soru sürümleri imzalıdır; içerik JSON'unun SHA-256 özeti imzaya dahildir. Mobil depolamadan önce içerik özeti ve sıralı soru/seçenekler doğrulanır. İmzalama için sunucu uygulama anahtarı kullanılır; anahtar döndürme durumunda eski imzaların doğrulanması için ayrıca plan gerekir. `POST /api/v1/contexts/{context}/offline-exam-imports` yalnız tamamlanmış resmî sınavı bütün olarak doğrular ve sunucuda puanlar; paket/soru/puanlama değişmişse 409 döndürür, cihazdaki kayıt korunmalıdır. Cihaz saatine ait tarihler doğrulanmış sunucu zamanı değildir. Bu uç rastgele sınavları veya çevrimiçi başlamış sınavı desteklemez.
 
 ## Paket yaşam döngüsü
 
@@ -10,7 +12,7 @@ Paket manifest'i `package_id`, `package_version`, `schema_version`, değişmez s
 
 Paketler değişmezdir. Yeni soru sürümü yeni manifest'e girer. Eski sürüm, tamamlanmamış denemeler ve sunucuya kabul edilebilecek geçmiş denemeler için korunur. Yayından kaldırma olayları tombstone taşır; hukuki/güvenlik geri çekmeleri yeniden bağlantıda paket erişimini kaldırabilir, geçmiş sonuç snapshot'larını keyfî değiştirmez.
 
-Çalışma paketi çevrimdışı değerlendirme için cevap anahtarı taşıyabilir. Deneme arayüzü bitişe kadar cevabı gizler fakat cihaz sahibinin yerel dosyadan anahtarı çıkarabilmesi teknik olarak engellenmiş sayılmaz. Offline sonuçlar hazırlık amaçlıdır; gözetimli/resmî sınav güvenliği iddiası yoktur. Sunucu istemci puanını kabul etmez.
+Çalışma paketi çevrimdışı değerlendirme için cevap anahtarı taşıyabilir. Yanıttan sonra doğru cevap gösterilir ve verilen cevap kilitlenir. Cihaz sahibinin yerel dosyadan anahtarı çıkarabilmesi teknik olarak engellenmiş sayılmaz. Offline sonuçlar hazırlık amaçlıdır; gözetimli/resmî sınav güvenliği iddiası yoktur. Sunucu istemci puanını kabul etmez.
 
 ## Yerel kalıcılık
 

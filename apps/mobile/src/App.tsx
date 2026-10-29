@@ -23,7 +23,7 @@ import { ArrowLeft } from "./icons";
 import type { ExamAttempt, StudyContext, User } from "@oggaq/shared-types";
 import { ApiError } from "@oggaq/api-client";
 import { api, sessionExpiredHandler } from "./api";
-import { session, verifyPreviewStorage } from "./storage";
+import { session, offlineIdentity, verifyPreviewStorage } from "./storage";
 import { Login } from "./auth";
 import { useResource, useResume, useTask } from "./hooks";
 import {
@@ -60,10 +60,13 @@ import { restoreApplication, type Prepared } from "./startup";
 import { textSizeFactors } from "./textSize";
 import { isTransientReadError, recoverRead } from "./readRecovery";
 import { AppUpdatesProvider } from "./appUpdates";
+import { OfflineExamScreen } from './offline/screen';
+import { OfflineAutoSync } from './offline/autoSync';
 
 type Routes = {
   Main: undefined;
   Exam: { id: string; initialExam?: ExamAttempt };
+  OfflineExam: { id: string };
   Account: undefined;
 };
 const Stack = createNativeStackNavigator<Routes>();
@@ -71,11 +74,22 @@ const primaryTabs: readonly MainTab[] = ["home", "deneme", "ders", "history", "p
 function ConnectionNotice({ retry }: { retry: () => void }) {
   const { styles, palette } = useTheme();
   return <View testID="connection-notice" accessibilityRole="alert" style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: palette.softPrimary }}>
-    <Text style={styles.muted}>Bağlantı yenilenemedi. Kayıtlı bilgilerin korunuyor; yeni işlemler için bağlantını kontrol et.</Text>
+    <Text style={styles.muted}>{Platform.OS === 'web' ? 'Bağlantı yenilenemedi. Kayıtlı bilgilerin korunuyor; bağlantını kontrol et.' : 'Bağlantı yenilenemedi. İndirdiğin sınavları çözebilirsin; diğer işlemler için bağlantını kontrol et.'}</Text>
     <TextLink onPress={retry}>Bağlantıyı yeniden dene</TextLink>
   </View>;
 }
 type PreparedContexts = Prepared<StudyContext[]>;
+async function readContexts(signal?: AbortSignal, allowOffline = false): Promise<StudyContext[]> {
+  const token = session.token;
+  try {
+    return (await api.request("get", "/api/v1/me/contexts", { signal })).data;
+  } catch (error) {
+    if (!allowOffline || !(error instanceof ApiError && error.status === 0) || signal?.aborted || !token || session.token !== token) throw error;
+    const cached = await offlineIdentity.read(token);
+    if (signal?.aborted || session.token !== token || !cached) throw error;
+    return cached.contexts;
+  }
+}
 function MainTabs({
   user,
   context,
@@ -86,6 +100,7 @@ function MainTabs({
   exam,
   account,
   refresh,
+  offlineExam,
 }: {
   user: User;
   context: StudyContext;
@@ -96,6 +111,7 @@ function MainTabs({
   exam: (id: string, initialExam?: ExamAttempt) => void;
   account: () => void;
   refresh: () => void;
+  offlineExam: (id: string) => void;
 }) {
   const { styles } = useTheme();
   const layout = useLayout();
@@ -191,7 +207,7 @@ function MainTabs({
                       exam={exam}
                     />
                   ) : page === "deneme" ? (
-                    <ExamList context={context} kind="deneme" open={exam} />
+                    <ExamList context={context} kind="deneme" open={exam} user={user} openOffline={offlineExam} />
                   ) : page === "ders" ? (
                     <ExamList
                       key={subjectRequest}
@@ -199,6 +215,8 @@ function MainTabs({
                       kind="ders"
                       open={exam}
                       initialSubject={subject}
+                      user={user}
+                      openOffline={offlineExam}
                     />
                   ) : page === "history" ? (
                     <Results context={context} openExam={exam} />
@@ -299,7 +317,7 @@ function Workspace({
         if ("error" in result) throw result.error;
         return result.data;
       }
-      return (await api.request("get", "/api/v1/me/contexts", { signal })).data;
+      return readContexts(signal);
     },
     [user.id],
     true, { manageResume: false },
@@ -313,6 +331,13 @@ function Workspace({
     }
   }, [user.email_verified_at, query.reload]);
   const [contextId, setContextId] = useState<string | null>(null);
+  useEffect(() => {
+    const token = session.token;
+    if (!token || !query.data) return;
+    void offlineIdentity.save(token, user, query.data).catch(() => {
+      console.warn("Çevrimdışı kimlik kaydedilemedi.");
+    });
+  }, [user, query.data]);
   useResume(() => {
     void query.reload(true);
   }, query.cancel);
@@ -371,6 +396,7 @@ function Workspace({
     );
   return (
     <View style={styles.shell}>
+    <OfflineAutoSync user={user} context={context} />
     {(query.error || query.refreshError) && !connectionWarning ? <ConnectionNotice retry={() => void query.reload(true)} /> : null}
     <NavigationContainer
       key={`${user.id}-${context.id}`}
@@ -404,6 +430,7 @@ function Workspace({
               logout={logout}
               pending={pending}
               exam={(id, initialExam) => navigation.navigate("Exam", { id, initialExam })}
+              offlineExam={id => navigation.navigate("OfflineExam", { id })}
               account={() => navigation.navigate("Account")}
             />
           )}
@@ -415,6 +442,9 @@ function Workspace({
           <ExamHeaderTitle>{children}</ExamHeaderTitle>
         }}>
           {({ route }) => <ExamDetail context={context} id={route.params.id} initialExam={route.params.initialExam} />}
+        </Stack.Screen>
+        <Stack.Screen name="OfflineExam" options={{ title: 'Çevrimdışı sınav' }}>
+          {({ route, navigation }) => <OfflineExamScreen user={user} context={context} id={route.params.id} openSynced={id => navigation.replace('Exam', { id })} />}
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
@@ -464,6 +494,12 @@ function Application() {
     } catch (e) {
       if (!current()) return;
       if (e instanceof ApiError && [401, 403].includes(e.status)) await clear();
+      else if (e instanceof ApiError && e.status === 0 && !user) {
+        const cached = await offlineIdentity.read(token);
+        if (!current()) return;
+        if (cached) { setUser(cached.user); setRefreshWarning(true); }
+        else setError(e);
+      }
       else if (recover && isTransientReadError(e)) setRefreshWarning(true);
       else setError(e);
     }
@@ -475,7 +511,7 @@ function Application() {
       await restoreApplication({
         probe: verifyPreviewStorage,
         restore: () => session.restore(),
-        contexts: async () => (await api.request("get", "/api/v1/me/contexts", {})).data,
+        contexts: () => readContexts(undefined, true),
         prepared: contexts => {
           if (session.token) setPrepared({ token: session.token, contexts });
         },

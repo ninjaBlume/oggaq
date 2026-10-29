@@ -21,7 +21,7 @@ class ReviewQuestionSet
         }
 
         return $query->whereRaw(
-            'id IN (SELECT question_id FROM (SELECT DISTINCT ON (question_id) question_id, outcome FROM ('.AnswerEvents::SQL.') events ORDER BY question_id, happened_at DESC) latest WHERE outcome = ?)',
+            'id IN (SELECT question_id FROM (SELECT DISTINCT ON (question_id) question_id, outcome FROM ('.AnswerEvents::sql().') events ORDER BY question_id, happened_at DESC) latest WHERE outcome = ?)',
             [...AnswerEvents::bindings($contextId), $kind],
         );
     }

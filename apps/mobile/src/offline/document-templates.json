@@ -1,0 +1,504 @@
+[
+  {
+    "id": "petition-general",
+    "kind": "petition",
+    "title": "Genel talep / bildirim",
+    "description": "Talebini ve gerekçeni kendi sözlerinle belirt.",
+    "version": "2026-10-28.2",
+    "fields": [
+      {
+        "key": "request",
+        "label": "Talep veya bildirim",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      },
+      {
+        "key": "reason",
+        "label": "Açıklama / gerekçe",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      }
+    ],
+    "signer_roles": [
+      "Başvuran"
+    ],
+    "sources": [],
+    "body": "Başvuru konusu: {request}\n\nBaşvuruma ilişkin açıklama ve gerekçem:\n{reason}\n\nBelirttiğim talebin değerlendirilmesini ve sonucuyla ilgili tarafıma bilgi verilmesini arz ederim."
+  },
+  {
+    "id": "petition-leave",
+    "kind": "petition",
+    "title": "İzin talebi",
+    "description": "İzin tarihlerini ve talebini düzenle.",
+    "version": "2026-10-28.2",
+    "fields": [
+      {
+        "key": "start_date",
+        "label": "İzin başlangıç tarihi (gg/aa/yyyy)",
+        "multiline": false,
+        "format": "date",
+        "optional": false
+      },
+      {
+        "key": "end_date",
+        "label": "İzin bitiş tarihi (gg/aa/yyyy)",
+        "multiline": false,
+        "format": "date",
+        "optional": false
+      },
+      {
+        "key": "reason",
+        "label": "İzin talebi ve açıklama",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      }
+    ],
+    "signer_roles": [
+      "Başvuran"
+    ],
+    "sources": [],
+    "body": "{start_date} - {end_date} tarihleri arasında izin kullanmak istiyorum.\n\nİzin talebime ilişkin açıklamam:\n{reason}\n\nTalebimin değerlendirilmesini arz ederim."
+  },
+  {
+    "id": "petition-shift",
+    "kind": "petition",
+    "title": "Vardiya / nöbet değişikliği",
+    "description": "Mevcut ve talep edilen vardiyayı belirt.",
+    "version": "2026-10-28.2",
+    "fields": [
+      {
+        "key": "current",
+        "label": "Mevcut vardiya",
+        "multiline": false,
+        "format": "text",
+        "optional": false
+      },
+      {
+        "key": "requested",
+        "label": "İstenen vardiya",
+        "multiline": false,
+        "format": "text",
+        "optional": false
+      },
+      {
+        "key": "reason",
+        "label": "Gerekçe",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      }
+    ],
+    "signer_roles": [
+      "Başvuran"
+    ],
+    "sources": [],
+    "body": "Mevcut vardiya / nöbet bilgilerim:\n{current}\n\nTalep ettiğim vardiya / nöbet düzeni:\n{requested}\n\nDeğişiklik talebimin gerekçesi:\n{reason}\n\nTalebimin değerlendirilmesini arz ederim."
+  },
+  {
+    "id": "petition-renewal",
+    "kind": "petition",
+    "title": "Özel güvenlik kimlik yenileme",
+    "description": "Kurumun istediği başvuru yolu ve ekleri ayrıca kontrol et.",
+    "version": "2026-10-28.2",
+    "fields": [
+      {
+        "key": "request",
+        "label": "Yenileme talebi ve açıklama",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      }
+    ],
+    "signer_roles": [
+      "Başvuran"
+    ],
+    "sources": [],
+    "body": "Özel güvenlik kimliğimin yenilenmesine ilişkin talebimi bilgilerinize sunuyorum.\n\nBaşvuruma ilişkin bilgiler ve açıklamam:\n{request}\n\nTalebimin değerlendirilmesini arz ederim."
+  },
+  {
+    "id": "petition-lost-id",
+    "kind": "petition",
+    "title": "Kayıp kimlik bildirimi",
+    "description": "Kayıp durumunu ve talebini bildiren düzenlenebilir örnek.",
+    "version": "2026-10-28.2",
+    "fields": [
+      {
+        "key": "occurred",
+        "label": "Kayıp tarihi (biliniyorsa) (gg/aa/yyyy)",
+        "multiline": false,
+        "format": "date",
+        "optional": true
+      },
+      {
+        "key": "place",
+        "label": "Kayıp yeri / son görüldüğü yer",
+        "multiline": false,
+        "format": "text",
+        "optional": false
+      },
+      {
+        "key": "circumstances",
+        "label": "Kayıp tarihi, yeri ve bilinen durum",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      },
+      {
+        "key": "request",
+        "label": "Talep",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      }
+    ],
+    "signer_roles": [
+      "Başvuran"
+    ],
+    "sources": [],
+    "body": "Özel güvenlik kimliğimin kaybına ilişkin bildirimimi bilgilerinize sunuyorum.\n\nBilinen kayıp tarihi: {occurred}\nKayıp yeri / son görüldüğü yer: {place}\n\nKayıp durumuna ilişkin açıklamam:\n{circumstances}\n\nBu bildirim kapsamındaki talebim:\n{request}\n\nGereğinin değerlendirilmesini arz ederim."
+  },
+  {
+    "id": "petition-identity",
+    "kind": "petition",
+    "title": "Kimlik bilgisi değişikliği",
+    "description": "Değişen bilgiyi ve talebini belirt.",
+    "version": "2026-10-28.2",
+    "fields": [
+      {
+        "key": "change",
+        "label": "Değişen bilgi ve açıklama",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      },
+      {
+        "key": "request",
+        "label": "Talep",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      }
+    ],
+    "signer_roles": [
+      "Başvuran"
+    ],
+    "sources": [],
+    "body": "Özel güvenlik kimlik bilgilerimdeki değişikliğe ilişkin açıklamam aşağıdadır.\n\nDeğişen bilgi ve açıklama:\n{change}\n\nGüncelleme talebim:\n{request}\n\nTalebimin değerlendirilmesini arz ederim."
+  },
+  {
+    "id": "petition-weapon",
+    "kind": "petition",
+    "title": "Silah farkı başvurusu",
+    "description": "İlgili kurumun güncel başvuru usulünü ayrıca kontrol et.",
+    "version": "2026-10-28.2",
+    "fields": [
+      {
+        "key": "request",
+        "label": "Başvuru talebi ve açıklama",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      }
+    ],
+    "signer_roles": [
+      "Başvuran"
+    ],
+    "sources": [],
+    "body": "Silah farkı başvurusuna ilişkin talebimi bilgilerinize sunuyorum.\n\nBaşvuru bilgilerim ve açıklamam:\n{request}\n\nTalebimin değerlendirilmesini arz ederim."
+  },
+  {
+    "id": "petition-free",
+    "kind": "petition",
+    "title": "Serbest dilekçe",
+    "description": "Kendi metninle bir dilekçe hazırla.",
+    "version": "2026-10-28.2",
+    "fields": [
+      {
+        "key": "text",
+        "label": "Dilekçe metni",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      }
+    ],
+    "signer_roles": [
+      "Başvuran"
+    ],
+    "sources": [],
+    "body": "{text}"
+  },
+  {
+    "id": "report-incident",
+    "kind": "report",
+    "title": "Olay / tespit tutanağı",
+    "description": "Yalnız gözlemlediğin ve bildiğin olayları belirt.",
+    "version": "2026-10-28.2",
+    "fields": [
+      {
+        "key": "occurred",
+        "label": "Olay tarihi (gg/aa/yyyy)",
+        "multiline": false,
+        "format": "date",
+        "optional": false
+      },
+      {
+        "key": "time",
+        "label": "Saat (biliniyorsa, ss:dd)",
+        "multiline": false,
+        "format": "time",
+        "optional": true
+      },
+      {
+        "key": "place",
+        "label": "Olay yeri",
+        "multiline": false,
+        "format": "text",
+        "optional": false
+      },
+      {
+        "key": "description",
+        "label": "Olayın öğrenilme biçimi ve anlatımı",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      },
+      {
+        "key": "actions",
+        "label": "Yapılan işlemler",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      }
+    ],
+    "signer_roles": [
+      "Düzenleyen",
+      "Tanık (varsa)"
+    ],
+    "sources": [],
+    "body": "Olay / tespit tarihi: {occurred}\nSaat (biliniyorsa): {time}\nGörev / olay yeri: {place}\n\nOlayın öğrenilme biçimi ve açıklaması:\n{description}\n\nYapılan işlemler ve mevcut durum:\n{actions}\n\nYukarıda belirtilen hususlar, imza alanında adı bulunan kişilerce kendi bilgi ve gözlemleri kapsamında kayıt altına alınmıştır."
+  },
+  {
+    "id": "report-found",
+    "kind": "report",
+    "title": "Buluntu eşya tutanağı",
+    "description": "Buluntu kaydını teslim işleminden ayrı düzenle.",
+    "version": "2026-10-28.2",
+    "fields": [
+      {
+        "key": "occurred",
+        "label": "Bulunma tarihi (gg/aa/yyyy)",
+        "multiline": false,
+        "format": "date",
+        "optional": false
+      },
+      {
+        "key": "time",
+        "label": "Saat (biliniyorsa, ss:dd)",
+        "multiline": false,
+        "format": "time",
+        "optional": true
+      },
+      {
+        "key": "place",
+        "label": "Bulunduğu yer",
+        "multiline": false,
+        "format": "text",
+        "optional": false
+      },
+      {
+        "key": "items",
+        "label": "Eşyanın ayırt edici özellikleri",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      },
+      {
+        "key": "actions",
+        "label": "Muhafaza / yapılan işlem",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      }
+    ],
+    "signer_roles": [
+      "Bulan / teslim eden",
+      "Teslim alan"
+    ],
+    "sources": [],
+    "body": "Bulunma tarihi: {occurred}\nSaat (biliniyorsa): {time}\nBulunduğu yer: {place}\n\nBulunan eşyanın türü, miktarı ve ayırt edici özellikleri:\n{items}\n\nEşyanın muhafazası ve yapılan işleme ilişkin açıklama:\n{actions}\n\nBu tutanak, yukarıda açıklanan buluntu kaydını belgelemek amacıyla düzenlenmiştir. Eşyanın sonraki teslimi ayrıca kayıt altına alınabilir."
+  },
+  {
+    "id": "report-handover",
+    "kind": "report",
+    "title": "Teslim-tesellüm tutanağı",
+    "description": "Eşya veya evrakın teslimini kayıt altına al.",
+    "version": "2026-10-28.2",
+    "fields": [
+      {
+        "key": "occurred",
+        "label": "Teslim tarihi (gg/aa/yyyy)",
+        "multiline": false,
+        "format": "date",
+        "optional": false
+      },
+      {
+        "key": "time",
+        "label": "Saat (biliniyorsa, ss:dd)",
+        "multiline": false,
+        "format": "time",
+        "optional": true
+      },
+      {
+        "key": "place",
+        "label": "Teslim yeri",
+        "multiline": false,
+        "format": "text",
+        "optional": false
+      },
+      {
+        "key": "items",
+        "label": "Teslim edilenler ve durumları",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      },
+      {
+        "key": "description",
+        "label": "Teslim açıklaması",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      }
+    ],
+    "signer_roles": [
+      "Teslim eden",
+      "Teslim alan"
+    ],
+    "sources": [],
+    "body": "Teslim tarihi: {occurred}\nSaat (biliniyorsa): {time}\nTeslim yeri: {place}\n\nTeslim edilen eşya / evrak, miktarı ve mevcut durumu:\n{items}\n\nTeslim işlemine ilişkin açıklamalar ve varsa çekinceler:\n{description}\n\nYukarıda açıklanan teslim işlemi, aşağıdaki teslim eden ve teslim alan imza alanlarıyla kayıt altına alınmak üzere bu tutanağa işlenmiştir."
+  },
+  {
+    "id": "report-shift",
+    "kind": "report",
+    "title": "Nöbet devir-teslim tutanağı",
+    "description": "Görev durumunu, teslim edilenleri ve açık işleri belirt.",
+    "version": "2026-10-28.2",
+    "fields": [
+      {
+        "key": "occurred",
+        "label": "Devir tarihi (gg/aa/yyyy)",
+        "multiline": false,
+        "format": "date",
+        "optional": false
+      },
+      {
+        "key": "time",
+        "label": "Saat (biliniyorsa, ss:dd)",
+        "multiline": false,
+        "format": "time",
+        "optional": true
+      },
+      {
+        "key": "place",
+        "label": "Görev yeri",
+        "multiline": false,
+        "format": "text",
+        "optional": false
+      },
+      {
+        "key": "items",
+        "label": "Teslim edilen malzeme / evrak",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      },
+      {
+        "key": "description",
+        "label": "Görev durumu ve devreden işler",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      }
+    ],
+    "signer_roles": [
+      "Nöbeti devreden",
+      "Nöbeti devralan"
+    ],
+    "sources": [],
+    "body": "Devir tarihi: {occurred}\nSaat (biliniyorsa): {time}\nGörev yeri: {place}\n\nDevre konu malzeme, anahtar ve evrakın listesi:\n{items}\n\nGörev sırasındaki durum, açık işler ve sonraki vardiyaya aktarılacak bilgiler:\n{description}\n\nNöbet devrine ilişkin bilgiler yukarıda belirtilmiş olup imza alanları devreden ve devralan görevliler için ayrılmıştır."
+  },
+  {
+    "id": "report-fault",
+    "kind": "report",
+    "title": "Malzeme / teçhizat arıza tutanağı",
+    "description": "Tespit edilen durumu ve alınan önlemleri belirt.",
+    "version": "2026-10-28.2",
+    "fields": [
+      {
+        "key": "occurred",
+        "label": "Tespit tarihi (gg/aa/yyyy)",
+        "multiline": false,
+        "format": "date",
+        "optional": false
+      },
+      {
+        "key": "time",
+        "label": "Saat (biliniyorsa, ss:dd)",
+        "multiline": false,
+        "format": "time",
+        "optional": true
+      },
+      {
+        "key": "place",
+        "label": "Görev yeri",
+        "multiline": false,
+        "format": "text",
+        "optional": false
+      },
+      {
+        "key": "items",
+        "label": "Malzeme / teçhizat",
+        "multiline": false,
+        "format": "text",
+        "optional": false
+      },
+      {
+        "key": "description",
+        "label": "Tespit edilen arıza ve yapılan işlemler",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      }
+    ],
+    "signer_roles": [
+      "Düzenleyen",
+      "Teslim alan / ilgili (varsa)"
+    ],
+    "sources": [],
+    "body": "Tespit tarihi: {occurred}\nSaat (biliniyorsa): {time}\nGörev yeri: {place}\nMalzeme / teçhizat bilgisi: {items}\n\nTespit edilen sorun, kullanım durumu ve yapılan işlemler:\n{description}\n\nBu tutanak, belirtilen malzeme / teçhizata ilişkin tespitin kayıt altına alınması amacıyla düzenlenmiştir."
+  },
+  {
+    "id": "report-free",
+    "kind": "report",
+    "title": "Serbest tutanak",
+    "description": "Başlığı, anlatımı ve imza rollerini kendin düzenle.",
+    "version": "2026-10-28.2",
+    "fields": [
+      {
+        "key": "text",
+        "label": "Tutanak metni",
+        "multiline": true,
+        "format": "text",
+        "optional": false
+      }
+    ],
+    "signer_roles": [
+      "Düzenleyen"
+    ],
+    "sources": [],
+    "body": "{text}"
+  }
+]

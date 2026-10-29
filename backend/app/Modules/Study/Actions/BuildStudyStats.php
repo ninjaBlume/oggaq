@@ -20,7 +20,7 @@ class BuildStudyStats
                 count(*) FILTER (WHERE events.outcome = 'correct') AS correct,
                 count(*) FILTER (WHERE events.outcome = 'incorrect') AS incorrect,
                 count(*) FILTER (WHERE events.outcome = 'blank') AS blank
-            FROM (".AnswerEvents::SQL.') events
+            FROM (".AnswerEvents::sql().') events
             JOIN question_versions v ON v.id = events.question_version_id
             JOIN subjects s ON s.id = v.subject_id
             GROUP BY s.id, s.name ORDER BY s.name, s.id',

@@ -9,6 +9,7 @@ use App\Modules\Study\Actions\ResolveStudyContext;
 use App\Support\ApiProblem;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 
 class AccessExam
@@ -39,7 +40,12 @@ class AccessExam
                     $this->finalize->execute($attempt);
                 }
 
-                return $attempt->load($compact ? ['answers.questionVersion:id,correct_option_id,explanation'] : ['answers.questionVersion.options', 'answers.questionVersion.source']);
+                $relations = $compact ? ['answers.questionVersion:id,correct_option_id,explanation'] : ['answers.questionVersion.options', 'answers.questionVersion.source'];
+                if (Schema::hasTable('offline_exam_imports')) {
+                    $relations[] = 'offlineImport';
+                }
+
+                return $attempt->load($relations);
             });
         } catch (QueryException $exception) {
             // A deadline can cross between the application check and the database write.

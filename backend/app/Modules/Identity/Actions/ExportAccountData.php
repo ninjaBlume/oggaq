@@ -74,6 +74,10 @@ class ExportAccountData
         if (Schema::hasColumn('exam_attempts', 'random_weapon_status')) {
             $attempts->addSelect('a.random_education_type', 'a.random_weapon_status', 'a.random_reference_exam_id', 'a.random_distribution', 'a.random_scoring_period_id');
         }
+        if (Schema::hasTable('offline_exam_imports')) {
+            $attempts->leftJoin('offline_exam_imports as offline', 'offline.exam_attempt_id', '=', 'a.id')
+                ->addSelect('offline.client_started_at', 'offline.client_finished_at', 'offline.client_elapsed_seconds', 'offline.received_at as offline_received_at');
+        }
         foreach ($attempts->lazyById(self::CHUNK, 'a.id', 'id')->chunk(self::CHUNK) as $chunk) {
             $answers = DB::table('exam_answers as x')->join('question_versions as v', 'v.id', '=', 'x.question_version_id')
                 ->whereIn('x.exam_attempt_id', $chunk->pluck('id')->all())->orderBy('x.exam_attempt_id')->orderBy('x.position')
@@ -86,6 +90,10 @@ class ExportAccountData
                 yield [
                     'timer_policy' => $attempt->timer_policy ?? 'continuous', 'paused_at' => $attempt->paused_at ?? null, 'paused_seconds' => $attempt->paused_seconds ?? 0,
                     'review_kind' => $attempt->review_kind ?? null,
+                    'offline_import' => ($attempt->offline_received_at ?? null) === null ? null : [
+                        'client_started_at' => $attempt->client_started_at, 'client_finished_at' => $attempt->client_finished_at,
+                        'client_elapsed_seconds' => $attempt->client_elapsed_seconds, 'received_at' => $attempt->offline_received_at,
+                    ],
                     'random_exam' => ($attempt->random_weapon_status ?? null) === null ? null : [
                         'education_type' => $attempt->random_education_type, 'weapon_status' => $attempt->random_weapon_status,
                         'reference_exam_id' => $attempt->random_reference_exam_id, 'distribution' => json_decode($attempt->random_distribution, true, flags: JSON_THROW_ON_ERROR),

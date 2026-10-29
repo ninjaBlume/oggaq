@@ -19,6 +19,9 @@ class ListExams
         $context = $this->contexts->execute($actor, $contextId);
 
         $query = ExamAttempt::notAbandoned()->where('study_context_id', $context->id);
+        if (Schema::hasTable('offline_exam_imports')) {
+            $query->with('offlineImport');
+        }
         if ($scope === 'exams') {
             $query->forExamResults();
         } elseif ($scope === 'review') {

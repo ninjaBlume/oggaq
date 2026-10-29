@@ -9,6 +9,7 @@ use App\Support\ApiProblem;
 use App\Support\PrivacyErasureLedger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 // Erases a person: their study history, memberships, sessions and the account itself, in one transaction.
@@ -68,6 +69,9 @@ class DeleteAccount
         // Reports are about the question: the link to the person and their free text go, the rest stays.
         DB::table('question_reports')->where('user_id', $user->id)->update(['user_id' => null, 'note' => null]);
         DB::table('question_reports')->whereIn('exam_attempt_id', $attempts)->update(['exam_attempt_id' => null]);
+        if (Schema::hasTable('offline_exam_imports')) {
+            DB::table('offline_exam_imports')->whereIn('exam_attempt_id', $attempts)->delete();
+        }
         DB::table('exam_answers')->whereIn('exam_attempt_id', $attempts)->delete();
         DB::table('exam_attempts')->whereIn('study_context_id', $contexts)->delete();
         DB::table('practice_attempts')->whereIn('study_context_id', $contexts)->delete();

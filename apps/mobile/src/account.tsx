@@ -5,6 +5,8 @@ import { Platform, ScrollView, Share, View } from "react-native";
 import type { User } from "@oggaq/shared-types";
 import { deleteAccountConfirmation, displayPersonName, vocabulary } from "@oggaq/study-core";
 import { api } from "./api";
+import { session } from './storage';
+import { eraseOfflineUser } from './offline/eraseUser';
 import { useResource, useTask } from "./hooks";
 import { Badge, Button, Card, ErrorNotice, ReadNotice, Field, Heading, Loading, ScreenTitle, SectionTitle } from "./ui";
 import { useBody, useTheme } from "./themeContext";
@@ -313,13 +315,20 @@ export function AccountScreen({ user, refresh, finished }: { user: User; refresh
   const body = useBody();
   const { styles } = useTheme();
   const [deleted, setDeleted] = useState(false);
+  const cleanup = useTask<void>();
+  const [cleared, setCleared] = useState(false);
+  function cleanDevice() {
+    void cleanup.run(async () => { await session.clear(); await eraseOfflineUser(user.id); }, () => setCleared(true));
+  }
   if (deleted)
     return (
       <ScrollView contentContainerStyle={body}>
         <Card tone="blue">
           <Heading>Hesabın silindi</Heading>
           <Text style={styles.text}>Hesabın ve çalışma geçmişin silindi. Eski e-posta adresine bir onay mesajı gönderdik.</Text>
-          <Button onPress={finished}>Girişe dön</Button>
+          {cleanup.pending && <Text style={styles.muted}>Bu cihazdaki sınav kayıtların siliniyor…</Text>}
+          <ErrorNotice error={cleanup.error} retry={cleanDevice} />
+          <Button disabled={!cleared} onPress={finished}>Girişe dön</Button>
         </Card>
       </ScrollView>
     );
@@ -331,7 +340,7 @@ export function AccountScreen({ user, refresh, finished }: { user: User; refresh
       <ChangePassword />
       <Sessions />
       <ExportData />
-      <DeleteAccount deleted={() => setDeleted(true)} />
+      <DeleteAccount deleted={() => { setDeleted(true); cleanDevice(); }} />
     </ScrollView>
   );
 }

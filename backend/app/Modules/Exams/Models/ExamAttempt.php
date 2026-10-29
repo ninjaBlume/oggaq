@@ -81,4 +81,9 @@ class ExamAttempt extends Model
     {
         return $this->hasMany(ExamAnswer::class)->orderBy('position');
     }
+
+    public function offlineImport(): HasOne
+    {
+        return $this->hasOne(OfflineExamImport::class, 'exam_attempt_id');
+    }
 }

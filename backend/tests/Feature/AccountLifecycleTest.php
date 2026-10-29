@@ -533,7 +533,7 @@ SQL);
             'exam_score_results(exam_attempt_id) -> exam_attempts', 'exam_score_results(user_id) -> users',
             'memberships(user_id) -> users', 'study_contexts(user_id) -> users', 'sessions(user_id) -> users',
             'exam_attempts(study_context_id) -> study_contexts', 'practice_attempts(study_context_id) -> study_contexts', 'favorite_questions(study_context_id) -> study_contexts',
-            'exam_answers(exam_attempt_id) -> exam_attempts', 'exam_bookmarks(exam_attempt_id) -> exam_attempts', 'privacy_notice_receipts(user_id) -> users', 'job_applications(user_id) -> users', 'study_contexts(membership_id,tenant_id,user_id) -> memberships',
+            'exam_answers(exam_attempt_id) -> exam_attempts', 'exam_bookmarks(exam_attempt_id) -> exam_attempts', 'offline_exam_imports(exam_attempt_id) -> exam_attempts', 'privacy_notice_receipts(user_id) -> users', 'job_applications(user_id) -> users', 'study_contexts(membership_id,tenant_id,user_id) -> memberships',
             // link severed, row kept
             'audit_events(actor_id) -> users', 'question_reports(user_id) -> users', 'question_reports(exam_attempt_id) -> exam_attempts',
             // only platform admins author these, and platform admins cannot delete themselves

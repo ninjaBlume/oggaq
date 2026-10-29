@@ -2,6 +2,8 @@
 
 namespace App\Modules\Study;
 
+use Illuminate\Support\Facades\Schema;
+
 // One row per graded answer in a study context: answered practice attempts plus answers of finished exams (an exam without a single answer is abandoned and counts for nothing).
 class AnswerEvents
 {
@@ -19,5 +21,18 @@ SQL;
     public static function bindings(string $contextId): array
     {
         return [$contextId, $contextId];
+    }
+
+    public static function sql(): string
+    {
+        if (! Schema::hasTable('offline_exam_imports')) {
+            return self::SQL;
+        }
+
+        return str_replace(
+            ['e.finished_at AS happened_at', 'JOIN exam_attempts e ON e.id = a.exam_attempt_id'],
+            ['COALESCE(offline.client_finished_at, e.finished_at) AS happened_at', 'JOIN exam_attempts e ON e.id = a.exam_attempt_id LEFT JOIN offline_exam_imports offline ON offline.exam_attempt_id = e.id'],
+            self::SQL,
+        );
     }
 }

@@ -1,9 +1,24 @@
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import * as Crypto from "expo-crypto";
 import { newId } from "./ids";
 import { SessionStore } from "./session";
+import { OfflineIdentityStore } from "./offline/identity";
 // Expo web is a disposable preview. Tokens never enter browser localStorage.
 let previewSession: string | null = null;
+let previewIdentity: string | null = null;
+const offlineIdentityKey = "oggaq.offline-identity";
+export const offlineIdentity = new OfflineIdentityStore({
+  read: () => Platform.OS === "web" ? Promise.resolve(previewIdentity) : SecureStore.getItemAsync(offlineIdentityKey),
+  write: async value => {
+    if (Platform.OS === "web") previewIdentity = value;
+    else await SecureStore.setItemAsync(offlineIdentityKey, value, { keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY });
+  },
+  remove: async () => {
+    if (Platform.OS === "web") previewIdentity = null;
+    else await SecureStore.deleteItemAsync(offlineIdentityKey);
+  },
+}, token => Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, token));
 export const session = new SessionStore({
   read: () =>
     Platform.OS === "web"
@@ -19,6 +34,7 @@ export const session = new SessionStore({
   remove: async () => {
     if (Platform.OS === "web") previewSession = null;
     else await SecureStore.deleteItemAsync("oggaq.session");
+    await offlineIdentity.clear();
   },
 });
 let previewDevice: string | null = null;

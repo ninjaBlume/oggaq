@@ -229,6 +229,36 @@ class ScoringTest extends TestCase
         $this->assertSame($p->scoring_rule_id, $p->fresh()->scoring_rule_id);
     }
 
+    public function test_offline_import_scores_pinned_general_and_weapon_sections_on_the_server(): void
+    {
+        $admin = $this->createUser(['platform_role' => 'platform_admin']);
+        $period = $this->period($admin, ['general_count' => 2, 'weapon_count' => 1]);
+        $source = QuestionSource::create(['title' => 'Sentetik çevrimdışı puan kaynağı']);
+        $subject = Subject::create(['name' => 'Sentetik çevrimdışı ders', 'code' => 'offline-score']);
+        $type = ExamType::create(['name' => 'Sentetik deneme', 'code' => 'offline-score']);
+        $versions = [];
+        foreach (range(1, 3) as $i) {
+            $q = app(SaveQuestion::class)->execute($admin, ['source_id' => $source->id, 'subject_id' => $subject->id, 'stem' => 'Sentetik soru '.$i, 'options' => ['Doğru', 'Yanlış'], 'correct_option_position' => 1]);
+            $q = app(PublishQuestion::class)->execute($admin, $q, $q->revision);
+            $versions[] = $q->published_version_id;
+        }
+        $official = app(SaveOfficialExam::class)->execute($admin, ['exam_type_id' => $type->id, 'title' => 'Sentetik sınav', 'year' => 2023, 'exam_number' => '104', 'weapon_status' => 'armed', 'question_version_ids' => $versions, 'scoring_period_id' => $period->id]);
+        app(PublishOfficialExam::class)->execute($admin, $official);
+        $student = $this->createUser();
+        $context = $student->studyContexts()->firstOrFail()->id;
+        $this->asToken($student);
+        $pack = $this->getJson('/api/v1/contexts/'.$context.'/offline-exams/'.$official->id)->assertOk()->json('data');
+        $answers = [];
+        foreach ($pack['questions'] as $index => $question) {
+            $answers[$question['question_id']] = $question['question']['options'][$index === 1 ? 1 : 0]['id'];
+        }
+        $body = ['id' => (string) Str::uuid(), 'package_id' => $pack['package_id'], 'signature' => $pack['signature'], 'claim' => $pack['claim'],
+            'duration_seconds' => 600, 'started_at' => '2026-01-01T12:00:00Z', 'finished_at' => '2026-01-01T12:05:00Z', 'elapsed_seconds' => 300, 'answers' => $answers];
+        $result = $this->postJson('/api/v1/contexts/'.$context.'/offline-exam-imports', $body)->assertOk()->assertJsonPath('data.score_result.output.status', 'awaiting_shooting')->json('data');
+        $this->postJson('/api/v1/contexts/'.$context.'/exam-attempts/'.$result['id'].'/score', ['id' => (string) Str::uuid(), 'shooting_hits' => 3, 'previous_general_score' => null])
+            ->assertCreated()->assertJsonPath('data.output.final_score', 65)->assertJsonPath('data.output.passed', true);
+    }
+
     public function test_full_exam_with_63_general_and_13_weapon_correct_scores_both_variants_from_saved_answers(): void
     {
         $admin = $this->createUser(['platform_role' => 'platform_admin']);
