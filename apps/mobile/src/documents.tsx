@@ -1,10 +1,8 @@
-import { draftDocument, blankDocument, personalDataWarning } from '@oggaq/study-core';
-import { PrivacyNoticeLink } from './legal';
+import { draftDocument, blankDocument } from '@oggaq/study-core';
 import { useState } from "react";
 import { View } from "react-native";
 import type { components, User } from "@oggaq/shared-types";
 import { readDocumentTemplates } from "./offline/documentTemplates";
-import brand from "../../../config/brand.json";
 import { api } from "./api";
 import { outputDocument } from './document-output';
 import { ChoiceGroup } from "./expressive";
@@ -66,9 +64,9 @@ function DocumentForm({ template, user }: { template: Template; user: User }) {
     }, action);
   }, () => {});
   return <>
-    <Text style={styles.muted}>{personalDataWarning} Belge metni ve PDF bu cihazda hazırlanır; sunucumuza veya yapay zekâ hizmetine gönderilmez. Kaydettiğin veya paylaştığın PDF kopyalarını sen yönetirsin. Android’de alıcı uygulamanın okuyabilmesi için yaklaşık 5 dakikalık korumalı paylaşım önbelleği kullanılır.</Text><PrivacyNoticeLink />
+    <Text style={styles.muted}>Belgen cihazında hazırlanır. Çıkmadan önce PDF olarak kaydet.</Text>
     <ChoiceGroup choices={modes} value={mode} disabled={pending} onChange={value => { setMode(value); setDraft(value === "free" ? { title: template.title, body: "" } : null); }} />
-    <Text style={styles.muted}>{blank ? "Boş alanlı örneği yazdırıp elle doldurabilirsin." : "Bu bir düzenlenebilir örnektir. Kurumunun istediği biçimi ve başvuru yolunu kontrol et."}</Text>
+    <Text style={styles.muted}>{blank ? "Yazdırıp elle doldurabilirsin." : "Örneği ihtiyacına göre düzenleyebilirsin."}</Text>
     {mode === "guided" && !draft && <Card compact>
       {template.fields.map(field => <Field key={field.key} label={field.label} placeholder={field.format === "date" ? "gg/aa/yyyy" : field.format === "time" ? "ss:dd" : undefined} value={fields[field.key] ?? ""} maxLength={field.format === "date" ? 10 : field.format === "time" ? 5 : 6000} multiline={field.multiline} editable={!pending} onChange={value => setFields(previous => ({ ...previous, [field.key]: value }))} />)}
       <Button disabled={missing || pending} onPress={createDraft}>{prepare.pending ? "Hazırlanıyor…" : "Taslağı oluştur"}</Button>
@@ -85,7 +83,7 @@ function DocumentForm({ template, user }: { template: Template; user: User }) {
         {template.kind === "petition" && <><Field label="Adres (isteğe bağlı)" value={address} maxLength={600} multiline editable={!pending} onChange={setAddress} /><Field label="İletişim (isteğe bağlı)" value={contact} maxLength={200} editable={!pending} onChange={setContact} /></>}
         {mode === "guided" && <Button secondary disabled={pending} onPress={() => setDraft(null)}>Bilgi alanlarına dön</Button>}
       </Card>
-      <Card compact><SectionTitle>İmza alanları</SectionTitle><Text style={styles.muted}>İmzalar PDF’de boş bırakılır. Gerekmeyen rolleri kaldırabilirsin.</Text>
+      <Card compact><SectionTitle>İmza alanları</SectionTitle><Text style={styles.muted}>İmzalar PDF’de boş bırakılır.</Text>
         {signers.map((signer, index) => <View key={index} style={{ gap: 8, borderBottomWidth: 1, borderColor: palette.line, paddingBottom: 10 }}>
           <Field label={`İmza ${index + 1} · rol`} value={signer.role} maxLength={80} editable={!pending} onChange={role => setSigners(previous => previous.map((item, i) => i === index ? { ...item, role } : item))} />
           <Field label={`İmza ${index + 1} · adı soyadı (isteğe bağlı)`} value={signer.name} maxLength={150} personName editable={!pending} onChange={name => setSigners(previous => previous.map((item, i) => i === index ? { ...item, name } : item))} />
@@ -96,9 +94,7 @@ function DocumentForm({ template, user }: { template: Template; user: User }) {
       <Button secondary onPress={() => setPreview(true)}>Metni önizle</Button>
       <Sheet visible={preview} title="Belge önizlemesi" close={() => setPreview(false)}><Text style={styles.heading}>{draft.title}</Text>{!!recipient && <Text style={styles.text}>{recipient}</Text>}{!!date && <Text style={styles.text}>{`Tarih: ${date}`}</Text>}<Text style={styles.text}>{draft.body}</Text>{!!attachments && <Text style={styles.text}>{`Ekler\n${attachments}`}</Text>}{signers.map((signer, i) => <Text key={i} style={styles.text}>{`${signer.role}\n${signer.name || "Adı soyadı"}\nİmza: ……………………`}</Text>)}</Sheet>
     </>}
-    {(blank || draft) && <Card compact tone="blue"><Button disabled={pending || (!blank && (!draft?.body.trim() || !draft.title.trim() || signers.some(s => !s.role.trim())))} onPress={() => exportPdf()}>{output.pending ? "PDF hazırlanıyor…" : "PDF kaydet / paylaş"}</Button><Button secondary disabled={pending} onPress={() => exportPdf('print')}>Yazdır</Button><Text style={styles.muted}>Paylaşım menüsünden PDF’yi kaydet veya gönder. Yazdırmak için aşağıdaki seçeneği kullan.</Text></Card>}
+    {(blank || draft) && <Card compact tone="blue"><Button disabled={pending || (!blank && (!draft?.body.trim() || !draft.title.trim() || signers.some(s => !s.role.trim())))} onPress={() => exportPdf()}>{output.pending ? "PDF hazırlanıyor…" : "PDF kaydet / paylaş"}</Button><Button secondary disabled={pending} onPress={() => exportPdf('print')}>Yazdır</Button></Card>}
     <ErrorNotice title="PDF açılamadı" error={output.error} retry={() => exportPdf()} />
-    <Text style={[styles.muted, { fontSize: 12 }]}>Belge yalnız cihazda hazırlanır; uygulamada belge arşivi tutulmaz. Paylaşmayı seçtiğin uygulama veya yazıcıya belgeyi sen iletirsin. Bu ekrandan çıkınca metnini yeniden girmen gerekir. Belge kurumlara gönderilmez ve elektronik olarak imzalanmaz.</Text>
-    <Text style={[styles.muted, { fontSize: 12 }]}>{`${brand.name} için hazırlanmış özgün ve düzenlenebilir örnektir.`}</Text>
   </>;
 }
