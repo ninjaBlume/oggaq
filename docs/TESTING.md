@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## 29 Ekim 2026 — PDF düzeltmesinin dağıtımı
+
+Kaynak **fbbeb6f**; gizlilik .5 ve web hesabı canlıya alındı. **privacy-fbbeb6f** app/web imajlarında PHP yapılandırması ve **43 frontend dosyası** hash eşleşti; migration veya iş verisi yazımı yok. DB/Redis/Mailpit/tünel konteynerleri değişmedi. Yeni şifreli ön yedek **oggaq-oggaq-20261029T145623Z.dump.age**, 2.113.098 bayt, SHA-256 **7c3a0bdaf3ef30301840b410a3ef9c89431efdac377c075327fa1cff54b8788c**. HTTPS .5/arşiv/hesap/ana sayfa 200; örnek hesap giriş/okuma/çıkış ve readiness geçti.
+
+iOS **01a1882a** testflight OTA yayımlandı; (8) runtime korunur, manifest ve 19 dosya hash’i/ortam/izolasyon geçti. Cihaz alımı henüz teyit edilmedi. Android **(9)** EAS kuyruğunda, Google’a yüklenmedi. **80 mobil test**, strict TS, **24 store/arşiv testi**, web/site build ve üç platform preview export geçti. Android Expo Go’da sistem PDF kaydetme ile Türkçe/tarih doğrulandı; Play/native paylaşım testi ayrıca bekliyor. Yalnız bu kontrol için açılan 8083 Metro ve emulator-5556 durduruldu, geçici QA klasörü ve node_modules symlink’i kaldırıldı; diğer geliştirme servisleri korunur. Git push/genel mağaza yayını yok.
+
 ## 29 Ekim 2026 — PDF paylaşımı devam kontrolü
 
 Native Android kontrolü erken temizlenen dosya nedeniyle ENOENT yakaladı. Taşımanın async sonucu beklenir; başarılı Android aktarımı için benzersiz özel cache dosyası 5 dakika korunur, zamanlayıcı/sonraki açılışta temizlenir. iOS paylaşım tamamlanınca temizlik korunur. Expo Go SDK 58 Android Print çıktısı scoped FileSystem dışına yazdığı için bu geliştirme ortamında doğrudan sistemin PDF olarak kaydet ekranı kullanılır; dağıtılan uygulama dosya paylaşımını kullanır. **80 mobil test** ve workspace strict TypeScript geçti. Başarısız aday dağıtılmadı. Gizlilik sürümü **2026-10-29.5** Android geçici saklama süresini açıklar; önceki arşivler değişmez.
