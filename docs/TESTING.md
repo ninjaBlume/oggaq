@@ -1,5 +1,9 @@
 # Test ve doğrulama stratejisi
 
+## 29 Ekim 2026 — Android (7) üretim taslağının Google'a yüklenmesi
+
+Somut kullanıcı onayıyla hash'i yeniden doğrulanan `OGGSor-1.0.0-7.aab` seçildi ve Google'a yüklendi. Önceki “Sürüm ayrıntılarını düzenle” yönlendirmesi yalnız ad/not penceresiydi; değişiklik yapmadan kapatılıp Üretim → Yeni sürüm oluştur ile doğru paket formu açıldı. Kullanıcıdan ikinci dosya seçimi istenmeden native seçicide yalnız (7) AAB ve 61,6 MB boyut kontrol edildi. Ad/Türkçe notlar ayrı alanlarda doğrulandı. Taslak kaydı mesajı, önizleme **Yayınlamaya hazır**, 7 (1.0.0)/min24+/target36/ReTrace/native semboller, telefon **12.540** ve tablet **6.838** desteğinde kayıp olmaması görüldü. Bu cihaz sayıları Google tahminidir, cihaz testi değildir. Son Kaydet sonrası kayıt mesajı ve yeniden açılan kanalın son sürümü **1.0.0 (7) — Güncel yayın adayı** doğrulandı. Track `4697621744685851140`, release `2`; Önceki (6) kaydı korunur. Yayın özetinin ek otomatik taraması sürüyor; “10 değişikliği incelemeye gönder” kullanılmadı. **İnceleme/genel yayın, Dahili Test/OTA, API/DB veya ürün kodu değişmedi.** Önceki otomatik/native sonuçlar geçerli; ürün testleri tekrarlanmadı.
+
 ## 29 Ekim 2026 — Güvenlik ve Expo yamalarının uygulanması
 
 Yalnız `symfony/mime` **8.0.15 → 7.4.22** değişti. MIME kurucu/tek parametre/toplu parametre üzerinden enjeksiyon ve normal Türkçe ekli ileti regresyonu **19 test**. Tam `composer test`: **342 test / 3.834 assertion**; Pint, strict manifest ve audit **0 advisory** geçti. Canlı dar app/web katmanı aktivasyonunda üç PHP servisi aynı sürümü/saldırı reddini doğruladı, dört korunan altyapı konteyneri aynı kaldı, origin/dış HTTPS readiness `ok`. Gizlilik ve hesap silmenin iki web kökü SHA-256 ile ve HTTPS içerikle doğrulandı. Migration/gerçek kullanıcı verisi değişmedi, dış test postası gönderilmedi. [İşletim](../deploy/server-development/README.md#29-ekim-2026--mime-güvenlik-yaması-ve-gizlilik-açıklamaları).
