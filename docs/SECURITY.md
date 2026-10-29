@@ -1,5 +1,13 @@
 # Güvenlik, kişisel veri ve mevzuat
 
+## 29 Ekim 2026 — Symfony MIME başlık enjeksiyonu düzeltmesi
+
+Güncel Composer taraması `symfony/mime v8.0.15` için **CVE-2026-45070** buldu. Symfony'nin güncellenmiş [resmî duyurusu](https://symfony.com/blog/cve-2026-45070-email-header-injection-via-non-token-characters-in-mime-parameter-names), daha önce yamalı olarak listelenen 8.0.12 gibi sürümlerin düzeltmeyi içermediğini açıklıyor. PHP 8.4/Laravel 13 koşullarını koruyan en küçük çözüm olarak yalnız MIME paketi **7.4.22** sürümüne alındı; audit istisnası eklenmedi.
+
+`MailHeaderSecurityTest` üç giriş yolunda (kurucu/tek parametre/toplu parametre) CRLF, satır sonu ve geçersiz ayırıcıların reddini, normal Türkçe e-posta/PDF ekinin serileşmesini doğrular: **19 regresyon testi**. Tam backend **342 test / 3.834 assertion**, Pint, strict Composer doğrulaması ve **0 advisory** geçti. Gerçek kullanıcıya test postası gönderilmedi.
+
+Canlı uygulama, worker ve scheduler `store-hardening-20261029` imajıyla aynı sürüme alındı; üçünün gerçek autoload yolunda sürüm ve enjeksiyon girdisinin reddi doğrulandı. Readiness `ok`; DB/Redis/tünel/Mailpit konteyner kimlikleri korundu. Migration/veri aktarımı, DNS veya host posta ayarı değişmedi. Önceki image sabitlemeleri ve geri dönüş dosyası sunucudaki korumalı yayın dizininde; [işletim kaydı](../deploy/server-development/README.md#29-ekim-2026--mime-güvenlik-yaması-ve-gizlilik-açıklamaları).
+
 ## 28 Ekim 2026 — Güvenlik düzeltmeleri
 
 - `deepmerge@4.3.1` / GHSA-gcqx-w48m-w2h4 için dar yerel yama uygulanır. Gerçek Expo yapılandırma çözümündeki `index.js`, `dist/cjs.js` ve `dist/umd.js` kaynakları sürüm ve SHA256 ile sınırlandırılır. Her iki birleştirme döngüsü `__proto__`, `constructor`, `prototype` anahtarlarını reddeder; kopyalama kendi veri özelliğini tanımlar. Null hedefli saldırı yamasız kaynakta yeniden üretildi, yamalı gerçek girişte reddedildi; normal Expo birleştirmeleri korunur. Bu upstream tarafından yayımlanmış bir düzeltme değildir.

@@ -47,6 +47,7 @@ const config: ExpoConfig = {
   // Tokens are stored without biometric protection (no requireAuthentication), so no Face ID usage string is declared.
   plugins: [
     ["expo-secure-store", { faceIDPermission: false }],
+    "expo-font",
     "expo-status-bar",
     ["expo-splash-screen", {
       image: "./assets/splash-icon.png",

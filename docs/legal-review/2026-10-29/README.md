@@ -1,12 +1,14 @@
 # Yayın öncesi somut hukuk işlemleri
 
-29 Ekim 2026. Bu klasör hazırlık ve inceleme kaydıdır; imza, tasdik, başvuru veya izin alındısı değildir. Bu turdaki metinler yereldedir; canlı site ve mağaza incelemesi değiştirilmedi.
+29 Ekim 2026. Bu klasör hazırlık ve inceleme kaydıdır; imza, tasdik, başvuru veya izin alındısı değildir. Sonraki teknik düzeltme işinde gizlilik ve hesap silmenin olgusal açıklamaları canlıya alındı; koşullardaki önerilen yeni hukuk maddesi ve bu klasördeki resmî işlem taslakları yayımlanmadı. Mağaza incelemesi/genel yayın başlatılmadı.
+
+**Mağaza talebi ile mevzuat değerlendirmesi ayrıdır:** Apple veya Google'ın bu hesap için VERBİS belgesi/temsilci kararı yüklememizi istediği bir talep görülmedi. Aşağıdaki sicil/temsilci/aktarım işleri, veri sorumlusunun ABD'deki Codentum olarak tanımlanmasına dayanan Türkiye mevzuatı değerlendirmesidir; Codentum'a özel verilmiş bir KVKK kararı/bildirimi görülmedi. `check:store` içindeki taslak engeli deponun iç kontrolüdür, mağaza reddi değildir. Genel yayın öncesi şirket yükümlülüklerini değerlendirmek, bütün belgelerin mağazaya yüklenmesi gerektiği anlamına gelmez. [Google denetimi](../../STORE_RELEASE.md#29-ekim--google-için-yeniden-denetim-gönderim-yapılmadı).
 
 | Konu | Hazırlanan sonuç | Gerçekten tamamlanması gereken |
 | --- | --- | --- |
 | Kullanım koşulları / aydınlatma | Toplama yöntemi, üçüncü taraf içerik hakları, başvuru yolu, belge/ilk yardım sınırı ve Türk hukuku/tüketici koruması önerisi eklendi | Şirketin son metin onayı; yayın tarihinde önerilen 29 Ekim tarihini kontrol etmek |
 | VERBİS | Kayıt bulunmadığına ilişkin kullanıcı bilgisi saklandı; Harun Altay adaylı temsilci kararı hazır | Adayın şartları, şirketin yetkili kararı, tasdikli nüsha ve resmî başvuru/kayıt |
-| Soru ve logo hakları | Resmî EGM iletişimi doğrulandı; somut talep hazır | Kullanıcı gönderimi şimdilik istemedi; talep/ek paylaşılmadı. İleride gönderim ve ardından kapsamı belli hak sahibi yanıtı gerekir |
+| Soru ve logo hakları | Resmî EGM iletişimi doğrulandı; somut talep hazır | Kullanıcı gönderimi şimdilik istemedi; talep/ek paylaşılmadı. Kullanım dayanağı teyit edilmeli; EGM'ye e-posta göndermek tek zorunlu yöntem veya her mağaza başvurusunun standart evrakı değildir |
 | Yurt dışı veri akışı | Sağlayıcı/rol bazlı aktarım inceleme tablosu hazır | Uygun KVKK m.9 güvencesinin belirlenmesi, gerekli sözleşme/imza/bildirim kanıtı |
 
 `docs/legal-values.json` içindeki boş alanlar öneri veya bildirilen gerçek durumla dolduruldu. Bu, VERBİS muafiyeti ya da hukuki uygunluk onayı değildir; `taslak: true` korunur. EGM soruları ve mevcut logo değiştirilmedi. İzin çıkmazsa içerik/marka değişikliği için ayrıca somut seçenek hazırlanır.

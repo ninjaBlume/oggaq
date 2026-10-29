@@ -1,5 +1,7 @@
 # Kişisel veri, saklama ve imha
 
+29 Ekim güncellemesi: toplama yöntemi, teknik tanılama, parola saklama, işleten şirket ve anahtarlı silme listesine ilişkin son olgusal açıklamalar `gizlilik.html`/`hesap-silme.html` ile canlıya alındı; iki web kökü hash ve HTTPS 200 ile doğrulandı. Veri toplama davranışı değişmedi. Kullanım koşullarındaki önerilen hukuk maddesi bu yayına dahil edilmedi; yasal inceleme, temsilci/VERBİS, aktarım güvencesi ve içerik hakkı tamamlandı sayılmaz. Aşağıdaki “canlıya yayımlanmadı” notları ilk hazırlık aşamasının kaydıdır.
+
 Durum: bu belge **teknik envanteri ve uygulanan davranışı** anlatır; hukuki metin değildir. Aydınlatma metni, kullanım koşulları, veri sorumlusu/işleyen rolleri ve yurt dışı aktarım kararları hukukçu gerektirir ve henüz yoktur (bkz. [Açık kalanlar](#açık-kalanlar)). Hesap ekranının teknik sözleşmesi [openapi.json](openapi.json), güvenlik kontrolleri [SECURITY](SECURITY.md) içindedir.
 
 ## Hangi kişisel veri nerede

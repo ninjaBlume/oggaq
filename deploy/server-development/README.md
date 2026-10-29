@@ -1,5 +1,15 @@
 # Sunucuda ayrı geliştirme ortamı
 
+## 29 Ekim 2026 — MIME güvenlik yaması ve gizlilik açıklamaları
+
+App/worker/scheduler **`oggaq-development-app:store-hardening-20261029`**, web **`oggaq-development-web:store-hardening-20261029`** olarak dar katmanla güncellendi. Önceki `brand-oggsor-20261028` imajlarının kaynakları korunur. App'in çalışan Composer JSON/lock hash'leri önceden doğrulandı; yalnız `symfony/mime` **8.0.15 → 7.4.22** değişti. Composer install/audit yeni imaj içinde geçti. Canlı üç PHP servisinde sürüm ve **CVE-2026-45070** girdisinin reddi, origin/dış HTTPS readiness `ok` doğrulandı. DB/Redis/Mailpit/tünel kimlikleri aynı; migration, hesap/sınav verisi yazımı, posta/DNS veya diğer sitelere müdahale yok.
+
+Web'de yalnız `gizlilik.html` ve `hesap-silme.html`, hem `/var/www/site/legal/` hem `/var/www/web/legal/` içinde eşitlendi. Toplama yöntemi, teknik tanılama, parola saklama ve anahtarlı silme listesi açıklamaları canlı HTTPS 200 ile doğrulandı. Koşullardaki önerilen yeni hukuk maddesi bu teknik açıklama yayınına dahil edilmedi; özel yasal inceleme/VERBİS/aktarım ve içerik hakkı işleri tamamlandı sayılmaz. Google/Apple incelemesi veya genel mağaza yayını yapılmadı.
+
+`manage` wrapper'ı korunur; yönettiği `publication/student-access-20261027/services.compose.yaml` içindeki dört image sabitlemesi güncellendi. `publication/store-hardening-20261029/` altında manifest, dar Dockerfile'lar, build logları, aktivasyon betiği, `services.before.yaml` ve `receipt.json` bulunur. Nginx aday kontrolü ve dosya hash'leri aktivasyondan önce geçti; aktivasyon hatasında eski sabitlemeleri geri yükleyen yol hazırdır. Normal geri alma yalnız önceki dört image sabitlemesini geri getirip `manage up -d --no-deps --no-build app worker scheduler web` çalıştırır; DB geri yüklenmez. Sunucunun `current/backend` kaynak Composer dosyaları eski tarihsel release'e aittir; sonraki dar dağıtım aktif imajdaki kilidi temel almalıdır.
+
+İlk web build'i hostun eski Docker builder'ı `COPY --chmod` desteklemediği için **aktivasyondan önce** durdu; düz `COPY` + `RUN chmod` ile tekrar geçildi. Başarısız aday çalışan servislere uygulanmadı. Aktarımda SFTP kapanınca aynı anahtarla SSH standart girişi kullanıldı; gizli değer aktarılmadı.
+
 ## 28 Ekim 2026 — Eski çalışma parçalarını sonuçlardan ayırma
 
 Kaynak `1c997dd`, app/worker/scheduler **`oggaq-development-app:legacy-results-1c997dd`**. Önceki üç runtime dosyası hash ile doğrulanarak katmanlandı. Aday ve aktif app'te gerçek etkilenen bağlamın ana sayfa ve sonuç sorguları salt okunur doğrulandı: eski 1/11 soruluk parçalar hariç, asıl sonuç ve cevaplar aynı. Migration/veri yazımı yok. Web image/konteyneri ve diğer servisler korundu; nginx upstream reload edildi. Önceki override/kaynaklar `publication/legacy-results-1c997dd/` içinde saklıdır. Geri dönüş önceki PHP image sabitlemeleriyle yapılır; DB restore gerekmez. Mobil OTA değişmedi. [Kontroller](../../docs/TESTING.md).

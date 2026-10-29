@@ -33,8 +33,12 @@ test('Metro watches the canonical brand configuration outside workspace packages
 
 test('the mobile workspace resolves the reviewed Expo CLI and fixed Zod version', () => {
   assert.equal(mobileRequire('expo/package.json').version, mobileRequire('./package.json').dependencies.expo);
-  assert.equal(expoRequire('@expo/cli/package.json').version, '58.1.15');
+  assert.equal(expoRequire('@expo/cli/package.json').version, '58.1.17');
   assert.equal(cliRequire('zod/package.json').version, '4.6.6');
+  for (const name of ['expo-crypto', 'expo-secure-store', 'expo-splash-screen', 'expo-status-bar', 'expo-updates']) {
+    const dependencyRequire = createRequire(mobileRequire.resolve(`${name}/package.json`));
+    assert.equal(dependencyRequire.resolve('expo/package.json'), mobileRequire.resolve('expo/package.json'), `${name} must not load a second Expo/CLI tree`);
+  }
 });
 test('real Expo plugin schema accepts valid config and rejects invalid command types', () => {
   assert.equal(PluginSchema.safeParse(plugin).success, true);
