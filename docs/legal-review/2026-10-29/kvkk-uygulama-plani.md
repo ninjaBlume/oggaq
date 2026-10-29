@@ -1,6 +1,6 @@
 # KVKK uygulama ve işlem dosyası
 
-29/10/2026. Bu dosya uygulama değişikliklerini, işletme politikasını ve imza/başvuru bekleyen işlemleri ayırır. Kodun testten geçmesi hukuki uygunluk belgesi değildir. Bu paket henüz canlıya veya telefonlara dağıtılmadı.
+29/10/2026. Bu dosya uygulama değişikliklerini, işletme politikasını ve imza/başvuru bekleyen işlemleri ayırır. Kodun testten geçmesi hukuki uygunluk belgesi değildir. **Migration, API ve gizlilik/hesap silme metinleri canlıya alındı.** Android (7) için uyumlu OTA yayımlandı; cihaz alımı henüz teyit edilmedi. iOS/iPad'deki (6) paketinin runtime'ı yeni native SDK yamalarıyla eşleşmediğinden ona uyumsuz OTA gönderilmedi; yeni TestFlight paketi gerekir. [Yayın kaydı](../../../deploy/server-development/README.md). Kullanım koşullarının önerilen hukuk maddesi, temsilci/VERBİS ve aktarım sözleşmeleri bu yayında tamamlanmadı.
 
 ## Uygulama değişiklikleri
 

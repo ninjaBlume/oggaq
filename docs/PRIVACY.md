@@ -1,5 +1,7 @@
 # Kişisel veri, saklama ve imha
 
+29 Ekim canlı yayın: **397c05d** kaynaklı KVKK migration'ı, API, gizlilik ve hesap silme metinleri yayımlandı; 19 iş tablosunun mevcut verileri korundu. Günlük imha 03:40 İstanbul, ilk önizlemede aday **0**. HTML'e otomatik ölçüm betiği eklenmesi `no-transform` ile önlendi. Android (7) için OTA yayımlandı; fiziksel alım doğrulanmadı. iOS/iPad yeni native paket bekliyor. Ortak yerel `oggaq` değiştirilmedi. Aşağıdaki “yalnız testte/dağıtılmadı” ifadeleri hazırlık kaydıdır; güncel işletim [sunucu yayın kaydında](../deploy/server-development/README.md).
+
 29 Ekim KVKK revizyonu: sürümlü aydınlatma kayıtları, sonuçlanmış başvurularda 180 gün, denetim/silme listesinde 3 yıl ve günlük imha kodu hazırlandı; yalnız `oggaq_test` üzerinde doğrulandı. **Yeni davranış henüz canlıya/telefonlara dağıtılmadı.** [Uygulama, prosedürler ve açık işler](legal-review/2026-10-29/kvkk-uygulama-plani.md). Aşağıdaki eski canlı notları tarihsel durumdur.
 
 29 Ekim güncellemesi: toplama yöntemi, teknik tanılama, parola saklama, işleten şirket ve anahtarlı silme listesine ilişkin son olgusal açıklamalar `gizlilik.html`/`hesap-silme.html` ile canlıya alındı; iki web kökü hash ve HTTPS 200 ile doğrulandı. Veri toplama davranışı değişmedi. Kullanım koşullarındaki önerilen hukuk maddesi bu yayına dahil edilmedi; yasal inceleme, temsilci/VERBİS, aktarım güvencesi ve içerik hakkı tamamlandı sayılmaz. Aşağıdaki “canlıya yayımlanmadı” notları ilk hazırlık aşamasının kaydıdır.

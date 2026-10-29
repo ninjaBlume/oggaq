@@ -9,7 +9,7 @@ RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY apps/admin/ apps/admin/
 COPY apps/web/ apps/web/
 COPY apps/site/ apps/site/
-COPY config/brand.json config/store-links.json config/
+COPY config/brand.json config/store-links.json config/privacy-notice.json config/
 COPY docs/legal-values.json docs/legal-values.json
 COPY apps/mobile/assets/brand-logo.png apps/mobile/assets/brand-logo.png
 COPY apps/mobile/assets/fonts/ apps/mobile/assets/fonts/

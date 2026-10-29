@@ -1,5 +1,7 @@
 # Veritabanı tasarımı
 
+29 Ekim canlı güncelleme: aşağıdaki `2026_10_29_000001_add_privacy_controls` migration'ı kullanıcı yönlendirmesiyle **canlı oggaq** DB'sine uygulandı. 19 iş tablosunun eski alanları ve önceki migration defteri aynı transaction içinde karşılaştırıldı; hesap/soru/cevap/sonuç değişmedi. Kurulumda imha yok; günlük işin ilk önizlemesi 0 aday. Ortak **yerel** `oggaq` değiştirilmedi. Aşağıdaki “henüz canlıda değil” bölümü hazırlık tarihçesidir. [Dağıtım ve geri dönüş](../deploy/server-development/README.md).
+
 ## 29 Ekim 2026 — KVKK kontrolleri (henüz canlıda değil)
 
 `2026_10_29_000001_add_privacy_controls`: `privacy_notice_receipts` kullanıcı FK/cascade, kapsam ve SHA-256 CHECK, user/scope/version unique ve UPDATE engeli. Kullanıcının dışa aktarımına dahil; IP/UA/rıza alanı yok. Zaman sunucudan, metin özeti arşiv manifestinden gelir.

@@ -1,5 +1,7 @@
 # Yayın öncesi somut hukuk işlemleri
 
+29 Ekim devamı: teknik KVKK **migration/API/gizlilik/hesap silme yayını canlıda**. Temsilci ataması/VERBİS, sağlayıcı sözleşme/imza/bildirim işleri ve kullanım koşullarının önerilen hukuk maddesi tamamlanmadı. Önceki “yayımlanmadı” notları hazırlık tarihçesidir; [güncel işlem dosyası](kvkk-uygulama-plani.md), [yayın kanıtı](../../../deploy/server-development/README.md).
+
 29 Ekim 2026. Bu klasör hazırlık ve inceleme kaydıdır; imza, tasdik, başvuru veya izin alındısı değildir. Sonraki teknik düzeltme işinde gizlilik ve hesap silmenin olgusal açıklamaları canlıya alındı; koşullardaki önerilen yeni hukuk maddesi ve bu klasördeki resmî işlem taslakları yayımlanmadı. Mağaza incelemesi/genel yayın başlatılmadı.
 
 **Mağaza talebi ile mevzuat değerlendirmesi ayrıdır:** Apple veya Google'ın bu hesap için VERBİS belgesi/temsilci kararı yüklememizi istediği bir talep görülmedi. Aşağıdaki sicil/temsilci/aktarım işleri, veri sorumlusunun ABD'deki Codentum olarak tanımlanmasına dayanan Türkiye mevzuatı değerlendirmesidir; Codentum'a özel verilmiş bir KVKK kararı/bildirimi görülmedi. `check:store` içindeki taslak engeli deponun iç kontrolüdür, mağaza reddi değildir. Genel yayın öncesi şirket yükümlülüklerini değerlendirmek, bütün belgelerin mağazaya yüklenmesi gerektiği anlamına gelmez. [Google denetimi](../../STORE_RELEASE.md#29-ekim--google-için-yeniden-denetim-gönderim-yapılmadı).

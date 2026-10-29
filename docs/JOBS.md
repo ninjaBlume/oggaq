@@ -1,5 +1,7 @@
 # İş İlanları
 
+29 Ekim devamı: aşağıdaki KVKK saklama revizyonunun **API/migration/zamanlayıcı bölümü canlıda**, ilk imha önizlemesi 0 aday; kurulumda başvuru silinmedi. Android (7) OTA hazır/yayımlandı, cihaz teyidi yok; iOS yeni native paket bekler. Önceki “dağıtılmadı” notları hazırlık kaydıdır.
+
 29 Ekim KVKK saklama revizyonu (dağıtılmadı): başvuru sonuçlandıktan veya ilan kapandıktan/geri çekildikten/sona erdikten 180 gün sonra günlük `privacy:prune --force` başvuruyu siler; önce gerçekleşen bitiş esas alınır. Açık/devam eden başvurular ve kullanıcı hesabı/sınav geçmişi korunur. Belgelenmiş uyuşmazlık için CLI ile süreli erteleme yapılabilir. 180 gün kanuni sabit süre diye sunulmaz. Önceki otomatik imha yok notları canlı eski sürümü anlatır. [Sınırlar ve yedek etkisi](legal-review/2026-10-29/kvkk-uygulama-plani.md).
 
 24 Ekim 2026: Jobs modülü; platform yöneticisi için ilan yönetimi ve başvuru inceleme, öğrenci web ve Expo istemcisi için ilanları görme ve uygulama içinden başvurma akışını uygular. Başvuru ad, e-posta, telefon ve isteğe bağlı kısa ön yazı alır. CV yükleme, işveren hesabı, dış başvuru yönlendirmesi ve başvuru bildirimi bu sürümde yoktur.
