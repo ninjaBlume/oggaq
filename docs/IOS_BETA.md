@@ -1,6 +1,8 @@
 # iPhone ve iPad için kapalı beta
 
-**30 Ekim — iOS 1.0.0 (11) hazırlığı:** EAS `d4e41f23-0652-4fa2-90be-23f7888dff09` TestFlight profiliyle tamamlandı. `OGGSor-1.0.0-11.ipa` SHA-256 `54c9c65380995f6a64c00c1a08564adf31904f7d1b0a73213e6f69af34bcfd11`; kod imzası, `net.codentum.oggsor`, 1.0.0 (11) ve `testflight` kanal kontrolleri geçti. 119 mobil testi ve workspace typecheck geçti. Apple'a yükleme ve test grubuna dağıtım için dosya yükleme onayı bekleniyor; henüz cihazlara teslim edilmedi. App Store incelemesine veya genel yayına gönderim yok.
+**30 Ekim — iOS 1.0.0 (11) TestFlight'ta:** Kullanıcının onayıyla aşağıdaki imzalı paket Transporter üzerinden Apple'a gönderildi; Apple işlemesini tamamladı. App Store Connect'te mevcut `Harun - iPhone ve iPad` iç test grubunda 1.0.0 (11) **Testing** olarak doğrulandı. iPhone ve iPad'e kurulum veya gerçek cihaz testi henüz doğrulanmadı. App Store incelemesi veya genel yayın yapılmadı.
+
+**30 Ekim — iOS 1.0.0 (11) hazırlığı:** EAS `d4e41f23-0652-4fa2-90be-23f7888dff09` TestFlight profiliyle tamamlandı. `OGGSor-1.0.0-11.ipa` SHA-256 `54c9c65380995f6a64c00c1a08564adf31904f7d1b0a73213e6f69af34bcfd11`; kod imzası, `net.codentum.oggsor`, 1.0.0 (11) ve `testflight` kanal kontrolleri geçti. 119 mobil testi ve workspace typecheck geçti. Hazırlık sırasında Apple yükleme onayı bekleniyordu; sonraki işlem ve test grubunun durumu yukarıda kaydedildi. App Store incelemesine veya genel yayına gönderim yok.
 
 **30 Ekim — Çevrimdışı bağlantı düzeltmesi:** 1.0.0 (10) için `01a189af-af05-7051-b1e1-1349ff430668`, `testflight` kanalında. Kullanıcı cihazında teslim ve çevrimdışı sınav kontrolü bekleniyor.
 
