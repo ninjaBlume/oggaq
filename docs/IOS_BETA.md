@@ -1,5 +1,8 @@
 # iPhone ve iPad için kapalı beta
 
+**30 Ekim — Otomatik çevrimdışı hazırlık OTA:** TestFlight 1.0.0 (10) runtime `83f44a1944b196ac635706739f028739b76a0762` için update `01a1899c-8dc8-7116-b554-7e7b2a3d968d` yayımlandı. Cihaz teslim teyidi ve otomatik indirme native kontrolü bekleniyor.
+
+
 **30 Ekim — Çevrimdışı sınav kısmi beta:** 1.0.0 (10), EAS `7ec25d35-79e8-4382-8414-06ec301b8578`, TestFlight iç test grubunda **Testing**. Apple hesabı Installed (10) gösteriyor; iki cihazda çevrimdışı akış ayrı ayrı doğrulanmadı. Geçmiş deneme ve dersler indirilebiliyor; rastgele, tekrar ve çevrimiçi başlayıp bağlantısı kesilen sınavlar kapsam dışında. Sunucu migration ve eşitleme altyapısı etkin.
 
 

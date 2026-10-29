@@ -1,5 +1,8 @@
 # Android kişisel beta ve güncelleme düzeni
 
+**30 Ekim — Otomatik çevrimdışı hazırlık OTA:** Dahili test 1.0.0 (11) runtime `ccaf9274786ff40d6978747b49324beb2fa53296` için update `01a1899d-02c7-7a8b-81e4-e95b9d23f29e` yayımlandı. Cihaz teslim teyidi ve otomatik indirme native kontrolü bekleniyor.
+
+
 **30 Ekim — Çevrimdışı sınav kısmi beta:** 1.0.0 (11), EAS `a9e354fa-0163-4091-8165-25662a8ab4cf`, Google Play dahili testte **30 Ekim 00:08** itibarıyla kullanıma sunuldu. Paket kimliği, sürüm, bundle doğrulaması ve JAR imzası kontrol edildi; gerçek cihaz kurulumu ve çevrimdışı akış henüz doğrulanmadı. Geçmiş deneme ve dersler indirilebiliyor; rastgele, tekrar ve çevrimiçi başlayıp bağlantısı kesilen sınavlar kapsam dışında.
 
 
