@@ -180,3 +180,6 @@ Bu komut `apps/mobile` dizininde çalıştırılır; yalnız hedef runtime'ın g
 Kullanıcı seçimi, Apple girişi ve ilk imzalı build tamamlanmadan indirme bağlantısı hazır denmez. Bu yol herkese açık mağaza yayınına hazır olduğumuz veya mevcut yasal/ürün incelemelerinin tamamlandığı anlamına gelmez.
 
 Kaynaklar (27 Ekim 2026): [Apple TestFlight](https://developer.apple.com/help/app-store-connect/test-a-beta-version/testflight-overview/), [Expo TestFlight](https://docs.expo.dev/submit/testflight/), [EAS profilleri](https://docs.expo.dev/build/eas-json/).
+# 30 Ekim — bağlantı uyarısı güncellemesi
+
+TestFlight kanalına `01a189b7-54c3-7e9e-a00b-fd97f31dc99e` yayımlandı (runtime `83f44a1944b196ac635706739f028739b76a0762`, commit `46d6b23`). Cihazda teslimi henüz doğrulanmadı.

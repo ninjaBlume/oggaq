@@ -1,5 +1,7 @@
 # Test ve doğrulama stratejisi
 
+**30 Ekim — Çevrimdışı bağlantı uyarısı:** Kişisel mobil oturumda bağlantı yenilenemediğinde cihazda hazır deneme ve ders sınavlarının çözülebileceği belirtilir. 119 mobil birim testi, workspace typecheck, 34 araç testi, iOS/Android/web export ve ilgili 16 E2E testi geçti. iOS `01a189b7-54c3` ve Android `01a189b7-c74a` test güncellemeleri yayımlandı; fiziksel cihazlarda teslim ve görünüm henüz doğrulanmadı.
+
 **30 Ekim — Kullanıcı kontrolü:** Kullanıcı, bağlantıyı kapattığında hazır bir sınavın açıldığını bildirdi. Cihaz türü, güncelleme kodu, cevap kaydı ve bağlantı döndüğünde sonuç eşitlemesi ayrı ayrı teyit edilmedi; bu bildirim iOS ve Android’in ikisinin de geçtiği anlamına gelmez.
 
 **30 Ekim — Çevrimdışı bağlantı kaybı:** Kişisel mobil sınav listesinde bağlantı kontrolü ve yerel paket listesine geçiş, bağlantı dönünce yenileme, boş/hazırlık hatası durumu ve hafif paket özeti eklendi. **118 mobil birim testi**, workspace typecheck, **34 araç testi**, iOS/Android/web export geçti. **191 E2E geçti**; web önizlemesi son native ekran düzenlemelerinden önce üretildi ve native bağlantı/SQLite UI davranışını doğrulamaz. Düzeltme iOS `01a189af` ve Android `01a189b0` test kanallarına gönderildi; fiziksel cihazla kontrol bekleniyor.

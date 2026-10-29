@@ -154,3 +154,6 @@ npm run update:android:beta -- --message "Düzeltmenin kısa Türkçe açıklama
 İlk kişisel Android beta ve OTA teslim kontrolü tamamlandı. İlk açılışta gömülü mağaza sürümü çalıştı; kullanıcı sınav dışında tam yeniden başlatmadan sonra profilde **Sürüm 0.1.1 · Güncelleme 01a17ac4** gördüğünü bildirdi. Veri temizleme/silme yapılmadı. Bu manuel test her güncellemede zorunlu kullanıcı adımı değildir; normal kullanımda indirilen güncelleme sonraki tam açılışta uygulanır. Uygulama akışlarının tamamı bu teslim kontrolüyle test edilmiş sayılmaz. Başka tester veya genel mağaza yayını yapılmadı.
 
 Kaynaklar (27 Ekim 2026): [Google test kanalları](https://support.google.com/googleplay/android-developer/answer/9845334?hl=tr), [Expo imzalama](https://docs.expo.dev/app-signing/app-credentials/), [Expo Android gönderimi](https://docs.expo.dev/submit/android/).
+# 30 Ekim — bağlantı uyarısı güncellemesi
+
+Android beta kanalına `01a189b7-c74a-7b9f-8733-b6c302b11928` yayımlandı (runtime `ccaf9274786ff40d6978747b49324beb2fa53296`, commit `46d6b23`). Cihazda teslimi henüz doğrulanmadı.
