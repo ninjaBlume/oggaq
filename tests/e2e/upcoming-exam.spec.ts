@@ -8,8 +8,10 @@ test.afterAll(()=>fixture('cleanup'));
 for(const platform of ['web','mobile']as const)for(const scheme of ['light','dark']as const)test(`${platform} ${scheme}: ana sayfada gün sayacı, hazır ekran, takvim bağlantısı ve boş/eski durum`,async({browser})=>{
  const context=await browser.newContext({baseURL:platform==='web'?'http://127.0.0.1:5183':mobilePreviewUrl,colorScheme:scheme,viewport:{width:390,height:900}});const page=await context.newPage();
  if (platform === 'mobile') await context.addInitScript(value => localStorage.setItem('oggaq.theme', value), scheme);
- let release!:()=>void;const held=new Promise<void>(r=>release=r);let first=true;
- await page.route('**/exam-calendar/next',async route=>{if(first){first=false;await held;}await route.continue();});
+ let release!:()=>void;const held=new Promise<void>(r=>release=r);
+ // A cancelled initial read can be retried while the first response is held.
+ // Keep every retry pending until the loading-state assertion is complete.
+ await page.route('**/exam-calendar/next',async route=>{await held;await route.continue();});
  async function refresh(){if(platform==='web')await page.reload();else{await page.getByRole('tab',{name:'Profil',exact:true}).click();await page.getByRole('tab',{name:'Ana sayfa',exact:true}).click();}}
  try{
   if(platform==='web')await login(page);else{await page.goto('/');await page.getByLabel('E-posta adresi',{exact:true}).fill('e2e-student@example.test');await page.getByLabel('Parola',{exact:true}).fill('Synthetic-Browser-42!');await page.getByRole('button',{name:'Giriş yap',exact:true}).click();await expect(page.getByText('Merhaba, E2E.',{exact:true})).toBeVisible();}

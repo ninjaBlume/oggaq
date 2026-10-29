@@ -47,7 +47,10 @@ test("herkese açık bilgi sayfaları giriş yapmadan açılır; doldurulmuş bi
   await page.goto(`${web}/legal/kosullar.html`);
   await expect(page.getByRole("main")).toContainText(scoreEstimateNotice);
   await page.goto(`${web}/legal/gizlilik.html`);
-  await expect(page.getByRole("main")).toContainText("Reklam, analitik veya davranış takibi amacıyla veri toplamıyoruz");
+  await expect(page.getByRole("main")).toContainText("Reklam veya uygulamalar arasında davranış takibi yapmıyoruz");
+  await expect(page.getByRole("main")).toContainText("Teknik tanılama ve güvenlik kayıtları");
+  await expect(page.getByRole("main")).toContainText("Toplama yöntemi:");
+  await expect(page.getByRole("main")).not.toContainText("Reklam, analitik veya davranış takibi amacıyla veri toplamıyoruz");
 });
 
 for (const scheme of ["light", "dark"] as const) {

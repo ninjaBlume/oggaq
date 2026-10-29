@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { mobilePreviewUrl } from '../../playwright.config';
 import { fixture } from './student';
+import mobilePackage from '../../apps/mobile/package.json';
 
 test.beforeEach(() => fixture('setup-study'));
 test.afterAll(() => fixture('cleanup'));
@@ -20,7 +21,7 @@ test('Expo önizlemede mağaza güncelleme denetimi, hata kartı ve OTA kimliği
   for (const returnFrom of ['Ana sayfa', 'Ders'] as const) {
     await page.getByRole('tab', { name: 'Profil', exact: true }).click();
     await page.getByTestId('app-release').scrollIntoViewIfNeeded();
-    await expect(page.getByTestId('app-release')).toContainText('Sürüm 0.1.1');
+    await expect(page.getByTestId('app-release')).toContainText(`Sürüm ${mobilePackage.version}`);
     await expect(page.getByTestId('app-release')).not.toContainText('Güncelleme');
     await expect(page.getByText('Uygulama güncellemesi', { exact: true })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Güncellemeleri denetle', exact: true })).toHaveCount(0);
