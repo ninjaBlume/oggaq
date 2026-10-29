@@ -1,5 +1,7 @@
 # Android kişisel beta ve güncelleme düzeni
 
+**30 Ekim — Belge ekranı:** Android beta kanalına `01a18a11-fefd-76c6-9d14-9b873d9dc25c`, runtime `ccaf9274786ff40d6978747b49324beb2fa53296`, commit `14c1d6b` yayımlandı; cihaz teslimi henüz doğrulanmadı. Google incelemesindeki production paketi bu beta güncellemesini almaz.
+
 **30 Ekim — Çevrimdışı bağlantı düzeltmesi:** 1.0.0 (11) için `01a189b0-3b55-7b60-8ad4-ad2429ca284d`, `android-beta` kanalında. Kullanıcı cihazında teslim ve çevrimdışı sınav kontrolü bekleniyor.
 
 

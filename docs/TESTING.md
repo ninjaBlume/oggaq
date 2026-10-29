@@ -1,5 +1,7 @@
 # Test ve doğrulama stratejisi
 
+**30 Ekim — Belge ekranı sadeleştirmesi:** Dilekçe ve tutanak açıklamaları kısaltıldı. 119 mobil testi ve workspace typecheck geçti. iOS `01a18a11-91dd` ve Android `01a18a11-fefd` test kanallarına yayımlandı; fiziksel cihaz teslimi doğrulanmadı. Google incelemesindeki production 1.0.0 (12) bu sonraki beta güncellemesini içermez.
+
 **30 Ekim — Çevrimdışı bağlantı uyarısı:** Kişisel mobil oturumda bağlantı yenilenemediğinde cihazda hazır deneme ve ders sınavlarının çözülebileceği belirtilir. 119 mobil birim testi, workspace typecheck, 34 araç testi, iOS/Android/web export ve ilgili 16 E2E testi geçti. iOS `01a189b7-54c3` ve Android `01a189b7-c74a` test güncellemeleri yayımlandı; fiziksel cihazlarda teslim ve görünüm henüz doğrulanmadı.
 
 **30 Ekim — Kullanıcı kontrolü:** Kullanıcı, bağlantıyı kapattığında hazır bir sınavın açıldığını bildirdi. Cihaz türü, güncelleme kodu, cevap kaydı ve bağlantı döndüğünde sonuç eşitlemesi ayrı ayrı teyit edilmedi; bu bildirim iOS ve Android’in ikisinin de geçtiği anlamına gelmez.
