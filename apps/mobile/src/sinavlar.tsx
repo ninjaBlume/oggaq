@@ -1,7 +1,7 @@
 import { Text } from "./text";
 import { cardTone } from "@oggaq/design-tokens";
 import { CatalogCache } from "./catalog-cache";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Platform, Pressable, View } from "react-native";
 import { newId } from "./ids";
 import { ApiError, cursorFromLink } from "@oggaq/api-client";
@@ -12,7 +12,6 @@ import { useOnReturn, useResource, useTask } from "./hooks";
 import {
   Badge,
   Button,
-  Card,
   Columns,
   EmptyState,
   ErrorNotice,
@@ -32,6 +31,8 @@ import { scoreTone, shape } from "./theme";
 import { useTheme } from "./themeContext";
 import { OfflineShelf } from './offline/controls';
 import { OfflinePreparationStatus, useOfflinePreparationRevision } from './offline/autoPrepare';
+import { useOffline } from './offline/useOffline';
+import { ScreenActive } from './screenActivity';
 
 const catalogCache = new CatalogCache();
 
@@ -175,6 +176,8 @@ export function ExamList({
   const [subject, setSubject] = useState<string | undefined>(initialSubject);
   const [picking, setPicking] = useState(false);
   const offlineRevision = useOfflinePreparationRevision(user, context);
+  const active = useContext(ScreenActive);
+  const connectionOffline = useOffline(active && context.kind === "personal");
   const subjects = useResource(
     (signal) => catalogCache.read(`${context.id}:subjects`, signal, () => collect((cursor) => api.request("get", "/api/v1/subjects", { signal, query: { per_page: 100, cursor, with_exam_counts: true } }))),
     [context.id], kind === "ders",
@@ -195,6 +198,16 @@ export function ExamList({
       }),
     [context.id],
   );
+  const wasOffline = useRef(false);
+  useEffect(() => {
+    if (connectionOffline) wasOffline.current = true;
+    else if (wasOffline.current && active) {
+      wasOffline.current = false;
+      void attempts.reload();
+      void exams.reload();
+      void subjects.reload();
+    }
+  }, [connectionOffline, active]);
   useOnReturn(() => {
     void attempts.reload();
     void exams.reload();
@@ -209,7 +222,8 @@ export function ExamList({
     || (kind === "ders" && subjects.loading && !subjects.data);
   const failure = exams.error ?? (kind === "ders" ? subjects.error : null);
   const offlineFailure = exams.error ?? exams.refreshError ?? (kind === "ders" ? subjects.error ?? subjects.refreshError : null);
-  const offline = Platform.OS !== 'web' && offlineFailure instanceof ApiError && offlineFailure.status === 0;
+  const offline = Platform.OS !== 'web' && context.kind === 'personal'
+    && (connectionOffline || (offlineFailure instanceof ApiError && offlineFailure.status === 0));
   return (
     <>
       <ScreenTitle
@@ -239,7 +253,7 @@ export function ExamList({
           onChange={setWeapon}
         />
       )}
-      <OfflineShelf user={user} context={context} kind={kind} education={education} weapon={weapon} revision={offlineRevision} open={openOffline} onlyPending={!offline} />
+      <OfflineShelf user={user} context={context} kind={kind} education={education} weapon={weapon} revision={offline ? offlineRevision : 0} open={openOffline} onlyPending={!offline} onlineActiveIds={(attempts.data?.data ?? []).filter(attempt => attempt.status === "active" && attempt.official_exam).map(attempt => attempt.official_exam!.id)} />
       {kind === "ders" && withExams.length > 0 && !offline && (
         <>
           {/* Eleven long subject names do not fit a one-row segmented control: the subject is picked from a list. */}
@@ -281,12 +295,10 @@ export function ExamList({
           </Sheet>
         </>
       )}
-      <ReadNotice resource={exams} refreshOnly />
-      {kind === "ders" && <ReadNotice resource={subjects} refreshOnly />}
-      {loading ? (
+      {!offline && <ReadNotice resource={exams} refreshOnly />}
+      {kind === "ders" && !offline && <ReadNotice resource={subjects} refreshOnly />}
+      {offline ? null : loading ? (
         <Loading layout="list" label="Sınavlar yükleniyor" />
-      ) : offline ? (
-        <Card compact tone="blue"><Text>Bağlantı yok. Cihazda hazır olan sınavları yukarıdan açabilirsin.</Text><Button secondary onPress={() => { void exams.reload(); void subjects.reload(); }}>Yeniden dene</Button></Card>
       ) : failure ? (
         <ErrorNotice
           title="Sınavlar yüklenemedi"

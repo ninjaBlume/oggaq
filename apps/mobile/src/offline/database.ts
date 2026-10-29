@@ -115,6 +115,18 @@ export class OfflineDatabase {
     return this.db.getAllAsync<{ id: string; manifest: string }>('SELECT id, manifest FROM offline_packages WHERE user_id = ? AND context_id = ? ORDER BY rowid DESC', owner.userId, owner.contextId);
   }
 
+  /** Lightweight metadata for revision checks; question text and options stay in SQLite. */
+  async packagePreparationData(owner: Owner): Promise<{ exam: string; claim: string }[]> {
+    return this.db.getAllAsync<{ exam: string; claim: string }>(`SELECT json_extract(manifest, '$.exam') AS exam,
+      json_extract(manifest, '$.claim') AS claim FROM offline_packages WHERE user_id = ? AND context_id = ?`, owner.userId, owner.contextId);
+  }
+
+  /** Read only the small exam metadata, never all question payloads into the screen. */
+  async packageSummaries(owner: Owner): Promise<{ id: string; exam: string }[]> {
+    return this.db.getAllAsync<{ id: string; exam: string }>(`SELECT id, json_extract(manifest, '$.exam') AS exam
+      FROM offline_packages WHERE user_id = ? AND context_id = ? ORDER BY rowid DESC`, owner.userId, owner.contextId);
+  }
+
   async attempts(owner: Owner): Promise<StoredAttempt[]> {
     return this.db.getAllAsync<StoredAttempt>('SELECT id, package_id AS packageId, snapshot, state FROM offline_attempts WHERE user_id = ? AND context_id = ? ORDER BY rowid DESC', owner.userId, owner.contextId);
   }

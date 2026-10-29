@@ -12,7 +12,7 @@ import { openOfflineDatabase } from './nativeDatabase';
 import { examsToPrepare, prepareQueue } from './preparePlan';
 
 type Exam = components['schemas']['OfficialExam'];
-type Status = { userId: string; contextId: string; ready: number; total: number; unavailable: number; working: boolean };
+type Status = { userId: string; contextId: string; ready: number; total: number; unavailable: number; working: boolean; failed?: boolean };
 let status: Status | null = null;
 const listeners = new Set<() => void>();
 function publish(next: Status | null) { status = next; listeners.forEach(listener => listener()); }
@@ -31,6 +31,7 @@ export function OfflineAutoPrepare({ user, context }: { user: User; context: Stu
     const run = async () => {
       if (running || !active()) return;
       running = true;
+      if (!status || status.userId !== owner.userId || status.contextId !== owner.contextId) publish({ ...owner, ready: 0, total: 0, unavailable: 0, working: true });
       try {
         const all: Exam[] = [];
         let cursor: string | undefined;
@@ -45,14 +46,16 @@ export function OfflineAutoPrepare({ user, context }: { user: User; context: Stu
         const revisions = await api.request('get', '/api/v1/contexts/{context}/offline-exam-revisions', { params: { context: owner.contextId } });
         if (!active()) return;
         const db = await openOfflineDatabase();
-        const stored = await db.packages(owner);
+        const stored = await db.packagePreparationData(owner);
         if (!active()) return;
         const candidates = all.filter(exam => exam.question_count > 0);
-        const missing = await examsToPrepare(candidates, stored.map(row => row.manifest), revisions.data, value => Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, value));
+        const missing = await examsToPrepare(candidates, stored.map(row => `{ "exam": ${row.exam}, "claim": ${row.claim} }`), revisions.data, value => Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, value));
         if (!active()) return;
         let ready = candidates.length - missing.length;
         const pending = missing.filter(exam => !rejected.has(exam.id)).sort((a, b) =>
-          Number(a.subject !== null) - Number(b.subject !== null) || b.year - a.year);
+          Number(a.subject !== null) - Number(b.subject !== null) || b.year - a.year
+          || (Number(b.exam_number) || 0) - (Number(a.exam_number) || 0)
+          || Number(a.weapon_status !== 'armed') - Number(b.weapon_status !== 'armed'));
         publish({ ...owner, ready, total: candidates.length, unavailable: rejected.size, working: pending.length > 0 });
         await prepareQueue(pending, active, exam => downloadOfflineExam(owner, exam.id, active),
           (error, exam) => {
@@ -68,7 +71,7 @@ export function OfflineAutoPrepare({ user, context }: { user: User; context: Stu
       } catch {
         // Network/storage failure leaves already committed packages and retries on return or later.
         if (active()) {
-          if (status?.userId === owner.userId && status.contextId === owner.contextId) publish({ ...status, working: false });
+          if (status?.userId === owner.userId && status.contextId === owner.contextId) publish({ ...status, working: false, failed: true });
           schedule(60_000);
         }
       } finally { running = false; }
@@ -87,7 +90,9 @@ export function OfflinePreparationStatus({ user, context }: { user: User; contex
   const [, render] = useState(0);
   const { styles } = useTheme();
   useEffect(() => { const listener = () => render(n => n + 1); listeners.add(listener); return () => { listeners.delete(listener); }; }, []);
-  if (!status || status.userId !== user.id || status.contextId !== context.id || !status.total) return null;
+  if (!status || status.userId !== user.id || status.contextId !== context.id) return null;
+  if (status.failed) return <Text accessibilityLiveRegion="polite" style={styles.muted}>Çevrimdışı hazırlık tamamlanamadı; otomatik olarak yeniden denenecek.{status.total ? ` Hazır: ${status.ready}/${status.total}.` : ''}</Text>;
+  if (!status.total) return <Text style={styles.muted}>Sınavlar çevrimdışı kullanım için hazırlanıyor…</Text>;
   const message = status.unavailable ? ` · ${status.unavailable} sınav hazırlanamadı` : '';
   return <Text accessibilityLiveRegion="polite" style={styles.muted}>{status.working ? 'Çevrimdışı hazırlık' : 'Çevrimdışı hazır'}: {status.ready}/{status.total} sınav{message}</Text>;
 }

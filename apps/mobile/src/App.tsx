@@ -399,7 +399,7 @@ function Workspace({
     <View style={styles.shell}>
     <OfflineAutoSync user={user} context={context} />
     <OfflineAutoPrepare user={user} context={context} />
-    {(query.error || query.refreshError) && !connectionWarning ? <ConnectionNotice retry={() => void query.reload(true)} /> : null}
+    {(query.error || query.refreshError) && !connectionWarning && (Platform.OS === "web" || context.kind !== "personal") ? <ConnectionNotice retry={() => void query.reload(true)} /> : null}
     <NavigationContainer
       key={`${user.id}-${context.id}`}
       theme={navigationTheme}
@@ -546,7 +546,7 @@ function Application() {
   }
   return (
     <View style={styles.shell}>
-      {refreshWarning && user ? <ConnectionNotice retry={() => void refresh(true)} /> : null}
+      {refreshWarning && user && Platform.OS === "web" ? <ConnectionNotice retry={() => void refresh(true)} /> : null}
       {error || task.error ? (
         <View
           style={{

@@ -8,6 +8,7 @@ let opening: Promise<OfflineDatabase> | undefined;
 export function openOfflineDatabase(): Promise<OfflineDatabase> {
   if (!opening) opening = (async () => {
     const connection = await openDatabaseAsync(databaseName);
+    await connection.execAsync("PRAGMA busy_timeout = 2000;");
     const adapter: SqlDatabase = {
       execAsync: sql => connection.execAsync(sql),
       runAsync: (sql, ...params) => connection.runAsync(sql, ...params),
@@ -17,7 +18,7 @@ export function openOfflineDatabase(): Promise<OfflineDatabase> {
         const tx = await openDatabaseAsync(databaseName, { useNewConnection: true });
         let began = false;
         try {
-          await tx.execAsync("PRAGMA foreign_keys = ON; BEGIN IMMEDIATE;");
+          await tx.execAsync("PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 2000; BEGIN IMMEDIATE;");
           began = true;
           await action(tx);
           await tx.execAsync("COMMIT;");

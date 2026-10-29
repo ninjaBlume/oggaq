@@ -53,6 +53,18 @@ describe('SQLite offline transaction log', () => {
     expect(await db.package(owner, 'package-a')).toBeNull();
     sqlite.close();
   });
+  it('reads only per-account package metadata for lists and preparation', async () => {
+    const { db, sqlite } = database(); await db.initialize();
+    await db.savePackage(owner, 'p', JSON.stringify({ exam: { id: 'exam', title: 'Sample' }, claim: { questions: [{ question_id: 'q' }] }, questions: [{ stem: 'large content' }] }));
+    expect(await db.packageSummaries(other)).toEqual([]);
+    const summary = await db.packageSummaries(owner);
+    expect(JSON.parse(summary[0].exam)).toEqual({ id: 'exam', title: 'Sample' });
+    expect(JSON.stringify(summary)).not.toContain('large content');
+    const preparation = await db.packagePreparationData(owner);
+    expect(JSON.parse(preparation[0].claim).questions[0].question_id).toBe('q');
+    expect(JSON.stringify(preparation)).not.toContain('large content');
+    sqlite.close();
+  });
   it('rolls back the entire attempt if recording its operation fails', async () => {
     const { db, sqlite } = database(); await db.initialize(); await db.savePackage(owner, 'package-a', 'one');
     await db.start(owner, 'package-a', 'attempt-a', 'operation-1', '{}', '{}');
