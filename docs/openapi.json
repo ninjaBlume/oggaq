@@ -6968,6 +6968,12 @@
                       "type": "string",
                       "maxLength": 6000
                     }
+                  },
+                  "privacy_notice_version": {
+                    "type": "string",
+                    "maxLength": 40,
+                    "description": "İstemcinin sunduğu arşivlenmiş KVKK aydınlatma sürümü. Açık rıza/okuma kaydı değildir. Eski paket uyumluluğu için isteğe bağlı; gönderilirse sunucudaki bilinen sürümlerden biri olmalıdır.",
+                    "example": "2026-10-29.1"
                   }
                 }
               }
@@ -7575,6 +7581,12 @@
           },
           "password_confirmation": {
             "type": "string"
+          },
+          "privacy_notice_version": {
+            "type": "string",
+            "maxLength": 40,
+            "description": "İstemcinin sunduğu arşivlenmiş KVKK aydınlatma sürümü. Açık rıza/okuma kaydı değildir. Eski paket uyumluluğu için isteğe bağlı; gönderilirse sunucudaki bilinen sürümlerden biri olmalıdır.",
+            "example": "2026-10-29.1"
           }
         },
         "required": [
@@ -11305,6 +11317,41 @@
                 }
               }
             }
+          },
+          "privacy_notice_receipts": {
+            "type": "array",
+            "description": "Yalnız hesabın kendi aydınlatma sunum kayıtları; içerik özeti sunucu manifestinden, zaman sunucudan gelir.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "scope",
+                "notice_version",
+                "content_hash",
+                "recorded_at"
+              ],
+              "properties": {
+                "scope": {
+                  "type": "string",
+                  "enum": [
+                    "registration",
+                    "job_application",
+                    "document"
+                  ]
+                },
+                "notice_version": {
+                  "type": "string"
+                },
+                "content_hash": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "recorded_at": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
           }
         },
         "required": [
@@ -11317,7 +11364,8 @@
           "favorites",
           "question_reports",
           "sessions",
-          "job_applications"
+          "job_applications",
+          "privacy_notice_receipts"
         ]
       },
       "ReadinessResponse": {
@@ -11656,6 +11704,12 @@
               "null"
             ],
             "maxLength": 2000
+          },
+          "privacy_notice_version": {
+            "type": "string",
+            "maxLength": 40,
+            "description": "İstemcinin sunduğu arşivlenmiş KVKK aydınlatma sürümü. Açık rıza/okuma kaydı değildir. Eski paket uyumluluğu için isteğe bağlı; gönderilirse sunucudaki bilinen sürümlerden biri olmalıdır.",
+            "example": "2026-10-29.1"
           }
         },
         "additionalProperties": false
@@ -13158,6 +13212,12 @@
             "items": {
               "$ref": "#/components/schemas/DocumentSigner"
             }
+          },
+          "privacy_notice_version": {
+            "type": "string",
+            "maxLength": 40,
+            "description": "İstemcinin sunduğu arşivlenmiş KVKK aydınlatma sürümü. Açık rıza/okuma kaydı değildir. Eski paket uyumluluğu için isteğe bağlı; gönderilirse sunucudaki bilinen sürümlerden biri olmalıdır.",
+            "example": "2026-10-29.1"
           }
         }
       },

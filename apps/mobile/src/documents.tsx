@@ -1,3 +1,5 @@
+import { privacyNoticeVersion, personalDataWarning } from '@oggaq/study-core';
+import { PrivacyNoticeLink } from './legal';
 import { useState } from "react";
 import { Linking, View } from "react-native";
 import type { components, User } from "@oggaq/shared-types";
@@ -53,9 +55,9 @@ function DocumentForm({ template, user }: { template: Template; user: User }) {
   const pending = prepare.pending || output.pending;
   const missing = template.fields.some(field => !field.optional && !fields[field.key]?.trim());
   const blank = mode === "blank";
-  const createDraft = () => void prepare.run(async () => (await api.request("post", "/api/v1/documents/prepare", { body: { template_id: template.id, fields } })).data, setDraft);
+  const createDraft = () => void prepare.run(async () => (await api.request("post", "/api/v1/documents/prepare", { body: { template_id: template.id, fields, privacy_notice_version: privacyNoticeVersion } })).data, setDraft);
   const exportPdf = () => void output.run(async () => {
-    const result = await api.request("post", "/api/v1/document-exports", { body: { template_id: template.id, mode,
+    const result = await api.request("post", "/api/v1/document-exports", { body: { template_id: template.id, mode, privacy_notice_version: privacyNoticeVersion,
       ...(blank ? {} : { title: draft?.title ?? "", body: draft?.body ?? "", recipient: recipient || null,
         document_date: date || null, address: address || null, contact: contact || null, attachments: attachments || null, signers }) } });
     const url = new URL(result.data.viewer_url);
@@ -63,6 +65,7 @@ function DocumentForm({ template, user }: { template: Template; user: User }) {
     await Linking.openURL(url.toString());
   }, () => {});
   return <>
+    <Text style={styles.muted}>{personalDataWarning} Metin, belgeyi hazırlamak için sunucuya gönderilir; PDF içeriği en çok 5 dakika şifreli geçici önbellekte tutulur. Kaydettiğin veya paylaştığın PDF kopyalarını sen yönetirsin.</Text><PrivacyNoticeLink />
     <ChoiceGroup choices={modes} value={mode} disabled={pending} onChange={value => { setMode(value); setDraft(value === "free" ? { title: template.title, body: "" } : null); }} />
     <Text style={styles.muted}>{blank ? "Boş alanlı örneği yazdırıp elle doldurabilirsin." : "Bu bir düzenlenebilir örnektir. Kurumunun istediği biçimi ve başvuru yolunu kontrol et."}</Text>
     {mode === "guided" && !draft && <Card compact>

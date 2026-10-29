@@ -1,5 +1,15 @@
 # Veritabanı tasarımı
 
+## 29 Ekim 2026 — KVKK kontrolleri (henüz canlıda değil)
+
+`2026_10_29_000001_add_privacy_controls`: `privacy_notice_receipts` kullanıcı FK/cascade, kapsam ve SHA-256 CHECK, user/scope/version unique ve UPDATE engeli. Kullanıcının dışa aktarımına dahil; IP/UA/rıza alanı yok. Zaman sunucudan, metin özeti arşiv manifestinden gelir.
+
+`job_postings.closed_at` ve `job_applications.resolved_at` indeksli; `retention_hold_until` süreli hukuki erteleme içindir. Tarihçesi bilinmeyen kapalı/sonuçlanmış satırlarda saat migration anından başlatılır. Kapanma/geri çekilme/yeniden açma ve terminal değerlendirme/incelemeye dönme geçişleri tarihleri yönetir.
+
+`privacy_erasure_runs`: kişi/başvuru kimliği yerine politika sürümü, zaman ve kategori başına silme adedi. UPDATE ve 3 yıldan önce DELETE yasak. `account_erasures` olağan append-only koruması sürer; yalnız işlem içi `oggaq.privacy_prune` bayrağı ve DB saatine göre 3 yıldan eski satır DELETE istisnası var. Bu bayrak yeni kayıt silme veya UPDATE izni vermez. Erteleme yalnız CLI ile yönetilir; HTTP girdisinden değiştirilemez. Yeni iç sütunlar öğrenci/yönetici kaynaklarında yayımlanmaz.
+
+Yalnız test DB migration'ı çalıştırıldı. Ortak yerel `oggaq` ve canlı DB değiştirilmedi. [Politika ve işletim](legal-review/2026-10-29/kvkk-uygulama-plani.md).
+
 ## 28 Ekim 2026 — Tekrar türünün kalıcı ayrımı
 
 `2026_10_28_000002_distinguish_review_sessions`, `exam_attempts.review_kind` nullable varchar(16) ekler. CHECK yalnız `incorrect|blank|favorite` kabul eder; tekrar olan kayıtta `official_exam_id` ve `random_weapon_status` null olmalıdır. `guard_exam_review_kind` UPDATE ile türü değiştirmeyi engeller. Tekrar geçmişi için `(study_context_id, started_at DESC, id DESC) WHERE review_kind IS NOT NULL` kısmi indeks vardır. Mevcut soru, cevap, puan ve kullanıcı satırları değiştirilmez; eski türü bilinmeyen kayıtlar null kalır.

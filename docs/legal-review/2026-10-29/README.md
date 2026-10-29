@@ -13,6 +13,10 @@
 
 `docs/legal-values.json` içindeki boş alanlar öneri veya bildirilen gerçek durumla dolduruldu. Bu, VERBİS muafiyeti ya da hukuki uygunluk onayı değildir; `taslak: true` korunur. EGM soruları ve mevcut logo değiştirilmedi. İzin çıkmazsa içerik/marka değişikliği için ayrıca somut seçenek hazırlanır.
 
+## 29 Ekim KVKK revizyonu
+
+[Uygulama/prosedür ve saklama planı](kvkk-uygulama-plani.md), [gönderilmemiş sağlayıcı sözleşme talepleri](saglayici-aktarim-talebi.txt). Harun Altay vatandaşlık ve Türkiye yerleşikliği koşullarını beyan etti; temsilci taslağı güncellendi. İmza/tasdik/başvuru hâlâ tamamlanmadı. Yeni teknik paket yalnız test ortamında; canlıya/OTA’ya dağıtılmadı.
+
 ## Kaynaklar ve sınırlar
 
 - [KVKK aydınlatma tebliği](https://www.kvkk.gov.tr/Icerik/4132/aydinlatma-yukumlulugunun-yerine-getirilmesinde-uyulacak-usul-ve-esaslar-hakkinda-teblig): veri toplama yöntemi ve işleme şartının açıklanması; aydınlatma ile açık rıza ayrıdır.

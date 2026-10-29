@@ -8,6 +8,7 @@ use App\Modules\Scoring\Models\ExamScoreResult;
 use Closure;
 use Generator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -40,6 +41,8 @@ class ExportAccountData
         $this->section($out, 'study_contexts', array_map(fn ($context) => [
             'id' => $context->id, 'kind' => $context->tenant_id === null ? 'personal' : 'tenant', 'tenant' => $context->tenant_name, 'created_at' => $context->created_at,
         ], $contexts));
+        $this->section($out, 'privacy_notice_receipts', DB::table('privacy_notice_receipts')->where('user_id', $user->id)
+            ->orderBy('id')->lazyById(self::CHUNK)->map(fn ($row) => ['scope' => $row->scope, 'notice_version' => $row->notice_version, 'content_hash' => $row->content_hash, 'recorded_at' => Carbon::parse($row->recorded_at)->toISOString()]));
         $this->section($out, 'job_applications', JobApplication::where('user_id', $user->id)->orderBy('id')->lazyById(self::CHUNK)->map(fn ($application) => [
             'job' => $application->job_snapshot, 'contact_name' => $application->contact_name, 'contact_email' => $application->contact_email,
             'phone' => $application->phone, 'cover_letter' => $application->cover_letter, 'status' => $application->status, 'created_at' => $application->created_at->toISOString(),

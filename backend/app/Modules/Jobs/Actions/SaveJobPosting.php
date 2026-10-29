@@ -26,6 +26,7 @@ class SaveJobPosting
             if ($input['status'] === 'published' && ! empty($input['expires_at']) && Carbon::parse($input['expires_at'])->lessThanOrEqualTo(now())) {
                 throw ValidationException::withMessages(['expires_at' => ['Yayımlanacak ilanın son başvuru tarihi gelecekte olmalı.']]);
             }
+            $job->closed_at = $input['status'] !== 'published' && ($job->exists || $input['status'] === 'closed') ? ($job->closed_at ?? now()) : null;
             $job->fill(collect($input)->only(['title', 'company_name', 'city', 'description', 'weapon_requirement', 'status', 'expires_at'])->all());
             $job->revision = $id === null ? 1 : $job->revision + 1;
             if ($id === null) {

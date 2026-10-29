@@ -22,7 +22,11 @@ class ReviewJobApplication
             if ($application->revision !== (int) $input['base_version']) {
                 throw new ApiProblem(409, 'version_conflict', 'Başvuru başka bir işlemde güncellendi. Güncel kaydı yükleyin.');
             }
-            $application->forceFill(['status' => $input['status'], 'revision' => $application->revision + 1])->save();
+            $terminal = in_array($input['status'], ['accepted', 'rejected'], true);
+            $application->forceFill([
+                'status' => $input['status'], 'revision' => $application->revision + 1,
+                'resolved_at' => $terminal ? ($application->resolved_at ?? now()) : null,
+            ])->save();
 
             return $application;
         });

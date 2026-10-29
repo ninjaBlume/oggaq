@@ -4,7 +4,7 @@ import type { Page } from "@playwright/test";
 import { execFileSync } from "node:child_process";
 import { browserTestEnv, phpBinary } from "../../playwright.config";
 import { luminance } from "../../packages/design-tokens/src/contrast";
-import { legalPages, notOfficialNotice, scoreEstimateNotice } from "../../packages/study-core/src/legal";
+import { legalPages, notOfficialNotice, scoreEstimateNotice, privacyNoticeFile, privacyNoticeVersion } from "../../packages/study-core/src/legal";
 
 // Store readiness (docs/STORE_RELEASE.md): public legal pages, links from every client, and the "not an official app" notes.
 function fixture(operation: string) {
@@ -78,9 +78,9 @@ test("web: giriş ve kayıt ekranında yasal bağlantılar, kayıt bildirimi ve 
   await expect(page.locator(".legal-consent")).toHaveCount(0);
   await page.getByRole("button", { name: "Hesap oluştur", exact: true }).click();
   const consent = page.locator(".legal-consent");
-  await expect(consent).toContainText("Kayıt olarak Kullanım Koşulları’nı ve Gizlilik Politikası’nı okuduğunu kabul edersin.");
+  await expect(consent).toContainText("Kayıt olarak Kullanım Koşulları’nı kabul edersin.");
   await expect(consent.getByRole("link", { name: "Kullanım Koşulları" })).toHaveAttribute("href", "/legal/kosullar.html");
-  await expect(consent.getByRole("link", { name: "Gizlilik Politikası" })).toHaveAttribute("href", "/legal/gizlilik.html");
+  await expect(consent.getByRole("link", { name: "Gizlilik Politikası" })).toHaveAttribute("href", privacyNoticeFile);
   await webLogin(page);
   await expectLegalLinks(page.locator("footer.site-footer"));
   await expect(page.locator("footer.site-footer")).toContainText(notOfficialNotice);
@@ -121,7 +121,7 @@ test("mobil: giriş/kayıt bağlantıları ve profilde gizlilik/koşul/destek er
   await page.getByRole("button", { name: "Hesap oluştur", exact: true }).first().click();
   await expect(page.getByText("Kayıt olarak", { exact: false })).toBeVisible();
   await page.getByRole("link", { name: "Gizlilik Politikası sayfasını aç", exact: true }).click();
-  expect((await opened(page)).at(-1)).toMatch(/^https?:\/\/.+\/legal\/gizlilik\.html$/);
+  expect(new URL((await opened(page)).at(-1)!).pathname).toBe(privacyNoticeFile);
 
   await mobileLogin(page);
   await page.getByRole("tab", { name: "Profil", exact: true }).click();
@@ -143,3 +143,22 @@ test("mobil: sade gizlilik bağlantıları 320/390/834 px'te erişilebilir", asy
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `@${width}`).toBe(true);
   }
 });
+
+for (const client of ['web', 'mobile'] as const) {
+  test(`${client}: kayıt sürümü gönderilir ve rıza onay kutusu olmadan giriş yapılır`, async ({ page }) => {
+    await page.goto(`${client === 'web' ? web : mobile}/`);
+    await page.getByRole('button', { name: 'Hesap oluştur', exact: true }).first().click();
+    await expect(page.getByText('Bu, açık rıza talebi değildir.', { exact: false })).toBeVisible();
+    const requestPromise = page.waitForRequest(r => r.url().endsWith('/api/v1/auth/register') && r.method() === 'POST');
+    await page.getByLabel('Ad soyad', { exact: true }).fill('Örnek Kayıt');
+    await page.getByLabel('E-posta adresi', { exact: true }).fill(`privacy-${client}-${Date.now()}@example.test`);
+    await page.getByLabel('Parola', { exact: true }).fill(password);
+    await page.getByLabel('Parola tekrar', { exact: true }).fill(password);
+    const responsePromise = page.waitForResponse(r => r.url().endsWith('/api/v1/auth/register') && r.request().method() === 'POST');
+    await page.getByRole('button', { name: 'Hesap oluştur', exact: true }).last().click();
+    expect((await responsePromise).status()).toBe(201);
+    expect((await requestPromise).postDataJSON().privacy_notice_version).toBe(privacyNoticeVersion);
+    if (client === 'web') await expect(page.getByRole('status')).toContainText('Hesabın oluşturuldu.');
+    else await expect(page.getByText('Merhaba, Örnek.', { exact: true })).toBeVisible();
+  });
+}

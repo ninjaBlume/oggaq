@@ -1,6 +1,6 @@
 # Codentum L.L.C. — veri sorumlusu temsilcisi atama kararı taslağı
 
-**İmzalanmadı / tasdik edilmedi / Kuruma sunulmadı.** Harun Altay, kullanıcı tarafından yalnız şartları sağlaması koşuluyla aday gösterildi. Bu metin bir atama kaydı oluşturmaz.
+**İmzalanmadı / tasdik edilmedi / Kuruma sunulmadı.** Harun Altay, 29 Ekim 2026 tarihinde Türkiye Cumhuriyeti vatandaşı ve Türkiye’de yerleşik olduğunu beyan etti. Taslak bu beyana dayanır; resmî kimlik ve adres doğrulaması yapılmış değildir. Bu metin bir atama kaydı oluşturmaz.
 
 Kararı alan: Codentum L.L.C. (Wyoming, ABD) adına şirket kayıtlarına göre yetkili organ veya kişi.
 
@@ -8,11 +8,11 @@ Kararı alan: Codentum L.L.C. (Wyoming, ABD) adına şirket kayıtlarına göre 
 
 Karar tarihi ve numarası: [İMZA TARİHİNDE DOLDURULACAK]
 
-Temsilci adayı: **Harun Altay**. Türkiye Cumhuriyeti vatandaşlığı şartı, kimlik ve tebligat adresi resmî başvuru dosyasında doğrulanacaktır. Kimlik numarası ve kişisel tebligat adresi bu Git dosyasına yazılmaz.
+Temsilci adayı: **Harun Altay**. Vatandaşlık ve Türkiye’de yerleşiklik beyanı alındı; kimlik ve tebligat adresi resmî başvuru dosyasında doğrulanacaktır. Kimlik numarası ve kişisel tebligat adresi bu Git dosyasına yazılmaz.
 
 ## Önerilen karar metni
 
-Codentum L.L.C.’nin 6698 sayılı Kanun kapsamındaki Türkiye işlemleri için, aşağıdaki görevlerle veri sorumlusu temsilcisi görevlendirilmesi önerilir:
+Codentum L.L.C.’nin 6698 sayılı Kanun kapsamındaki Türkiye işlemleri için, aşağıdaki görevlerle veri sorumlusu temsilcisi Harun Altay’ın veri sorumlusu temsilcisi olarak atanmasına ve aşağıdaki konularda şirketi temsile yetkili kılınmasına karar verilmiştir (bu hüküm yalnız yetkili imza ve usulüne uygun tasdik sonrasında kullanılacaktır):
 
 1. Kişisel Verileri Koruma Kurumunun şirket adına yönelttiği tebligat ve yazışmaları almak.
 2. Kurum taleplerini şirkete, şirket yanıtlarını Kuruma iletmek.

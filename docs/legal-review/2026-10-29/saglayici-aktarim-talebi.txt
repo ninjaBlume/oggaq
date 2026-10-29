@@ -1,0 +1,29 @@
+GÖNDERİLMEDİ — şirket adına gönderim onayı sonrası her sağlayıcıya ayrı iletilecek taslak.
+Gönderen: Codentum L.L.C. / destek@oggsor.com
+Konu: Turkish KVKK Article 9 transfer safeguards for ÖGGSor
+
+Hello,
+
+Codentum L.L.C. operates ÖGGSor, a mobile exam preparation service for users in Türkiye. We are documenting the safeguards for transfers subject to Article 9 of Turkish Law No. 6698 (KVKK).
+
+Please confirm:
+1. Your contracting entity, controller/processor roles for the service below, processing/storage/access countries, subprocessors and onward-transfer safeguards.
+2. Whether you can execute the relevant Turkish Personal Data Protection Authority standard contract, with completed annexes and evidence of signatory authority, or identify another applicable safeguard recognised under Article 9. An EU SCC/DPA alone is not being treated as an executed Turkish standard contract.
+3. Deletion/return, retention, data subject request assistance, security measures and breach notification commitments applicable to our plan.
+4. How we can obtain the signed documents and any information required for the Turkish notification process.
+
+We have not represented that a Turkish standard contract has already been signed. Please provide the documents or the appropriate privacy/legal contact.
+
+SERVICE-SPECIFIC SCOPE — keep only the relevant paragraph:
+
+Cloudflare: proxied HTTPS and Tunnel traffic to oggsor.com, including IP/request metadata and potentially account/authentication request payloads terminated at the proxy; Email Routing for incoming support messages. Please distinguish each service and any independent-controller processing.
+
+Resend (Plus Five Five, Inc.): account/security transactional email recipient addresses, message content and delivery metadata. Sending region eu-west-1; please distinguish sending region from logs/account data storage and access locations.
+
+Expo / 650 Industries: EAS Update and asset delivery. IP addresses, installation identifier, platform, project/runtime/channel and limited fatal-error information. We do not intentionally add account identity, email, authentication tokens or exam answers to update requests. Please clarify separate roles for account data versus update delivery telemetry.
+
+Google: support email received through Cloudflare Email Routing into an existing Gmail mailbox. Please confirm safeguards actually available for this account type; do not assume a Google Workspace DPA applies to a consumer Gmail account. If no applicable mechanism is available, we need to evaluate moving the mailbox before treating this transfer as resolved.
+
+Regards,
+Harun Altay
+Codentum L.L.C.

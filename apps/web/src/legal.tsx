@@ -1,5 +1,5 @@
 import { BrandWordmark } from './ui';
-import { legalPages, notOfficialNotice } from '@oggaq/study-core';
+import { legalPages, notOfficialNotice, privacyNoticeFile } from '@oggaq/study-core';
 import { brand } from './config';
 
 // Links to the public static pages (apps/web/public/legal). Plain anchors that open a new tab: the pages are not part
@@ -17,8 +17,12 @@ export function SiteFooter() {
   </footer>;
 }
 
-// Shown under the registration form. A notice, not a stored consent: the API records no consent.
+// A versioned disclosure, separate from terms acceptance; never a blanket consent.
 export function RegisterNotice() {
   const [terms, privacy] = [legalPages[1], legalPages[0]];
-  return <p className="legal-consent">Kayıt olarak <a href={terms.file} target="_blank" rel="noopener">{terms.title}</a>’nı ve <a href={privacy.file} target="_blank" rel="noopener">{privacy.title}</a>’nı okuduğunu kabul edersin.</p>;
+  return <p className="legal-consent">Kayıt olarak <a href={terms.file} target="_blank" rel="noopener">{terms.title}</a>’nı kabul edersin. Verilerinin işlenmesini <a href={privacyNoticeFile} target="_blank" rel="noopener">{privacy.title}</a>’nda açıklıyoruz. Bu, açık rıza talebi değildir.</p>;
+}
+
+export function PrivacyNoticeLink() {
+  return <p className="muted">Codentum’un veri işleme amaçları, alıcıları, saklama süreleri ve hakların için <a href={privacyNoticeFile} target="_blank" rel="noopener" style={{ textDecorationLine: 'underline' }}>KVKK aydınlatma metni</a>.</p>;
 }

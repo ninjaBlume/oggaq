@@ -1,3 +1,5 @@
+import { privacyNoticeVersion, personalDataWarning } from '@oggaq/study-core';
+import { PrivacyNoticeLink } from './legal';
 import { Text } from "./text";
 import { useState } from 'react';
 import { View } from "react-native";
@@ -44,9 +46,9 @@ function ApplicationForm({ job, user, applications, refresh, back }: { job: Job;
   if (sent || job.application_id) return <Card tone="blue"><Text accessibilityRole="header" style={styles.heading}>{sent ? 'Başvurun alındı.' : 'Bu ilana başvurdun.'}</Text><Text style={styles.muted}>Başvurunun durumunu Başvurularım bölümünden takip edebilirsin.</Text><Button secondary onPress={applications}>Başvurularımı gör</Button></Card>;
   if (!user.email_verified_at) return <Verify user={user} verified={refresh} refresh={refresh} cancel={back} />;
   const errors = task.error instanceof ApiError ? task.error : null;
-  function submit() { void task.run(() => api.request('post', '/api/v1/job-postings/{job}/applications', { params: { job: job.id }, body: input }), () => setSent(true)); }
+  function submit() { void task.run(() => api.request('post', '/api/v1/job-postings/{job}/applications', { params: { job: job.id }, body: { ...input, privacy_notice_version: privacyNoticeVersion } }), () => setSent(true)); }
   const fields = [{ key: 'contact_name', label: 'Ad soyad', max: 100 }, { key: 'contact_email', label: 'E-posta adresi', max: 254 }, { key: 'phone', label: 'Telefon', max: 30 }, { key: 'cover_letter', label: 'Kısa ön yazı (isteğe bağlı)', max: 2000 }] as const;
-  return <Card tone="indigo"><Text accessibilityRole="header" style={styles.heading}>Başvuru bilgilerin</Text>{fields.map(({ key, label, max }) => <View key={key} style={{ gap: 6 }}><Field label={label} value={input[key] ?? ''} onChange={(value) => setInput((old) => ({ ...old, [key]: value }))} editable={!task.pending} email={key === 'contact_email'} phone={key === 'phone'} multiline={key === 'cover_letter'} maxLength={max} outlined />{errors?.field(key) && <Text style={{ color: palette.red }}>{errors.field(key)}</Text>}</View>)}<Text style={styles.muted}>{jobApplicationNotice}</Text>{errors?.field('job_posting_id') && <Text style={{ color: palette.red }}>{errors.field('job_posting_id')}</Text>}<ErrorNotice error={task.error} /><Button disabled={task.pending || !input.contact_name || !input.contact_email || !input.phone} onPress={submit}>{task.pending ? 'Başvuruluyor…' : 'Başvur'}</Button></Card>;
+  return <Card tone="indigo"><Text accessibilityRole="header" style={styles.heading}>Başvuru bilgilerin</Text>{fields.map(({ key, label, max }) => <View key={key} style={{ gap: 6 }}><Field label={label} value={input[key] ?? ''} onChange={(value) => setInput((old) => ({ ...old, [key]: value }))} editable={!task.pending} email={key === 'contact_email'} phone={key === 'phone'} multiline={key === 'cover_letter'} maxLength={max} outlined />{errors?.field(key) && <Text style={{ color: palette.red }}>{errors.field(key)}</Text>}</View>)}<Text style={styles.muted}>{jobApplicationNotice} {personalDataWarning}</Text><PrivacyNoticeLink />{errors?.field('job_posting_id') && <Text style={{ color: palette.red }}>{errors.field('job_posting_id')}</Text>}<ErrorNotice error={task.error} /><Button disabled={task.pending || !input.contact_name || !input.contact_email || !input.phone} onPress={submit}>{task.pending ? 'Başvuruluyor…' : 'Başvur'}</Button></Card>;
 }
 function MyApplications({ userId }: { userId: string }) {
   const { styles } = useTheme(); const [cursor, setCursor] = useState<string>();

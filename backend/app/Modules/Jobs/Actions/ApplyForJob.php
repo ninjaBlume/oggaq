@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Modules\Jobs\Models\JobApplication;
 use App\Modules\Jobs\Models\JobPosting;
 use App\Support\ApiProblem;
+use App\Support\PrivacyNotice;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -38,6 +39,7 @@ class ApplyForJob
             $application->status = 'submitted';
             $application->revision = 1;
             $application->save();
+            PrivacyNotice::record($user, 'job_application', $input['privacy_notice_version'] ?? null);
 
             return [$application, true];
         });

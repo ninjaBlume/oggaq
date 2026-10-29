@@ -6,6 +6,7 @@ use App\Modules\Documents\Actions\DocumentExports;
 use App\Modules\Documents\Actions\DocumentTemplates;
 use App\Modules\Documents\Http\Requests\ExportDocumentRequest;
 use App\Modules\Documents\Http\Requests\PrepareDocumentRequest;
+use App\Support\PrivacyNotice;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +22,7 @@ class DocumentController
     {
         $input = $request->validated();
         $template = $templates->find($input['template_id']);
+        PrivacyNotice::record($request->user(), 'document', $input['privacy_notice_version'] ?? null);
 
         return response()->json(['data' => ['title' => $template['title'], 'body' => $templates->draft($template, $input['fields'])]]);
     }

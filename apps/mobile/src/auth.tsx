@@ -1,3 +1,4 @@
+import { privacyNoticeVersion } from '@oggaq/study-core';
 import { Text } from "./text";
 import { BrandWordmark } from "./wordmark";
 import { BrandLogo } from "./brandLogo";
@@ -41,6 +42,7 @@ export function Login({ signedIn }: { signedIn: (user: User) => void }) {
               email,
               password,
               password_confirmation: confirmation,
+              privacy_notice_version: privacyNoticeVersion,
             },
           });
         }

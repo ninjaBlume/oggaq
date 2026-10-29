@@ -1,5 +1,10 @@
 // Public legal and support pages: static HTML in apps/web/public/legal, served by the web origin. Web and mobile link
 // to the same files so a store listing, the web footer and the apps never disagree about where a page lives.
+import notice from '../../../config/privacy-notice.json' with { type: 'json' };
+
+export const privacyNoticeVersion = notice.current;
+export const privacyNoticeFile = notice.notices[notice.current as keyof typeof notice.notices].file;
+export const personalDataWarning = 'Yalnız gerekli bilgileri yaz. T.C. kimlik numarası, sağlık veya adli sicil bilgisi ve gereksiz üçüncü kişi verisi ekleme.';
 export const legalPages = [
   { id: 'gizlilik', title: 'Gizlilik Politikası', file: '/legal/gizlilik.html' },
   { id: 'kosullar', title: 'Kullanım Koşulları', file: '/legal/kosullar.html' },

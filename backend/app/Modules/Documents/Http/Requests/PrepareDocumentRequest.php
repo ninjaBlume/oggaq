@@ -4,6 +4,7 @@ namespace App\Modules\Documents\Http\Requests;
 
 use App\Modules\Documents\Actions\DocumentDates;
 use App\Modules\Documents\Actions\DocumentTemplates;
+use App\Support\PrivacyNotice;
 use Illuminate\Foundation\Http\FormRequest;
 
 class PrepareDocumentRequest extends FormRequest
@@ -13,6 +14,7 @@ class PrepareDocumentRequest extends FormRequest
         $template = $templates->find(is_string($this->input('template_id')) ? $this->input('template_id') : '');
 
         $rules = [
+            'privacy_notice_version' => PrivacyNotice::rules(),
             'template_id' => ['required', 'string', 'max:80'],
             'fields' => ['required', 'array:'.implode(',', array_column($template['fields'], 'key'))],
         ];

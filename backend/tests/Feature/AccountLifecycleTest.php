@@ -352,7 +352,7 @@ class AccountLifecycleTest extends TestCase
         $raw = $this->post('/api/v1/me/export', ['current_password' => self::PASSWORD], ['Accept' => 'application/json'])->assertOk()->streamedContent();
         $data = json_decode($raw, true, flags: JSON_THROW_ON_ERROR);
         $this->assertCount(60, $data['exam_attempts']);
-        $this->assertSame(['exported_at', 'profile', 'memberships', 'study_contexts', 'job_applications', 'score_calculations', 'exam_attempts', 'practice_attempts', 'favorites', 'question_reports', 'sessions'], array_keys($data));
+        $this->assertSame(['exported_at', 'profile', 'memberships', 'study_contexts', 'privacy_notice_receipts', 'job_applications', 'score_calculations', 'exam_attempts', 'practice_attempts', 'favorites', 'question_reports', 'sessions'], array_keys($data));
         $this->post('/api/v1/me/export', ['current_password' => self::PASSWORD])->assertOk()->streamedContent();
         $this->post('/api/v1/me/export', ['current_password' => self::PASSWORD])->assertOk()->streamedContent();
         // Wrong passwords never spend the allowance; the fourth real export is refused.
@@ -533,7 +533,7 @@ SQL);
             'exam_score_results(exam_attempt_id) -> exam_attempts', 'exam_score_results(user_id) -> users',
             'memberships(user_id) -> users', 'study_contexts(user_id) -> users', 'sessions(user_id) -> users',
             'exam_attempts(study_context_id) -> study_contexts', 'practice_attempts(study_context_id) -> study_contexts', 'favorite_questions(study_context_id) -> study_contexts',
-            'exam_answers(exam_attempt_id) -> exam_attempts', 'exam_bookmarks(exam_attempt_id) -> exam_attempts', 'job_applications(user_id) -> users', 'study_contexts(membership_id,tenant_id,user_id) -> memberships',
+            'exam_answers(exam_attempt_id) -> exam_attempts', 'exam_bookmarks(exam_attempt_id) -> exam_attempts', 'privacy_notice_receipts(user_id) -> users', 'job_applications(user_id) -> users', 'study_contexts(membership_id,tenant_id,user_id) -> memberships',
             // link severed, row kept
             'audit_events(actor_id) -> users', 'question_reports(user_id) -> users', 'question_reports(exam_attempt_id) -> exam_attempts',
             // only platform admins author these, and platform admins cannot delete themselves
@@ -549,6 +549,7 @@ SQL);
             'password_reset_tokens.email', 'question_reports.resolved_by', 'question_reports.user_id', 'questions.created_by', 'sessions.ip_address', 'sessions.user_agent', 'sessions.user_id',
             'study_contexts.user_id', 'users.email'];
         $known[] = 'exam_score_results.user_id';
+        $known[] = 'privacy_notice_receipts.user_id';
         $known[] = 'scoring_rules.created_by';
         sort($known);
         $this->assertSame($known, $columns, 'A column that can hold personal data is new: decide how deletion and export treat it, then list it here.');

@@ -28,7 +28,7 @@ class AuthController extends Controller
 {
     public function register(RegisterRequest $request, RegisterUser $action): JsonResponse
     {
-        $user = $action->execute($request->safe()->only(['name', 'email', 'password']));
+        $user = $action->execute($request->safe()->only(['name', 'email', 'password', 'privacy_notice_version']));
 
         return (new UserResource($user))->response()->setStatusCode(201);
     }

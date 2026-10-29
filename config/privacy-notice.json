@@ -1,0 +1,17 @@
+{
+  "current": "2026-10-29.3",
+  "notices": {
+    "2026-10-29.1": {
+      "file": "/legal/privacy-notices/2026-10-29.1.html",
+      "sha256": "b18a4c3e23514457f9daf6f2e73123db90ca29f00d29cbbb27685eed82f03a00"
+    },
+    "2026-10-29.2": {
+      "file": "/legal/privacy-notices/2026-10-29.2.html",
+      "sha256": "b18a4c3e23514457f9daf6f2e73123db90ca29f00d29cbbb27685eed82f03a00"
+    },
+    "2026-10-29.3": {
+      "file": "/legal/privacy-notices/2026-10-29.3.html",
+      "sha256": "189348c1fd3cd9233451149bb52eafdf6f7eaa22d19f1a01795f1884c3a078f1"
+    }
+  }
+}

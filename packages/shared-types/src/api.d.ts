@@ -1977,6 +1977,11 @@ export interface components {
             /** @description En az bir büyük harf, küçük harf, rakam ve sembol içerir. */
             password: string;
             password_confirmation: string;
+            /**
+             * @description İstemcinin sunduğu arşivlenmiş KVKK aydınlatma sürümü. Açık rıza/okuma kaydı değildir. Eski paket uyumluluğu için isteğe bağlı; gönderilirse sunucudaki bilinen sürümlerden biri olmalıdır.
+             * @example 2026-10-29.1
+             */
+            privacy_notice_version?: string;
         };
         MobileTokenInput: components["schemas"]["LoginInput"] & {
             /** Format: uuid */
@@ -2976,6 +2981,15 @@ export interface components {
                 /** Format: date-time */
                 created_at: string;
             }[];
+            /** @description Yalnız hesabın kendi aydınlatma sunum kayıtları; içerik özeti sunucu manifestinden, zaman sunucudan gelir. */
+            privacy_notice_receipts: {
+                /** @enum {string} */
+                scope: "registration" | "job_application" | "document";
+                notice_version: string;
+                content_hash: string;
+                /** Format: date-time */
+                recorded_at: string;
+            }[];
         };
         ReadinessResponse: {
             data: {
@@ -3058,6 +3072,11 @@ export interface components {
             contact_email: string;
             phone: string;
             cover_letter?: string | null;
+            /**
+             * @description İstemcinin sunduğu arşivlenmiş KVKK aydınlatma sürümü. Açık rıza/okuma kaydı değildir. Eski paket uyumluluğu için isteğe bağlı; gönderilirse sunucudaki bilinen sürümlerden biri olmalıdır.
+             * @example 2026-10-29.1
+             */
+            privacy_notice_version?: string;
         };
         SaveJobPostingInput: {
             title: string;
@@ -3408,6 +3427,11 @@ export interface components {
             contact?: string | null;
             attachments?: string | null;
             signers?: components["schemas"]["DocumentSigner"][];
+            /**
+             * @description İstemcinin sunduğu arşivlenmiş KVKK aydınlatma sürümü. Açık rıza/okuma kaydı değildir. Eski paket uyumluluğu için isteğe bağlı; gönderilirse sunucudaki bilinen sürümlerden biri olmalıdır.
+             * @example 2026-10-29.1
+             */
+            privacy_notice_version?: string;
         };
         DocumentExport: {
             /**
@@ -6757,6 +6781,11 @@ export interface operations {
                     fields: {
                         [key: string]: string;
                     };
+                    /**
+                     * @description İstemcinin sunduğu arşivlenmiş KVKK aydınlatma sürümü. Açık rıza/okuma kaydı değildir. Eski paket uyumluluğu için isteğe bağlı; gönderilirse sunucudaki bilinen sürümlerden biri olmalıdır.
+                     * @example 2026-10-29.1
+                     */
+                    privacy_notice_version?: string;
                 };
             };
         };

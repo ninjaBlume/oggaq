@@ -3,6 +3,7 @@
 namespace App\Modules\Documents\Actions;
 
 use App\Models\User;
+use App\Support\PrivacyNotice;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\Cache;
@@ -16,6 +17,8 @@ class DocumentExports
     public function create(User $user, array $input): array
     {
         $template = $this->templates->find($input['template_id']);
+        PrivacyNotice::record($user, 'document', $input['privacy_notice_version'] ?? null);
+        unset($input['privacy_notice_version']);
         $blank = $input['mode'] === 'blank';
         if ($blank) {
             $input = [

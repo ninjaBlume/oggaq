@@ -1,8 +1,10 @@
 # Kişisel veri, saklama ve imha
 
+29 Ekim KVKK revizyonu: sürümlü aydınlatma kayıtları, sonuçlanmış başvurularda 180 gün, denetim/silme listesinde 3 yıl ve günlük imha kodu hazırlandı; yalnız `oggaq_test` üzerinde doğrulandı. **Yeni davranış henüz canlıya/telefonlara dağıtılmadı.** [Uygulama, prosedürler ve açık işler](legal-review/2026-10-29/kvkk-uygulama-plani.md). Aşağıdaki eski canlı notları tarihsel durumdur.
+
 29 Ekim güncellemesi: toplama yöntemi, teknik tanılama, parola saklama, işleten şirket ve anahtarlı silme listesine ilişkin son olgusal açıklamalar `gizlilik.html`/`hesap-silme.html` ile canlıya alındı; iki web kökü hash ve HTTPS 200 ile doğrulandı. Veri toplama davranışı değişmedi. Kullanım koşullarındaki önerilen hukuk maddesi bu yayına dahil edilmedi; yasal inceleme, temsilci/VERBİS, aktarım güvencesi ve içerik hakkı tamamlandı sayılmaz. Aşağıdaki “canlıya yayımlanmadı” notları ilk hazırlık aşamasının kaydıdır.
 
-Durum: bu belge **teknik envanteri ve uygulanan davranışı** anlatır; hukuki metin değildir. Aydınlatma metni, kullanım koşulları, veri sorumlusu/işleyen rolleri ve yurt dışı aktarım kararları hukukçu gerektirir ve henüz yoktur (bkz. [Açık kalanlar](#açık-kalanlar)). Hesap ekranının teknik sözleşmesi [openapi.json](openapi.json), güvenlik kontrolleri [SECURITY](SECURITY.md) içindedir.
+Durum: bu belge **teknik envanteri ve uygulanan davranışı** anlatır; hukuki uygunluk belgesi değildir. Temsilci/VERBİS ve yurt dışı aktarım güvenceleri somut imza/başvuru kanıtı gerektirir ve tamamlanmadı (bkz. [Açık kalanlar](#açık-kalanlar)). Hesap ekranının teknik sözleşmesi [openapi.json](openapi.json), güvenlik kontrolleri [SECURITY](SECURITY.md) içindedir.
 
 ## Hangi kişisel veri nerede
 
@@ -12,11 +14,13 @@ Durum: bu belge **teknik envanteri ve uygulanan davranışı** anlatır; hukuki 
 | Çalışma alanı, kurum üyelikleri | `study_contexts`, `memberships` | Hesap silinene kadar (üyelik iptali kaydı silmez) |
 | Sınav denemeleri, cevaplar, sonuçlar, eski alıştırmalar, favoriler | `exam_attempts`, `exam_answers`, `practice_attempts`, `favorite_questions` | Hesap silinene kadar; sonuçlar kullanıcı dışında değiştirilemez |
 | Soru bildirimleri (neden, en çok 500 karakterlik not) | `question_reports` | Soru kalitesi için tutulur; hesap silinince bildirenle bağı ve notu silinir |
-| İş başvuruları (ad, e-posta, telefon, isteğe bağlı ön yazı; şifreli), ilan kopyası ve değerlendirme durumu | `job_applications` | Hesap silinene kadar; ilan kapatılması silmez; otomatik süreli imha yok |
+| İş başvuruları (ad, e-posta, telefon, isteğe bağlı ön yazı; şifreli), ilan kopyası ve değerlendirme durumu | `job_applications` | Yeni kod: sonuçlanma/kapanma/geri çekilme/son başvuru tarihinden 180 gün sonra; gerekçeli süreli erteleme mümkün. Canlıda henüz eski davranış |
 | Tarayıcı oturumları (kullanıcı, IP, tarayıcı bilgisi, son etkinlik) | `sessions` (veritabanı sürücüsü) | Boşta 120 dk (`SESSION_LIFETIME`); çıkışta, parola değişiminde ve hesap silinince silinir |
 | Mobil tokenlar (özet, cihaz türü etiketi, son kullanım) | `personal_access_tokens` | En çok 7 gün; günlük `sanctum:prune-expired`; çıkış, parola değişimi ve silmede silinir |
 | Parola sıfırlama jetonu (e-posta, jeton özeti) | `password_reset_tokens` | 60 dk geçerli; günlük `auth:clear-resets`; sıfırlama ve silmede silinir |
-| Denetim kayıtları (aktör, kurum, işlem adı; içerik yok) | `audit_events` | Süresiz; hesap silinince aktör ve hesaba bağlı hedef kimlik koparılır |
+| Denetim kayıtları (aktör, kurum, işlem adı; içerik yok) | `audit_events` | Yeni kod: 3 yıl; hesap silinince aktör/hedef bağı daha erken koparılır. Canlıya dağıtılmadı |
+| Aydınlatma sunum sürümü/özeti/kapsam/zaman | `privacy_notice_receipts` | Hesap silinene kadar; kişisel dışa aktarmaya dahil; açık rıza/okuma takibi değil |
+| İmha işlem kanıtı (politika, tarih, kategori/adet) | `privacy_erasure_runs` | En az 3 yıl; içerik veya iletişim bilgisi yok |
 | Kuyruktaki e-posta işleri (alıcı adresi, **şifreli** yük) | `jobs`, `failed_jobs` | İş bitince silinir; başarısız işler günlük `queue:prune-failed --hours=168` ile 7 gün sonra |
 | Hız sınırı sayaçları (e-posta+IP özeti) | önbellek | Dakikalar–gün |
 

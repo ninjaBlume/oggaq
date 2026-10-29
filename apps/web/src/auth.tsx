@@ -1,3 +1,4 @@
+import { privacyNoticeVersion } from '@oggaq/study-core';
 import { useEffect, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
@@ -65,7 +66,7 @@ export function Login() {
   const cache = useQueryClient();
   const mutation = useMutation({ mutationFn: async () => {
     await api.csrf();
-    if (mode === 'register') { await api.request('post', '/api/v1/auth/register', { body: { name, email, password, password_confirmation: confirmation } }); return null; }
+    if (mode === 'register') { await api.request('post', '/api/v1/auth/register', { body: { name, email, password, password_confirmation: confirmation, privacy_notice_version: privacyNoticeVersion } }); return null; }
     if (mode === 'forgot') { await api.request('post', '/api/v1/auth/forgot-password', { body: { email } }); return null; }
     return (await api.request('post', '/api/v1/auth/login', { body: { email, password } })).data;
   }, onSuccess: async (user) => {

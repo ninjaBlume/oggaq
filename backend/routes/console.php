@@ -14,6 +14,7 @@ Schedule::command('sanctum:prune-expired --hours=24')->daily();
 // Retention of short-lived personal data (docs/PRIVACY.md): expired reset tokens and failed-job payloads do not pile up.
 Schedule::command('auth:clear-resets')->daily();
 Schedule::command('queue:prune-failed --hours=168')->daily();
+Schedule::command('privacy:prune --force')->dailyAt('03:40')->timezone('Europe/Istanbul')->withoutOverlapping();
 Schedule::command('horizon:snapshot')->everyFiveMinutes();
 
 // Proof that the scheduler runs: GET /api/v1/health/ready reports "degraded" when this stops (App\Support\Readiness).

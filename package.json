@@ -33,7 +33,7 @@
     "test:tokens": "npm run test --workspace @oggaq/design-tokens",
     "generate:tokens": "npm run generate --workspace @oggaq/design-tokens",
     "check:store": "node scripts/check-store-release.mjs",
-    "test:store": "node --test scripts/check-store-release.test.mjs scripts/apply-legal-values.test.mjs",
+    "test:store": "node --test scripts/check-store-release.test.mjs scripts/apply-legal-values.test.mjs scripts/privacy-notice.test.mjs",
     "legal:apply": "node scripts/apply-legal-values.mjs",
     "brand:apply": "node scripts/apply-brand.mjs",
     "check:brand": "node scripts/apply-brand.mjs --check",
@@ -45,7 +45,8 @@
     "build:android:beta": "npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs build --platform android --profile play-internal --freeze-credentials",
     "update:android:beta": "npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs update --channel android-beta --platform android --environment preview",
     "build:ios:production": "npm run check:store && npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs build --platform ios --profile production --freeze-credentials",
-    "build:android:production": "npm run check:store && npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs build --platform android --profile production --freeze-credentials"
+    "build:android:production": "npm run check:store && npm exec --yes --package=eas-cli@26.0.0 -- node scripts/eas-sdk58.cjs build --platform android --profile production --freeze-credentials",
+    "privacy:check": "node scripts/privacy-notice.mjs --check"
   },
   "devDependencies": {
     "@redocly/cli": "2.60.0",

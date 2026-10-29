@@ -1,6 +1,6 @@
 import { Text } from "./text";
 import { Linking, Pressable, View } from "react-native";
-import { legalPages, legalUrl } from "@oggaq/study-core";
+import { legalPages, legalUrl, privacyNoticeFile } from "@oggaq/study-core";
 import type { LegalPageId } from "@oggaq/study-core";
 import { frontendUrl } from "./api";
 import { useTask } from "./hooks";
@@ -9,10 +9,11 @@ import { ErrorNotice } from "./ui";
 
 // The public legal pages are static files of the web origin (apps/web/public/legal); the apps open them in the
 // system browser, exactly the address a store listing uses.
-function useLegalLink() {
+function useLegalLink(versioned = false) {
   const task = useTask<unknown>();
   const open = (id: LegalPageId) => {
-    void task.run(() => Linking.openURL(legalUrl(frontendUrl, id)), () => {});
+    const url = id === "gizlilik" && versioned ? `${frontendUrl.replace(/\/+$/, '')}${privacyNoticeFile}` : legalUrl(frontendUrl, id);
+    void task.run(() => Linking.openURL(url), () => {});
   };
   return { open, error: task.error };
 }
@@ -46,7 +47,7 @@ export function LegalSection({ includeAccountDeletion = false }: { includeAccoun
 // Under the auth forms: the pages as text links; on the registration form also the "by registering" notice.
 export function AuthLegal({ register }: { register: boolean }) {
   const { styles } = useTheme();
-  const { open, error } = useLegalLink();
+  const { open, error } = useLegalLink(true);
   const terms = legalPages.find((page) => page.id === "kosullar")!;
   const privacy = legalPages.find((page) => page.id === "gizlilik")!;
   return (
@@ -55,9 +56,9 @@ export function AuthLegal({ register }: { register: boolean }) {
         <Text style={[styles.muted, { fontSize: 12, textAlign: "center" }]}>
           {"Kayıt olarak "}
           <Text accessibilityRole="link" style={styles.link} onPress={() => open("kosullar")}>{terms.title}</Text>
-          {"’nı ve "}
+          {"’nı kabul edersin. Verilerinin işlenmesini "}
           <Text accessibilityRole="link" style={styles.link} onPress={() => open("gizlilik")}>{privacy.title}</Text>
-          {"’nı okuduğunu kabul edersin."}
+          {"’nda açıklıyoruz. Bu, açık rıza talebi değildir."}
         </Text>
       )}
       <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", columnGap: 14 }}>
@@ -76,4 +77,10 @@ export function AuthLegal({ register }: { register: boolean }) {
       <ErrorNotice error={error} />
     </View>
   );
+}
+
+export function PrivacyNoticeLink() {
+  const { styles } = useTheme();
+  const { open, error } = useLegalLink(true);
+  return <View><Text style={[styles.muted, { fontSize: 12 }]}>Codentum’un veri işleme amaçları, alıcıları, saklama süreleri ve hakların için <Text accessibilityRole="link" style={styles.link} onPress={() => open("gizlilik")}>KVKK aydınlatma metni</Text>.</Text><ErrorNotice error={error} /></View>;
 }

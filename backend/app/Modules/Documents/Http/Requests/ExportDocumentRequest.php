@@ -4,6 +4,7 @@ namespace App\Modules\Documents\Http\Requests;
 
 use App\Modules\Documents\Actions\DocumentDates;
 use App\Modules\Documents\Actions\DocumentTemplates;
+use App\Support\PrivacyNotice;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -28,6 +29,7 @@ class ExportDocumentRequest extends FormRequest
         $plain = 'not_regex:/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u';
 
         return [
+            'privacy_notice_version' => PrivacyNotice::rules(),
             'template_id' => ['required', 'string', 'max:80'],
             'mode' => ['required', Rule::in(['blank', 'guided', 'free'])],
             'title' => ['required_unless:mode,blank', 'nullable', 'string', 'max:150', $plain],

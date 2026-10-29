@@ -1,5 +1,7 @@
 # Güvenlik, kişisel veri ve mevzuat
 
+29 Ekim KVKK revizyonunda [ihlale müdahale ve ilgili kişi başvurusu prosedürü](legal-review/2026-10-29/kvkk-uygulama-plani.md) hazırlandı: öğrenmeden itibaren en geç 72 saat Kurul bildirimi, etkilenen kişilere makul en kısa sürede bildirim; başvurularda en geç 30 gün. Bunlar gerçek ihlal tespit edildiği veya resmî bildirim yapıldığı anlamına gelmez. Teknik saklama/aydınlatma kontrolleri yalnız test ortamında; temsilci/VERBİS ve aktarım güvenceleri açık.
+
 ## 29 Ekim 2026 — Symfony MIME başlık enjeksiyonu düzeltmesi
 
 Güncel Composer taraması `symfony/mime v8.0.15` için **CVE-2026-45070** buldu. Symfony'nin güncellenmiş [resmî duyurusu](https://symfony.com/blog/cve-2026-45070-email-header-injection-via-non-token-characters-in-mime-parameter-names), daha önce yamalı olarak listelenen 8.0.12 gibi sürümlerin düzeltmeyi içermediğini açıklıyor. PHP 8.4/Laravel 13 koşullarını koruyan en küçük çözüm olarak yalnız MIME paketi **7.4.22** sürümüne alındı; audit istisnası eklenmedi.

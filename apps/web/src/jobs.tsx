@@ -1,3 +1,5 @@
+import { privacyNoticeVersion, personalDataWarning } from '@oggaq/study-core';
+import { PrivacyNoticeLink } from './legal';
 import { useState } from 'react';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, cursorFromLink } from '@oggaq/api-client';
@@ -37,7 +39,7 @@ export function Jobs() {
 function JobDetail({ job, user, applications }: { job: Job; user: User; applications: () => void }) {
   const cache = useQueryClient();
   const [input, setInput] = useState<ApplicationInput>({ contact_name: user.name, contact_email: user.email, phone: '', cover_letter: '' });
-  const apply = useMutation({ mutationFn: () => api.request('post', '/api/v1/job-postings/{job}/applications', { params: { job: job.id }, body: input }), onSuccess: () => { void cache.invalidateQueries({ queryKey: ['my-job-applications'] }); void cache.invalidateQueries({ queryKey: ['jobs'] }); void cache.invalidateQueries({ queryKey: ['job', job.id] }); } });
+  const apply = useMutation({ mutationFn: () => api.request('post', '/api/v1/job-postings/{job}/applications', { params: { job: job.id }, body: { ...input, privacy_notice_version: privacyNoticeVersion } }), onSuccess: () => { void cache.invalidateQueries({ queryKey: ['my-job-applications'] }); void cache.invalidateQueries({ queryKey: ['jobs'] }); void cache.invalidateQueries({ queryKey: ['job', job.id] }); } });
   const error = (field: string) => apply.error instanceof ApiError ? apply.error.field(field) : undefined;
   return <section className="card job-detail card-tone-blue"><h2>{job.title}</h2><p className="muted">{job.company_name} · {job.city} · {jobWeaponLabels[job.weapon_requirement]}</p>{job.expires_at && <p>Son başvuru: {dateLabel(job.expires_at)}</p>}<p className="job-description">{job.description}</p>
     {apply.isSuccess || job.application_id ? <div className="notice"><p role="status">{apply.isSuccess ? 'Başvurun alındı.' : 'Bu ilana başvurdun.'}</p><button className="text-button" onClick={applications}>Başvurularımı gör</button></div> : !user.email_verified_at ? <VerifyForApplication /> : <form onSubmit={(event) => { event.preventDefault(); apply.mutate(); }}><h3>Başvuru bilgilerin</h3><fieldset disabled={apply.isPending}>
@@ -45,7 +47,7 @@ function JobDetail({ job, user, applications }: { job: Job; user: User; applicat
       <Field label="E-posta adresi" error={error('contact_email')}>{(p) => <input {...p} type="email" autoComplete="email" required maxLength={254} value={input.contact_email} onChange={(e) => setInput({ ...input, contact_email: e.target.value })} />}</Field>
       <Field label="Telefon" error={error('phone')}>{(p) => <input {...p} type="tel" autoComplete="tel" required minLength={7} maxLength={30} value={input.phone} onChange={(e) => setInput({ ...input, phone: e.target.value })} />}</Field>
       <Field label="Kısa ön yazı (isteğe bağlı)" error={error('cover_letter')}>{(p) => <textarea {...p} rows={4} maxLength={2000} value={input.cover_letter ?? ''} onChange={(e) => setInput({ ...input, cover_letter: e.target.value })} />}</Field>
-      <p className="muted job-sharing">{jobApplicationNotice}</p><button className="button primary" type="submit">{apply.isPending ? 'Başvuruluyor…' : 'Başvur'}</button>
+      <p className="muted job-sharing">{jobApplicationNotice} {personalDataWarning}</p><PrivacyNoticeLink /><button className="button primary" type="submit">{apply.isPending ? 'Başvuruluyor…' : 'Başvur'}</button>
     </fieldset></form>}{apply.isError && <><ErrorNotice error={apply.error} />{error('job_posting_id') && <p role="alert">{error('job_posting_id')}</p>}</>}
   </section>;
 }
