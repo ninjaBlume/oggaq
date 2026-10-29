@@ -1,5 +1,8 @@
 # iPhone ve iPad için kapalı beta
 
+**30 Ekim — Çevrimdışı bağlantı düzeltmesi:** 1.0.0 (10) için `01a189af-af05-7051-b1e1-1349ff430668`, `testflight` kanalında. Kullanıcı cihazında teslim ve çevrimdışı sınav kontrolü bekleniyor.
+
+
 **30 Ekim — Otomatik çevrimdışı hazırlık OTA:** TestFlight 1.0.0 (10) runtime `83f44a1944b196ac635706739f028739b76a0762` için update `01a1899c-8dc8-7116-b554-7e7b2a3d968d` yayımlandı. Cihaz teslim teyidi ve otomatik indirme native kontrolü bekleniyor.
 
 

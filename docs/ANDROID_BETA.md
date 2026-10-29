@@ -1,5 +1,8 @@
 # Android kişisel beta ve güncelleme düzeni
 
+**30 Ekim — Çevrimdışı bağlantı düzeltmesi:** 1.0.0 (11) için `01a189b0-3b55-7b60-8ad4-ad2429ca284d`, `android-beta` kanalında. Kullanıcı cihazında teslim ve çevrimdışı sınav kontrolü bekleniyor.
+
+
 **30 Ekim — Otomatik çevrimdışı hazırlık OTA:** Dahili test 1.0.0 (11) runtime `ccaf9274786ff40d6978747b49324beb2fa53296` için update `01a1899d-02c7-7a8b-81e4-e95b9d23f29e` yayımlandı. Cihaz teslim teyidi ve otomatik indirme native kontrolü bekleniyor.
 
 
