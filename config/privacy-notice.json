@@ -1,5 +1,5 @@
 {
-  "current": "2026-10-29.4",
+  "current": "2026-10-29.5",
   "notices": {
     "2026-10-29.1": {
       "file": "/legal/privacy-notices/2026-10-29.1.html",
@@ -16,6 +16,10 @@
     "2026-10-29.4": {
       "file": "/legal/privacy-notices/2026-10-29.4.html",
       "sha256": "c130fb918a3be8f28c695c68d4bb231d9d240b5fa2f79e8fcea0b9eb6bb54945"
+    },
+    "2026-10-29.5": {
+      "file": "/legal/privacy-notices/2026-10-29.5.html",
+      "sha256": "2736dc8d9356ad9d94ab0f16582e53974ec4de4d0d407336bdd6e9333bee462f"
     }
   }
 }

@@ -65,7 +65,7 @@ function DocumentForm({ template, user }: { template: Template; user: User }) {
     }, action);
   }, () => {});
   return <>
-    <Text style={styles.muted}>{personalDataWarning} Belge metni ve PDF bu cihazda hazırlanır; sunucumuza veya yapay zekâ hizmetine gönderilmez. Kaydettiğin veya paylaştığın PDF kopyalarını sen yönetirsin.</Text><PrivacyNoticeLink />
+    <Text style={styles.muted}>{personalDataWarning} Belge metni ve PDF bu cihazda hazırlanır; sunucumuza veya yapay zekâ hizmetine gönderilmez. Kaydettiğin veya paylaştığın PDF kopyalarını sen yönetirsin. Android’de alıcı uygulamanın okuyabilmesi için yaklaşık 5 dakikalık korumalı paylaşım önbelleği kullanılır.</Text><PrivacyNoticeLink />
     <ChoiceGroup choices={modes} value={mode} disabled={pending} onChange={value => { setMode(value); setDraft(value === "free" ? { title: template.title, body: "" } : null); }} />
     <Text style={styles.muted}>{blank ? "Boş alanlı örneği yazdırıp elle doldurabilirsin." : "Bu bir düzenlenebilir örnektir. Kurumunun istediği biçimi ve başvuru yolunu kontrol et."}</Text>
     {mode === "guided" && !draft && <Card compact>
