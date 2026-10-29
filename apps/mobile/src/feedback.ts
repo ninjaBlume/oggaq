@@ -14,3 +14,11 @@ export function errorMessage(error: unknown): string {
   if (error instanceof TypeError) return "Sunucuya ulaşılamadı. İnternet bağlantını kontrol edip yeniden dene.";
   return "Beklenmeyen bir sorun oluştu. Yeniden deneyebilirsin.";
 }
+
+/** A personal native session may use only previously prepared past exams. */
+export function connectionReadMessage(error: unknown, retained: boolean, offlineHint: boolean): string {
+  const offline = error instanceof TypeError || (error instanceof ApiError && error.status === 0);
+  const prefix = retained ? 'Son yüklenen bilgiler gösteriliyor. ' : '';
+  if (offlineHint && offline) return `${prefix}Deneme ve Ders Sınavları bölümünde cihazda hazır olan sınavları çözebilirsin.`;
+  return retained ? `${prefix}Bağlantını kontrol edip yeniden deneyebilirsin.` : errorMessage(error);
+}

@@ -63,6 +63,7 @@ import { AppUpdatesProvider } from "./appUpdates";
 import { OfflineExamScreen } from './offline/screen';
 import { OfflineAutoSync } from './offline/autoSync';
 import { OfflineAutoPrepare } from './offline/autoPrepare';
+import { OfflineNoticeContext } from './offline/noticeContext';
 
 type Routes = {
   Main: undefined;
@@ -75,7 +76,7 @@ const primaryTabs: readonly MainTab[] = ["home", "deneme", "ders", "history", "p
 function ConnectionNotice({ retry }: { retry: () => void }) {
   const { styles, palette } = useTheme();
   return <View testID="connection-notice" accessibilityRole="alert" style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: palette.softPrimary }}>
-    <Text style={styles.muted}>{Platform.OS === 'web' ? 'Bağlantı yenilenemedi. Kayıtlı bilgilerin korunuyor; bağlantını kontrol et.' : 'Bağlantı yenilenemedi. İndirdiğin sınavları çözebilirsin; diğer işlemler için bağlantını kontrol et.'}</Text>
+    <Text style={styles.muted}>{Platform.OS === 'web' ? 'Bağlantı yenilenemedi. Kayıtlı bilgilerin korunuyor; bağlantını kontrol et.' : 'Bağlantı yenilenemedi. Bağlantını kontrol edip yeniden deneyebilirsin.'}</Text>
     <TextLink onPress={retry}>Bağlantıyı yeniden dene</TextLink>
   </View>;
 }
@@ -400,6 +401,7 @@ function Workspace({
     <OfflineAutoSync user={user} context={context} />
     <OfflineAutoPrepare user={user} context={context} />
     {(query.error || query.refreshError) && !connectionWarning && (Platform.OS === "web" || context.kind !== "personal") ? <ConnectionNotice retry={() => void query.reload(true)} /> : null}
+    <OfflineNoticeContext.Provider value={Platform.OS !== "web" && context.kind === "personal"}>
     <NavigationContainer
       key={`${user.id}-${context.id}`}
       theme={navigationTheme}
@@ -450,6 +452,7 @@ function Workspace({
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
+    </OfflineNoticeContext.Provider>
     </View>
   );
 }

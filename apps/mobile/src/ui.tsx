@@ -2,7 +2,7 @@ import { cardDensity, cardTone, type CardTone } from "@oggaq/design-tokens";
 import { Text, TextInput } from "./text";
 import { Children } from "react";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { ActivityIndicator, Modal, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
@@ -20,7 +20,8 @@ import {
   X,
 } from "./icons";
 import type { LucideIcon } from "lucide-react-native";
-import { errorMessage } from "./feedback";
+import { connectionReadMessage } from "./feedback";
+import { OfflineNoticeContext } from "./offline/noticeContext";
 import { isTransientReadError } from "./readRecovery";
 import { buttonDensity, shape } from "./theme";
 import { useLayout, useTheme } from "./themeContext";
@@ -321,6 +322,7 @@ export function ErrorNotice({ error, retry, title = "İşlem tamamlanamadı", re
   retained?: boolean;
 }) {
   const { palette, styles } = useTheme();
+  const offlineHint = useContext(OfflineNoticeContext);
   if (!error) return null;
   const connection = read && isTransientReadError(error);
   const color = connection ? palette.primary : palette.red;
@@ -332,7 +334,7 @@ export function ErrorNotice({ error, retry, title = "İşlem tamamlanamadı", re
         <NoticeIcon size={20} color={color} />
         <View style={{ flex: 1, gap: 5 }}>
           <Text style={[styles.buttonText, { color }]}>{connection ? "Bağlantı yenilenemedi" : title}</Text>
-          <Text style={[styles.muted, { color }]}>{connection && retained ? "Son yüklenen bilgiler gösteriliyor. Bağlantını kontrol edip yeniden deneyebilirsin." : errorMessage(error)}</Text>
+          <Text style={[styles.muted, { color }]}>{connectionReadMessage(error, connection && retained, connection && offlineHint)}</Text>
         </View>
       </View>
       {retry && <TextLink onPress={retry}>Yeniden dene</TextLink>}
