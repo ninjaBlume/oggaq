@@ -10,7 +10,7 @@
 #   --dir DIR            use the newest backup (LATEST heartbeat) and the newest erasure export in DIR
 #   --file / --erasures-file   explicit encrypted files
 #   --identity KEY       age private key file (gpg: the private key must be in the running user's keyring)
-#   --backend-dir DIR    Laravel backend of THIS revision (enables the accounts:reapply-erasures dry run; needs php)
+#   --backend-dir DIR    Laravel backend of THIS revision (enables the privacy:reapply-erasures dry run; needs php)
 #   --compare-db NAME    additionally compare content checksum and counts with this database (rehearsal only)
 #   --keep               do not drop the throwaway database (for manual inspection)
 # Connection: PGHOST/PGPORT/PGUSER/PGPASSFILE of a role that may create databases (restore.sh rules apply).
@@ -89,7 +89,7 @@ if [ -n "$erasures" ] && [ -n "$backend" ]; then
     *.gpg) gpg --batch --yes --no-tty --decrypt "$erasures" >"$tmpdir/erasures.ndjson" ;;
     *) die "Silme listesi .age ya da .gpg olmalı." ;;
   esac
-  ( cd "$backend" && DB_DATABASE="$scratch" php artisan accounts:reapply-erasures --from="$tmpdir/erasures.ndjson" )
+  ( cd "$backend" && DB_DATABASE="$scratch" php artisan privacy:reapply-erasures --from="$tmpdir/erasures.ndjson" )
 else
   log "Atlandı (--erasures-file ve --backend-dir verilmedi)."
 fi

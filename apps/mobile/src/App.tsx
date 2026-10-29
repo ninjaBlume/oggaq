@@ -1,3 +1,4 @@
+import { clearDocumentFiles } from './document-output';
 import { Text } from "./text";
 import { RandomExam } from "./randomExam";
 import { ExamHeaderTitle } from "./examHeaderTitle";
@@ -569,6 +570,9 @@ function Application() {
 function Root() {
   const { styles } = useTheme();
   const fontTask = useTask<void>();
+  const documentCleanup = useTask<void>();
+  function cleanDocuments() { void documentCleanup.run(async () => clearDocumentFiles(), () => {}); }
+  useEffect(cleanDocuments, []);
   function loadFont() { void fontTask.run(loadBrandFont, () => {}); }
   useEffect(loadFont, []);
   return (
@@ -578,6 +582,7 @@ function Root() {
         style={styles.shell}
       >
         {fontTask.error ? <View style={{ padding: 12 }}><ErrorNotice title="Marka yazısı yüklenemedi" error={fontTask.error} retry={loadFont} /></View> : null}
+        {documentCleanup.error ? <View style={{ padding: 12 }}><ErrorNotice title="Geçici belge dosyaları temizlenemedi" error={documentCleanup.error} retry={cleanDocuments} /></View> : null}
         <AppUpdatesProvider><Application /></AppUpdatesProvider>
       </KeyboardAvoidingView>
     </MotionProvider>

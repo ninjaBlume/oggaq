@@ -17,7 +17,8 @@ oggaq_init   # re-evaluate path defaults the config may have changed
 : "${PGDATABASE:=oggaq}"
 BACKUP_DIR="${BACKUP_DIR:-${OGGAQ_BASE:-$HOME/oggaq-development}/backups}"
 MAX_AGE_HOURS="${MAX_AGE_HOURS:-26}"
-export KEEP_DAILY="${KEEP_DAILY:-7}" KEEP_WEEKLY="${KEEP_WEEKLY:-4}" KEEP_MONTHLY="${KEEP_MONTHLY:-6}"
+export KEEP_DAILY="${KEEP_DAILY:-7}" KEEP_WEEKLY="${KEEP_WEEKLY:-4}" KEEP_MONTHLY="${KEEP_MONTHLY:-0}"
+export BACKUP_MAX_DAYS="${BACKUP_MAX_DAYS:-35}"
 
 if [ "${1:-}" = --check ]; then
   age=$(heartbeat_age "$BACKUP_DIR/LATEST")

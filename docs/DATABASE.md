@@ -185,3 +185,7 @@ Identity/Tenancy/QuestionBank FK/CHECK/unique, transaction ve yayımlanmış iç
 ## Resmî sınav takvimi
 
 `2026_10_26_000004_create_exam_calendar`, `exam_calendar_sources` (year PK, sabit EGM source_url, status, checked_at, verified_at, active_snapshot_id) ve `exam_calendar_snapshots` (UUID PK, year FK, unique year/content_hash, jsonb entries, created_at) tablolarını ekler. Kaynak, snapshot'ı aynı yıl üzerinden bileşik FK ile seçer. Snapshot UPDATE/DELETE PostgreSQL trigger'ı ile engellenir. Soru ve puanlama tablolarına bağlanmaz, mevcut kayıtları güncellemez. Ayrıntılar [EXAM_CALENDAR](EXAM_CALENDAR.md).
+
+## 29 Ekim 2026 — Başvuru silme ve yedekten dönüş
+
+`2026_10_29_000002_add_application_erasure_ledger`: `application_erasures` tablosu UUID anahtar, unique/indexli `application_hash` (64 hex, alan ayrımlı HMAC-SHA256), indeksli `erased_at`; kişiye FK yok, iletişim/metin/başvuru UUID’si tutulmaz. Aynı hesap silme defteri anahtarı güvenli alan ayrımıyla kullanılır. Güncelleme ve üç yıldan önce silme trigger ile reddedilir. `privacy_erasure_runs.application_erasures` varsayılan sıfır; negatif ve toplam sıfır kayıt koruması yeni sayacı kapsar. Mevcut iş verisi migration’da değişmez. Operasyonel rollback bu defteri kaldırmaz; yalnız test ortamında geri alınabilir. [İşletim](PRIVACY.md).

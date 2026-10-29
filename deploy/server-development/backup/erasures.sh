@@ -14,7 +14,8 @@ config="${BACKUP_ENV:-${OGGAQ_BASE:-$HOME/oggaq-development}/shared/backup.env}"
 if [ -f "$config" ]; then set -a; . "$config"; set +a; fi
 oggaq_init   # re-evaluate path defaults the config may have changed
 BACKUP_DIR="${BACKUP_DIR:-${OGGAQ_BASE:-$HOME/oggaq-development}/backups}"
-export KEEP_DAILY="${KEEP_DAILY:-7}" KEEP_WEEKLY="${KEEP_WEEKLY:-4}" KEEP_MONTHLY="${KEEP_MONTHLY:-6}"
+export KEEP_DAILY="${KEEP_DAILY:-7}" KEEP_WEEKLY="${KEEP_WEEKLY:-4}" KEEP_MONTHLY="${KEEP_MONTHLY:-0}"
+export BACKUP_MAX_DAYS="${BACKUP_MAX_DAYS:-35}"
 
 if [ "${1:-}" = --check ]; then
   age=$(heartbeat_age "$BACKUP_DIR/LATEST-ERASURES")
@@ -38,7 +39,7 @@ trap 'status=$?; release_lock; rm -f -- "$plain" "${partial:-}"; true' EXIT
 
 # The ledger is a few hashes per deleted account; stdout of the artisan command, written to a private temp file only to
 # compare it with the previous export (hashes are not personal data, and the file is removed at exit).
-app_artisan accounts:export-erasures >"$plain" || die "Silme listesi okunamadı (accounts:export-erasures)."
+app_artisan privacy:export-erasures >"$plain" || die "Silme listesi okunamadı (privacy:export-erasures)."
 now_digest="$(sha256_of "$plain")"
 state="$BACKUP_DIR/.erasures-state"
 last_digest="$(state_value "$state" plain_sha256)"

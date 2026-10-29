@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\PrivateLogTap;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -54,11 +55,12 @@ return [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
+            'channels' => explode(',', (string) env('LOG_STACK', 'daily')),
             'ignore_exceptions' => false,
         ],
 
         'single' => [
+            'tap' => [PrivateLogTap::class],
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
@@ -66,14 +68,16 @@ return [
         ],
 
         'daily' => [
+            'tap' => [PrivateLogTap::class],
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
-            'max_files' => env('LOG_DAILY_DAYS', 14),
+            'days' => 14,
             'replace_placeholders' => true,
         ],
 
         'monthly' => [
+            'tap' => [PrivateLogTap::class],
             'driver' => 'monthly',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
@@ -82,6 +86,7 @@ return [
         ],
 
         'slack' => [
+            'tap' => [PrivateLogTap::class],
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
             'username' => env('LOG_SLACK_USERNAME', env('APP_NAME', 'Laravel')),
@@ -91,6 +96,7 @@ return [
         ],
 
         'papertrail' => [
+            'tap' => [PrivateLogTap::class],
             'driver' => 'monolog',
             'level' => env('LOG_LEVEL', 'debug'),
             'handler' => env('LOG_PAPERTRAIL_HANDLER', SyslogUdpHandler::class),
@@ -103,6 +109,7 @@ return [
         ],
 
         'stderr' => [
+            'tap' => [PrivateLogTap::class],
             'driver' => 'monolog',
             'level' => env('LOG_LEVEL', 'debug'),
             'handler' => StreamHandler::class,
@@ -114,6 +121,7 @@ return [
         ],
 
         'syslog' => [
+            'tap' => [PrivateLogTap::class],
             'driver' => 'syslog',
             'level' => env('LOG_LEVEL', 'debug'),
             'facility' => env('LOG_SYSLOG_FACILITY', LOG_USER),
@@ -121,6 +129,7 @@ return [
         ],
 
         'errorlog' => [
+            'tap' => [PrivateLogTap::class],
             'driver' => 'errorlog',
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
@@ -132,7 +141,7 @@ return [
         ],
 
         'emergency' => [
-            'path' => storage_path('logs/laravel.log'),
+            'path' => storage_path('logs/laravel-emergency-'.date('Y-m-d').'.log'),
         ],
 
     ],

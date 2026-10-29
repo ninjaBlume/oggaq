@@ -1,6 +1,12 @@
 import { expect, it } from "vitest";
 import { ApiError } from "@oggaq/api-client";
 import { errorMessage } from "./feedback";
+import { DocumentValidationError } from '@oggaq/study-core';
+
+it('shows approved local validation messages while unexpected errors stay private', () => {
+  expect(errorMessage(new DocumentValidationError('Tarihi gg/aa/yyyy biçiminde girin.'))).toBe('Tarihi gg/aa/yyyy biçiminde girin.');
+  expect(errorMessage(new Error('private PDF path'))).not.toContain('private PDF path');
+});
 
 it("shows actionable validation without exception details", () => {
   expect(errorMessage(new ApiError(422, { errors: { duration_seconds: ["Süre 1 ile 180 dakika arasında olmalı."] } }))).toBe("Süre 1 ile 180 dakika arasında olmalı.");

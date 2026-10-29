@@ -9,7 +9,7 @@
 #   --yes                onay sorusunu atlar (otomasyon/prova)
 # Bağlantı: PGHOST/PGPORT/PGUSER/PGPASSFILE; veritabanı oluşturma yetkisi gerekir (genelde `sudo -u postgres`).
 # Yedek geri yüklendikten sonra: verify.sh çalıştırılır ve silinmiş hesaplar yeniden uygulanır
-# (accounts:reapply-erasures, docs/DEPLOYMENT.md "Geri yükleme ve silinen hesaplar"). Bu betik onları KENDİSİ çalıştırmaz.
+# (privacy:reapply-erasures, docs/DEPLOYMENT.md "Geri yükleme ve silinen hesaplar"). Bu betik onları KENDİSİ çalıştırmaz.
 set -Eeuo pipefail
 umask 077
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -92,7 +92,7 @@ cat <<MSG
 Sıradaki adımlar (elle):
   1. $here/verify.sh $target            # satır sayıları, tetikleyiciler, içerik özeti
   2. Silinen hesapları yeniden uygula (yedekten daha yeni silmeler için ayrı silme listesini ver):
-       cd /srv/oggaq/current/backend && DB_DATABASE=$target php artisan accounts:reapply-erasures --from=<erasures-….ndjson>     # önce sayar
+       cd /srv/oggaq/current/backend && DB_DATABASE=$target php artisan privacy:reapply-erasures --from=<erasures-….ndjson>     # önce sayar
        ... --force ekleyerek gerçekten siler
   3. Uygulamayı bu veritabanına yönlendirmeden önce yukarıdakilerin ikisi de temiz olmalı.
 MSG

@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Modules\Identity\AccountErasureLedger;
 use App\Modules\Identity\Notifications\AccountDeletedNotification;
 use App\Support\ApiProblem;
+use App\Support\PrivacyErasureLedger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
@@ -58,6 +59,9 @@ class DeleteAccount
     private function erase(User $user): void
     {
         DB::table('exam_score_results')->where('user_id', $user->id)->delete();
+        foreach (DB::table('job_applications')->where('user_id', $user->id)->pluck('id') as $id) {
+            PrivacyErasureLedger::recordApplication($id);
+        }
         DB::table('job_applications')->where('user_id', $user->id)->delete();
         $contexts = DB::table('study_contexts')->where('user_id', $user->id)->pluck('id')->all();
         $attempts = DB::table('exam_attempts')->whereIn('study_context_id', $contexts)->select('id');

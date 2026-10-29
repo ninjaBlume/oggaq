@@ -13,18 +13,7 @@ test.beforeEach(async ({ page }) => {
 });
 test.afterAll(() => fixture('cleanup'));
 
-// Production nginx adds this policy in addition to the controller's nonce policy.
-// Both policies must permit the handoff; inline script would be blocked by nginx.
-test.beforeEach(async ({ context }) => {
-  await context.route('**/api/v1/document-exports/viewer', async route => {
-    const response = await route.fetch();
-    const headers = response.headers();
-    headers['content-security-policy'] += ", default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; object-src 'none'";
-    await route.fulfill({ response, headers });
-  });
-});
-
-test('dilekçe: gerçek API ile taslak, düzenleme, önizleme ve tek kullanımlık PDF', async ({ page, context }) => {
+test('dilekçe: gerçek katalog, cihazda taslak ve kişisel içerik göndermeyen yazdırma', async ({ page, context }) => {
   await page.getByRole('button', { name: 'Menüyü aç', exact: true }).click();
   await page.getByRole('button', { name: 'Dilekçe hazırla', exact: true }).click();
   const create = page.getByRole('button', { name: 'Taslağı oluştur', exact: true });
@@ -43,25 +32,15 @@ test('dilekçe: gerçek API ile taslak, düzenleme, önizleme ve tek kullanıml�
   await expect(page.getByText('Sentetik çizelge talebi', { exact: true })).toBeVisible();
   await expect(page.getByText('Tarih: 28/10/2026', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Kapat', exact: true }).click();
-  const exported = page.waitForResponse(r => r.url().endsWith('/api/v1/document-exports') && r.request().method() === 'POST');
   const popup = context.waitForEvent('page');
-  await page.getByRole('button', { name: 'PDF aç / indir', exact: true }).click();
+  await page.getByRole('button', { name: 'PDF kaydet / paylaş', exact: true }).click();
   const viewer = await popup;
-  await expect(viewer.getByRole('heading', { name: 'Belgen hazır' })).toBeVisible();
-  await expect(viewer).not.toHaveURL(/#/);
-  const originalUrl = (await (await exported).json()).data.viewer_url as string;
-  const changed = new URL(originalUrl); changed.hash = 'a'.repeat(64);
-  await viewer.goto(changed.toString());
-  await expect(viewer).not.toHaveURL(/#/);
-  await expect(viewer.locator('#ticket')).toHaveValue('a'.repeat(64));
-  await viewer.goto(originalUrl);
-  await expect(viewer).not.toHaveURL(/#/);
-  expect(await viewer.locator('#ticket').inputValue() === new URL(originalUrl).hash.slice(1)).toBe(true);
-  const response = viewer.waitForResponse(r => r.url().endsWith('/document-exports/open'));
-  await viewer.getByRole('button', { name: 'PDF’yi aç', exact: true }).click();
-  const pdf = await response;
-  expect(pdf.status()).toBe(200);
-  expect(pdf.headers()['content-type']).toBe('application/pdf');
+  await expect(viewer.getByRole('heading', { name: 'Sentetik çizelge talebi' })).toBeVisible();
+  expect(viewer.url()).not.toMatch(/[?#]/);
+  expect(viewer.url() === 'about:blank' || viewer.url() === mobilePreviewUrl+'/').toBe(true);
+  await expect(viewer.locator('.signer')).toContainText('Örnek Öğrenci');
+  expect(await viewer.evaluate(() => window.opener === null)).toBe(true);
+  await viewer.close();
   await page.screenshot({ path: 'artifacts/documents/petition-phone.png', fullPage: true });
 });
 
@@ -74,11 +53,11 @@ test('tutanak: matbu PDF ve serbest metin, rol düzenleme; telefon/tablet taşma
   await page.getByRole('button', { name: 'Matbu örnek', exact: true }).click();
   await expect(page.getByLabel('Belge metni', { exact: true })).toHaveCount(0);
   const popup = context.waitForEvent('page');
-  await page.getByRole('button', { name: 'PDF aç / indir', exact: true }).click();
+  await page.getByRole('button', { name: 'PDF kaydet / paylaş', exact: true }).click();
   const viewer = await popup;
-  const response = viewer.waitForResponse(r => r.url().endsWith('/document-exports/open'));
-  await viewer.getByRole('button', { name: 'PDF’yi aç', exact: true }).click();
-  expect((await response).status()).toBe(200);
+  await expect(viewer.getByRole('heading', { name: 'Teslim-tesellüm tutanağı' })).toBeVisible();
+  expect(viewer.url()).not.toMatch(/[?#]/);
+  expect(viewer.url() === 'about:blank' || viewer.url() === mobilePreviewUrl+'/').toBe(true);
   await viewer.close();
   await page.getByRole('button', { name: 'Serbest düzenleme', exact: true }).click();
   await page.getByLabel('Belge metni', { exact: true }).fill('Sentetik eşya, sağlam durumda teslim edildi.');
@@ -94,20 +73,26 @@ test('tutanak: matbu PDF ve serbest metin, rol düzenleme; telefon/tablet taşma
   await page.screenshot({ path: 'artifacts/documents/report-tablet.png', fullPage: true });
 });
 
-test('taslak isteği başarısız olunca girilen metin korunur ve tekrar oluşturulabilir', async ({ page }) => {
+test('belge hazırlama ve PDF sırasında sunucuya kişisel içerik gönderilmez', async ({ page, context }) => {
+  const forbidden: string[] = [];
+  context.on('request', request => {
+    if (request.method() === 'POST' && /documents\/prepare|document-exports/.test(request.url())) forbidden.push(request.url());
+  });
+  await page.route('**/api/v1/documents/prepare', route => route.abort());
+  await page.route('**/api/v1/document-exports', route => route.abort());
   await page.getByRole('button', { name: 'Menüyü aç', exact: true }).click();
   await page.getByRole('button', { name: 'Dilekçe hazırla', exact: true }).click();
-  await page.getByLabel('Talep veya bildirim', { exact: true }).fill('Sentetik talep');
-  await page.getByLabel('Açıklama / gerekçe', { exact: true }).fill('Sentetik açıklama');
-  await page.route('**/api/v1/documents/prepare', route => route.fulfill({ status: 503, contentType: 'application/problem+json', body: JSON.stringify({ title: 'Geçici sorun', detail: 'Yeniden deneyebilirsin.' }) }));
+  await page.getByLabel('Talep veya bildirim', { exact: true }).fill('Sentetik yerel talep');
+  await page.getByLabel('Açıklama / gerekçe', { exact: true }).fill('Özel metin yalnız cihazda.');
   await page.getByRole('button', { name: 'Taslağı oluştur', exact: true }).click();
-  await expect(page.getByText('Yeniden deneyebilirsin.', { exact: true })).toBeVisible();
-  await expect(page.getByLabel('Talep veya bildirim', { exact: true })).toHaveValue('Sentetik talep');
-  await page.unroute('**/api/v1/documents/prepare');
-  await page.getByRole('button', { name: 'Taslağı oluştur', exact: true }).click();
-  await expect(page.getByLabel('Belge metni', { exact: true })).toContainText('Sentetik talep');
+  await expect(page.getByLabel('Belge metni', { exact: true })).toContainText('Sentetik yerel talep');
+  const popup = context.waitForEvent('page');
+  await page.getByRole('button', { name: 'PDF kaydet / paylaş', exact: true }).click();
+  const viewer = await popup;
+  await expect(viewer.getByText('Özel metin yalnız cihazda.', { exact: false })).toBeVisible();
+  expect(forbidden).toEqual([]);
+  await viewer.close();
 });
-
 
 test('izin tarihleri gg/aa/yyyy girilir; ters tarih aralığı açıklanır ve düzeltilince özgün metin oluşur', async ({ page }) => {
   await page.getByRole('button', { name: 'Menüyü aç', exact: true }).click();

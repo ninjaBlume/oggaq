@@ -149,3 +149,5 @@ export { upcomingCountdown, nextExamRefreshDelay } from './upcoming';
 export type { UpcomingExam } from './upcoming';
 export { calendarRules } from './calendar-rules';
 export { displayPersonName, personInitials } from './person-name';
+export { draftDocument, blankDocument, documentDate, documentHtml, DocumentValidationError } from './documents';
+export type { LocalDocument } from './documents';

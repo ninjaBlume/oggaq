@@ -1,10 +1,11 @@
-import { privacyNoticeVersion, personalDataWarning } from '@oggaq/study-core';
+import { draftDocument, blankDocument, personalDataWarning } from '@oggaq/study-core';
 import { PrivacyNoticeLink } from './legal';
 import { useState } from "react";
-import { Linking, View } from "react-native";
+import { View } from "react-native";
 import type { components, User } from "@oggaq/shared-types";
 import brand from "../../../config/brand.json";
-import { api, apiUrl } from "./api";
+import { api } from "./api";
+import { outputDocument } from './document-output';
 import { ChoiceGroup } from "./expressive";
 import { useResource, useTask } from "./hooks";
 import { Text } from "./text";
@@ -55,17 +56,16 @@ function DocumentForm({ template, user }: { template: Template; user: User }) {
   const pending = prepare.pending || output.pending;
   const missing = template.fields.some(field => !field.optional && !fields[field.key]?.trim());
   const blank = mode === "blank";
-  const createDraft = () => void prepare.run(async () => (await api.request("post", "/api/v1/documents/prepare", { body: { template_id: template.id, fields, privacy_notice_version: privacyNoticeVersion } })).data, setDraft);
-  const exportPdf = () => void output.run(async () => {
-    const result = await api.request("post", "/api/v1/document-exports", { body: { template_id: template.id, mode, privacy_notice_version: privacyNoticeVersion,
-      ...(blank ? {} : { title: draft?.title ?? "", body: draft?.body ?? "", recipient: recipient || null,
-        document_date: date || null, address: address || null, contact: contact || null, attachments: attachments || null, signers }) } });
-    const url = new URL(result.data.viewer_url);
-    if (url.origin !== new URL(apiUrl).origin || url.pathname !== "/api/v1/document-exports/viewer" || !/^#[a-f0-9]{64}$/.test(url.hash)) throw new Error("PDF bağlantısı doğrulanamadı.");
-    await Linking.openURL(url.toString());
+  const createDraft = () => void prepare.run(async () => ({ title: template.title, body: draftDocument(template, fields) }), setDraft);
+  const exportPdf = (action: 'share' | 'print' = 'share') => void output.run(async () => {
+    await outputDocument(blank ? blankDocument(template) : {
+      title: draft?.title ?? '', body: draft?.body ?? '', recipient: recipient || null,
+      document_date: date || null, address: address || null, contact: contact || null,
+      attachments: attachments || null, signers,
+    }, action);
   }, () => {});
   return <>
-    <Text style={styles.muted}>{personalDataWarning} Metin, belgeyi hazırlamak için sunucuya gönderilir; PDF içeriği en çok 5 dakika şifreli geçici önbellekte tutulur. Kaydettiğin veya paylaştığın PDF kopyalarını sen yönetirsin.</Text><PrivacyNoticeLink />
+    <Text style={styles.muted}>{personalDataWarning} Belge metni ve PDF bu cihazda hazırlanır; sunucumuza veya yapay zekâ hizmetine gönderilmez. Kaydettiğin veya paylaştığın PDF kopyalarını sen yönetirsin.</Text><PrivacyNoticeLink />
     <ChoiceGroup choices={modes} value={mode} disabled={pending} onChange={value => { setMode(value); setDraft(value === "free" ? { title: template.title, body: "" } : null); }} />
     <Text style={styles.muted}>{blank ? "Boş alanlı örneği yazdırıp elle doldurabilirsin." : "Bu bir düzenlenebilir örnektir. Kurumunun istediği biçimi ve başvuru yolunu kontrol et."}</Text>
     {mode === "guided" && !draft && <Card compact>
@@ -95,9 +95,9 @@ function DocumentForm({ template, user }: { template: Template; user: User }) {
       <Button secondary onPress={() => setPreview(true)}>Metni önizle</Button>
       <Sheet visible={preview} title="Belge önizlemesi" close={() => setPreview(false)}><Text style={styles.heading}>{draft.title}</Text>{!!recipient && <Text style={styles.text}>{recipient}</Text>}{!!date && <Text style={styles.text}>{`Tarih: ${date}`}</Text>}<Text style={styles.text}>{draft.body}</Text>{!!attachments && <Text style={styles.text}>{`Ekler\n${attachments}`}</Text>}{signers.map((signer, i) => <Text key={i} style={styles.text}>{`${signer.role}\n${signer.name || "Adı soyadı"}\nİmza: ……………………`}</Text>)}</Sheet>
     </>}
-    {(blank || draft) && <Card compact tone="blue"><Button disabled={pending || (!blank && (!draft?.body.trim() || !draft.title.trim() || signers.some(s => !s.role.trim())))} onPress={exportPdf}>{output.pending ? "PDF hazırlanıyor…" : "PDF aç / indir"}</Button><Text style={styles.muted}>PDF’yi tarayıcıda açarak kaydedebilir, paylaşabilir veya yazdırabilirsin.</Text></Card>}
-    <ErrorNotice title="PDF açılamadı" error={output.error} retry={exportPdf} />
-    <Text style={[styles.muted, { fontSize: 12 }]}>Belge bilgileri PDF hazırlamak için sunucuya iletilir; geçici erişim 5 dakika sonra sona erer. Uygulamada belge arşivi tutulmaz. Bu ekrandan çıkınca metnini yeniden girmen gerekir. Belge kurumlara gönderilmez ve elektronik olarak imzalanmaz.</Text>
+    {(blank || draft) && <Card compact tone="blue"><Button disabled={pending || (!blank && (!draft?.body.trim() || !draft.title.trim() || signers.some(s => !s.role.trim())))} onPress={() => exportPdf()}>{output.pending ? "PDF hazırlanıyor…" : "PDF kaydet / paylaş"}</Button><Button secondary disabled={pending} onPress={() => exportPdf('print')}>Yazdır</Button><Text style={styles.muted}>Paylaşım menüsünden PDF’yi kaydet veya gönder. Yazdırmak için aşağıdaki seçeneği kullan.</Text></Card>}
+    <ErrorNotice title="PDF açılamadı" error={output.error} retry={() => exportPdf()} />
+    <Text style={[styles.muted, { fontSize: 12 }]}>Belge yalnız cihazda hazırlanır; uygulamada belge arşivi tutulmaz. Paylaşmayı seçtiğin uygulama veya yazıcıya belgeyi sen iletirsin. Bu ekrandan çıkınca metnini yeniden girmen gerekir. Belge kurumlara gönderilmez ve elektronik olarak imzalanmaz.</Text>
     <Text style={[styles.muted, { fontSize: 12 }]}>{`${brand.name} için hazırlanmış özgün ve düzenlenebilir örnektir.`}</Text>
   </>;
 }

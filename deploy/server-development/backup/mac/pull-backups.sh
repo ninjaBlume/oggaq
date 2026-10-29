@@ -20,7 +20,8 @@ SSH_KEY="${SSH_KEY:-$HOME/.ssh/oggaq_dev_ed25519}"
 STALE_HOURS="${STALE_HOURS:-26}"
 ERASURES_STALE_HOURS="${ERASURES_STALE_HOURS:-6}"
 # The Mac keeps its own, longer history; it is cheap and independent of the server's pruning.
-export KEEP_DAILY="${KEEP_DAILY:-14}" KEEP_WEEKLY="${KEEP_WEEKLY:-8}" KEEP_MONTHLY="${KEEP_MONTHLY:-12}"
+export KEEP_DAILY="${KEEP_DAILY:-14}" KEEP_WEEKLY="${KEEP_WEEKLY:-4}" KEEP_MONTHLY="${KEEP_MONTHLY:-0}"
+export BACKUP_MAX_DAYS="${BACKUP_MAX_DAYS:-35}"
 PRUNE_SCRIPT="${PRUNE_SCRIPT:-$here/../../../backup/prune.sh}"
 mode="${1:-pull}"
 

@@ -1,5 +1,9 @@
 # Sunucu geliştirme ortamı: yedekleme, geri yükleme ve izleme
 
+**29 Ekim KVKK devam politikası:** yeni kod DB yedeklerini sunucu/Mac için **35 takvim günü** ile sınırlar (`BACKUP_MAX_DAYS=35`); günlük/haftalık kurtarma noktaları korunur, aylık DB kopyası kaldırılır. Sınır dosya sayısından veya değişiklik tarihinden değil UTC dosya adından hesaplanır; seyrek eski yedek de düşer. Bu süre kanuni sabit süre değil, dört haftalık kurtarma penceresi için ölçülülük seçimidir. Önce güncel şifreli yedek/sağlama toplamı ve `--dry-run` kontrol edilir. Gerçek uygulama durumu TESTING yayın kaydındadır; aşağıdaki 6/12 ay ilk kurulum tarihçesidir.
+
+Silme listesi artık **hesap + tekil iş başvurusu** HMAC’lerini içerir (`privacy:export-erasures`); anonim veri değildir. Değişmeyen en yeni `LATEST-ERASURES` hedefi, dosya yaşı 35 günü aşsa bile silinmez: DB yedeği değil, eski yedeklerden silinmiş verinin geri gelmesini önleyen sınırlı defterdir. Yeni silme yoksa yeni şifreli kopya yazılmaz; eski defterlerin gereksiz kopyaları normal sınıra tabidir. Hedefin güncelliği saatlik heartbeat ile, dosyası checksum ile kontrol edilir. Geri yüklemede **`privacy:reapply-erasures --from=...`**, sonra `--force` ve `privacy:prune --force`; web/worker açılmadan önce. Eski hesap-only NDJSON da kabul edilir. Yeni defteri anlamayan eski `accounts:reapply-erasures` komutu yeni dosya için kullanılmaz. `restore-drill.sh` yeni komutla yalnız önizleme yapar.
+
 Bu klasör `oggaq-development` Docker Compose ortamının uygulama veritabanını yedekler. **28 Ekim 2026’da gerçek sunucuda kuruldu ve doğrulandı.** Günlük 00:30 UTC şifreli DB yedeği, saatlik 7. dakikada silme defteri, 07:15 UTC tazelik kontrolü ve Mac’te saatlik çekme etkindir. Mevcut diğer cron işleri korundu; ana makine/diğer siteler değiştirilmedi.
 
 İlk canlı yedek `oggaq-oggaq-20261028T132509Z.dump.age` (2.085.853 bayt), 7 kayıtlık bağımsız silme defteriyle Mac’e SSH/rsync üzerinden alındı ve checksum doğrulandı. Ayrı geçici PostgreSQL DB’sine gerçek geri yükleme, 15 tetikleyici/bütünlük kontrolü, manifestte 4.292 soru/624 sınav/2 hesap/7 deneme eşleşmesi ve silme listesi kuru çalıştırması geçti. Geçici DB kaldırıldı; yerel `oggaq` ve canlı veriler değiştirilmedi. Bu sayılar ilk yedeğin anlık durumudur.
@@ -202,8 +206,8 @@ dc() { docker compose --env-file "$OGGAQ_ENV_FILE" -f deploy/server-development/
    ```sh
    age -d -i ~/keys/oggaq-backup.key erasures-….ndjson.age | ssh -i … harun@<sunucu> 'cat > /tmp/erasures.ndjson'
    dc cp /tmp/erasures.ndjson app:/tmp/erasures.ndjson      # sunucuda
-   dc exec -T app php artisan accounts:reapply-erasures --from=/tmp/erasures.ndjson          # önce sayar
-   dc exec -T app php artisan accounts:reapply-erasures --from=/tmp/erasures.ndjson --force  # gerçekten siler
+   dc exec -T app php artisan privacy:reapply-erasures --from=/tmp/erasures.ndjson          # önce sayar
+   dc exec -T app php artisan privacy:reapply-erasures --from=/tmp/erasures.ndjson --force  # gerçekten siler
    dc exec -T app rm /tmp/erasures.ndjson; rm /tmp/erasures.ndjson
    ```
 8. **Servisleri başlatın ve doğrulayın:** `dc start worker scheduler web`, ardından `curl -fsS http://127.0.0.1:18080/api/v1/health/ready` (`ok` ve tüm kontroller `true`). Kısa bir giriş denemesi yapın.

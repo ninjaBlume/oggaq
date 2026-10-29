@@ -1,5 +1,9 @@
 # Dilekçe ve tutanak hazırlama
 
+29 Ekim 2026 KVKK devamı: yeni mobil istemci taslağı ve PDF’yi **cihazda** oluşturur. Katalog gerçek API’den okunur; kişisel metin/tarih/adres/imza alanları için `documents/prepare` veya `document-exports` isteği yapılmaz. Ortak `study-core/documents.ts` gerçek tarih/saat, uzunluk ve metin sınırlarını doğrular; HTML’de bütün alanlar kaçışlanır, uzak içerik CSP ile yasaktır. `expo-print` 58.0.8 / `expo-sharing` 58.0.21 / `expo-file-system` 58.0.13 SDK 58’e uygundur. PDF cihazda yerel dosyaya üretilir; işletim sisteminin paylaşım/yazdırma ekranı kullanılır. Paylaşım sonunda, iptalde veya hatada geçici dosya temizlenir; uygulama kesilmişse sonraki açılışta yalnız uygulamanın Print ve oggsor-documents cache alanları temizlenir. Kaydedilen/paylaşılan dosya kullanıcının yönettiği kopyadır; seçilen yazıcı veya paylaşım hizmetinin veri işlemesi ayrıca geçerlidir. Yeni native modüller nedeniyle eski runtime’a OTA gönderilemez; yeni iOS/Android paketi gerekir. Dağıtım sonucu [TESTING](TESTING.md) içinde kaydedilir.
+
+Eski yayımlanmış istemciler için aşağıdaki sunucu PDF uçları korunur. Bu nedenle “hiçbir sürümde sunucuya belge gelmez” denmez; eski sürüm beş dakikalık şifreli akışı kullanabilir. Güncel sürüm bu yola hata durumunda da otomatik dönmez.
+
 28 Ekim 2026 kullanıcı düzeltmesi: **Matbu metinler ÖGG SOR için özgün olarak yazılır. Firma/kurum formu veya kurumsal matbu bağlantısı kullanılmaz. Belgelerde tarih gg/aa/yyyy biçimindedir.** İlk araştırmanın kurum katalogları ürün şablonu veya atıf kaynağı değildir; eski araştırma kaydı Git geçmişinde bulunur.
 
 ## Örnekler ve kullanım

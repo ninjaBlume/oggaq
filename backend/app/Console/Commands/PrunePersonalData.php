@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Support\PrivacyErasureLedger;
 use Illuminate\Console\Command;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
@@ -29,7 +30,8 @@ class PrunePersonalData extends Command
     {
         $counts = ['job_applications' => $this->applications()->count(),
             'audit_events' => DB::table('audit_events')->where('created_at', '<', now()->subYears(3))->count(),
-            'account_erasures' => DB::table('account_erasures')->where('erased_at', '<', now()->subYears(3))->count()];
+            'account_erasures' => DB::table('account_erasures')->where('erased_at', '<', now()->subYears(3))->count(),
+            'application_erasures' => DB::table('application_erasures')->where('erased_at', '<', now()->subYears(3))->count()];
         if (! $this->option('force')) {
             $this->line('Hiçbir şey silinmedi. Aday kayıt sayıları: '.json_encode($counts));
 
@@ -41,6 +43,9 @@ class PrunePersonalData extends Command
                 // Lock both rows and recheck the predicate: reopening/review/holds cannot race the deletion.
                 $ids = $this->applications()->orderBy('a.id')->limit(200)
                     ->lock('FOR UPDATE OF a, j SKIP LOCKED')->pluck('a.id');
+                foreach ($ids as $id) {
+                    PrivacyErasureLedger::recordApplication($id);
+                }
                 $count = DB::table('job_applications')->whereIn('id', $ids)->delete();
                 if ($count > 0) {
                     $this->record(['job_applications' => $count, 'audit_events' => 0, 'account_erasures' => 0]);
@@ -55,9 +60,10 @@ class PrunePersonalData extends Command
             try {
                 $counts['audit_events'] = DB::table('audit_events')->where('created_at', '<', now()->subYears(3))->delete();
                 $counts['account_erasures'] = DB::table('account_erasures')->where('erased_at', '<', now()->subYears(3))->delete();
+                $counts['application_erasures'] = DB::table('application_erasures')->where('erased_at', '<', now()->subYears(3))->delete();
                 DB::table('privacy_erasure_runs')->where('executed_at', '<', now()->subYears(3))->delete();
-                if ($counts['audit_events'] + $counts['account_erasures'] > 0) {
-                    $this->record(['job_applications' => 0, 'audit_events' => $counts['audit_events'], 'account_erasures' => $counts['account_erasures']]);
+                if ($counts['audit_events'] + $counts['account_erasures'] + $counts['application_erasures'] > 0) {
+                    $this->record(['job_applications' => 0, 'audit_events' => $counts['audit_events'], 'account_erasures' => $counts['account_erasures'], 'application_erasures' => $counts['application_erasures']]);
                 }
             } finally {
                 DB::statement("SET LOCAL oggaq.privacy_prune = 'off'");

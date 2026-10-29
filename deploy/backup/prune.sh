@@ -6,10 +6,19 @@
 set -Eeuo pipefail
 dir="${1:?kullanım: prune.sh <dizin> [--dry-run]}"
 dry="${2:-}"
-kd="${KEEP_DAILY:-7}"; kw="${KEEP_WEEKLY:-4}"; km="${KEEP_MONTHLY:-6}"
+kd="${KEEP_DAILY:-7}"; kw="${KEEP_WEEKLY:-4}"; km="${KEEP_MONTHLY:-0}"
+max_days="${BACKUP_MAX_DAYS:-35}"
+for number in "$kd" "$kw" "$km" "$max_days"; do
+  [[ "$number" =~ ^[0-9]+$ ]] || { echo "Saklama sınırları pozitif tam sayı olmalı." >&2; exit 1; }
+done
+[ "$max_days" -ge 1 ] || { echo "BACKUP_MAX_DAYS en az 1 olmalı." >&2; exit 1; }
+today="$(date -u +%Y%m%d)"
+# The newest complete erasure ledger must outlive DB backups: it can be unchanged for months.
+ledger="$(awk -F= '$1 == "name" {print $2; exit}' "$dir/LATEST-ERASURES" 2>/dev/null || true)"
+case "$ledger" in erasures-*.ndjson.age|erasures-*.ndjson.gpg) ;; *) ledger="" ;; esac
 
 decide() { # stdin: en yeniden eskiye dosya adları; stdout: "keep|delete <ad>"
-  awk -v kd="$kd" -v kw="$kw" -v km="$km" '
+  awk -v kd="$kd" -v kw="$kw" -v km="$km" -v maxDays="$max_days" -v today="$today" -v ledger="$ledger" '
     function days(y, m, d,   era, yoe, mp, doy, doe) {
       y -= (m <= 2); era = int(y / 400); yoe = y - era * 400; mp = (m + 9) % 12
       doy = int((153 * mp + 2) / 5) + d - 1; doe = yoe * 365 + int(yoe / 4) - int(yoe / 100) + doy
@@ -20,6 +29,9 @@ decide() { # stdin: en yeniden eskiye dosya adları; stdout: "keep|delete <ad>"
       ts = substr($0, RSTART, 15)
       day = substr(ts, 1, 8); month = substr(ts, 1, 6)
       week = int(days(substr(ts, 1, 4) + 0, substr(ts, 5, 2) + 0, substr(ts, 7, 2) + 0) / 7)
+      if ($0 == ledger) { print "keep " $0; next }
+      age = days(substr(today,1,4)+0, substr(today,5,2)+0, substr(today,7,2)+0) - days(substr(day,1,4)+0, substr(day,5,2)+0, substr(day,7,2)+0)
+      if (age >= maxDays) { print "delete " $0; next }
       keep = 0
       if (!(day in seenDay)) { seenDay[day] = 1; if (++dayRank <= kd) keep = 1 }
       if (!(week in seenWeek)) { seenWeek[week] = 1; if (++weekRank <= kw) keep = 1 }
