@@ -1,5 +1,11 @@
 # Test ve doğrulama stratejisi
 
+## 29 Ekim 2026 — Google üretim paketi ve ülke hazırlığı
+
+Temiz kaynak `67d5236` → Android **1.0.0 (6)** / EAS `e7d398d5-32fa-4d58-8ed0-d874a84bcb76`, production kanalı. Resmî bundletool 1.18.3 yayımlanmış digest’i doğrulandı; bundle/manifest/JAR imzası/upload sertifikası, gerçek HTTPS API/web, preview=false, marka ve güncel ilk yardım SSS metni, runtime/kanal/açılış beklemesi ve **44 adet 64 bit ELF için 16 KB LOAD hizalaması** geçti. SHA-256 `6f4954fc4a562aff7b15180141ec2bd5abb48bf1c9d3b08f6abf09799e650b73`, 59.338.988 bayt. Doğrulayıcının ilk çalışması eski yerel bundletool dosyası bulunmadığından durdu; resmî dosya digest kontrolüyle alınıp doğrulayıcı tekrar çalıştırıldı ve geçti. Kanıt `artifacts/google-production-20261029/android-verification.json`.
+
+Türkiye seçimi/kayıt mesajı ve hedeflenen ülke sayısı 1 UI üzerinden teyit edildi. Logo AI kökeni kullanıcı tarafından doğrulandı; görsel etiketlerinin son kaydı araçtaki boş sayfa nedeniyle henüz teyit edilmedi. Yeni AAB yükleme onayı istendi; Üretim taslağına henüz yüklenmedi. Fiziksel üretim kurulumu, Google sürüm önizlemesi ve genel gönderim yapılmadı. `check:store` exit 1 / **2 açık hukuki engel** korunur. Uygulama kodu/API/DB değişmediğinden önceki 72 mobil/34 araç-güvenlik/strict sonuçları tekrar çalıştırılmadı; PHPUnit/E2E yok. Beta kanalları ve sunucu değişmedi.
+
 ## 29 Ekim 2026 — Apple mağaza metni/iOS OTA ve Google genel gönderim kontrolü
 
 Apple 1.0.0 Türkçe açıklamasına ilk yardım notu kaydedildi. Tam yenilemede 1.924 karakterlik açıklama kaynakla birebir eşleşti; anahtar kelimeler korundu, Save pasif ve Prepare for Submission durumu teyit edildi. Alan odağı nedeniyle anahtar kelimelere giden ara giriş kayıt öncesi geri alındı, doğru açıklama alanı üzerinden son kayıt doğrulandı. İncelemeye gönderilmedi.
