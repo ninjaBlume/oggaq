@@ -1,0 +1,24 @@
+Alıcı: ozelguvenlik@egm.gov.tr
+Konu: ÖGGSor uygulamasında yayımlanmış sınav soruları ve uygulama simgesi için kullanım koşulları
+
+Emniyet Genel Müdürlüğü
+Özel Güvenlik Denetleme Başkanlığına,
+
+Codentum L.L.C. tarafından işletilen ÖGGSor - Soru Bankası, özel güvenlik adaylarına ücretsiz sınav hazırlığı sunan bağımsız bir mobil uygulamadır. Uygulama Emniyet Genel Müdürlüğünün resmî uygulaması değildir; kurumsal bağlantı veya yetkilendirme iddiası taşımaz. Tanıtım ve destek adresimiz https://oggsor.com, iletişim adresimiz destek@oggsor.com’dur.
+
+Başkanlığınızın resmî internet sitesinde yayımlanan temel ve yenileme eğitimi soru kitapçıkları ile cevap anahtarlarının kullanım koşullarını yazılı olarak öğrenmek istiyoruz. Talebimiz, Ekim 2022’den itibaren kamuya açık yayımlanmış kitapçıkların iOS/Android uygulamasında; kaynak URL’si, sınav numarası/tarihi ve soru bilgisi korunarak, ders çalışması, deneme, tekrar ve cevap değerlendirmesi için sunulmasıdır. Metin ve seçenekler mobil ekrana uyarlanacak; soruların ve resmî cevap anahtarlarının anlamı değiştirilmeyecektir.
+
+Soruların, seçeneklerin, kitapçıklardaki görsellerin ve cevap anahtarlarının bu kapsamda çoğaltılması, uygulama üzerinden erişime açılması ve soru havuzunda saklanması için geçerli kullanım/lisans koşullarını paylaşmanızı rica ederiz. Yazılı izin gerekiyorsa yetkili hak sahibini, başvuru usulünü, kapsamı, süresi ve atıf şartlarını; farklı hak sahibine ait görseller için ayrı işlem gerekip gerekmediğini belirtmenizi rica ederiz. İleride yayımlanacak dönemlerin aynı izne dahil olup olamayacağını da öğrenmek isteriz.
+
+Ayrıca ChatGPT ile üretilmiş, ÖGGSor adını taşıyan uygulama simgesini kullanım değerlendirmesi için ekliyoruz. Tasarımda yıldız biçimi ve ay-yıldız öğeleri bulunuyor. Bu tasarımın resmî arma veya üniforma işaretleriyle benzerliği nedeniyle ayrı izin/uyarlama gerektirip gerektirmediğini ve ilgili yetkili birimi bildirmenizi rica ederiz. Bu talep, simgenin resmî bir amblem olduğuna veya kullanım izni bulunduğuna ilişkin beyan değildir.
+
+İzin gerektiğinin bildirilmesi halinde gerekli usulü izleyerek hakları ve kullanım kapsamını belgelemek istiyoruz. Yanıtınızın hangi içerik ve kullanım biçimlerini kapsadığını açıkça belirtmeniz bizim için önemlidir.
+
+Bilgilerinize sunarız.
+
+Codentum L.L.C.
+ÖGGSor - Soru Bankası
+destek@oggsor.com
+https://oggsor.com
+
+Ek: ÖGGSor uygulama simgesi (oggsor-logo.png)

@@ -16,6 +16,7 @@ export const labels = {
   verbis: '[VERBİS KAYIT DURUMU]', 'uygulanacak-hukuk': '[UYGULANACAK HUKUK VE YETKİLİ MAHKEME]', 'hukuki-sebep': '[HUKUKİ SEBEP — hukukçu belirleyecek]',
   'gunluk-suresi': '[GÜNLÜK SAKLAMA SÜRESİ]', 'eposta-saglayicisi': '[E-POSTA SAĞLAYICISI]', 'basvuru-saklama': '[BAŞVURU SAKLAMA SÜRESİ — hukukçu belirleyecek]',
   'barindirma-konumu': '[BARINDIRMA KONUMU]',
+  'veri-toplama-yontemi': '[KİŞİSEL VERİ TOPLAMA YÖNTEMİ]',
 };
 const mailKey = 'destek-eposta-baglantisi';
 const escapeHtml = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

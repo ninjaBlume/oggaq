@@ -1,5 +1,7 @@
 # App Store ve Google Play yayın hazırlığı
 
+**29 Ekim yasal hazırlık:** Yerel gizlilik/koşul metinlerinin veri toplama yöntemi, üçüncü taraf içerik hakları/bildirim yolu, belge ve ilk yardım sınırları ile tüketici haklarını koruyan hukuk maddesi hazırlandı. Önerilen yürürlük tarihi 29 Ekim; bugün yayımlanmazsa yayın sırasında güncellenir. VERBİS alanı gerçek bildirilen eksik kayıt durumunu anlatır; muafiyet yazılmadı. Kullanıcı Harun Altay’ı yalnız şartları sağlaması koşuluyla temsilci adayı gösterdi; imzasız karar taslağı hazır. ChatGPT logo kaynağı/OpenAI çıktı hakları incelendi; üçüncü taraf amblem hakkı ayrıca açık. Resmî EGM alıcısı doğrulandı, kullanıcı mesaj/logo gönderimini şimdilik istemedi; talep/ek paylaşılmadı. [Hazır belgeler](legal-review/2026-10-29/README.md). 21 mağaza/yasal + 4 site + 2 statik E2E ve site/hesap web build geçti. `legal:apply --check` tüm alanlar dolu; `check:store` **1 engel** ile beklenen biçimde durur (taslak). **Bu değişiklik canlıya/OTA’ya dağıtılmadı; kayıt, izin veya aktarım sözleşmesi tamamlandı sayılmaz.**
+
 **29 Ekim Google üretim taslağı tamamlandı:** Kullanıcının somut dosya onayıyla yeni Android **1.0.0 (6)** Üretim kanalına yüklendi; **1.0.0 (6) — İlk genel sürüm** adı/Türkçe notlarla kaydedildi. Önizleme **Yayınlamaya hazır**, versionCode 6, minimum 24+/target 36 ve eşleme/native sembol dosyalarını gösterdi; önizlemede engelleyici hata yok. Kaydet sonrasında kayıt mesajı ve Yayın özeti → Üretim satırı doğrulandı. Türkiye/Hedeflenenler ve 1 ülke yeniden açılan Üretim ekranında korundu. [Paket doğrulaması](ANDROID_BETA.md).
 
 Yayın özetinin hızlı kontrolü **Tamamlanmamış reklam kimliği beyanı** buldu. Uygulama/SDK envanteri ve birleşik imzalı manifestle uyumlu **Hayır** kaydedildi; tam yenilemede seçim korundu. Son Yayın özetinde **10 değişikliği incelemeye gönder** etkin, önceki sorun düğmesi yok ve hızlı kontroller tamamlandı: **Değişiklikleriniz artık incelemeye gönderilebilir. Uygulamanız incelenirken başka sorunlar tespit edilebilir.** mesajı doğrulandı. Bu, Google incelemesinin onayı değildir. Kullanıcı simge/özellik grafiği AI etiketlerini kaydettiğini bildirdi; tam yenilemede beyanın etiketle seçimi korundu/Kaydet pasifti. Tek tek öğe ayrıntıları araçta gri perde verdi; bu ayrıntının bağımsız teyidi yok.
@@ -76,7 +78,7 @@ Mağaza taslağı hazırlanırken Google Play Dahili Test 0.1.1 (3) idi; sonraki
 
 | Açık nokta | Gerekli çözüm |
 | --- | --- |
-| Hukuki inceleme taslak; yürürlük tarihi, VERBİS ve uygulanacak hukuk boş | Codentum’un mevcut kayıtları ve hizmet kapsamıyla hukuki değerlendirme; gerçek kararları `legal-values.json` içine kaydet, metinleri onaylandıktan sonra uygula. Boş alanı uydurarak veya yalnız `taslak:false` yaparak geçme. |
+| Hukuki inceleme taslak; temsilci/VERBİS ve aktarım güvencesi kanıtları yok | 29 Ekim’de boş alanlar önerilen tarih/hukuk maddesi ve bildirilen gerçek kayıt durumuyla dolduruldu. Toplama yöntemi ve içerik hakkı açıklamaları düzeltildi. [Atama/izin/aktarım hazırlığı](legal-review/2026-10-29/README.md) hazırdır; imza, tasdik, resmî kayıt ve gerekli aktarım güvenceleri tamamlanmadan `taslak:false` yapma. Yerel metin değişikliği henüz canlıda değil. |
 | Soru kitapçıkları ve logodaki amblem için kullanım hakkı belgesi yok (kullanıcı 28 Ekim teyidi) | Hak sahibinden/lisans koşullarından yeniden dağıtım yetkisini belgelemek veya hakları teyit edilmiş içerik/amblem seçmek. Kamuya açık PDF tek başına lisans kanıtı değildir. Yazılı izin talebi göndermek ayrıca açık talimat gerektirir. |
 | Mağaza kurulumunun kalan alanları ve hesap doğrulamaları | Gizlilik, yaş/kitle ve inceleme erişimi tamamlandı. Google ilk kurulum görevleri tamamlandı; Apple ilk yardım açıklaması ve iOS beta dağıtımı tamamlandı; Türkiye ve Android production yükleme/taslak/önizleme kaydı tamamlandı; reklam kimliği beyanı düzeltildi. Google hızlı kontrolleri gönderime uygun sonuçlandı; fiziksel production kontrolü ve tek tek AI etiketlerinin bağımsız teyidi açık. Apple yayıncı dönüşümü/DSA ile Google kuruluş doğrulamasının son durumunu ayrıca teyit et. |
 | Yeni 1.0.0 paketlerinin native ve temiz kurulum kontrolü | Son kaynak gömülü, production kanallı imzalı IPA/AAB oluştur; iPhone/iPad ve Android temiz kurulum, eski hesaptan yükseltme ve bağlantı kesintisini gerçek cihazda kontrol et. Eski beta gömülü kodunu doğrudan genel sürüme yükseltme. |
@@ -112,7 +114,7 @@ Ekran görüntüleri gerçek uygulamadan ve sentetik hesapla alınır. Silah bil
 
 ## Elle kontrol
 
-- [ ] Hukuki inceleme ve üç eksik karar tamamlandı; metinlerin son hâli onaylandı
+- [ ] Metinlerin son hâli onaylandı; temsilci/VERBİS ve yurt dışı aktarım güvenceleri somut belgelerle doğrulandı
 - [ ] Soru kitapçıkları ve amblem kullanım hakkı belgelendi
 - [ ] Apple yayıncı/Organization ve DSA, Google kuruluş doğrulaması son durumu teyit edildi
 - [x] Apple App Privacy ve Google Data safety son paket/sağlayıcı envanteriyle tamamlandı

@@ -1,47 +1,56 @@
 {
   "_nasil": "Bu dosya dört yasal sayfanın ve uygulamaların boş alanlarını tek yerden doldurur. Boş bırakılan alan sayfada işaretli yer tutucu olarak kalır. Doldurduktan sonra `npm run legal:apply` çalıştırın; kalan eksikleri `npm run legal:apply -- --check` ve `npm run check:store` gösterir.",
-  "_dikkat": "Dolu alanlar uygulamanın belgelenen davranışını anlatır. taslak alanı mağaza ön kontrolündeki iç inceleme durumudur; herkese açık sayfalarda inceleme notu gösterilmez. Tasarım/metin temizliği hukuki uygunluk onayı yerine geçmez.",
+  "_dikkat": "Sağlayıcı ve veri akışı alanları belgelenen davranışı anlatır. Yürürlük tarihi ve hukuk maddesi yerel, yayımlanmamış öneridir. taslak alanı iç inceleme durumudur; alanların dolması temsilci/VERBİS kaydı, aktarım güvencesi veya içerik izni yerine geçmez.",
   "taslak": true,
   "_inceleme": {
-    "tarih": "2026-10-28",
+    "tarih": "2026-10-29",
     "verbis-mevcut-durum": "Kullanıcı, bildiği kadarıyla Codentum adına VERBİS kaydı ve Türkiye'de atanmış veri sorumlusu temsilcisi bulunmadığını belirtti. Muafiyet teyidi değildir.",
     "verbis-yerlesiklik": "Veri sorumlusu ABD'de kurulu Codentum L.L.C. olarak kayıtlıdır. KVKK Sorularla VERBİS (Ekim 2025), soru 51/sayfa 46, yurt dışında yerleşik veri sorumluları bakımından çalışan sayısı, mali bilanço ve özel nitelikli veri ana faaliyeti ölçütlerinin dikkate alınmadığını açıklar. Küçük işletme eşikleri tek başına muafiyet dayanağı olarak kullanılmadı.",
     "verbis-guncel-esikler": "04.09.2025 tarihli 2025/1572 ve 25.12.2025 tarihli 2025/2393 kararlarının uygulama duyurusu kontrol edildi. Mali bilanço toplamı ciro ile aynı ölçüt değildir; bu kararlar Codentum için muafiyet kararı olarak kaydedilmedi.",
     "verbis-rehber": "https://www.kvkk.gov.tr/SharedFolderServer/CMSFiles/2f2fbcf4-932b-4dad-af8a-cd32e315d815.pdf#page=46",
-    "verbis-guncel-duyuru": "https://www.kvkk.gov.tr/Icerik/8577/kisisel-verileri-koruma-kurulunun-04-09-2025-tarihli-ve-2025-1572-sayili-kararinin-uygulama-esaslarina-iliskin-kamuoyu-duyurusu"
+    "verbis-guncel-duyuru": "https://www.kvkk.gov.tr/Icerik/8577/kisisel-verileri-koruma-kurulunun-04-09-2025-tarihli-ve-2025-1572-sayili-kararinin-uygulama-esaslarina-iliskin-kamuoyu-duyurusu",
+    "metin-durumu": "Yerel, yayımlanmamış düzenleme taslağı. Şirket kararı, VERBİS kaydı, temsilci ataması, KVKK m.9 aktarım güvencesi veya içerik kullanım izni yerine geçmez. taslak=true korunur.",
+    "yururluk-tarihi": "29 Ekim 2026, hazırlanan metnin önerilen yürürlük tarihidir. Bugün yayımlanmazsa son onay/yayın tarihinde güncellenmelidir; canlıya geçmiş sayılmaz.",
+    "uygulanacak-hukuk-karari": "Türk hukuku ve emredici tüketici korumalarını saklı tutan öneri hazırlandı; münhasır yabancı mahkeme veya zorunlu tahkim seçilmedi. Şirketin son metin onayı bekleniyor.",
+    "temsilci-adayi": "Kullanıcı, şartları sağlıyorsa Harun Altay olarak kendisini belirtti. Vatandaşlık/başvuru koşulları ve imzalı, tasdikli şirket kararı henüz doğrulanmadı; atanmış temsilci diye kaydedilmez.",
+    "aktarim-guvencesi": "KVKK m.9 kapsamında sağlayıcı/rol bazında uygun güvence ve gerekli imza/bildirim kayıtları doğrulanmadı. Resend/Cloudflare DPA veya AB SCC varlığı tek başına Türk standart sözleşmesi imzalandığını göstermez.",
+    "icerik-haklari": "Kullanıcı logonun ChatGPT ile üretildiğini bildirdi; OpenAI çıktı hakları çerçevesi doğrulandı. EGM kitapçıkları/görselleri ve üçüncü taraf amblem hakları için açık yeniden kullanım dayanağı henüz doğrulanmadı. Kullanıcı 29 Ekim’de EGM’ye gönderimi şimdilik istemedi. Talep ve logo paylaşılmadı; bu tercih iznin alınmış olduğu anlamına gelmez."
   },
   "degerler": {
     "veri-sorumlusu-unvan": "Codentum L.L.C. (Wyoming, ABD)",
     "veri-sorumlusu-adres": "30 N Gould St Ste N, Sheridan, WY 82801, ABD (şirketin kayıtlı ofis adresi)",
     "destek-eposta": "destek@oggsor.com",
     "yayinci-adi": "Codentum L.L.C.",
-    "yururluk-tarihi": "",
-    "verbis": "",
+    "yururluk-tarihi": "29 Ekim 2026",
+    "verbis": "Ürün sahibinin bildirdiği mevcut duruma göre Codentum L.L.C. adına VERBİS kaydı ve Türkiye’de veri sorumlusu temsilcisi ataması henüz tamamlanmamıştır. Kayıt muafiyeti beyan edilmemektedir.",
     "barindirma-konumu": "Türkiye (İstanbul); barındırma sağlayıcısı Hosting Dünyam Bilişim Teknolojileri Tic. Ltd. Şti.",
     "eposta-saglayicisi": "Hesap ve güvenlik bildirimlerinin gönderimi: Resend (Plus Five Five, Inc., ABD); gönderim bölgesi İrlanda (eu-west-1). Destek postalarının alımı ve yönlendirmesi: Cloudflare Email Routing; destek posta kutusu: Google Gmail.",
     "yurt-disi-aktarim": "Uygulama veritabanı Türkiye’deki sunucuda saklanır. Siteye ve uygulamaya erişim trafiği, güvenlik ve performans için Cloudflare, Inc. (ABD) ağı üzerinden iletilir. Hesap ve güvenlik bildirimlerinin alıcı e-posta adresleri ile ileti içerikleri Resend (Plus Five Five, Inc., ABD) üzerinden kullanıcının e-posta hizmet sağlayıcısına iletilir. Gönderim bölgesi İrlanda seçilmiştir; bu seçim veri saklama yerini belirlemez. Resend hesap verileri, e-posta üst verileri, günlükleri ve API kayıtlarını ABD’de sakladığını belirtir. Destek adresine gönderilen e-postalar Cloudflare Email Routing üzerinden Google Gmail destek posta kutusuna yönlendirilir. Mobil uygulamanın uyumlu güncellemeleri Expo/EAS Update (650 Industries, Inc., ABD) ve dosya dağıtım ağı üzerinden alınır. Bu isteklerde IP adresi, platform, proje/sürüm/kanal bilgileri, rastgele kurulum tanımlayıcısı ve varsa sınırlı ciddi hata metni işlenebilir. Uygulama bu hizmete hesap adı, e-posta, oturum anahtarı veya sınav cevaplarını eklemez.",
-    "uygulanacak-hukuk": "",
+    "uygulanacak-hukuk": "Bu koşullara Türk hukuku uygulanır. Kullanıcının mutat meskeni hukukunun emredici hükümlerinden doğan asgari koruması ve kanunen vazgeçilemeyen hakları saklıdır. Uyuşmazlıklarda görevli ve yetkili merci ilgili mevzuata göre belirlenir; koşulları varsa tüketici hakem heyetine veya tüketici mahkemesine başvuru hakları korunur. Bu koşullar münhasır bir yabancı mahkeme veya zorunlu tahkim şartı getirmez.",
     "hukuki-sebep": "Hesabı ve sınav hizmetini sunmak, sonuçlarını saklamak ve iş ilanı başvurusunu işleme almak için sözleşmenin kurulması veya ifasıyla doğrudan ilgili olması (KVKK m.5/2-c); güvenliği sağlamak ve hataları gidermek için veri sorumlusunun meşru menfaati (KVKK m.5/2-f).",
     "yanit-suresi": "en geç 30 gün",
     "gunluk-suresi": "Sunucu günlükleri boyut sınırına göre dönüşümlü tutulur; sınır dolunca en eski kayıtlar otomatik silinir. Günlüklere parola ve oturum anahtarı yazılmaz.",
     "yedek-suresi": "en çok 12 ay (sunucuda 6 aya kadar, sunucu dışı şifreli kopyada 12 aya kadar)",
     "basvuru-saklama": "iş ilanı başvuruları ilan kapandığında kendiliğinden silinmez; başvuruyu hesabını silerek ya da bize yazarak sildirebilirsin",
-    "basvuru-sureci": "Başvurunu yalnızca platform yöneticileri görür ve durumunu (Başvuru alındı, İnceleniyor, Olumlu değerlendirildi, Olumsuz değerlendirildi) güncelleyebilir. Platform başvurunu ilan sahibi firmaya otomatik göndermez; iş veren hesabı ve dış başvuru yönlendirmesi yoktur."
+    "basvuru-sureci": "Başvurunu yalnızca platform yöneticileri görür ve durumunu (Başvuru alındı, İnceleniyor, Olumlu değerlendirildi, Olumsuz değerlendirildi) güncelleyebilir. Platform başvurunu ilan sahibi firmaya otomatik göndermez; iş veren hesabı ve dış başvuru yönlendirmesi yoktur.",
+    "veri-toplama-yontemi": "Veriler; mobil uygulama ve hesap sitesindeki kayıt, giriş, hesap, sınav, soru bildirimi, iş başvurusu ve belge formları üzerinden elektronik ortamda, tamamen veya kısmen otomatik yöntemlerle elde edilir. Destek talepleri e-posta üzerinden alınır ve yetkili kişilerce incelenir. Oturum, güvenlik, hata ve güncelleme verileri hizmetlerin kullanımı sırasında teknik olarak oluşur."
   },
   "_oneriler": {
     "veri-sorumlusu-unvan": "Öneri: platformu işleten ve amaç/araçlara karar veren tüzel kişi. Şirket adı, ticari unvanıyla ve varsa MERSİS numarasıyla.",
     "verbis": "Codentum ABD’de yerleşik bir tüzel kişidir. Kurum rehberinde yurt dışında yerleşik veri sorumluları için genel kuralın VERBİS kaydı olduğu belirtilir. İstisna, temsilci ve mevcut kayıt durumu ayrıca doğrulanmadan bu alana muafiyet yazılmamalıdır.",
     "yurt-disi-aktarim": "Dikkat: Cloudflare Tunnel/proxy trafiği (giriş parolası dahil) Cloudflare ağından geçer; bunu yurt dışı aktarım sayıp saymayacağınıza ve KVKK m.9 gereğini nasıl karşılayacağınıza siz karar verin. Yazılı metin yalnızca olgusal durumu söylüyor. Ayrıca veri sorumlusu ABD şirketi (Codentum L.L.C.) ise bu da aktarım/temsilci sorusunu doğurur.",
-    "uygulanacak-hukuk": "Codentum’un ABD şirketi olması ve kullanıcı kitlesi birlikte değerlendirilerek hukuki incelemeyle kararlaştırılacak. Henüz ülke/mahkeme seçilmedi; teknik hazırlık bu kararı otomatik doldurmaz.",
+    "uygulanacak-hukuk": "Önerilen Türk hukuku/tüketici koruması metni hazırdır. Yayımlanmadan önce şirketin onayı ve güncel yetki/uygulanacak hukuk değerlendirmesi gerekir.",
     "yayinci-adi": "Mağazadaki yayıncı adıyla birebir aynı yazın (Apple/Google hesabındaki ad)."
   },
   "_kaynaklar": {
     "verbis": "https://verbis.kvkk.gov.tr/sharedFolder/sorularla-verbis.pdf",
-    "kontrol-tarihi": "2026-10-25",
+    "kontrol-tarihi": "2026-10-29",
     "eposta-saglayicisi": "https://resend.com/legal/privacy-policy",
     "eposta-bolge-ve-saklama": "https://resend.com/docs/dashboard/domains/regions",
     "eposta-kontrol-tarihi": "2026-10-27",
     "guncelleme-saglayicisi": "https://expo.dev/privacy-explained",
-    "guncelleme-gizlilik": "https://expo.dev/privacy"
+    "guncelleme-gizlilik": "https://expo.dev/privacy",
+    "aydinlatma": "https://www.kvkk.gov.tr/Icerik/4132/aydinlatma-yukumlulugunun-yerine-getirilmesinde-uyulacak-usul-ve-esaslar-hakkinda-teblig",
+    "aktarim": "https://www.kvkk.gov.tr/Icerik/2053/Yurtdisina-Aktarim"
   }
 }

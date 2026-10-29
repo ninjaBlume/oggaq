@@ -6,19 +6,12 @@
 
 Mağazalar her uygulamadan ilk başvuruda ayrı bir izin dosyası yüklemesini otomatik istemez. Gereken, içeriği ve markaları kullanmak için geçerli hakka sahip olmaktır; inceleme sırasında yetki kanıtı istenebilir. Yazılı izin, uygun lisans veya uygulanabilir başka bir hukuki dayanak birbirinden ayrılmalıdır. Henüz belge bulunmaması tek başına ihlal kararı değildir; kaynak göstermek ve uygulamanın ücretsiz olması da tek başına yeniden kullanım hakkını kanıtlamaz. 28 Ekim 2026 kontrolü: [Apple 5.2](https://developer.apple.com/app-store/review/guidelines/#intellectual-property), [Google fikrî mülkiyet politikası](https://support.google.com/googleplay/android-developer/answer/9888072?hl=en).
 
-## Gönderilmemiş talep taslağı
+## 29 Ekim 2026 incelemesi ve hazır talep
 
-Konu: ÖGGSor sınava hazırlık uygulaması için soru kitapçıkları kullanım koşulu
+Kullanıcı logonun **ChatGPT** ile üretildiğini bildirdi. [OpenAI Kullanım Şartları — Content](https://openai.com/policies/terms-of-use/) kullanıcı ile OpenAI arasındaki ilişkide ve uygulanabilir hukukun izin verdiği ölçüde çıktı haklarını kullanıcıya bırakır; üçüncü taraf haklarını veya benzersizliği garanti etmez. Bu nedenle AI çıktısı için hak kaynağı belgelendi, fakat resmî amblemlerle benzerlik ve üçüncü taraf hakları ayrıca açık kaldı. Özgün üretim sohbeti/tarihi henüz kayıt altına alınmadı; görselin SHA-256 kaydı yerel inceleme kanıtında saklandı. Logonun kesin bir ihlal olduğu sonucu çıkarılmadı.
 
-Yetkili biriminize,
+İncelenen 122. temel A kitapçığında açık yeniden kullanım lisansı bulunamadı; bu bulgu bütün kitapçıkların hak statüsünü belirlemez. Üniforma/özel güvenlik şirketi işaretleri için yayımlanan kurallar, bağımsız eğitim uygulamasına otomatik olarak aynı kapsamda uygulanmış sayılmaz. Buna karşılık [Google’ın kimliğe bürünme politikası](https://support.google.com/googleplay/android-developer/answer/9888374?hl=tr), simgenin resmî bir ilişkiyi yanıltıcı biçimde ima etmesini ayrıca değerlendirir. Mevcut resmî bağlantı yok açıklaması, tek başına hak veya mağaza kabul garantisi değildir.
 
-Codentum L.L.C. tarafından geliştirilen ÖGGSor - Soru Bankası, özel güvenlik adaylarına ücretsiz çalışma imkânı sunan bağımsız bir mobil uygulamadır. EGM ile bağlantısı veya resmî sonuç üretme yetkisi olduğu iddia edilmemektedir.
+[Gönderilmeye hazır somut talep](legal-review/2026-10-29/egm-kullanim-talebi.txt), Ekim 2022’den itibaren temel/yenileme sorularının, görsellerin, cevap anahtarlarının ve uygulama simgesinin kapsamını ayrı ayrı sorar. `ozelguvenlik@egm.gov.tr`, [resmî iletişim sayfası](https://www.egm.gov.tr/ozelguvenlik/iletisim) üzerinden 29 Ekim’de doğrulandı. Ek olarak yalnız `config/assets/oggsor-logo.png` önerilir; şirket kuruluş/kimlik belgeleri veya kullanıcı verileri gerekmez.
 
-EGM sitesinde kamuya açık yayımlanan temel/yenileme eğitimi soru kitapçıkları ve cevap anahtarlarının, kaynak URL ve sınav bilgileri belirtilerek iOS/Android uygulamasında soru çözümü ve değerlendirme amacıyla yeniden sunulabilmesine ilişkin kullanım koşullarını öğrenmek istiyoruz. Kitapçıklardaki görsellerin ve cevap anahtarlarının kapsamda olup olmadığını da belirtmenizi rica ederiz. Resmî takvim bilgilerinin kaynak gösterilerek aktarılması ayrı işlevdir.
-
-Yazılı izin gerekiyorsa başvuru usulünü, yetkili birimi, izin kapsamı/süresini ve yerine getirmemiz gereken atıf veya diğer koşulları paylaşabilir misiniz? Kurumsal amblem kullanımı için ayrı bir yetkilendirme gerekiyorsa ilgili usulün de bildirilmesini rica ederiz.
-
-İletişim: destek@oggsor.com
-Codentum L.L.C.
-
-Bu taslak gönderilmedi. Kullanıcı açıkça alıcıyı ve göndermeyi yetkilendirmeden dış iletişim başlatılmaz. Bir başvurunun gönderilmiş olması, iznin alınmış olması değildir.
+**Gönderilmedi. Kullanıcı 29 Ekim’de “Şimdilik gönderme” dedi.** Talep/logo paylaşılmadı; yeni gönderme talimatı olmadan dış iletişim başlatılmaz. Gönderim alındısı ve hak sahibinin olumlu, kapsamı belirli yanıtı birbirinden ayrılır. Canlı sorular, yayımlanmış sürümler ve logo değiştirilmedi.
