@@ -81,6 +81,7 @@ Route::prefix('v1')->group(function () {
         Route::get('contexts/{context}/practice-attempts/{attempt}', [PracticeAttemptController::class, 'show'])->whereUuid(['context', 'attempt']);
         Route::post('contexts/{context}/practice-attempts/{attempt}/answer', [PracticeAttemptController::class, 'answer'])->whereUuid(['context', 'attempt']);
         Route::get('contexts/{context}/random-exam', [RandomExamController::class, 'current'])->whereUuid('context');
+        Route::get('contexts/{context}/offline-exam-revisions', [OfflineExamController::class, 'revisions'])->whereUuid('context');
         Route::get('contexts/{context}/offline-exams/{exam}', [OfflineExamController::class, 'show'])->whereUuid(['context', 'exam']);
         Route::post('contexts/{context}/offline-exam-imports', [OfflineExamController::class, 'import'])->whereUuid('context');
         Route::post('contexts/{context}/random-exam', [RandomExamController::class, 'store'])->whereUuid('context');

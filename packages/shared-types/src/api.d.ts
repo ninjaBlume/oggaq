@@ -1887,6 +1887,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/contexts/{context}/offline-exam-revisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Çevrimdışı sınav sürümleri */
+        get: operations["listOfflineExamRevisions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/contexts/{context}/offline-exams/{exam}": {
         parameters: {
             query?: never;
@@ -1896,7 +1913,7 @@ export interface paths {
         };
         /**
          * Çevrimdışı sınav paketi
-         * @description Yalnız kişisel bağlam için yayımlanmış soru sürümlerini ve cevap anahtarlarını indirir. Eşitleme henüz uygulanmamıştır.
+         * @description Yalnız kişisel bağlam için yayımlanmış soru sürümlerini ve cevap anahtarlarını indirir; tamamlanan sınav ayrı uç üzerinden eşitlenir.
          */
         get: operations["downloadOfflineExam"];
         put?: never;
@@ -7161,6 +7178,37 @@ export interface operations {
             422: components["responses"]["Problem"];
             429: components["responses"]["Problem"];
             503: components["responses"]["Problem"];
+        };
+    };
+    listOfflineExamRevisions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                context: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Kişisel bağlam için yayımlanmış sınav sürümleri. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** Format: uuid */
+                            exam_id: string;
+                            revision: string;
+                        }[];
+                    };
+                };
+            };
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            429: components["responses"]["Problem"];
         };
     };
     downloadOfflineExam: {

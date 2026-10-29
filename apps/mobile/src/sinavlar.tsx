@@ -30,7 +30,8 @@ import { featureIcons } from "./featureIcons";
 import { BookOpen, ChevronDown, ChevronRight, Clock3 } from "./icons";
 import { scoreTone, shape } from "./theme";
 import { useTheme } from "./themeContext";
-import { OfflineDownload, OfflineShelf } from './offline/controls';
+import { OfflineShelf } from './offline/controls';
+import { OfflinePreparationStatus, useOfflinePreparationRevision } from './offline/autoPrepare';
 
 const catalogCache = new CatalogCache();
 
@@ -71,16 +72,12 @@ function ExamEntry({
   title,
   attempts,
   open,
-  user,
-  offlineChanged,
 }: {
   context: StudyContext;
   exam: OfficialExam;
   title: string;
   attempts: Summary[];
   open: (id: string, initialExam?: ExamAttempt) => void;
-  user: User;
-  offlineChanged: () => void;
 }) {
   const { styles, palette } = useTheme();
   const tint = cardTone(palette, exam.subject ? "indigo" : "blue");
@@ -134,7 +131,6 @@ function ExamEntry({
           <Button compact secondary onPress={() => setExpanded(true)}>{progress.runs > 0 ? "Tekrar gir" : "Sınava gir"}</Button>
         ) : null}
       </View>
-      <OfflineDownload user={user} context={context} exam={exam} changed={offlineChanged} />
       {expanded && !progress.open && (
         <View style={{ gap: 12, borderTopWidth: 1, borderTopColor: tint.line, paddingTop: 10 }}>
           <Field label="Süre (dakika)" numeric value={minutes} onChange={setMinutes} editable={!locked} />
@@ -178,7 +174,7 @@ export function ExamList({
   const [weapon, setWeapon] = useState<"armed" | "unarmed">("armed");
   const [subject, setSubject] = useState<string | undefined>(initialSubject);
   const [picking, setPicking] = useState(false);
-  const [offlineRevision, setOfflineRevision] = useState(0);
+  const offlineRevision = useOfflinePreparationRevision(user, context);
   const subjects = useResource(
     (signal) => catalogCache.read(`${context.id}:subjects`, signal, () => collect((cursor) => api.request("get", "/api/v1/subjects", { signal, query: { per_page: 100, cursor, with_exam_counts: true } }))),
     [context.id], kind === "ders",
@@ -212,6 +208,8 @@ export function ExamList({
   const loading = (exams.loading && !exams.data) || (attempts.loading && !attempts.data)
     || (kind === "ders" && subjects.loading && !subjects.data);
   const failure = exams.error ?? (kind === "ders" ? subjects.error : null);
+  const offlineFailure = exams.error ?? exams.refreshError ?? (kind === "ders" ? subjects.error ?? subjects.refreshError : null);
+  const offline = Platform.OS !== 'web' && offlineFailure instanceof ApiError && offlineFailure.status === 0;
   return (
     <>
       <ScreenTitle
@@ -222,7 +220,7 @@ export function ExamList({
             : vocabulary.ders.description
         }
       />
-      <OfflineShelf user={user} context={context} kind={kind} education={education} weapon={weapon} revision={offlineRevision} open={openOffline} />
+      <OfflinePreparationStatus user={user} context={context} />
       <ChoiceGroup
         choices={[
           { value: "basic", label: "Temel eğitim", accessibilityLabel: "Temel eğitim sınavları" },
@@ -241,7 +239,8 @@ export function ExamList({
           onChange={setWeapon}
         />
       )}
-      {kind === "ders" && withExams.length > 0 && (
+      <OfflineShelf user={user} context={context} kind={kind} education={education} weapon={weapon} revision={offlineRevision} open={openOffline} onlyPending={!offline} />
+      {kind === "ders" && withExams.length > 0 && !offline && (
         <>
           {/* Eleven long subject names do not fit a one-row segmented control: the subject is picked from a list. */}
           <Pressable
@@ -286,8 +285,8 @@ export function ExamList({
       {kind === "ders" && <ReadNotice resource={subjects} refreshOnly />}
       {loading ? (
         <Loading layout="list" label="Sınavlar yükleniyor" />
-      ) : Platform.OS !== 'web' && failure instanceof ApiError && failure.status === 0 ? (
-        <Card compact tone="blue"><Text>Bağlantı yok. Daha önce indirdiğin sınavları yukarıdan açabilirsin.</Text><Button secondary onPress={() => { void exams.reload(); void subjects.reload(); }}>Yeniden dene</Button></Card>
+      ) : offline ? (
+        <Card compact tone="blue"><Text>Bağlantı yok. Cihazda hazır olan sınavları yukarıdan açabilirsin.</Text><Button secondary onPress={() => { void exams.reload(); void subjects.reload(); }}>Yeniden dene</Button></Card>
       ) : failure ? (
         <ErrorNotice
           title="Sınavlar yüklenemedi"
@@ -315,8 +314,6 @@ export function ExamList({
                 title={examQuestionTitle(exam)}
                 attempts={attempts.data?.data ?? []}
                 open={open}
-                user={user}
-                offlineChanged={() => setOfflineRevision(value => value + 1)}
               />
             ))}
           </Columns></View>

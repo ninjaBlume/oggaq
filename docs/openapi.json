@@ -7271,6 +7271,80 @@
         }
       }
     },
+    "/api/v1/contexts/{context}/offline-exam-revisions": {
+      "get": {
+        "tags": [
+          "Exams"
+        ],
+        "security": [
+          {
+            "CookieAuth": []
+          },
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "operationId": "listOfflineExamRevisions",
+        "summary": "Çevrimdışı sınav sürümleri",
+        "responses": {
+          "200": {
+            "description": "Kişisel bağlam için yayımlanmış sınav sürümleri.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "exam_id",
+                          "revision"
+                        ],
+                        "properties": {
+                          "exam_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "revision": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
     "/api/v1/contexts/{context}/offline-exams/{exam}": {
       "get": {
         "tags": [
@@ -7336,7 +7410,7 @@
         ],
         "operationId": "downloadOfflineExam",
         "summary": "Çevrimdışı sınav paketi",
-        "description": "Yalnız kişisel bağlam için yayımlanmış soru sürümlerini ve cevap anahtarlarını indirir. Eşitleme henüz uygulanmamıştır."
+        "description": "Yalnız kişisel bağlam için yayımlanmış soru sürümlerini ve cevap anahtarlarını indirir; tamamlanan sınav ayrı uç üzerinden eşitlenir."
       }
     },
     "/api/v1/contexts/{context}/offline-exam-imports": {

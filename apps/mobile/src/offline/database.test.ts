@@ -47,6 +47,12 @@ describe('SQLite offline transaction log', () => {
     await expect(db.mutateAttempt(owner, 'attempt-a', 'operation-4', 'answer', () => ({ snapshot: '{}', payload: '{}' }))).rejects.toThrow();
     sqlite.close();
   });
+  it('does not commit a package after its session has ended', async () => {
+    const { db, sqlite } = database(); await db.initialize();
+    await expect(db.savePackage(owner, 'package-a', '{}', () => false)).rejects.toThrow('Oturum değişti');
+    expect(await db.package(owner, 'package-a')).toBeNull();
+    sqlite.close();
+  });
   it('rolls back the entire attempt if recording its operation fails', async () => {
     const { db, sqlite } = database(); await db.initialize(); await db.savePackage(owner, 'package-a', 'one');
     await db.start(owner, 'package-a', 'attempt-a', 'operation-1', '{}', '{}');

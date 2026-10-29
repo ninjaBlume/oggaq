@@ -4,7 +4,7 @@ import type { OfflineDatabase, Owner } from './database';
 export type ExamPackage = components['schemas']['OfflineExamPackageResponse']['data'];
 
 /** A download is made visible only after its complete snapshot is validated and committed. */
-export async function storeExamPackage(db: OfflineDatabase, owner: Owner, expectedExamId: string, pack: ExamPackage, digest: (value: string) => Promise<string>): Promise<void> {
+export async function storeExamPackage(db: OfflineDatabase, owner: Owner, expectedExamId: string, pack: ExamPackage, digest: (value: string) => Promise<string>, allowed: () => boolean = () => true): Promise<void> {
   if (pack.claim.version !== 1 || pack.claim.user_id !== owner.userId || pack.claim.context_id !== owner.contextId
     || pack.claim.official_exam_id !== expectedExamId || pack.exam.id !== expectedExamId
     || !/^[a-f0-9]{64}$/.test(pack.package_id) || !/^[a-f0-9]{64}$/.test(pack.signature)
@@ -27,5 +27,5 @@ export async function storeExamPackage(db: OfflineDatabase, owner: Owner, expect
     }
     seen.add(row.question_id);
   }
-  await db.savePackage(owner, pack.package_id, JSON.stringify(pack));
+  await db.savePackage(owner, pack.package_id, JSON.stringify(pack), allowed);
 }

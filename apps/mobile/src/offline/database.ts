@@ -50,9 +50,10 @@ export class OfflineDatabase {
     `));
   }
 
-  async savePackage(owner: Owner, id: string, manifest: string): Promise<void> {
+  async savePackage(owner: Owner, id: string, manifest: string, allowed: () => boolean = () => true): Promise<void> {
     // A package identifier pins an immutable published revision. Never overwrite a different snapshot.
     await this.db.withExclusiveTransactionAsync(async tx => {
+      if (!allowed()) throw new Error('Oturum değişti; sınav indirilmedi.');
       const previous = await tx.getFirstAsync<{ manifest: string }>(
         'SELECT manifest FROM offline_packages WHERE user_id = ? AND context_id = ? AND id = ?', owner.userId, owner.contextId, id);
       if (previous && previous.manifest !== manifest) throw new Error('Paket sürümü değiştirilemez.');
@@ -111,7 +112,7 @@ export class OfflineDatabase {
   }
 
   async packages(owner: Owner): Promise<{ id: string; manifest: string }[]> {
-    return this.db.getAllAsync<{ id: string; manifest: string }>('SELECT id, manifest FROM offline_packages WHERE user_id = ? AND context_id = ? ORDER BY id', owner.userId, owner.contextId);
+    return this.db.getAllAsync<{ id: string; manifest: string }>('SELECT id, manifest FROM offline_packages WHERE user_id = ? AND context_id = ? ORDER BY rowid DESC', owner.userId, owner.contextId);
   }
 
   async attempts(owner: Owner): Promise<StoredAttempt[]> {

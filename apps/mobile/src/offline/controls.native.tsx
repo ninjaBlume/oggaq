@@ -5,38 +5,40 @@ import { examQuestionTitle, suggestedMinutes } from '@oggaq/study-core';
 import { Text } from '../text';
 import { useOnReturn, useResource, useTask } from '../hooks';
 import { newId } from '../ids';
-import { Button, Card, ErrorNotice, SectionTitle } from '../ui';
+import { Button, Card, ErrorNotice, SectionTitle, Sheet } from '../ui';
 import { ChoiceGroup } from '../expressive';
 import { useTheme } from '../themeContext';
-import { downloadOfflineExam } from './download';
 import { openOfflineDatabase } from './nativeDatabase';
 import { startLocalAttempt } from './attempts';
 import type { ExamPackage } from './package';
-import type { Props } from './controls';
 
-export function OfflineDownload({ user, context, exam, changed }: Props) {
-  const task = useTask<void>();
-  if (context.kind !== 'personal') return null;
-  return <View style={{ gap: 4 }}><Button compact secondary disabled={task.pending} onPress={() => void task.run(
-    () => downloadOfflineExam({ userId: user.id, contextId: context.id }, exam.id), changed,
-  )}>{task.pending ? 'İndiriliyor…' : 'Çevrimdışı indir'}</Button><ErrorNotice error={task.error} /></View>;
-}
-
-export function OfflineShelf({ user, context, kind, education, weapon, revision, open }: { user: User; context: StudyContext; kind: 'deneme' | 'ders'; education: 'basic' | 'renewal'; weapon: 'armed' | 'unarmed'; revision: number; open: (id: string) => void }) {
+export function OfflineShelf({ user, context, kind, education, weapon, revision, open, onlyPending }: { user: User; context: StudyContext; onlyPending: boolean; kind: 'deneme' | 'ders'; education: 'basic' | 'renewal'; weapon: 'armed' | 'unarmed'; revision: number; open: (id: string) => void }) {
   const { styles } = useTheme();
   const owner = { userId: user.id, contextId: context.id };
   const [chosen, setChosen] = useState<string | null>(null);
+  const [subject, setSubject] = useState<string | null>(null);
+  const [choosingSubject, setChoosingSubject] = useState(false);
   const [policy, setPolicy] = useState<'continuous' | 'pause_on_exit'>('continuous');
   const task = useTask<string>();
   const resource = useResource(async () => {
     const db = await openOfflineDatabase();
     const [packs, attempts] = await Promise.all([db.packages(owner), db.attemptSummaries(owner)]);
     return { packs: packs.map(row => JSON.parse(row.manifest) as ExamPackage), attempts };
-  }, [user.id, context.id, revision], context.kind === 'personal');
+  }, [user.id, context.id, revision, onlyPending], context.kind === 'personal');
   useOnReturn(() => void resource.reload(false));
   if (context.kind !== 'personal') return null;
-  const packs = (resource.data?.packs ?? []).filter(pack => (pack.exam.subject === null) === (kind === 'deneme')
+  const seen = new Set<string>();
+  const allPacks = resource.data?.packs ?? [];
+  const candidates = allPacks.filter(pack => {
+    const latest = !seen.has(pack.exam.id); seen.add(pack.exam.id);
+    return latest || (resource.data?.attempts ?? []).some(row => row.packageId === pack.package_id);
+  }).filter(pack => (pack.exam.subject === null) === (kind === 'deneme')
     && pack.exam.education_type === education && (kind === 'ders' || pack.exam.weapon_status === weapon));
+  const visibleCandidates = candidates.filter(pack => !onlyPending || (resource.data?.attempts ?? []).some(row => row.packageId === pack.package_id));
+  const subjects = Array.from(new Map(visibleCandidates.flatMap(pack => pack.exam.subject ? [[pack.exam.subject.id, pack.exam.subject] as const] : [])).values());
+  const selectedSubject = subjects.find(item => item.id === subject) ?? subjects[0];
+  const packs = visibleCandidates.filter(pack => kind !== 'ders' || pack.exam.subject?.id === selectedSubject?.id);
+
   if (!packs.length && !resource.error) return null;
   function begin(pack: ExamPackage) {
     const id = newId();
@@ -46,8 +48,14 @@ export function OfflineShelf({ user, context, kind, education, weapon, revision,
       return id;
     }, open);
   }
-  return <Card compact tone="blue"><SectionTitle>İndirilen sınavlar</SectionTitle>
+  return <Card compact tone="blue"><SectionTitle>{onlyPending ? 'Devam eden çalışmalar' : 'Sınavlar'}</SectionTitle>
     <Text style={styles.muted}>Bu cihazda internet olmadan çözebilirsin.</Text>
+    {kind === 'ders' && subjects.length > 1 && <>
+      <Button compact secondary onPress={() => setChoosingSubject(true)}>{selectedSubject?.name ?? 'Ders seç'}</Button>
+      <Sheet visible={choosingSubject} title="Hangi dersin sınavları?" close={() => setChoosingSubject(false)}>
+        {subjects.map(item => <Button key={item.id} secondary={item.id !== selectedSubject?.id} alignStart onPress={() => { setSubject(item.id); setChoosingSubject(false); }}>{item.name}</Button>)}
+      </Sheet>
+    </>}
     <ErrorNotice error={resource.error ?? task.error} />
     {packs.map(pack => {
       const attempts = (resource.data?.attempts ?? []).filter(row => row.packageId === pack.package_id);
@@ -58,7 +66,7 @@ export function OfflineShelf({ user, context, kind, education, weapon, revision,
         {current ? <Button compact onPress={() => open(current.id)}>Devam et</Button> : chosen === pack.package_id ? <>
           <ChoiceGroup choices={[{ value: 'continuous', label: 'Süre devam etsin', accessibilityLabel: 'Süre devam etsin' }, { value: 'pause_on_exit', label: 'Çıkınca süre dursun', accessibilityLabel: 'Çıkınca süre dursun' }]} value={policy} onChange={value => setPolicy(value as typeof policy)} />
           <Button compact disabled={task.pending} onPress={() => begin(pack)}>Sınavı başlat</Button>
-        </> : <Button compact secondary onPress={() => setChosen(pack.package_id)}>Çevrimdışı çöz</Button>}
+        </> : <Button compact secondary onPress={() => setChosen(pack.package_id)}>Sınava gir</Button>}
         {waiting.map(row => <Button key={row.id} compact secondary onPress={() => open(row.id)}>{`Eşitlemeyi bekliyor · ${pack.questions.length} soru`}</Button>)}
       </View>;
     })}

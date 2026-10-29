@@ -4,6 +4,7 @@ namespace App\Modules\Exams\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Exams\Actions\ImportOfflineExam;
+use App\Modules\Exams\Actions\ListOfflineExamRevisions;
 use App\Modules\Exams\Actions\PrepareOfflineExam;
 use App\Modules\Exams\Http\Requests\ImportOfflineExamRequest;
 use App\Modules\Exams\Http\Resources\ExamAttemptResource;
@@ -12,6 +13,11 @@ use Illuminate\Http\Request;
 
 class OfflineExamController extends Controller
 {
+    public function revisions(Request $request, string $context, ListOfflineExamRevisions $action): JsonResponse
+    {
+        return response()->json(['data' => $action->execute($request->user(), $context)])->header('Cache-Control', 'private, no-store');
+    }
+
     public function show(Request $request, string $context, string $exam, PrepareOfflineExam $action): JsonResponse
     {
         return response()->json($action->execute($request->user(), $context, $exam, $request))->header('Cache-Control', 'private, no-store');

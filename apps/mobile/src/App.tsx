@@ -62,6 +62,7 @@ import { isTransientReadError, recoverRead } from "./readRecovery";
 import { AppUpdatesProvider } from "./appUpdates";
 import { OfflineExamScreen } from './offline/screen';
 import { OfflineAutoSync } from './offline/autoSync';
+import { OfflineAutoPrepare } from './offline/autoPrepare';
 
 type Routes = {
   Main: undefined;
@@ -397,6 +398,7 @@ function Workspace({
   return (
     <View style={styles.shell}>
     <OfflineAutoSync user={user} context={context} />
+    <OfflineAutoPrepare user={user} context={context} />
     {(query.error || query.refreshError) && !connectionWarning ? <ConnectionNotice retry={() => void query.reload(true)} /> : null}
     <NavigationContainer
       key={`${user.id}-${context.id}`}

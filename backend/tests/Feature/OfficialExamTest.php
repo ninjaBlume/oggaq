@@ -41,6 +41,13 @@ class OfficialExamTest extends TestCase
             ->assertJsonPath('data.claim.user_id', $student->id)->assertJsonPath('data.exam.question_count', 3)
             ->assertJsonPath('data.questions.0.question.id', $this->questions[0]->published_version_id);
         $data = $response->json('data');
+        $revisions = $this->getJson('/api/v1/contexts/'.$context.'/offline-exam-revisions')->assertOk()->assertHeader('Cache-Control', 'no-store, private')->json('data');
+        $revision = collect($revisions)->firstWhere('exam_id', $published['id']);
+        $claim = $data['claim'];
+        $versions = collect($claim['questions'])->map(fn ($row) => $row['position'].':'.$row['question_id'].':'.$row['question_version_id'])->implode(',');
+        $this->assertSame(hash('sha256', ($claim['scoring_period_id'] ?? '').':'.($claim['scoring_rule_id'] ?? '').'|'.$versions), $revision['revision']);
+        $this->assertNull(collect($revisions)->firstWhere('exam_id', $draft['id']));
+        $this->getJson('/api/v1/contexts/'.$otherContext.'/offline-exam-revisions')->assertNotFound();
         $this->assertSame(hash('sha256', $data['content_json']), $data['claim']['content_hash']);
         $this->assertSame($data['questions'][0]['question']['options'][0]['id'], $data['questions'][0]['correct_option_id']);
         $this->assertSame('Gizli açıklama', $data['questions'][0]['explanation']);
@@ -67,6 +74,7 @@ class OfficialExamTest extends TestCase
         $this->createMembership($student, $tenant);
         $institution = $student->studyContexts()->whereNotNull('tenant_id')->firstOrFail();
         $this->getJson('/api/v1/contexts/'.$institution->id.'/offline-exams/'.$published['id'])->assertForbidden()->assertJsonPath('code', 'offline_personal_only');
+        $this->getJson('/api/v1/contexts/'.$institution->id.'/offline-exam-revisions')->assertForbidden()->assertJsonPath('code', 'offline_personal_only');
         $this->asToken($other)->getJson($url)->assertNotFound();
     }
 
@@ -103,10 +111,13 @@ class OfficialExamTest extends TestCase
         $newAttempt['answers'][$pack['questions'][0]['question_id']] = (string) Str::uuid();
         $this->postJson($url, $newAttempt)->assertUnprocessable();
         $this->assertDatabaseCount('exam_attempts', 1);
+        $beforeRevision = collect($this->getJson('/api/v1/contexts/'.$context.'/offline-exam-revisions')->assertOk()->json('data'))->firstWhere('exam_id', $exam['id'])['revision'];
         $first = $this->questions[0];
         $next = app(SaveQuestion::class)->execute($this->admin, ['source_id' => $this->source->id, 'subject_id' => $this->subject->id, 'stem' => 'Sentetik düzeltme', 'options' => ['A', 'B'], 'correct_option_position' => 2, 'base_version' => $first->revision], $first);
         $next = app(PublishQuestion::class)->execute($this->admin, $next, $next->revision);
         $this->asToken($this->admin)->putJson('/api/v1/admin/official-exams/'.$exam['id'].'/questions/'.$first->id, ['question_version_id' => $next->published_version_id])->assertOk();
+        $afterRevision = collect($this->asToken($student)->getJson('/api/v1/contexts/'.$context.'/offline-exam-revisions')->assertOk()->json('data'))->firstWhere('exam_id', $exam['id'])['revision'];
+        $this->assertNotSame($beforeRevision, $afterRevision);
         $stale = $payload;
         $stale['id'] = (string) Str::uuid();
         $this->asToken($student)->postJson($url, $stale)->assertConflict()->assertJsonPath('code', 'offline_package_changed');
