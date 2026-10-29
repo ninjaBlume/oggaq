@@ -1,5 +1,18 @@
 # Test ve doğrulama stratejisi
 
+**Son ek — gerçek 16 KB emülatör kontrolü:** Kurulu resmî Android 16 `google_apis_ps16k` imajından yalnız bu iş için geçici cihaz oluşturuldu; `getconf PAGE_SIZE` **16384**. Android (9) temiz kurulum, gerçek API ile sentetik inceleme hesabı girişi, matbu PDF oluşturma/paylaşım, alıcı Print önizlemesi ve Dosyalar’a kaydetme geçti. PDF’den Türkçe metin doğrulandı, cihazdaki test PDF’si silindi. Universal APK için `zipalign -c -P 16 -v 4` ve AAB `PAGE_ALIGNMENT_16K` kontrolü de geçti. Önceki yalnız 4 KB test sınırlaması bu aday için artık kapandı; fiziksel Play kurulumu veya (10) adayının doğrudan testi değildir.
+
+## 29 Ekim 2026 — Son mağaza hazırlığı
+
+Kaynak ürün kodu **fbbeb6f**; bu hazırlıkta uygulama/backend kodu veya veri şeması değiştirilmedi. **80 mobil**, **24 mağaza/arşiv testi** ve workspace strict TS geçti. Dört yasal sayfanın kaynak/canlı byte ve SHA-256 karşılaştırması eşleşti. İnceleme hesabı otomasyonda yanlış alana yazılan parolası nedeniyle yenilendi; işlem yalnız sentetik öğrenci hesabına yapıldı ve oturumları iptal edildi. Parola kaynak kontrolü veya kanıt dosyalarına yazılmaz. Apple yeni parolayı taslakta kaydetti; Google mevcut kaydı güncelledi ve açık kayıt mesajı döndü. Gerçek kullanıcı verisi değiştirilmedi.
+
+Android **(9)** imza/sertifika/API/izin/44 ELF 16 KB kontrolleri geçti. AAB’den geçici QA sertifikasıyla türetilen universal APK temiz Android 16 emülatörüne kuruldu. Gerçek API giriş, menü, matbu dilekçe → PDF paylaşımı → alıcı Print önizlemesi → Downloads’a kaydetme ve çıkış geçti. Türkçe metin PDF’den okundu; kaydedilen sentetik dosya emülatörden silindi. Bu **4 KB** emülatör testidir; gerçek Play imzası/telefon veya 16 KB çalıştırma teyidi değildir. Yeni üretim kanallı Android **(10)** EAS **53fc3b26-e949-41d8-bd42-f77babc51f17** hazırlanıyor; Google’a henüz yüklenmedi.
+
+Apple üretim **1.0.0 (9)** EAS **9eb9038f-74c3-413d-8e8d-bb4f741cfc6c** tamamlandı. Strict/deep codesign, profil/team, iPhone+iPad, debugger kapalı, HTTPS API, preview=false, yeni notice .5/native PDF ve runtime **b51b753fd9051929e36f71f5dde5ca7658d2d0d9** doğrulandı. Kanal **production**, 0 ms bekleme; **15.354.270 bayt**, SHA-256 **d87686766d19b003e799bb7965fa44b273946e25b825497e4eb38c8b465b9c3a**. Kullanıcı Apple’da yayın istemediğinden IPA Apple’a yüklenmedi. Canlı App Privacy **Published / 11 tür** ve gizlilik/silme URL’leri yeniden okundu; beyan değiştirilmedi. Önceki cihaz içi PDF teyidi TestFlight (8)’e aittir.
+
+EGM talebi kullanıcı talimatıyla hazır tutuldu, gönderilmedi. Kullanım hakkı/temsilci-VERBİS/aktarım için kanıt bulunmadığından genel uygunluk veya mağaza inceleme onayı verilmiş sayılmaz. İç `check:store` taslak engeli korunur; Google politika reddi değildir. Kanıt **artifacts/store-final-prep-20261029/**.
+
+
 ## 29 Ekim 2026 — PDF düzeltmesinin dağıtımı
 
 Kaynak **fbbeb6f**; gizlilik .5 ve web hesabı canlıya alındı. **privacy-fbbeb6f** app/web imajlarında PHP yapılandırması ve **43 frontend dosyası** hash eşleşti; migration veya iş verisi yazımı yok. DB/Redis/Mailpit/tünel konteynerleri değişmedi. Yeni şifreli ön yedek **oggaq-oggaq-20261029T145623Z.dump.age**, 2.113.098 bayt, SHA-256 **7c3a0bdaf3ef30301840b410a3ef9c89431efdac377c075327fa1cff54b8788c**. HTTPS .5/arşiv/hesap/ana sayfa 200; örnek hesap giriş/okuma/çıkış ve readiness geçti.

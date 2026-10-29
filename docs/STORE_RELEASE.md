@@ -1,5 +1,21 @@
 # App Store ve Google Play yayın hazırlığı
 
+**Son ek — gerçek 16 KB emülatör kontrolü:** Kurulu resmî Android 16 `google_apis_ps16k` imajından yalnız bu iş için geçici cihaz oluşturuldu; `getconf PAGE_SIZE` **16384**. Android (9) temiz kurulum, gerçek API ile sentetik inceleme hesabı girişi, matbu PDF oluşturma/paylaşım, alıcı Print önizlemesi ve Dosyalar’a kaydetme geçti. PDF’den Türkçe metin doğrulandı, cihazdaki test PDF’si silindi. Universal APK için `zipalign -c -P 16 -v 4` ve AAB `PAGE_ALIGNMENT_16K` kontrolü de geçti. Önceki yalnız 4 KB test sınırlaması bu aday için artık kapandı; fiziksel Play kurulumu veya (10) adayının doğrudan testi değildir.
+
+## 29 Ekim — Son mağaza hazırlığı (genel gönderim yapılmadı)
+
+Kullanıcı Google Play yayıncısını **Codentum L.L.C. kuruluş hesabı** olarak kesinleştirdi. Apple yalnız hazırlanır; inceleme ve yayın yok. EGM kullanım talebi kullanıcı tarafından yeniden **yalnız hazır tutulsun** olarak sınırlandı; gönderilmedi, kullanım hakkı alınmış sayılmaz.
+
+- Android **1.0.0 (9)** play-internal adayının imza/sertifika, API 36, beklenen izinler ve 44 adet 64 bit ELF 16 KB kontrolleri geçti. AAB’den geçici QA sertifikasıyla türetilen APK temiz emülatöre kuruldu; gerçek API ile yalnız örnek inceleme hesabında giriş, Matbu PDF oluşturma, paylaşım → sistem Print önizlemesi → Downloads’a kaydetme geçti. PDF 40.879 bayt; Türkçe metin çıkarımı başarılı. Emülatör 4 KB sayfalıdır; bu test 16 KB cihazda çalıştırma yerine geçmez.
+- Android üretim kanalı için ayrı **1.0.0 (10)**, EAS **53fc3b26-e949-41d8-bd42-f77babc51f17** derlemesi başlatıldı. Google Üretim taslağı hâlâ (7); (8) bilinen PDF hatası nedeniyle dağıtılmadı. (9) android-beta kanalındadır ve üretim adayı olarak kullanılmaz.
+- Apple üretim adayı **1.0.0 (9)**, EAS **9eb9038f-74c3-413d-8e8d-bb4f741cfc6c**, production kanalıyla hazır. Strict/deep codesign, Team ID, dağıtım profili, iPhone+iPad, runtime ve HTTPS/önizleme kapalı/0 ms bekleme doğrulandı. IPA **15.354.270 bayt**, SHA-256 **d87686766d19b003e799bb7965fa44b273946e25b825497e4eb38c8b465b9c3a**. Apple’a yüklenmedi; mevcut TestFlight (8) korunur.
+- İnceleme hesabı parolası otomasyonda yanlış e-posta alanına yazıldığı için yalnız bu sentetik öğrenci hesabının parolası yenilendi; gerçek kullanıcı verisi yoktur. Apple taslağında yeni parola kaydedilip yenilemede doğrulandı. Google’da mevcut **Student review account** kaydı düzenlendi; yeni kopya eklenmedi, “Değişiklik kaydedildi” ve tek satır görüldü. Fazladan iş ortağı test paylaşımı kapalı kaldı. Parolalar Git’e/kanıt dosyalarına yazılmaz.
+- Dört kamu metni canlıyla **byte/SHA-256 düzeyinde aynı**; boş alan yok. Önceki “hukuk maddesi yalnız yerelde” kaydı güncel değildir. Açık resmî işlemler/hak dayanağı nedeniyle `taslak:true` korunur; bu Google’ın istediği bir belge veya verdiği ret değildir.
+- Google veri güvenliği 12 / Apple 11 tür beyanı bu tur azaltılmadı: hâlen dağıtılan eski sürümlerde sunucuda PDF hazırlama yolu vardır. Yeni istemci belgeyi cihazda oluşturur. Google tek etiketin dağıtılan bütün sürümlerin toplamını kapsamasını ister; eski sürümler kaldırıldıktan sonra adres/doküman beyanı yeniden değerlendirilir.
+
+Kanıt `artifacts/store-final-prep-20261029/`. Güncel sürüm notları [store-release-notes.tr.txt](store-release-notes.tr.txt), teknik dağıtım [ANDROID_BETA](ANDROID_BETA.md) / [IOS_BETA](IOS_BETA.md). Google’a inceleme veya genel yayın gönderilmedi.
+
+
 **29 Ekim telefon testi:** Kullanıcı isteğiyle aynı doğrulanmış Android **1.0.0 (7)** paketi yalnız Google Play **Dahili Test** kanalında yayımlandı; kanal **Etkin**, paket **Dahili test kullanıcıları tarafından kullanılabilir** olarak UI’den doğrulandı. Son yayımlama onayını kullanıcı ekranında tamamladı. Genel Üretim taslağı incelemeye/yayına gönderilmedi; iOS/iPad ve OTA değişmedi. Fiziksel telefon indirme/açılış teyidi bekleniyor. Bu adayın gömülü EAS kanalı production’dır; günlük android-beta profilinden ayrımı [ANDROID_BETA](ANDROID_BETA.md) içinde kayıtlıdır.
 
 

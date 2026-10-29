@@ -75,3 +75,6 @@ Eski bir yedek geri yüklenirse silinmiş hesaplar yeniden ortaya çıkar. `php 
 - **Soru bildirim notları** kişisel veri içerebilir; yalnızca platform yöneticisi görür.
 
 İş başvurusunda iletişim bilgileri ve ön yazı yalnız başvuru sahibiyle platform yöneticilerine açılır; kurum yöneticilerine verilmez. Formda bu erişim açıklanır. Ayrı işveren paylaşımı veya otomatik dış aktarım yoktur. Saklama süresinin hukuki kararı ve buna bağlı otomatik imha ayrıca belirlenmelidir; teknik davranış [JOBS](JOBS.md) içindedir.
+
+
+29 Ekim son mağaza hazırlığı: yeni cihaz içi PDF uygulaması için adres/doküman verisini yalnız cihazda işlemek toplama sayılmaz. Ancak Google Data safety tek uygulama kaydındaki hâlen dağıtılan bütün sürümleri kapsar; eski (7) sunucu-PDF istemcisi mevcut olduğundan önceki 12 tür beyanını erken daraltmadık. Apple’ın 11 tür beyanı da eski dağıtılan istemciler değerlendirilmeden değiştirilmedi. Veri envanterinden alan çıkarmak için yalnız yeni koda bakmak yeterli değildir. [Google kapsamı](https://support.google.com/googleplay/android-developer/answer/10787469?hl=en), [Apple cihazda işleme](https://developer.apple.com/app-store/app-privacy-details/).

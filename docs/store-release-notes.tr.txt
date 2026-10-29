@@ -1,0 +1,6 @@
+<tr-TR>
+Temel ve yenileme sınavları, ders çalışmaları ve rastgele denemeler.
+Kaldığın sorudan devam etme, ayrıntılı sonuçlar ve tekrar çalışmaları.
+Silahlı ve silahsız puan hesaplama; sınav takvimi ve cihazda PDF hazırlama.
+Hesap/veri yönetimi ve telefon-tablet düzenleri iyileştirildi.
+</tr-TR>

@@ -1,6 +1,6 @@
 {
   "_nasil": "Bu dosya dört yasal sayfanın ve uygulamaların boş alanlarını tek yerden doldurur. Boş bırakılan alan sayfada işaretli yer tutucu olarak kalır. Doldurduktan sonra `npm run legal:apply` çalıştırın; kalan eksikleri `npm run legal:apply -- --check` ve `npm run check:store` gösterir.",
-  "_dikkat": "Sağlayıcı ve veri akışı alanları belgelenen davranışı anlatır. Yürürlük tarihi ve hukuk maddesi yerel, yayımlanmamış öneridir. taslak alanı iç inceleme durumudur; alanların dolması temsilci/VERBİS kaydı, aktarım güvencesi veya içerik izni yerine geçmez.",
+  "_dikkat": "Bu dosya kamu metinlerinin ve iç inceleme notlarının kaynağıdır. Dört sayfa canlıda doğrulandı. taslak alanı açık hukuki işlemleri de içerir; sayfaların dolu veya teknik olarak çalışır olması resmî kayıt, kullanım izni veya aktarım güvencesi yerine geçmez.",
   "taslak": true,
   "_inceleme": {
     "tarih": "2026-10-29",
@@ -9,12 +9,13 @@
     "verbis-guncel-esikler": "04.09.2025 tarihli 2025/1572 ve 25.12.2025 tarihli 2025/2393 kararlarının uygulama duyurusu kontrol edildi. Mali bilanço toplamı ciro ile aynı ölçüt değildir; bu kararlar Codentum için muafiyet kararı olarak kaydedilmedi.",
     "verbis-rehber": "https://www.kvkk.gov.tr/SharedFolderServer/CMSFiles/2f2fbcf4-932b-4dad-af8a-cd32e315d815.pdf#page=46",
     "verbis-guncel-duyuru": "https://www.kvkk.gov.tr/Icerik/8577/kisisel-verileri-koruma-kurulunun-04-09-2025-tarihli-ve-2025-1572-sayili-kararinin-uygulama-esaslarina-iliskin-kamuoyu-duyurusu",
-    "metin-durumu": "29 Ekim KVKK teknik yayınıyla gizlilik ve hesap silme metinleri canlıya alındı. Kullanım koşullarının önerilen hukuk maddesi yerel inceleme taslağıdır. Temsilci kararı/VERBİS kaydı, KVKK m.9 aktarım güvencesi ve içerik kullanım izni tamamlanmadı; taslak=true korunur.",
-    "yururluk-tarihi": "Gizlilik ve hesap silme teknik revizyonu 29 Ekim 2026 tarihinde yayımlandı. Kullanım koşullarının önerilen hukuk maddesi için tarih hâlâ yerel öneridir; yayımlanmış sayılmaz.",
-    "uygulanacak-hukuk-karari": "Türk hukuku ve emredici tüketici korumalarını saklı tutan öneri hazırlandı; münhasır yabancı mahkeme veya zorunlu tahkim seçilmedi. Şirketin son metin onayı bekleniyor.",
+    "metin-durumu": "29 Ekim canlı karşılaştırmasında gizlilik, kullanım koşulları, destek ve hesap silme sayfalarının tamamı kaynakla SHA-256/byte düzeyinde eşleşti. Metinlerde boş alan yok. İçerik kullanım dayanağı, temsilci/VERBİS ve KVKK m.9 aktarım güvencesi ayrıca açık olduğundan taslak=true korunur; bu Google form reddi değildir.",
+    "yururluk-tarihi": "Dört kamu metninin 29 Ekim 2026 sürümü canlıda doğrulandı. Önceki yalnız yerel öneri notu tarihsel hazırlık durumuydu.",
+    "uygulanacak-hukuk-karari": "Türk hukuku ve emredici tüketici korumalarını saklı tutan, münhasır yabancı mahkeme veya zorunlu tahkim içermeyen metin canlıda kaynakla aynı olarak doğrulandı. Bu olgusal kontrol, şirketin tüm mevzuat yükümlülüklerinin tamamlandığı anlamına gelmez.",
     "temsilci-adayi": "Harun Altay 29 Ekim 2026 tarihinde Türkiye Cumhuriyeti vatandaşı ve Türkiye’de yerleşik olduğunu beyan etti. Karar taslağı bu beyanla hazırlandı; kimlik/adres, yetki, imza ve tasdik işlemleri henüz tamamlanmadı, resmî atama veya VERBİS kaydı değildir.",
     "aktarim-guvencesi": "KVKK m.9 kapsamında sağlayıcı/rol bazında uygun güvence ve gerekli imza/bildirim kayıtları doğrulanmadı. Resend/Cloudflare DPA veya AB SCC varlığı tek başına Türk standart sözleşmesi imzalandığını göstermez.",
-    "icerik-haklari": "Kullanıcı logonun ChatGPT ile üretildiğini bildirdi; OpenAI çıktı hakları çerçevesi doğrulandı. EGM kitapçıkları/görselleri ve üçüncü taraf amblem hakları için açık yeniden kullanım dayanağı henüz doğrulanmadı. Kullanıcı 29 Ekim’de EGM’ye gönderimi şimdilik istemedi. Talep ve logo paylaşılmadı; bu tercih iznin alınmış olduğu anlamına gelmez."
+    "icerik-haklari": "Kullanıcı logonun ChatGPT ile üretildiğini bildirdi; OpenAI çıktı hakları çerçevesi doğrulandı. EGM kitapçıkları/görselleri ve üçüncü taraf amblem hakları için açık yeniden kullanım dayanağı henüz doğrulanmadı. Kullanıcı 29 Ekim’de EGM’ye gönderimi şimdilik istemedi. Talep ve logo paylaşılmadı; bu tercih iznin alınmış olduğu anlamına gelmez. Kullanıcı son hazırlıkta da EGM talebinin yalnız hazır tutulmasını istedi; gönderim yok.",
+    "magaza-karari": "29 Ekim kullanıcı kararı: Google Play yayıncısı Codentum L.L.C. kuruluş hesabı olarak kesinleştirildi. Apple yalnız hazırlanacak; incelemeye/genel yayına gönderilmeyecek."
   },
   "degerler": {
     "veri-sorumlusu-unvan": "Codentum L.L.C. (Wyoming, ABD)",
