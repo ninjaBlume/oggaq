@@ -1,5 +1,13 @@
 # Sunucuda ayrı geliştirme ortamı
 
+## 21 Kasım 2026 — Genişletilmiş tanıtım sitesi canlıda
+
+Güncel web imajı **`oggaq-development-web:site-features-20261121`**; önceki **`store-icons-20261121`** imajı geri dönüş için saklanır. Yalnız web yenilendi: 19 dosya (ana sayfa, yeni CSS/görseller, robots/sitemap, ortak yasal sayfa çerçevesi ve nginx) manifestle doğrulandı; diğer 119 mevcut dosya ve yedi servis konteynerinin kimlikleri aynı kaldı. Yasal sayfaların ana metinleri değiştirilmedi. DB/migration, mobil paket, posta/DNS veya EAS yayını yapılmadı.
+
+`oggsor.com`/www ana sayfası `index, follow`; hesap/yönetim/API ve eski geliştirme alanı `noindex, nofollow` kalır. Kök/www için 24 HTTP dosya hash'i, 10 yol/indeksleme kontrolü ve readiness `ok` doğrulandı. Kaynaklar/testler [PUBLIC_WEBSITE](../../docs/PUBLIC_WEBSITE.md) ve [TESTING](../../docs/TESTING.md) içindedir.
+
+Sunucuda `publication/site-features-20261121/` içinde manifest, aday/aktivasyon betiği, önceki overlay ve receipt saklanır. Geri dönüş: `services.before.yaml` dosyasını aktif `publication/student-access-20261027/services.compose.yaml` üzerine geri koyup `./manage up -d --no-deps --no-build web` çalıştırın. Bu işlem DB geri yüklemesi gerektirmez. `manage` wrapper'ının yolu değişmedi.
+
 ## 29 Ekim 2026 — KVKK kontrolleri canlıya alındı
 
 Kullanıcının canlıya alma yönlendirmesiyle kaynak **397c05d**, app/worker/scheduler **`oggaq-development-app:kvkk-397c05d`**, web **`oggaq-development-web:kvkk-397c05d-notransform`** olarak etkinleştirildi. Önceki 19 runtime dosyasının hash'leri çalışan imajlarla karşılaştırıldı; yeni adaylar derlendi, nginx ön kontrolü geçti. Adlandırılmış **`2026_10_29_000001_add_privacy_controls`** migration'ı canlı `oggaq` DB'sine uygulandı. Tek transaction içinde 19 iş tablosunun eski alanları ve önceki migration kayıtları karşılaştırıldı: kullanıcı, soru, cevap ve sonuçlar değişmedi; başvuru tarihçesi bilinmeyen satırlardaki yeni alanlar migration zamanı ile başlatıldı. Kurulum sırasında toplu imha çalıştırılmadı; imha önizlemesi üç kategoride **0** aday buldu. Günlük iş İstanbul saatiyle **03:40** için kayıtlı.

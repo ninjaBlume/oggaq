@@ -22,23 +22,31 @@ export function storeLinks(config, bundleIdentifier) {
   return { appStore: validate(config.appStoreUrl, 'appStore'), googlePlay: validate(config.googlePlayUrl, 'googlePlay') };
 }
 
-function storeCard(store, url) {
+function storeCard(store, url, iconUrl) {
   const apple = store === 'appStore';const name = apple ? 'App Store' : 'Google Play';const platform = apple ? 'iPhone ve iPad' : 'Android';
-  const content = `<span class="store-copy"><strong>${name}</strong><span>${platform}</span></span><span class="store-state">${url ? 'İndir ↗' : 'Yakında'}</span>`;
+  const content = `<img class="store-icon" src="${escapeHtml(iconUrl)}" width="36" height="36" alt="" aria-hidden="true"><span class="store-copy"><strong>${name}</strong><span>${platform}</span></span><span class="store-state">${url ? 'İndir' : 'Yakında'}</span>`;
   return url ? `<a class="store-card available" data-store="${store}" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" aria-label="${name} üzerinden indir">${content}</a>` : `<div class="store-card pending" data-store="${store}" role="group" aria-label="${name}: yakında">${content}</div>`;
 }
 
 export async function buildSite({ output = path.join(root, 'apps/site/dist'), links: suppliedLinks } = {}) {
   const brand = JSON.parse(await readFile(path.join(root, 'config/brand.json'), 'utf8'));
   const links = storeLinks(suppliedLinks ?? JSON.parse(await readFile(path.join(root, 'config/store-links.json'), 'utf8')), brand.bundleIdentifier);
+  const icons = {};
+  for (const [store, filename] of Object.entries({ appStore: 'app-store.png', googlePlay: 'google-play.svg' })) {
+    const digest = createHash('sha256').update(await readFile(path.join(root, 'apps/site/public/store-icons', filename))).digest('hex').slice(0, 12);
+    icons[store] = `/store-icons/${filename}?v=${digest}`;
+  }
   const css = cssTokens()+'\n'+await readFile(path.join(root, 'apps/site/styles.css'), 'utf8');
   const cssName = `site-${createHash('sha256').update(css).digest('hex').slice(0, 12)}.css`;
+  const screenUrl = async filename => `/screens/${filename}?v=${createHash('sha256').update(await readFile(path.join(root, 'apps/site/public/screens', filename))).digest('hex').slice(0, 12)}`;
   const values = {
     name: brand.name, subtitle: brand.subtitle, title: brand.displayName, themeColor: lightPalette.navy,
     website: brand.websiteUrl, support: brand.supportEmail,
     css: `/site-assets/${cssName}`, notice: notOfficialNotice,
-    homeScreen: `/screens/mobile-home.jpg?v=${createHash('sha256').update(await readFile(path.join(root, 'apps/site/public/screens/mobile-home.jpg'))).digest('hex').slice(0, 12)}`,
-    stores: storeCard('appStore', links.appStore)+storeCard('googlePlay', links.googlePlay),
+    homeScreen: await screenUrl('mobile-home.jpg'),
+    examScreen: await screenUrl('mobile-exams.png'),
+    resultScreen: await screenUrl('mobile-result.jpg'),
+    stores: storeCard('appStore', links.appStore, icons.appStore)+storeCard('googlePlay', links.googlePlay, icons.googlePlay),
     storeNotice: links.appStore || links.googlePlay ? '' : '<p class="store-notice">Mağaza yayını hazırlanıyor. Bağlantılar burada yer alacak.</p>',
     legal: legalPages.map(page => `<a href="${page.file}">${escapeHtml(page.title)}</a>`).join(''),
   };
@@ -51,7 +59,12 @@ export async function buildSite({ output = path.join(root, 'apps/site/dist'), li
   await writeFile(path.join(output, 'index.html'), html);await writeFile(path.join(output, 'site-assets', cssName), css);
   for (const name of ['brand-logo.png', 'favicon.png', 'fonts', 'legal']) await cp(path.join(root, 'apps/web/public', name), path.join(output, name), { recursive: true });
   await cp(path.join(root, 'apps/site/public/screens'), path.join(output, 'screens'), { recursive: true });
-  return { output, links, files: ['index.html', `site-assets/${cssName}`] };
+  await cp(path.join(root, 'apps/site/public/store-icons'), path.join(output, 'store-icons'), { recursive: true });
+  const robots = `User-agent: *\nAllow: /\n\nSitemap: ${brand.websiteUrl}/sitemap.xml\n`;
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${escapeHtml(brand.websiteUrl)}/</loc></url></urlset>\n`;
+  await writeFile(path.join(output, 'robots.txt'), robots);
+  await writeFile(path.join(output, 'sitemap.xml'), sitemap);
+  return { output, links, files: ['index.html', `site-assets/${cssName}`, 'robots.txt', 'sitemap.xml'] };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

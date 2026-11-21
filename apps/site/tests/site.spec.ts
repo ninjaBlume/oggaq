@@ -6,21 +6,42 @@ for (const colorScheme of ['light', 'dark'] as const) test(`tanıtım sitesi: ${
   page.on('request', request => { if (new URL(request.url()).pathname.startsWith('/api/')) apiRequests.push(request.url()); });
   try {
     await page.goto('http://127.0.0.1:5187/');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Çıkmış sorularla');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Sınavına çalış.');
     const screen = page.getByRole('img', { name: /^ÖGGSor ana ekranı:/ });
     await expect(screen).toBeVisible();
     await expect.poll(() => screen.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth === 780 && img.naturalHeight === 1688)).toBe(true);
     await expect(page.getByText('Örnek veriler', { exact: true })).toBeVisible();
-    await expect(page.getByRole('group', { name: 'App Store: yakında', exact: true })).toBeVisible();
-    await expect(page.getByRole('group', { name: 'Google Play: yakında', exact: true })).toBeVisible();
+    await expect(page.locator('#indir').getByRole('group', { name: 'App Store: yakında', exact: true })).toBeVisible();
+    const googlePlay = page.locator('#indir').getByRole('link', { name: 'Google Play üzerinden indir', exact: true });
+    await expect(googlePlay).toBeVisible();
+    await expect(googlePlay).toHaveAttribute('href', 'https://play.google.com/store/apps/details?id=net.codentum.oggsor');
+    await expect(googlePlay).toHaveAttribute('target', '_blank');
+    await expect(googlePlay).toHaveAttribute('rel', 'noopener noreferrer');
+    await expect(page.locator('.store-notice')).toHaveCount(0);
+    const storeIcons = page.locator('.store-card .store-icon');
+    await expect(storeIcons).toHaveCount(4);
+    await expect.poll(() => storeIcons.evaluateAll(images => images.every(image => {
+      const img = image as HTMLImageElement;
+      return img.complete && img.naturalWidth > 0 && img.naturalHeight > 0;
+    }))).toBe(true);
     await expect(page.getByRole('textbox')).toHaveCount(0);
-    await expect(page.getByRole('link', { name: /üzerinden indir/ })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /üzerinden indir/ })).toHaveCount(2);
+    await expect(page.getByRole('heading', { name: /Bugün bir ders/ })).toBeVisible();
+    await expect(page.locator('.study-options dt')).toHaveText(['Çıkmış sınavlar', 'Ders sınavları', 'Rastgele sınav', 'Tekrar sınavı']);
+    await expect(page.locator('.tools-list dt')).toHaveText(['Puan hesapla', 'Sınav takvimini takip et', 'Dilekçe ve tutanak hazırla']);
     await expect(page.locator('script')).toHaveCount(0);
     await expect(page.getByRole('link', { name: /giriş yap|kayıt ol|sınava gir/i })).toHaveCount(0);
     mkdirSync('artifacts/public-site/screens', { recursive: true });
     for (const width of [320, 390, 834, 1280]) {
       await page.setViewportSize({ width, height: 1000 });
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      for (const card of await page.locator('.store-card').all()) {
+        const icon = await card.locator('.store-icon').boundingBox();
+        const copy = await card.locator('.store-copy').boundingBox();
+        expect(icon).not.toBeNull();expect(copy).not.toBeNull();
+        expect(icon!.width).toBe(36);expect(icon!.height).toBe(36);
+        expect(icon!.x + icon!.width).toBeLessThanOrEqual(copy!.x);
+      }
       await screen.scrollIntoViewIfNeeded();
       const phone = await page.locator('.phone').boundingBox();
       const image = await screen.boundingBox();
@@ -34,6 +55,10 @@ for (const colorScheme of ['light', 'dark'] as const) test(`tanıtım sitesi: ${
         const r = img.getBoundingClientRect();
         return document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2) === img;
       })).toBe(true);
+      for (const image of await page.locator('.exam-preview img, .result-preview img').all()) {
+        await image.scrollIntoViewIfNeeded();
+        await expect.poll(() => image.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+      }
       await page.evaluate(() => window.scrollTo(0, 0));
       await page.screenshot({ path: `artifacts/public-site/screens/${colorScheme}-${width}.png`, fullPage: true, animations: 'disabled' });
     }
@@ -70,7 +95,8 @@ for (const colorScheme of ['light', 'dark'] as const) test(`bilgi sayfaları: or
       expect(response?.ok()).toBe(true);
       await expect(page.getByRole('navigation', { name: 'Bilgi ve destek', exact: true }).getByRole('link', { name: title, exact: true })).toHaveAttribute('aria-current', 'page');
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-      expect(await page.locator('body').innerText()).not.toMatch(/taslak|hukukçu|\[YÜRÜRLÜK|\[VERBİS|YETKİLİ MAHKEME/i);
+      // Belge özelliğini açıklayan “taslak ekran belleğinde tutulur” geçerli ürün metnidir.
+      expect(await page.locator('body').innerText()).not.toMatch(/taslak metin|hukukçu incelemesi|\[YÜRÜRLÜK|\[VERBİS|YETKİLİ MAHKEME/i);
       await expect(page.locator('[data-placeholder], script')).toHaveCount(0);
       await expect(page.getByRole('banner').getByRole('link', { name: 'Mağazalar' })).toHaveAttribute('href', '/#indir');
       await expect.poll(() => page.getByRole('contentinfo').locator('.brand img').evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
@@ -92,6 +118,20 @@ for (const colorScheme of ['light', 'dark'] as const) test(`bilgi sayfaları: or
     }
     expect(apiRequests).toEqual([]);
     await page.getByRole('banner').getByRole('link', { name: 'ÖGGSor ana sayfa', exact: true }).click();
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Çıkmış sorularla');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Sınavına çalış.');
   } finally { await context.close(); }
+});
+
+test('SSS klavyeyle açılır ve kapanır; son indirme alanı doğru mağazaya gider', async ({ page }) => {
+  await page.goto('http://127.0.0.1:5187/');
+  const question = page.locator('#sss summary').first();
+  const answer = page.getByText('Evet. Soru çözme, deneme ve ders sınavları, tekrar çalışmaları ve yardımcı araçlar ücretsizdir.', { exact: false });
+  await question.focus();
+  await page.keyboard.press('Enter');
+  await expect(answer).toBeVisible();
+  await page.keyboard.press('Enter');
+  await expect(answer).toBeHidden();
+  const closing = page.getByRole('region', { name: /Bir sonraki çalışman/ });
+  await expect(closing.getByRole('link', { name: 'Google Play üzerinden indir' })).toHaveAttribute('href', 'https://play.google.com/store/apps/details?id=net.codentum.oggsor');
+  await expect(closing.getByRole('group', { name: 'App Store: yakında' })).toBeVisible();
 });

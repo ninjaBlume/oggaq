@@ -1,5 +1,14 @@
 # Tanıtım sayfasındaki uygulama görselleri
 
+## 21 Kasım 2026 — Özellikleri anlatan sayfa
+
+Mevcut `mobile-home.jpg` ana ekranda korundu. Çalışma ve sonuç bölümlerine iki mevcut gerçek uygulama görüntüsü eklendi:
+
+- `public/screens/mobile-exams.png`: `docs/store-assets/android/tr-TR/02-exams.png` dosyasının byte'ları değiştirilmeden kopyalandı. 1080 × 1920 Android emülatör/Expo Go görüntüsüdür; temel/yenileme ve silahlı/silahsız seçimleriyle deneme listesini gösterir. Çekimde yalnız sentetik öğrenci kullanıldığı [mağaza görsel kaydında](../../docs/store-assets/README.md) belgelenmiştir. iOS ekranı olarak sunulmaz.
+- `public/screens/mobile-result.jpg`: `artifacts/site-visual-refresh/publication/site/screens/mobile-result.jpg` içindeki gerçek Expo `exam-result-summary` bileşeni çekiminin değişmemiş kopyasıdır. 724 × 268 px; 100 soruda 72 doğru, 18 yanlış, 10 boş gösteren anonim örnektir. Kaynak çekim `artifacts/site-visual-refresh/capture.mjs` içinde kayıtlıdır; önceki sayfa kompozisyonunun reddi bu bileşen görüntüsünün kaynağını değiştirmez.
+
+Her iki görselin yanında örnek ekran/veri açıklaması vardır. Yapay soru, gerçek kişisel bilgi veya yeni başarı iddiası eklenmedi. İki yeni görsel `loading="lazy"` ile yüklenir; URL'leri içerik hash'i taşır. Ana ekranın tarih/sayaç değerleri aşağıdaki tarihsel çekime aittir. Yeni çekim, mobil paket veya fiziksel cihaz testi yapılmadı.
+
 **Güncel durum (28 Ekim 2026):** Onaylanan tek düz telefon düzeni ve güncel sistem ikonlarını gösteren ana ekran `oggaq-development-web:system-icons-20261028-r2` imajıyla yayındadır. Genel HTTPS üzerinden görsel/yerleşim, hesap/yönetim girişleri ve API kontrol edildi. Önceki reddedilen kompozisyonun geri alım geçmişi aşağıda korunur.
 
 28 Ekim 2026: görseller mevcut `apps/mobile` Expo web önizlemesinden, açık tema / standart yazı / 390 × 844 px / 2× yoğunluk ile yeniden alındı. HTML ile taklit edilmiş ekran veya AI ile üretilmiş resim değildir. Native cihaz testi yerine sayılmaz.

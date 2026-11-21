@@ -2,10 +2,10 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{title}}</title>
-<meta name="description" content="Özel güvenlik sınavlarına {{name}} ile hazırlan. Temel ve yenileme sınavlarının çıkmış soruları, ders sınavları ve tekrar çalışmaları iOS ve Android uygulamasında.">
+<title>{{title}} | Özel Güvenlik Sınavına Hazırlık</title>
+<meta name="description" content="Çıkmış ÖGG sorularını çöz, yanlışlarını tekrar et ve ilerlemeni takip et. Deneme, ders sınavları ve puan hesaplama {{name}} uygulamasında. Ücretsiz indir.">
 <link rel="canonical" href="{{website}}/">
-<meta property="og:title" content="{{title}}"><meta property="og:description" content="Özel güvenlik sınavlarına hazırlığın her zaman yanında."><meta property="og:type" content="website"><meta property="og:url" content="{{website}}/"><meta property="og:image" content="{{website}}/brand-logo.png">
+<meta property="og:title" content="{{title}}"><meta property="og:description" content="Çıkmış soruları çöz, eksiklerini gör, sınavına hazırlan. Deneme, ders, tekrar ve puan hesaplama. Ücretsiz."><meta property="og:type" content="website"><meta property="og:url" content="{{website}}/"><meta property="og:image" content="{{website}}/brand-logo.png">
 <meta name="theme-color" content="{{themeColor}}">
 <link rel="icon" type="image/png" href="/favicon.png"><link rel="stylesheet" href="/fonts/wordmark.css"><link rel="stylesheet" href="{{css}}">
 </head>
@@ -13,14 +13,14 @@
 <a class="skip-link" href="#icerik">İçeriğe geç</a>
 <header class="site-header wrap">
   <a class="brand" href="/" aria-label="{{name}} ana sayfa"><img src="/brand-logo.png" width="42" height="42" alt=""><span><span class="brand-wordmark">{{name}}</span><small>{{subtitle}}</small></span></a>
-  <nav aria-label="Ana menü"><a href="#uygulama">Uygulama hakkında</a><a href="/legal/destek.html">Destek</a><a class="nav-download" href="#indir">Mağazalar <span aria-hidden="true">↓</span></a></nav>
+  <nav aria-label="Ana menü"><a href="#uygulama">Özellikler</a><a href="#sss">Sık sorulanlar</a><a class="nav-download" href="#indir">Mağazalar</a></nav>
 </header>
 <main id="icerik">
   <section class="hero wrap" aria-labelledby="hero-title">
     <div class="hero-copy">
       <p class="kicker">Özel güvenlik sınavlarına hazırlık</p>
-      <h1 id="hero-title">Çıkmış sorularla<br><em>sınavına hazırlan.</em></h1>
-      <p class="hero-description">Temel ve yenileme eğitimi için ders sınavları, denemeler ve tekrar çalışmaları. Hepsi {{name}} uygulamasında.</p>
+      <h1 id="hero-title">Sınavına çalış.<br><em>Gelişimini gör.</em></h1>
+      <p class="hero-description">Çıkmış ÖGG sorularını çöz. Yanlışlarına yeniden çalış, sonuçlarını takip et. Temel ve yenileme sınavlarına {{name}} ile hazırlan.</p>
       <p class="exam-types">Temel ve yenileme <span aria-hidden="true">/</span> Silahlı ve silahsız</p>
     </div>
     <figure class="app-preview">
@@ -33,20 +33,53 @@
     </figure>
     <div class="download-section" id="indir">
       <h2>Telefonuna indir</h2>
-      <p class="download-caption">iPhone, iPad ve Android için. Ücretsiz.</p>
+      <p class="download-caption">Tüm özellikler ücretsiz. Mağazanı seç, çalışmaya başla.</p>
       <div class="store-list">{{stores}}</div>
       {{storeNotice}}
     </div>
   </section>
-  <section class="app-details wrap" id="uygulama" aria-labelledby="details-title">
-    <div class="details-intro"><p class="kicker">Çalışma biçimini sen seç</p><h2 id="details-title">Bir ders, bir deneme<br>ya da kaldığın yer.</h2><p>İster konu konu ilerle, ister bir sınavı baştan sona çöz.</p></div>
-    <dl class="feature-list">
-      <div><dt>Ders sınavları</dt><dd>Çalışacağın dersi seç. Çıkmış soruları konularına göre çöz.</dd></div>
-      <div><dt>Deneme sınavları</dt><dd>Temel veya yenileme sınavını, silahlı ya da silahsız olarak aç. Ara verdiğinde kaldığın yerden devam et.</dd></div>
-      <div><dt>Sonuçlar ve tekrar</dt><dd>Doğru ve yanlışlarını incele. Yanlış, boş ve favori sorularınla yeniden çalış.</dd></div>
-    </dl>
+  <section class="study-section section wrap" id="uygulama" aria-labelledby="details-title">
+    <div class="section-heading"><p class="kicker">Çalışma biçimini sen seç</p><h2 id="details-title">Bugün bir ders.<br> Yarın tam bir deneme.</h2><p>İhtiyacına göre çalış; temel ve yenileme, silahlı ve silahsız seçenekleri arasından sınavını seç.</p></div>
+    <div class="study-layout">
+      <dl class="study-options">
+        <div><dt>Çıkmış sınavlar</dt><dd>Geçmiş ÖGG sınavlarını özgün soru sırasıyla çöz. Dönemini seç, çalışmanı tamamla ve sonucunu incele.</dd></div>
+        <div><dt>Ders sınavları</dt><dd>Çalışmak istediğin derse odaklan. Konulara göre sorularla eksiklerini tamamla.</dd></div>
+        <div><dt>Rastgele sınav</dt><dd>Çıkmış sorulardan, ders ve konu dağılımı korunarak hazırlanan karma bir sınavla kendini dene.</dd></div>
+        <div><dt>Tekrar sınavı</dt><dd>Yanlışların, boş bıraktıkların veya favorilerin üzerinden yeni bir çalışma başlat.</dd></div>
+      </dl>
+      <figure class="exam-preview"><img src="{{examScreen}}" width="1080" height="1920" loading="lazy" decoding="async" alt="Android uygulamasında deneme sınavları: temel ve yenileme eğitimi, silahlı ve silahsız seçimleri ve geçmiş sınav listesi."><figcaption>Gerçek Android uygulama ekranı · Örnek çalışma</figcaption></figure>
+    </div>
   </section>
-  <section class="support wrap" aria-label="Destek"><p>Uygulama veya hesabınla ilgili bir sorun mu var?</p><a href="mailto:{{support}}">{{support}} <span aria-hidden="true">↗</span></a></section>
+  <section class="progress-section section wrap" aria-labelledby="progress-title">
+    <div class="progress-copy"><p class="kicker">Her çalışmadan sonra</p><h2 id="progress-title">Nerede olduğunu bil.<br> Sonraki adımını seç.</h2><p>Hangi sorularda zorlandığını ve hangi derslere yeniden çalışman gerektiğini incele. Sonuçlarına göre bir sonraki çalışmanı planla.</p>
+      <dl class="feature-list"><div><dt>Cevaplarını incele</dt><dd>Tamamladığın sınavlarda doğru, yanlış ve boşlarını sorularınla birlikte gör.</dd></div><div><dt>İlerlemeni takip et</dt><dd>Başarı istatistiklerinde genel doğruluğunu ve derslere göre durumunu değerlendir.</dd></div><div><dt>Kaldığın yerden devam et</dt><dd>Kaydedilmiş sınavına geri dön. Sürenin nasıl işleyeceğini sınava başlarken seç.</dd></div></dl>
+    </div>
+    <figure class="result-preview"><div class="result-image"><img src="{{resultScreen}}" width="724" height="268" loading="lazy" decoding="async" alt="Uygulamanın sonuç özeti örneği: 100 soruda 72 doğru, 18 yanlış ve 10 boş; doğru oranı yüzde 72."></div><figcaption>Uygulamadan sonuç özeti<br><span>Örnek verilerle gösterilen uygulama ekranı.</span></figcaption></figure>
+  </section>
+  <section class="tools-section section wrap" aria-labelledby="tools-title">
+    <div class="section-heading"><p class="kicker">Soru çözmenin yanında</p><h2 id="tools-title">İhtiyaç duyduğun araçlar,<br> aynı uygulamada.</h2></div>
+    <dl class="tools-list">
+      <div><dt>Puan hesapla</dt><dd>Eğitim türünü, cevap ve atış bilgilerini girerek tahmini ÖGG puanını hesapla. Hesaplama yöntemini ve kaynaklarını uygulamada incele.</dd><dd class="tool-note">Uygulama hesabı, resmî sınav sonucu değildir.</dd></div>
+      <div><dt>Sınav takvimini takip et</dt><dd>Sıradaki sınavı ve EGM takviminden alınan tarihleri uygulamada gör. Başvuru işlemleri için kurumunu ve resmî duyuruları takip et.</dd></div>
+      <div><dt>Dilekçe ve tutanak hazırla</dt><dd>Bir belge örneği seç, alanlarını düzenle. Cihazında hazırlanan belgeni PDF olarak kaydet, paylaş veya yazdır.</dd></div>
+    </dl>
+    <p class="comfort-note">Telefonda ve tablette çalış. Açık veya koyu görünümü seç, yazı boyutunu kendine göre ayarla.</p>
+  </section>
+  <section class="faq-section section wrap" id="sss" aria-labelledby="faq-title">
+    <div class="section-heading"><p class="kicker">Başlamadan önce</p><h2 id="faq-title">Aklındaki sorular.</h2><p>Uygulamanın içindeki SSS bölümünde daha fazla yardım bulabilirsin.</p></div>
+    <div class="faq-list">
+      <details><summary>ÖGGSor ücretsiz mi?</summary><p>Evet. Soru çözme, deneme ve ders sınavları, tekrar çalışmaları ve yardımcı araçlar ücretsizdir. Ücretli üyelik veya ödeme ile açılan özellik bulunmaz.</p></details>
+      <details><summary>Hangi sınavlara çalışabilirim?</summary><p>Temel ve yenileme eğitimi için silahlı veya silahsız sınavları seçebilirsin. Yalnız silah bilgisine çalışmak için ilgili ders sınavını da açabilirsin.</p></details>
+      <details><summary>Yanlışlarımı ve favorilerimi tekrar çözebilir miyim?</summary><p>Evet. Tekrar Sınavı bölümünden yanlışların, boş bıraktıkların veya favorilerinle yeni bir çalışma başlatabilirsin. Listelerin, soru çözdükçe ve favori ekledikçe oluşur.</p></details>
+      <details><summary>Telefon ve tabletimde aynı hesabı kullanabilir miyim?</summary><p>Evet. Aynı hesapla giriş yaptığında sunucuya kaydedilmiş sınavlarını ve sonuçlarını görebilirsin. Aynı sınava bir cihazdan devam et; henüz kaydedilmemiş işlemler diğer cihaza geçmez.</p></details>
+      <details><summary>Uygulamadaki puanım resmî sınav sonucu mu?</summary><p>Hayır. Sonuçlar ve puan hesaplamaları çalışmanı değerlendirmene yardımcı olur; resmî sınav sonucu veya başarı garantisi değildir. Resmî sonuç ve duyurular için yetkili kurumun açıklamalarını esas al.</p></details>
+    </div>
+  </section>
+  <section class="closing-download section wrap" aria-labelledby="closing-title">
+    <div><p class="kicker">Hazır olduğunda</p><h2 id="closing-title">Bir sonraki çalışman<br> telefonunda hazır.</h2><p>{{name}} uygulamasını indir, hesabını oluştur ve sınavını seç.</p></div>
+    <div class="closing-stores"><div class="store-list">{{stores}}</div>{{storeNotice}}</div>
+  </section>
+  <section class="support wrap" aria-label="Destek"><p>Uygulama veya hesabınla ilgili bir sorun mu var?</p><a href="mailto:{{support}}">{{support}}</a></section>
 </main>
 <footer class="site-footer wrap">
   <div class="footer-top"><a class="brand" href="/"><img src="/brand-logo.png" width="32" height="32" alt=""><span class="brand-wordmark">{{name}}</span></a><nav aria-label="Yasal sayfalar">{{legal}}</nav></div>

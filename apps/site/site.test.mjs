@@ -25,6 +25,12 @@ test('the site renders without scripts, session requests or study forms and pres
     assert.match(html, /href="\/legal\/hesap-silme.html"/);
     assert.match(html, /class="app-screen" src="\/screens\/mobile-home.jpg\?v=[a-f0-9]{12}"/);
     assert.ok((await readFile(path.join(temp, 'screens/mobile-home.jpg'))).length > 0);
+    assert.ok((await readFile(path.join(temp, 'screens/mobile-exams.png'))).length > 0);
+    assert.ok((await readFile(path.join(temp, 'screens/mobile-result.jpg'))).length > 0);
+    assert.match(await readFile(path.join(temp, 'robots.txt'), 'utf8'), /Sitemap: https:\/\/oggsor\.com\/sitemap\.xml/);
+    const sitemap = await readFile(path.join(temp, 'sitemap.xml'), 'utf8');
+    assert.match(sitemap, /<loc>https:\/\/oggsor\.com\/<\/loc>/);
+    assert.doesNotMatch(sitemap, /account|yonetim|api\//);
     assert.match(html, /Örnek veriler/);
     assert.ok((await readFile(path.join(temp, 'fonts/LeagueSpartan-Bold.woff2'))).length > 0);
     assert.match(await readFile(path.join(temp, 'legal/gizlilik.html'), 'utf8'), /Gizlilik/);
@@ -38,9 +44,14 @@ test('configured store pages become working external links while unavailable sto
     await buildSite({ output: temp, links: { appStoreUrl: apple, googlePlayUrl: google } });
     const html = await readFile(path.join(temp, 'index.html'), 'utf8');
     assert.ok(html.includes(`href="${apple}"`));assert.ok(html.includes(`href="${google}"`));
-    assert.equal((html.match(/rel="noopener noreferrer"/g) ?? []).length, 2);
+    assert.equal((html.match(/rel="noopener noreferrer"/g) ?? []).length, 4);
     assert.doesNotMatch(html, /class="store-card pending"|class="store-notice"/i);
     await buildSite({ output: temp, links: { appStoreUrl: apple, googlePlayUrl: null } });
     assert.match(await readFile(path.join(temp, 'index.html'), 'utf8'), /Google Play: yakında/);
+    await buildSite({ output: temp, links: { appStoreUrl: null, googlePlayUrl: google } });
+    const androidOnly = await readFile(path.join(temp, 'index.html'), 'utf8');
+    assert.match(androidOnly, /App Store: yakında/);
+    assert.ok(androidOnly.includes(`href="${google}"`));
+    assert.doesNotMatch(androidOnly, /Google Play: yakında|class="store-notice"/);
   } finally { await rm(temp, { recursive: true, force: true }); }
 });

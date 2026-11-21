@@ -1,5 +1,29 @@
 # Test ve doğrulama stratejisi
 
+## 21 Kasım 2026 — Uygulama özelliklerini anlatan site
+
+**4 site birim testi / 7 Chromium E2E testi**, site build, `check:brand` ve `git diff --check` geçti. Açık/koyu temada 320/390/834/1280 px yerleşim; üç gerçek uygulama görselinin yüklenmesi; iki indirme alanında Google Play/Apple bekleme davranışı; çalışma/araç başlıkları ve SSS'nin Enter ile açılıp kapanması doğrulandı. Hesap giriş/parola yenileme yolları ile dört bilgi sayfası da geçti. İlk görsel incelemede mobilde gizlenen `<br>` sonrasındaki sözcüklerin bitiştiği görüldü; aralara boşluk eklenip testlerin tamamı tekrar geçti. Son 320 px koyu ve 1280 px açık görünümler incelendi.
+
+Önceki bilgi sayfası testinin genel `/taslak/` kontrolü, gizlilik sayfasındaki geçerli PDF taslağı açıklamasını yanlışlıkla reddediyordu. Kontrol iç taslak/hukukçu notları ve karar yer tutucularını hedefleyecek şekilde düzeltildi; dört hukuki sayfanın `<main>` içerikleri aynı kaldı. Önceki bölümdeki iki test hatası bu sürümde giderildi.
+
+Eklenen Android deneme ekranı ve Expo sonuç özeti, kaynağı belgeli önceki çekimlerle byte düzeyinde eşleşir; yeni gerçek kullanıcı verisi, hesap veya yapay resmî soru üretilmedi. Çevrimdışı kullanım vaadi eklenmedi. Backend/PostgreSQL, EAS/native paket ve fiziksel cihaz testleri yalnız statik site değiştiğinden çalıştırılmadı.
+
+**Canlı yayın:** `site-features-20261121` yalnız web imajıyla etkin. Aday/aktif konteynerde 19 yayımlanan dosya ve değişmeyen 119 dosya doğrulandı; diğer yedi konteyner korundu. Nginx sözdizimi, root/www/query ana sayfa `index, follow`, hesap/yönetim/API/404/eski alan adı `noindex, nofollow` kontrolleri geçti. Genel HTTPS'de kök/www için 24 dosya hash'i, 10 status/robots kontrolü ve tüm readiness kontrolleri başarılı. CSP ve HTML `no-cache, no-transform` korundu. Manifest/receipt, önceki overlay ve dış kontrol raporu `artifacts/site-features-20261121/` ile sunucudaki aynı adlı yayın dizininde kayıtlıdır.
+
+## 21 Kasım 2026 — Mağaza simgeleri
+
+App Store ve Google Play kartlarına sağlayıcı kaynaklı yerel simgeler eklendi. **4 site birim testi**, site build ve ilgili **4 Chromium E2E testi** geçti. Açık/koyu temada 320/390/834/1280 px görünümde iki görselin yüklenmesi, 36 × 36 px boyutu, metinle çakışmaması, yatay taşma olmaması ve indirme/bekleme durumları doğrulandı. Telefon açık tema ve masaüstü koyu tema ekran görüntüleri incelendi. Önceki bölümde kayıtlı iki bilgi sayfası testi bu simge değişikliğinde tekrar çalıştırılmadı; backend/PostgreSQL ve fiziksel mobil cihaz testleri kapsam dışındadır.
+
+`store-icons-20261121` imajı yayımlandı. Aday nginx yapılandırması/HTTP dosya hash'leri geçti; mevcut web dosyaları değişmeden üç yeni statik dosya eklendi ve ana sayfa güncellendi. Diğer yedi servis konteyneri korundu. Kök/www HTTPS üzerinde ana sayfa, CSS ve iki simgenin hash'leri eşleşti; readiness `ok`. Kanıt `artifacts/store-icons-20261121/` ve aynı adlı sunucu yayın dizinindedir.
+
+## 21 Kasım 2026 — Google Play indirme bağlantısı
+
+Google Play genel uygulama sayfası HTTPS 200, uygulama adı **ÖGGSor - Soru Bankası**, yayıncı **Codentum**, paket **net.codentum.oggsor** olarak doğrulandı. Merkezi mağaza ayarı güncellendi. **4 site birim testi** ve ilgili **4 Chromium E2E testi** geçti; site/account web build başarılı. Açık/koyu temada 320/390/834/1280 px düzeni, Google Play adresi/güvenli yeni sekme, App Store bekleme durumu, genel yayın bekleme metninin kalkması ve hesap giriş/parola yenileme yolları doğrulandı. Telefon açık tema ve masaüstü koyu tema ekran görüntüleri incelendi.
+
+**Ayrı başarısızlık:** Tam site E2E çalışmasında **4 geçti / 2 başarısız**. İki mevcut bilgi sayfası testi, gizlilik metnindeki geçerli “taslak ekran belleğinde tutulur” ifadesini genel `/taslak/` yasağıyla reddediyor. Hukuki metin veya bu ilgisiz kontrol değiştirilmedi. Backend/PostgreSQL, mobil paket ve fiziksel cihaz testleri bu ana sayfa bağlantısı değişikliği için çalıştırılmadı.
+
+Canlı `google-play-link-20261121-r2` yalnız `/var/www/site/index.html` dosyasını güncelledi. Aday nginx/HTTP yolları ve etkin origin hazır; tüm diğer web dosyaları/nginx hash'leri ile app/worker/scheduler/database/redis/mailpit/tunnel kimlikleri korundu. Kök ve www HTTPS HTML SHA-256 **7fb57a22534c57ba924dcecde253f0047003afb84b06a50afb9bebaf0d606c33**, doğru Google Play bağlantısı ve tüm readiness kontrolleri doğrulandı. İlk aktivasyondaki erken bağlantı denetimi otomatik rollback yaptı; sınırlı yeniden denemeyle ikinci yayın başarılı. Kanıtlar `artifacts/google-play-link-20261121/`, sunucu receipt/geri dönüş dosyaları `publication/google-play-link-20261121-r2/` içinde.
+
 **30 Ekim — Belge ekranı sadeleştirmesi:** Dilekçe ve tutanak açıklamaları kısaltıldı. 119 mobil testi ve workspace typecheck geçti. iOS `01a18a11-91dd` ve Android `01a18a11-fefd` test kanallarına yayımlandı; fiziksel cihaz teslimi doğrulanmadı. Google incelemesindeki production 1.0.0 (12) bu sonraki beta güncellemesini içermez.
 
 **30 Ekim — Çevrimdışı bağlantı uyarısı:** Kişisel mobil oturumda bağlantı yenilenemediğinde cihazda hazır deneme ve ders sınavlarının çözülebileceği belirtilir. 119 mobil birim testi, workspace typecheck, 34 araç testi, iOS/Android/web export ve ilgili 16 E2E testi geçti. iOS `01a189b7-54c3` ve Android `01a189b7-c74a` test güncellemeleri yayımlandı; fiziksel cihazlarda teslim ve görünüm henüz doğrulanmadı.

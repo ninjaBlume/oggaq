@@ -4,7 +4,7 @@ Türkiye'deki özel güvenlik görevlisi adayları için ücretsiz sınav hazır
 
 ## Mevcut durum
 
-26 Ekim 2026: **oggsor.com artık mobil uygulamanın tanıtım ve indirme sitesidir.** Genel sitede öğrenci soru çözme ekranları sunulmaz. Mobil uygulama ve API korunur; hesap, e-posta doğrulama ve parola yenileme bağlantıları webde çalışmaya devam eder. Gerçek mağaza adresleri henüz sağlanmadığı için indirme alanları “Yakında” gösterir. [Site, mağaza bağlantıları ve yayın düzeni](docs/PUBLIC_WEBSITE.md).
+26 Ekim 2026: **oggsor.com artık mobil uygulamanın tanıtım ve indirme sitesidir.** Genel sitede öğrenci soru çözme ekranları sunulmaz. Mobil uygulama ve API korunur; hesap, e-posta doğrulama ve parola yenileme bağlantıları webde çalışmaya devam eder. 21 Kasım 2026 itibarıyla Google Play indirme bağlantısı canlıdadır; App Store alanı “Yakında” gösterir. [Site, mağaza bağlantıları ve yayın düzeni](docs/PUBLIC_WEBSITE.md).
 
 9 Ekim 2026: **Identity/Tenancy ve merkezi QuestionBank API teslimleri** çalışıyor. Laravel 13, PostgreSQL 18, Redis ve Horizon kuruldu; migration, kimlik doğrulama, kurum/üyelik/çalışma bağlamı yetkilendirmesi ve API sözleşmesi oluşturuldu. E-posta doğrulama ve parola sıfırlama bildirimleri şifreli queue payload'larıyla yerel Mailpit'e ulaşıyor.
 
